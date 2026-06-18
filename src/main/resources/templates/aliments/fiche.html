@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Fiche aliment</title>
+</head>
+
+<body>
+
+    <h1>Fiche aliment</h1>
+
+    <p th:if="${erreur}" th:text="${erreur}"></p>
+
+    <p>Id: <span th:text="${aliment.id}"></span></p>
+    <p>Nom: <span th:text="${aliment.nom}"></span></p>
+    <p>Type: <span th:text="${aliment.type}"></span></p>
+    <p>Age min: <span th:text="${aliment.ageMin}"></span></p>
+    <p>Age max: <span th:text="${aliment.ageMax}"></span></p>
+    <p>Taille granulé: <span th:text="${aliment.tailleGranule}"></span></p>
+    <p>Prix unitaire: <span th:text="${aliment.prixUnitaire}"></span></p>
+    <p>Seuil alerte: <span th:text="${aliment.seuilAlerteKg}"></span> kg</p>
+    <p>Stock actuel: <span th:text="${stockActuel}"></span> kg</p>
+
+    <h2>Mouvements récents</h2>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Montant</th>
+            <th>Commentaire</th>
+        </tr>
+        <tr th:each="m : ${mouvementsRecents}">
+            <td th:text="${m.dateMouvement}"></td>
+            <td th:text="${m.typeMouvement}"></td>
+            <td th:text="${m.quantiteKg}"></td>
+            <td th:text="${m.commentaire}"></td>
+        </tr>
+    </table>
+
+    <form method="get" th:action="@{/aliments/{id}/edit(id=${aliment.id})}">
+        <button type="submit">Modifier</button>
+    </form>
+
+    <form method="post" th:action="@{/aliments/{id}/delete(id=${aliment.id})}">
+        <button type="submit">Supprimer</button>
+    </form>
+
+    <a th:href="@{/aliments}">Retour</a>
+
+</body>
+
+</html>

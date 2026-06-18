@@ -1,6 +1,6 @@
 package mg.itu.aquanova.repository;
+
 import mg.itu.aquanova.entity.MouvementStock;
-import mg.itu.aquanova.entity.TypeMouvement;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +13,8 @@ import java.util.List;
 public interface MouvementStockRepository extends JpaRepository<MouvementStock, Long> {
 
     /**
-     * Stock = somme des ENTREE - somme des SORTIE/PERTE pour un alimen
+     * Stock = somme des ENTREE - somme des SORTIE/PERTE pour un aliment, jusqu'à une date donnée incluse.
+     * Utilisé par StockService.getStockAtDate / getStockByAlimentAndDate.
      */
     @Query("""
         SELECT COALESCE(SUM(
@@ -26,28 +27,14 @@ public interface MouvementStockRepository extends JpaRepository<MouvementStock, 
         """)
     BigDecimal calculerStock(@Param("alimentId") Long alimentId, @Param("date") LocalDate date);
 
-    /**
-     * Recherche multi-critères pour la page Liste mouvements 
-     */
-    @Query("""
-        SELECT m FROM MouvementStock m
-        WHERE (:id IS NULL OR m.id = :id)
-        AND (:dateDebut IS NULL OR m.dateMouvement >= :dateDebut)
-        AND (:dateFin IS NULL OR m.dateMouvement <= :dateFin)
-        AND (:alimentId IS NULL OR m.aliment.id = :alimentId)
-        AND (:type IS NULL OR m.typeMouvement = :type)
-        ORDER BY m.dateMouvement DESC
-        """)
-    List<MouvementStock> search(
-            @Param("id") Long id,
-            @Param("dateDebut") LocalDate dateDebut,
-            @Param("dateFin") LocalDate dateFin,
-            @Param("alimentId") Long alimentId,
-            @Param("type") TypeMouvement type
-    );
+    // La recherche multi-critères (id, dateDebut, dateFin, alimentId, type) se fait en mémoire
+    // dans MouvementService.search(), via findAll() + filtrage par streams Java.
+    // Ça évite le problème Postgres "could not determine data type of parameter"
+    // qu'on avait avec une requête JPQL du type (:param IS NULL OR ...).
 
     /**
-     * Historique récent des mouvements d'un aliment jusqu'à une date donnée, 
+     * Historique récent des mouvements d'un aliment jusqu'à une date donnée, le plus récent en premier.
+     * Utilisé par la fiche état de stock et la fiche aliment (avec un Pageable limité, ex: PageRequest.of(0, limit)).
      */
     @Query("""
         SELECT m FROM MouvementStock m
@@ -62,7 +49,7 @@ public interface MouvementStockRepository extends JpaRepository<MouvementStock, 
     );
 
     /**
-     * Historique récent sans filtre de date 
+     * Historique récent sans filtre de date (utilisé par la fiche aliment / mouvementService.getRecentByAliment).
      */
     List<MouvementStock> findByAliment_IdOrderByDateMouvementDesc(Long alimentId, Pageable pageable);
 }

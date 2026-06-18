@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Fiche mouvement</title>
+</head>
+
+<body>
+
+    <h1>Fiche mouvement</h1>
+
+    <p th:if="${erreur}" th:text="${erreur}"></p>
+
+    <p>Id: <span th:text="${mouvement.id}"></span></p>
+    <p>Date: <span th:text="${mouvement.dateMouvement}"></span></p>
+    <p>Aliment: <span th:text="${mouvement.aliment.nom}"></span></p>
+    <p>Type: <span th:text="${mouvement.typeMouvement}"></span></p>
+    <p>Montant: <span th:text="${mouvement.quantiteKg}"></span> kg</p>
+    <p>Commentaire: <span th:text="${mouvement.commentaire}"></span></p>
+
+    <form method="get" th:action="@{/stocks/mouvements/{id}/edit(id=${mouvement.id})}">
+        <button type="submit">Modifier</button>
+    </form>
+
+    <form method="post" th:action="@{/stocks/mouvements/{id}/delete(id=${mouvement.id})}">
+        <button type="submit">Supprimer</button>
+    </form>
+
+    <a th:href="@{/stocks/mouvements}">Retour</a>
+
+</body>
+
+</html>

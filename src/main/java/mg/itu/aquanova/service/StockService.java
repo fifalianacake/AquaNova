@@ -21,18 +21,15 @@ public class StockService {
         this.alimentRepository = alimentRepository;
     }
 
-   
     public BigDecimal getStockByAlimentAndDate(Long alimentId, LocalDate date) {
         BigDecimal stock = mouvementStockRepository.calculerStock(alimentId, date);
         return stock != null ? stock : BigDecimal.ZERO;
     }
 
-   
     public BigDecimal getStockByAliment(Long alimentId) {
         return getStockByAlimentAndDate(alimentId, LocalDate.now());
     }
 
-   
     public List<Object[]> getStockAtDate(LocalDate date) {
         List<Aliment> aliments = alimentRepository.findAll();
         return aliments.stream()
@@ -40,12 +37,10 @@ public class StockService {
                 .toList();
     }
 
-    
     public boolean isAlerte(Aliment aliment, LocalDate date) {
         BigDecimal stock = getStockByAlimentAndDate(aliment.getId(), date);
         return stock.compareTo(aliment.getSeuilAlerteKg()) < 0;
     }
-
 
     public long countAlertes(LocalDate date) {
         return alimentRepository.findAll().stream()
@@ -53,7 +48,6 @@ public class StockService {
                 .count();
     }
 
-    
     public BigDecimal totalStock(LocalDate date) {
         return alimentRepository.findAll().stream()
                 .map(aliment -> getStockByAlimentAndDate(aliment.getId(), date))

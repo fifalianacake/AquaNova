@@ -8,6 +8,7 @@ import mg.itu.aquanova.service.StockService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
@@ -29,9 +30,6 @@ public class AlimentController {
         this.mouvementService = mouvementService;
     }
 
-    /**
-     * Page: Liste aliments /aliments
-     */
     @GetMapping
     public String getAll(Model model) {
         List<Aliment> aliments = alimentService.findAll();
@@ -39,18 +37,13 @@ public class AlimentController {
         return "aliments/liste";
     }
 
-    /**
-     * Page: Saisie aliment /aliments/new
-     */
+  
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("aliment", new Aliment());
         return "aliments/saisie";
     }
 
-    /**
-     * @PostMapping("/aliments")
-     */
     @PostMapping
     public String save(
             @RequestParam String nom,
@@ -75,10 +68,7 @@ public class AlimentController {
         }
     }
 
-    /**
-     * Page: Fiche aliment /aliments/{id}
-     * Affiche: info aliment, stock actuel, mouvements recents
-     */
+   
     @GetMapping("/{id}")
     public String getById(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -150,9 +140,7 @@ public class AlimentController {
         }
     }
 
-    /**
-     * button supprimer
-     */
+  
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -161,6 +149,13 @@ public class AlimentController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("erreur", "Impossible de supprimer l'aliment: " + e.getMessage());
         }
+        return "redirect:/aliments";
+    }
+
+    
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public String handleBadPathVariable(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("erreur", "URL invalide");
         return "redirect:/aliments";
     }
 }

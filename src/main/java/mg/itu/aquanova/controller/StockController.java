@@ -8,10 +8,12 @@ import mg.itu.aquanova.service.StockService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
@@ -34,11 +36,7 @@ public class StockController {
         this.mouvementService = mouvementService;
     }
 
-    /**
-     * Page: Liste états de stocks /stocks
-     * Filtres multi-critères: date, nom aliment, alerte (ALL / OUI / NON)
-     * Recap: nb d'alertes, stock total
-     */
+    
     @GetMapping
     public String getEtatStocks(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -79,18 +77,13 @@ public class StockController {
         model.addAttribute("alimentNom", alimentNom);
         model.addAttribute("alerte", alerte);
 
-        // Recap
         model.addAttribute("nbAlertes", stockService.countAlertes(dateRecherche));
         model.addAttribute("stockTotal", stockService.totalStock(dateRecherche));
 
         return "stocks/liste";
     }
 
-    /**
-     * Page: Fiche état de stock /stocks/{alimentId}
-     * Affiche l'aliment, son stock/seuil/alerte a la date donnee,
-     * et l'historique des mouvements recents par rapport a la date.
-     */
+
     @GetMapping("/{alimentId}")
     public String getFicheStock(
             @PathVariable Long alimentId,
@@ -121,5 +114,11 @@ public class StockController {
             redirectAttributes.addFlashAttribute("erreur", e.getMessage());
             return "redirect:/stocks?date=" + dateRecherche;
         }
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public String handleBadPathVariable(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("erreur", "URL invalide: la liste des stocks se trouve a /stocks");
+        return "redirect:/stocks";
     }
 }

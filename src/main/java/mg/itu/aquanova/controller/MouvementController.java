@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
@@ -28,10 +29,6 @@ public class MouvementController {
         this.alimentService = alimentService;
     }
 
-    /**
-     * Page: Liste mouvements /stocks/mouvements
-     * Recherche multi-criteres: id, date range, aliment, type
-     */
     @GetMapping
     public String search(
             @RequestParam(required = false) Long id,
@@ -46,7 +43,6 @@ public class MouvementController {
         model.addAttribute("mouvements", mouvements);
         model.addAttribute("aliments", alimentService.findAll());
 
-        // re-affichage des criteres dans le formulaire de recherche
         model.addAttribute("id", id);
         model.addAttribute("dateDebut", dateDebut);
         model.addAttribute("dateFin", dateFin);
@@ -56,9 +52,7 @@ public class MouvementController {
         return "mouvements/liste";
     }
 
-    /**
-     * Page: Fiche mouvement /stocks/mouvements/{id}
-     */
+    
     @GetMapping("/{id}")
     public String getById(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -74,10 +68,7 @@ public class MouvementController {
         }
     }
 
-    /**
-     * Page: Saisie mouvement /stocks/mouvements/new
-     * Formulaire: date, aliment (dropdown), type (dropdown), montant, commentaire
-     */
+ 
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("aliments", alimentService.findAll());
@@ -85,10 +76,6 @@ public class MouvementController {
         return "mouvements/saisie";
     }
 
-    /**
-     * @PostMapping("/stocks/mouvements")
-     * Cree le mouvement. Validation (montant > 0, stock suffisant si SORTIE) faite dans MouvementService.create.
-     */
     @PostMapping
     public String create(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -114,9 +101,6 @@ public class MouvementController {
         }
     }
 
-    /**
-     * Page: formulaire de modification, champs prerempli
-     */
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -134,9 +118,7 @@ public class MouvementController {
         }
     }
 
-    /**
-     * button modifier -> sauvegarde des modifications
-     */
+
     @PostMapping("/{id}/edit")
     public String update(
             @PathVariable Long id,
@@ -167,10 +149,7 @@ public class MouvementController {
         }
     }
 
-    /**
-     * button supprimer -> DELETE /stocks/mouvements/{id}
-     * Formulaire HTML standard ne supportant pas DELETE, on expose un POST /delete.
-     */
+
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -179,6 +158,13 @@ public class MouvementController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("erreur", "Impossible de supprimer le mouvement: " + e.getMessage());
         }
+        return "redirect:/stocks/mouvements";
+    }
+
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public String handleBadPathVariable(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("erreur", "URL invalide");
         return "redirect:/stocks/mouvements";
     }
 }
