@@ -1,8 +1,8 @@
 package mg.itu.aquanova.entity;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "aliment")
@@ -12,12 +12,11 @@ public class Aliment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "nom", nullable = false, length = 100)
     private String nom;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TypeAliment type;
+    @Column(name = "type", nullable = false, length = 50)
+    private String type; // Alevin / Croissance / Finition
 
     @Column(name = "age_min", nullable = false)
     private Integer ageMin;
@@ -25,16 +24,30 @@ public class Aliment {
     @Column(name = "age_max", nullable = false)
     private Integer ageMax;
 
-    @Column(name = "taille_granule")
+    @Column(name = "taille_granule", precision = 5, scale = 2)
     private BigDecimal tailleGranule;
 
-    @Column(name = "prix_unitaire", nullable = false)
+    @Column(name = "prix_unitaire", nullable = false, precision = 10, scale = 2)
     private BigDecimal prixUnitaire;
 
-    @Column(name = "seuil_alerte_kg", nullable = false)
+    @Column(name = "seuil_alerte_kg", nullable = false, precision = 10, scale = 2)
     private BigDecimal seuilAlerteKg;
 
+    @OneToMany(mappedBy = "aliment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MouvementStock> mouvements;
+
     public Aliment() {
+    }
+
+    public Aliment(String nom, String type, Integer ageMin, Integer ageMax,
+            BigDecimal tailleGranule, BigDecimal prixUnitaire, BigDecimal seuilAlerteKg) {
+        this.nom = nom;
+        this.type = type;
+        this.ageMin = ageMin;
+        this.ageMax = ageMax;
+        this.tailleGranule = tailleGranule;
+        this.prixUnitaire = prixUnitaire;
+        this.seuilAlerteKg = seuilAlerteKg;
     }
 
     public Long getId() {
@@ -53,11 +66,11 @@ public class Aliment {
         this.nom = nom;
     }
 
-    public TypeAliment getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(TypeAliment type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -99,5 +112,13 @@ public class Aliment {
 
     public void setSeuilAlerteKg(BigDecimal seuilAlerteKg) {
         this.seuilAlerteKg = seuilAlerteKg;
+    }
+
+    public List<MouvementStock> getMouvements() {
+        return mouvements;
+    }
+
+    public void setMouvements(List<MouvementStock> mouvements) {
+        this.mouvements = mouvements;
     }
 }
