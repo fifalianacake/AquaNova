@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des paramètres système</title>
+</head>
+
+<body>
+    <h1>Liste des paramètres système</h1>
+
+    <p>
+        <a th:href="@{/parametres-systeme/new}">Créer un nouveau paramètre</a>
+    </p>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Code</th>
+                <th>Libellé</th>
+                <th>Valeur</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="parametre : ${parametres}">
+                <td th:text="${parametre.id}"></td>
+                <td th:text="${parametre.code}"></td>
+                <td th:text="${parametre.libelle}"></td>
+                <td th:text="${parametre.valeur}"></td>
+                <td th:text="${parametre.typeValeur}"></td>
+                <td th:text="${parametre.description}"></td>
+                <td>
+                    <a th:href="@{'/parametres-systeme/' + ${parametre.id}}">Détails</a>
+                    |
+                    <a th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
+                    |
+                    <a th:href="@{'/parametres-systeme/' + ${parametre.id} + '/delete'}"
+                        onclick="return confirm('Supprimer ce paramètre ?');">Supprimer</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
