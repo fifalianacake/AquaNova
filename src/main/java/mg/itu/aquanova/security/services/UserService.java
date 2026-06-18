@@ -1,25 +1,16 @@
 package mg.itu.aquanova.security.services;
 
 import java.util.List;
-
-import org.springframework.stereotype.*;
-
+import org.springframework.stereotype.Service;
 import mg.itu.aquanova.security.models.UserModels;
 import mg.itu.aquanova.security.repositories.UserRepository;
 
 @Service
 public class UserService {
-    UserRepository userRepository;
+
+    private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public UserRepository getUserRepository() {
-        return userRepository;
-    }
-
-    public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -42,6 +33,4 @@ public class UserService {
     public UserModels getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
-
-    
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ui.Model;
 import java.util.List;
@@ -25,17 +26,16 @@ public class RoleController {
     public String getAllRoles(Model model) {
         List<RoleModels> roles = roleService.getAllRoles();
         model.addAttribute("roles", roles);
-        return "role-list";
+        return "security/roles/list";
     }
 
     @GetMapping("/new")
     public String showCreateRoleForm(Model model) {
         model.addAttribute("role", new RoleModels());
-        return "role-form";
-
+        return "security/roles/form";
     }
 
-    @GetMapping("/save")
+    @PostMapping("/save")
     public String saveRole(@ModelAttribute("role") RoleModels role) {
         roleService.saveRole(role);
         return "redirect:/roles";

@@ -1,7 +1,6 @@
 package mg.itu.aquanova.security.controllers;
 
 import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,23 +24,21 @@ public class UserController {
 
     @GetMapping
     public String getAllUsers(Model model) {
-        
         List<UserModels> users = userService.getAllUsers();
-
         model.addAttribute("users", users);
-        
-        return "user-list";
+        return "security/users/list";
     }
 
     @GetMapping("/new")
     public String showCreateUserForm(Model model) {
         model.addAttribute("user", new UserModels());
-        return "user-form";
+        return "security/users/form"; // Plus besoin de passer la liste des rôles
     }
 
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("user") UserModels user) {
         userService.saveUser(user);
+
         return "redirect:/users";
     }
 
@@ -50,5 +47,4 @@ public class UserController {
         userService.deleteUser(id);
         return "redirect:/users";
     }
-
 }
