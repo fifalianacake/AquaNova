@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import mg.itu.aquanova.referentiel.modeles.EspecesModels;
+import mg.itu.aquanova.referentiel.models.EspecesModels;
 import mg.itu.aquanova.referentiel.services.EspecesService;
 
 @Controller

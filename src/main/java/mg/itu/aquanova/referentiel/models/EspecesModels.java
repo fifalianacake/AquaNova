@@ -1,4 +1,4 @@
-package mg.itu.aquanova.referentiel.modeles;
+package mg.itu.aquanova.referentiel.models;
 
 import java.math.BigDecimal;
 

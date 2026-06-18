@@ -2,7 +2,8 @@ package mg.itu.aquanova.referentiel.services;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import mg.itu.aquanova.referentiel.modeles.EspecesModels;
+
+import mg.itu.aquanova.referentiel.models.EspecesModels;
 import mg.itu.aquanova.referentiel.repositories.EspecesRepository;
 
 @Service
