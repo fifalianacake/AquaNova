@@ -1,0 +1,33 @@
+<h2>Liste des Stades de Croissance</h2>
+
+<a href="/stade-croissance/new">Ajouter</a>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Poids Min</th>
+        <th>Poids Max</th>
+        <th>Actions</th>
+    </tr>
+
+```
+<tr th:each="s : ${stades}">
+    <td th:text="${s.id}"></td>
+    <td th:text="${s.nom}"></td>
+    <td th:text="${s.poidsMin}"></td>
+    <td th:text="${s.poidsMax}"></td>
+
+    <td>
+        <a th:href="@{/stade-croissance/{id}(id=${s.id})}">
+            Edit
+        </a>
+
+        <a th:href="@{/stade-croissance/delete/{id}(id=${s.id})}">
+            Delete
+        </a>
+    </td>
+</tr>
+```
+
+</table>
