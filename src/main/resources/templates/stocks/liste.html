@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Liste états de stocks</title>
+</head>
+
+<body>
+
+    <h1>Liste états de stocks</h1>
+
+    <p th:if="${erreur}" th:text="${erreur}"></p>
+    <p th:if="${succes}" th:text="${succes}"></p>
+
+    <form method="get" th:action="@{/stocks}">
+        <label>Date: <input type="date" name="date" th:value="${date}"></label>
+        <label>Nom aliment: <input type="text" name="alimentNom" th:value="${alimentNom}"></label>
+        <label>Alerte:
+            <select name="alerte">
+                <option value="ALL" th:selected="${alerte == 'ALL'}">Tous</option>
+                <option value="OUI" th:selected="${alerte == 'OUI'}">Oui</option>
+                <option value="NON" th:selected="${alerte == 'NON'}">Non</option>
+            </select>
+        </label>
+        <button type="submit">Rechercher</button>
+    </form>
+
+    <p>Nb alertes: <span th:text="${nbAlertes}"></span> | Stock total: <span th:text="${stockTotal}"></span> kg</p>
+
+    <table border="1">
+        <tr>
+            <th>Id</th>
+            <th>Nom</th>
+            <th>Stock (kg)</th>
+            <th>Seuil</th>
+            <th>Alerte</th>
+        </tr>
+        <tr th:each="row : ${stocks}">
+            <td><a th:href="@{/stocks/{id}(id=${row[0].id}, date=${date})}" th:text="${row[0].id}"></a></td>
+            <td><a th:href="@{/stocks/{id}(id=${row[0].id}, date=${date})}" th:text="${row[0].nom}"></a></td>
+            <td th:text="${row[1]}"></td>
+            <td th:text="${row[0].seuilAlerteKg}"></td>
+            <td th:text="${row[1] lt row[0].seuilAlerteKg} ? 'OUI' : 'NON'"></td>
+        </tr>
+    </table>
+
+    <p><a th:href="@{/aliments}">Catalogue aliments</a> | <a th:href="@{/stocks/mouvements}">Mouvements de stocks</a>
+    </p>
+
+</body>
+
+</html>
