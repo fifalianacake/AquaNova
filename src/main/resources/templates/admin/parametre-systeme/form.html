@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 th:text="${parametre.id == null ? 'Créer un paramètre système' : 'Modifier un paramètre système'}"></h1>
+
+    <form th:action="@{${parametre.id == null} ? '/parametres-systeme' : '/parametres-systeme/' + ${parametre.id}}"
+        th:object="${parametre}" method="post">
+        <div>
+            <label for="code">Code</label>
+            <input type="text" id="code" th:field="*{code}">
+        </div>
+
+        <div>
+            <label for="libelle">Libellé</label>
+            <input type="text" id="libelle" th:field="*{libelle}">
+        </div>
+
+        <div>
+            <label for="valeur">Valeur</label>
+            <input type="text" id="valeur" th:field="*{valeur}">
+        </div>
+
+        <div>
+            <label for="typeValeur">Type de valeur</label>
+            <select id="typeValeur" th:field="*{typeValeur}">
+                <option value="" disabled>-- Choisir un type --</option>
+                <option th:each="type : ${typesValeur}" th:value="${type}"
+                    th:text="${type}">
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label for="description">Description</label>
+            <textarea id="description" th:field="*{description}"></textarea>
+        </div>
+
+        <div>
+            <button type="submit">Enregistrer</button>
+            <a th:href="@{/parametres-systeme}">Retour à la liste</a>
+        </div>
+    </form>
+</body>
+
+</html>
