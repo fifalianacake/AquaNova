@@ -1,0 +1,24 @@
+<h2>Liste des espèces</h2>
+
+<a href="/especes/new">Ajouter</a>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Poids</th>
+        <th>Image</th>
+        <th>Actions</th>
+    </tr>
+
+    <tr th:each="e : ${especes}">
+        <td th:text="${e.id}"></td>
+        <td th:text="${e.nom}"></td>
+        <td th:text="${e.poidsCibleMoyen}"></td>
+        <td th:text="${e.image}"></td>
+        <td>
+            <a th:href="@{/especes/{id}(id=${e.id})}">Edit</a>
+            <a th:href="@{/especes/delete/{id}(id=${e.id})}">Delete</a>
+        </td>
+    </tr>
+</table>

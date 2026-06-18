@@ -1,0 +1,11 @@
+<h2>Form Espece</h2>
+
+<form action="/especes" method="post" th:object="${espece}">
+    <input type="hidden" th:field="*{id}" />
+
+    Nom: <input type="text" th:field="*{nom}" /><br/>
+    Poids: <input type="number" step="0.01" th:field="*{poidsCibleMoyen}" /><br/>
+    Image: <input type="text" th:field="*{image}" /><br/>
+
+    <button type="submit">Save</button>
+</form>
