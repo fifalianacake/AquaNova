@@ -1,0 +1,34 @@
+package mg.itu.aquanova.alimentation.services;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import mg.itu.aquanova.alimentation.models.TypeAlimentModels;
+import mg.itu.aquanova.alimentation.repositories.TypeAlimentRepository;
+
+@Service
+public class TypeAlimentService {
+
+    private final TypeAlimentRepository repo;
+
+    public TypeAlimentService(TypeAlimentRepository repo) {
+        this.repo = repo;
+    }
+
+    public List<TypeAlimentModels> findAll() {
+        return repo.findAll();
+    }
+
+    public TypeAlimentModels findById(Integer id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    public TypeAlimentModels save(TypeAlimentModels type) {
+        return repo.save(type);
+    }
+
+    public void delete(Integer id) {
+        repo.deleteById(id);
+    }
+}
