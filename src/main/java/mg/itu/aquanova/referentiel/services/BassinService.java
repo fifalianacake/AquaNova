@@ -1,9 +1,10 @@
 package mg.itu.aquanova.referentiel.services;
 
-import com.aquanova.model.Bassins;
-import com.aquanova.model.TypeBassin;
-import com.aquanova.repository.BassinsRepository;
-import com.aquanova.repository.TypeBassinRepository;
+import mg.itu.aquanova.referentiel.models.Bassin;
+import mg.itu.aquanova.referentiel.models.TypeBassin;
+import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
+import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,40 +16,96 @@ import java.util.List;
 public class BassinService {
 
     @Autowired
-    private BassinsRepository bassinsRepository;
+    private BassinRepository bassinRepository;
 
     @Autowired
     private TypeBassinRepository typeBassinRepository;
 
-    public List<Bassins> listerTousLesBassins() {
-        return bassinsRepository.findAll();
+    // ==========================
+    // Gestion des Bassins
+    // ==========================
+
+    public List<Bassin> getAllBassins() {
+        return bassinRepository.findAll();
     }
 
+    public Bassin getBassinById(Long id) {
+        return bassinRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Bassin introuvable avec l'ID : " + id));
+    }
+
+    public void saveBassin(Bassin bassin) {
+        bassinRepository.save(bassin);
+    }
+
+    public void deleteBassin(Long id) {
+        bassinRepository.deleteById(id);
+    }
+
+    // ==========================
+    // Création avec validation
+    // ==========================
+
     @Transactional
-    public Bassins creerBassin(String reference, Integer idStatut, Long idType, BigDecimal capaciteM3) {
-        
+    public Bassin creerBassin(String reference,
+                              Integer idStatut,
+                              Long idType,
+                              BigDecimal capaciteM3) {
+
         if (reference == null || reference.trim().isEmpty()) {
             throw new IllegalArgumentException("La référence du bassin est obligatoire.");
         }
+
         if (idStatut == null) {
             throw new IllegalArgumentException("Le statut du bassin est obligatoire.");
         }
-        if (capaciteM3 == null || capaciteM3.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("La capacité en m³ doit être strictement supérieure à 0.");
+
+        if (capaciteM3 == null ||
+                capaciteM3.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException(
+                    "La capacité en m³ doit être strictement supérieure à 0.");
         }
-        if (bassinsRepository.findByReference(reference).isPresent()) {
-            throw new IllegalStateException("Erreur : Le bassin '" + reference + "' existe déjà.");
+
+        if (bassinRepository.findByReference(reference).isPresent()) {
+            throw new IllegalStateException(
+                    "Erreur : Le bassin '" + reference + "' existe déjà.");
         }
+
         TypeBassin typeBassin = typeBassinRepository.findById(idType)
-                .orElseThrow(() -> new IllegalArgumentException("Le type de bassin spécifié n'existe pas."));
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Le type de bassin spécifié n'existe pas."));
 
-       
-        Bassins nouveauBassin = new Bassins();
-        nouveauBassin.setReference(reference);
-        nouveauBassin.setIdStatut(idStatut);
-        nouveauBassin.setCapaciteM3(capaciteM3);
-        nouveauBassin.setTypeBassin(typeBassin); 
+        Bassin bassin = new Bassin();
+        bassin.setReference(reference);
+        bassin.setIdStatut(idStatut);
+        bassin.setCapaciteM3(capaciteM3);
+        bassin.setTypeBassin(typeBassin);
 
-        return bassinsRepository.save(nouveauBassin);
+        return bassinRepository.save(bassin);
+    }
+
+    // ==========================
+    // Gestion des Types
+    // ==========================
+
+    public List<TypeBassin> getAllTypes() {
+        return typeBassinRepository.findAll();
+    }
+
+    public TypeBassin getTypeBassinById(Long id) {
+        return typeBassinRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Type de bassin introuvable : " + id));
+    }
+
+    public void saveTypeBassin(TypeBassin typeBassin) {
+        typeBassinRepository.save(typeBassin);
+    }
+
+    public void deleteTypeBassin(Long id) {
+        typeBassinRepository.deleteById(id);
     }
 }

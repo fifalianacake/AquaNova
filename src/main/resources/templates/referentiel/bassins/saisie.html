@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Référentiel - Saisie Bassin</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="container mt-5">
+
+    <h2 class="mb-4" th:text="${bassin.id == null ? 'Nouveau Bassin' : 'Modifier le Bassin'}">Saisie Bassin</h2>
+
+    <form th:action="@{/referentiel/bassins/enregistrer}" th:object="${bassin}" method="post" class="col-md-6">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-3">
+            <label for="reference" class="form-label">Référence :</label>
+            <input type="text" id="reference" th:field="*{reference}" class="form-control" required
+                placeholder="Ex: B-01" />
+        </div>
+
+        <div class="mb-3">
+            <label for="typeBassin" class="form-label">Type de Bassin :</label>
+            <select id="typeBassin" th:field="*{typeBassin}" class="form-select" required>
+                <option value="" disabled selected>Choisir un type...</option>
+                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="capaciteM3" class="form-label">Capacité (m³) :</label>
+            <input type="number" step="0.1" id="capaciteM3" th:field="*{capaciteM3}" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="statut" class="form-label">Statut du Bassin :</label>
+            <select id="statut" th:field="*{statut}" class="form-select" required>
+                <option th:each="s : ${statuts}" th:value="${s.name()}" th:text="${s.libelle}"></option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success"
+            th:text="${bassin.id == null ? 'Créer' : 'Enregistrer'}">Enregistrer</button>
+        <a th:href="@{/referentiel/bassins}" class="btn btn-secondary">Annuler</a>
+    </form>
+
+</body>
+
+</html>

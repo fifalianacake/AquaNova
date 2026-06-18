@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Référentiel - Liste des Bassins</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Référentiel des Bassins / Happas</h2>
+        <div>
+            <a th:href="@{/referentiel/types-bassins}" class="btn btn-outline-secondary">Gérer les Types</a>
+            <a th:href="@{/referentiel/bassins/nouveau}" class="btn btn-primary">Ajouter un Bassin</a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Référence</th>
+                <th>Type</th>
+                <th>Capacité (m³)</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="b : ${bassins}">
+                <td th:text="${b.id}">1</td>
+                <td th:text="${b.reference}">BASSIN-01</td>
+                <td th:text="${b.typeBassin.libelle}">Happa</td>
+                <td th:text="${b.capaciteM3}">50.0</td>
+                <td>
+                    <span th:text="${b.statut.libelle}"
+                        th:classappend="${b.statut.name() == 'LIBRE' ? 'badge bg-success' : (b.statut.name() == 'OCCUPE' ? 'badge bg-warning text-dark' : 'badge bg-danger')}">
+                        Libre
+                    </span>
+                </td>
+                <td>
+                    <a th:href="@{/referentiel/bassins/modifier/{id}(id=${b.id})}"
+                        class="btn btn-sm btn-warning">Modifier</a>
+                    <a th:href="@{/referentiel/bassins/supprimer/{id}(id=${b.id})}" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Voulez-vous supprimer ce bassin ?')">Supprimer</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(bassins)}">
+                <td colspan="6" class="text-center">Aucun bassin enregistré.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>
