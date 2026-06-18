@@ -1,11 +1,11 @@
-package mg.itu.aquanova.alimentation.controllers;
+package mg.itu.aquanova.referentiel.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import mg.itu.aquanova.alimentation.models.StadeCroissanceModels;
-import mg.itu.aquanova.alimentation.services.StadeCroissanceService;
+import mg.itu.aquanova.referentiel.models.StadeCroissanceModels;
+import mg.itu.aquanova.referentiel.services.StadeCroissanceService;
 
 @Controller
 @RequestMapping("/stade-croissance")

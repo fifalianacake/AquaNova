@@ -1,11 +1,11 @@
-package mg.itu.aquanova.alimentation.services;
+package mg.itu.aquanova.referentiel.services;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.alimentation.models.StadeCroissanceModels;
-import mg.itu.aquanova.alimentation.repositories.StadeCroissanceRepository;
+import mg.itu.aquanova.referentiel.models.StadeCroissanceModels;
+import mg.itu.aquanova.referentiel.repositories.StadeCroissanceRepository;
 
 @Service
 public class StadeCroissanceService {

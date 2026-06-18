@@ -1,11 +1,11 @@
-package mg.itu.aquanova.alimentation.controllers;
+package mg.itu.aquanova.referentiel.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import mg.itu.aquanova.alimentation.models.TypeAlimentModels;
-import mg.itu.aquanova.alimentation.services.TypeAlimentService;
+import mg.itu.aquanova.referentiel.models.TypeAlimentModels;
+import mg.itu.aquanova.referentiel.services.TypeAlimentService;
 
 @Controller
 @RequestMapping("/type-aliment")

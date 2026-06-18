@@ -1,4 +1,4 @@
-package mg.itu.aquanova.alimentation.models;
+package mg.itu.aquanova.referentiel.models;
 
 import jakarta.persistence.*;
 
