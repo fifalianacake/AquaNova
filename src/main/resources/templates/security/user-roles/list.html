@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Affectations des Rôles</title>
+</head>
+<body>
+
+    <h1>Liste des Rôles par Utilisateur</h1>
+    
+    <a th:href="@{/user-roles/new}">Affecter un rôle à un utilisateur</a>
+    <br><br>
+
+    <table border="1" >
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Utilisateur (Email)</th>
+                <th>Rôle Assigné</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ur : ${userRoles}">
+                <td th:text="${ur.id}">1</td>
+                <td th:text="${ur.user.email}">user@exemple.com</td>
+                <td th:text="${ur.role.name}">ROLE_USER</td>
+                <td>
+                    <a th:href="@{/user-roles/delete/{id}(id=${ur.id})}" 
+                       onclick="return confirm('Retirer ce rôle à l\'utilisateur ?');">
+                       Retirer le rôle
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(userRoles)}">
+                <td colspan="4" style="text-align: center;">Aucune affectation trouvée.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+    <a th:href="@{/users}">Retour à la liste des utilisateurs</a>
+
+</body>
+</html>
