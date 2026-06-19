@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Liste des Utilisateurs</title>
 </head>
+
 <body>
 
     <h1>Liste des Utilisateurs</h1>
 
-    <a th:href="@{/users/new}">Ajouter un utilisateur</a> | 
-    <a th:href="@{/roles}">Gérer les rôles</a>
+    <a th:href="@{/users/new}">Ajouter un utilisateur</a> |
+    <a th:href="@{/roles}">Gerer les rôles</a>
     <br><br>
 
     <table border="1">
@@ -17,7 +19,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
-                <th>Prénom</th>
+                <th>Prenom</th>
                 <th>Email</th>
                 <th>Date d'embauche</th>
                 <th>Actions</th>
@@ -27,21 +29,22 @@
             <tr th:each="user : ${users}">
                 <td th:text="${user.id}">1</td>
                 <td th:text="${user.name}">Nom</td>
-                <td th:text="${user.lastname}">Prénom</td>
+                <td th:text="${user.lastname}">Prenom</td>
                 <td th:text="${user.email}">email@exemple.com</td>
                 <td th:text="${user.dateHired}">2026-06-18</td>
                 <td>
-                    <a th:href="@{/users/delete/{id}(id=${user.id})}" 
-                       onclick="return confirm('Supprimer cet utilisateur ?');">
-                       Supprimer
+                    <a th:href="@{/users/delete/{id}(id=${user.id})}"
+                        onclick="return confirm('Supprimer cet utilisateur ?');">
+                        Supprimer
                     </a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(users)}">
-                <td colspan="6" style="text-align: center;">Aucun utilisateur trouvé.</td>
+                <td colspan="6" style="text-align: center;">Aucun utilisateur trouve.</td>
             </tr>
         </tbody>
     </table>
 
 </body>
+
 </html>

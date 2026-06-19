@@ -11,7 +11,7 @@
     <h1>Liste des paramètres système</h1>
 
     <p>
-        <a th:href="@{/parametres-systeme/new}">Créer un nouveau paramètre</a>
+        <a th:href="@{/parametres-systeme/new}">Creer un nouveau paramètre</a>
     </p>
 
     <table border="1">
@@ -19,7 +19,7 @@
             <tr>
                 <th>ID</th>
                 <th>Code</th>
-                <th>Libellé</th>
+                <th>Libelle</th>
                 <th>Valeur</th>
                 <th>Type</th>
                 <th>Description</th>
@@ -35,7 +35,7 @@
                 <td th:text="${parametre.typeValeur}"></td>
                 <td th:text="${parametre.description}"></td>
                 <td>
-                    <a th:href="@{'/parametres-systeme/' + ${parametre.id}}">Détails</a>
+                    <a th:href="@{'/parametres-systeme/' + ${parametre.id}}">Details</a>
                     |
                     <a th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
                     |

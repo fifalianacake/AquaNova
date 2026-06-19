@@ -32,7 +32,7 @@ public class UserController {
     @GetMapping("/new")
     public String showCreateUserForm(Model model) {
         model.addAttribute("user", new UserModels());
-        return "security/users/form"; // Plus besoin de passer la liste des rôles
+        return "security/users/form"; 
     }
 
     @PostMapping("/save")

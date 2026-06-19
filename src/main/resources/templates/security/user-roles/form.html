@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Affecter un Rôle</title>
 </head>
+
 <body>
 
     <h1>Affecter un rôle à un utilisateur</h1>
 
     <form th:action="@{/user-roles/save}" th:object="${userRole}" method="post">
-        
+
         <input type="hidden" th:field="*{id}" />
 
         <label for="user">Choisir l'utilisateur :</label>
         <select id="user" th:field="*{user.id}" required>
-            <option value="">-- Sélectionner un utilisateur --</option>
-            <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.name} + ' ' + ${u.lastname} + ' (' + ${u.email} + ')'"></option>
+            <option value="">-- Selectionner un utilisateur --</option>
+            <option th:each="u : ${users}" th:value="${u.id}"
+                th:text="${u.name} + ' ' + ${u.lastname} + ' (' + ${u.email} + ')'"></option>
         </select>
         <br><br>
 
         <label for="role">Choisir le rôle :</label>
         <select id="role" th:field="*{role.id}" required>
-            <option value="">-- Sélectionner un rôle --</option>
+            <option value="">-- Selectionner un rôle --</option>
             <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"></option>
         </select>
         <br><br>
@@ -33,4 +36,5 @@
     <a th:href="@{/user-roles}">Annuler et retourner à la liste</a>
 
 </body>
+
 </html>

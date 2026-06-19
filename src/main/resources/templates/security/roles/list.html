@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Liste des Rôles</title>
 </head>
+
 <body>
 
     <h1>Liste des Rôles</h1>
-    
+
     <a th:href="@{/roles/new}"> Ajouter un nouveau rôle</a>
     <br><br>
 
@@ -24,14 +26,14 @@
                 <td th:text="${role.id}">1</td>
                 <td th:text="${role.name}">ROLE_ADMIN</td>
                 <td>
-                    <a th:href="@{/roles/delete/{id}(id=${role.id})}" 
-                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce rôle ?');">
-                       Supprimer
+                    <a th:href="@{/roles/delete/{id}(id=${role.id})}"
+                        onclick="return confirm('Êtes-vous sur de vouloir supprimer ce rôle ?');">
+                        Supprimer
                     </a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(roles)}">
-                <td colspan="3" style="text-align: center;">Aucun rôle trouvé.</td>
+                <td colspan="3" style="text-align: center;">Aucun rôle trouve.</td>
             </tr>
         </tbody>
     </table>
@@ -40,4 +42,5 @@
     <a th:href="@{/users}">Retour à la liste des utilisateurs</a>
 
 </body>
+
 </html>

@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <h1 th:text="${parametre.id == null ? 'Créer un paramètre système' : 'Modifier un paramètre système'}"></h1>
+    <h1 th:text="${parametre.id == null ? 'Creer un paramètre système' : 'Modifier un paramètre système'}"></h1>
 
     <form th:action="@{${parametre.id == null} ? '/parametres-systeme' : '/parametres-systeme/' + ${parametre.id}}"
         th:object="${parametre}" method="post">
@@ -18,7 +18,7 @@
         </div>
 
         <div>
-            <label for="libelle">Libellé</label>
+            <label for="libelle">Libelle</label>
             <input type="text" id="libelle" th:field="*{libelle}">
         </div>
 
@@ -31,8 +31,7 @@
             <label for="typeValeur">Type de valeur</label>
             <select id="typeValeur" th:field="*{typeValeur}">
                 <option value="" disabled>-- Choisir un type --</option>
-                <option th:each="type : ${typesValeur}" th:value="${type}"
-                    th:text="${type}">
+                <option th:each="type : ${typesValeur}" th:value="${type}" th:text="${type}">
                 </option>
             </select>
         </div>
