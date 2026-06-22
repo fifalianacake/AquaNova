@@ -1,7 +1,6 @@
 package mg.itu.aquanova.production.services;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;

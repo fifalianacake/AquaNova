@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import mg.itu.aquanova.production.models.StatutLotModels;
+import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.services.StatutLotService;
 
 @Controller
@@ -28,6 +29,7 @@ public class StatutLotController {
     @GetMapping("/statut-lots/new")
     public String createForm(Model model) {
         model.addAttribute("statut", new StatutLotModels());
+        model.addAttribute("libelles", StatutLotEnum.values());
         return "production/statut-lots/form";
     }
 
@@ -46,6 +48,7 @@ public class StatutLotController {
     @GetMapping("/statut-lots/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         model.addAttribute("statut", service.trouverParId(id));
+        model.addAttribute("libelles", StatutLotEnum.values());
         return "production/statut-lots/form";
     }
 
