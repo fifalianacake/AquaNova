@@ -14,8 +14,9 @@ public class Bassin {
     @Column(nullable = false, unique = true, length = 50)
     private String reference;
 
-    @Column(name = "id_statut", nullable = false)
-    private Integer idStatut;
+    @ManyToOne
+    @JoinColumn(name = "id_statut", nullable = false)
+    private StatutBassin statut;
 
     @Column(name = "capacite_m3", nullable = false, precision = 10, scale = 2)
     private BigDecimal capaciteM3;
@@ -41,21 +42,12 @@ public class Bassin {
         this.reference = reference;
     }
 
-    public Integer getIdStatut() {
-        return idStatut;
-    }
-
-    public void setIdStatut(Integer idStatut) {
-        this.idStatut = idStatut;
-    }
-
-    @Transient
     public StatutBassin getStatut() {
-        return StatutBassin.fromId(idStatut);
+        return statut;
     }
 
     public void setStatut(StatutBassin statut) {
-        this.idStatut = statut != null ? statut.getId() : null;
+        this.statut = statut;
     }
 
     public BigDecimal getCapaciteM3() {

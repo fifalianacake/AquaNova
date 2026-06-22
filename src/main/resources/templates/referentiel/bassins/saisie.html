@@ -35,8 +35,12 @@
 
         <div class="mb-3">
             <label for="statut" class="form-label">Statut du Bassin :</label>
-            <select id="statut" th:field="*{statut}" class="form-select" required>
-                <option th:each="s : ${statuts}" th:value="${s.name()}" th:text="${s.libelle}"></option>
+            <select id="statut" th:field="*{statut.id}" class="form-select" required>
+                <option value="">Choisir un statut...</option>
+                <option th:each="s : ${statuts}"
+                        th:value="${s.id}"
+                        th:text="${s.libelle}">
+                </option>
             </select>
         </div>
 
