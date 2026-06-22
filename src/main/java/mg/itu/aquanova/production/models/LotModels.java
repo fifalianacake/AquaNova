@@ -15,7 +15,7 @@ import lombok.Setter;
 @Table(name = "lot")
 @Getter
 @Setter
-public class LotsModels {
+public class LotModels {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -52,8 +52,8 @@ public class LotsModels {
     private String observation;
 
 
-    public LotsModels() {
-        
+    public LotModels() {
+
     }
 
 }
