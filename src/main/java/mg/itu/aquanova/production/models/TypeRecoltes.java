@@ -2,6 +2,8 @@ package mg.itu.aquanova.production.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,15 +17,16 @@ public class TypeRecoltes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "libelle", nullable = false, unique = true, length = 100)
-    private String libelle;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "libelle", nullable = false, unique = true)
+    private TypeRecolteEnum libelle;
 
     @Column(name = "description", nullable = false)
     private String description;
 
     public TypeRecoltes() {
     }
-    public TypeRecoltes(Long id, String libelle, String description) {
+    public TypeRecoltes(Long id, TypeRecolteEnum libelle, String description) {
         this.id = id;
         this.libelle = libelle;
         this.description = description;
@@ -32,7 +35,7 @@ public class TypeRecoltes {
     public void setId(Long id) {
         this.id = id;
     }
-    public void setLibelle(String libelle) {
+    public void setLibelle(TypeRecolteEnum libelle) {
         this.libelle = libelle;
     }
     public void setDescription(String description) {
@@ -42,7 +45,7 @@ public class TypeRecoltes {
     public Long getId() {
         return id;
     }
-    public String getLibelle() {
+    public TypeRecolteEnum getLibelle() {
         return libelle;
     }
     public String getDescription() {
