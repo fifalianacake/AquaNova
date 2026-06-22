@@ -13,7 +13,7 @@ public class Recoltes {
 
     @ManyToOne
     @JoinColumn(name = "id_Lot", nullable = false)
-    private Lot lot; 
+    private LotModels lot; 
 
     @ManyToOne
     @JoinColumn(name = "id_type_recolte", nullable = false)
@@ -33,7 +33,7 @@ public class Recoltes {
 
     public Recoltes() {
     }
-    public Recoltes(Long id, Lot lot, TypeRecoltes typeRecolte, LocalDate dateRecolte, int effectifRecolte,
+    public Recoltes(Long id, LotModels lot, TypeRecoltes typeRecolte, LocalDate dateRecolte, int effectifRecolte,
             Double poidsTotal, Double poidsMoyen) {
         this.id = id;
         this.lot = lot;
@@ -47,7 +47,7 @@ public class Recoltes {
     public void setId(Long id) {
         this.id = id;
     }
-    public void setLot(Lot lot) {
+    public void setLot(LotModels lot) {
         this.lot = lot;
     }
     public void setTypeRecolte(TypeRecoltes typeRecolte) {
@@ -69,7 +69,7 @@ public class Recoltes {
     public Long getId() {
         return id;
     }
-    public Lot getLot() {
+    public LotModels getLot() {
         return lot;
     }
     public TypeRecoltes getTypeRecolte() {
