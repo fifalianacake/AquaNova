@@ -7,13 +7,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "statut_lot")
-@Getter
-@Setter
 public class StatutLotModels {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +19,35 @@ public class StatutLotModels {
     private StatutLotEnum libelle;
 
     private String description;
+
+    public StatutLotModels() {
+        
+    }
+
+    // getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public StatutLotEnum getLibelle() {
+        return libelle;
+    }
+
+    public void setLibelle(StatutLotEnum libelle) {
+        this.libelle = libelle;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    
 }

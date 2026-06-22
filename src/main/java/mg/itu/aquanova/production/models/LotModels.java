@@ -8,13 +8,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "lot")
-@Getter
-@Setter
+
 public class LotModels {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,5 +52,127 @@ public class LotModels {
     public LotModels() {
 
     }
+
+    // getters and setters
+    public Long getId() {
+        return id;
+    }
+
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+    public String getCode() {
+        return code;
+    }
+
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+
+    public Long getIdEspece() {
+        return idEspece;
+    }
+
+
+    public void setIdEspece(Long idEspece) {
+        this.idEspece = idEspece;
+    }
+
+
+    public Long getIdBassin() {
+        return idBassin;
+    }
+
+
+    public void setIdBassin(Long idBassin) {
+        this.idBassin = idBassin;
+    }
+
+
+    public Long getIdStadeCroissance() {
+        return idStadeCroissance;
+    }
+
+
+    public void setIdStadeCroissance(Long idStadeCroissance) {
+        this.idStadeCroissance = idStadeCroissance;
+    }
+
+
+    public Long getIdStatutLot() {
+        return idStatutLot;
+    }
+
+
+    public void setIdStatutLot(Long idStatutLot) {
+        this.idStatutLot = idStatutLot;
+    }
+
+
+    public LocalDate getDateMiseEnCharge() {
+        return dateMiseEnCharge;
+    }
+
+
+    public void setDateMiseEnCharge(LocalDate dateMiseEnCharge) {
+        this.dateMiseEnCharge = dateMiseEnCharge;
+    }
+
+
+    public Integer getEffectifInitial() {
+        return effectifInitial;
+    }
+
+
+    public void setEffectifInitial(Integer effectifInitial) {
+        this.effectifInitial = effectifInitial;
+    }
+
+
+    public Integer getEffectifActuel() {
+        return effectifActuel;
+    }
+
+
+    public void setEffectifActuel(Integer effectifActuel) {
+        this.effectifActuel = effectifActuel;
+    }
+
+
+    public Double getPoidsMoyenInitial() {
+        return poidsMoyenInitial;
+    }
+
+
+    public void setPoidsMoyenInitial(Double poidsMoyenInitial) {
+        this.poidsMoyenInitial = poidsMoyenInitial;
+    }
+
+
+    public Double getPoidsMoyenActuel() {
+        return poidsMoyenActuel;
+    }
+
+
+    public void setPoidsMoyenActuel(Double poidsMoyenActuel) {
+        this.poidsMoyenActuel = poidsMoyenActuel;
+    }
+
+
+    public String getObservation() {
+        return observation;
+    }
+
+
+    public void setObservation(String observation) {
+        this.observation = observation;
+    }
+
+    
 
 }
