@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 th:text="${transfert != null ? 'Modifier le transfert' : 'Créer un nouveau transfert'}"></h1>
+
+    <form th:action="@{${transfert != null} ? '/transferts/edit/' + ${transfert.id} : '/transferts/save'}"
+        th:object="${transfert}" method="post">
+        <div>
+            <label for="dateTransfert">Date de transfert</label>
+            <input type="date" id="dateTransfert" th:field="*{dateTransfert}">
+        </div>
+
+        <div>
+            <label for="effectif">Effectif</label>
+            <input type="number" id="effectif" th:field="*{effectif}">
+        </div>
+
+        <div>
+            <label for="poidsMoyen">Poids moyen</label>
+            <input type="number" step="0.01" id="poidsMoyen" th:field="*{poidsMoyen}">
+        </div>
+
+        <div>
+            <label for="lotSource">Lot source</label>
+            <input type="text" id="lotSource" th:field="*{lotSource}">
+        </div>
+
+        <div>
+            <label for="lotDestination">Lot destination</label>
+            <input type="text" id="lotDestination" th:field="*{lotDestination}">
+        </div>
+
+        <div>
+            <label for="bassinSource">Bassin source</label>
+            <input type="text" id="bassinSource" th:field="*{bassinSource}">
+        </div>
+
+        <div>
+            <label for="bassinDestination">Bassin destination</label>
+            <input type="text" id="bassinDestination" th:field="*{bassinDestination}">
+        </div>
+
+        <div>
+            <button type="submit">Enregistrer</button>
+            <a th:href="@{/transferts}">Retour à la liste</a>
+        </div>
+    </form>
+</body>
+
+</html>
