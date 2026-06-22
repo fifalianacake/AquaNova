@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Référentiel - Types de Bassins</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Types de Bassins</h2>
+        <div>
+            <a th:href="@{/referentiel/bassins}" class="btn btn-secondary">Retour aux Bassins</a>
+            <a th:href="@{/referentiel/types-bassins/nouveau}" class="btn btn-primary">Ajouter un Type</a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Libellé du Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="t : ${types}">
+                <td th:text="${t.id}">1</td>
+                <td th:text="${t.libelle}">Happa</td>
+                <td>
+                    <a th:href="@{/referentiel/types-bassins/modifier/{id}(id=${t.id})}"
+                        class="btn btn-sm btn-warning">Modifier</a>
+                    <a th:href="@{/referentiel/types-bassins/supprimer/{id}(id=${t.id})}" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Supprimer ce type ?')">Supprimer</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>
