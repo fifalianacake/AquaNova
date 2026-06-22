@@ -1,6 +1,6 @@
-package mg.itu.aquanova.referentiel.repository;
+package mg.itu.aquanova.referentiel.repositories;
 
-import com.aquanova.model.TypeBassin;
+import mg.itu.aquanova.referentiel.models.TypeBassin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -16,7 +16,7 @@ import java.util.List;
 public class BassinService {
 
     @Autowired
-    private BassinRepository bassinRepository;
+    private BassinsRepository bassinRepository;
 
     @Autowired
     private TypeBassinRepository typeBassinRepository;
