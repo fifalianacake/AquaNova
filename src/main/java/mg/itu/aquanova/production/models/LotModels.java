@@ -8,6 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+import mg.itu.aquanova.referentiel.models.EspecesModels;
+import mg.itu.aquanova.referentiel.models.Bassin;
+import mg.itu.aquanova.referentiel.models.StadeCroissanceModels;
+// StatutLotModels is in the same package; no import needed
 
 @Entity
 @Table(name = "lot")
@@ -19,17 +26,21 @@ public class LotModels {
 
     private String code;
 
-    @Column(name = "id_espece")
-    private Long idEspece;
+    @ManyToOne
+    @JoinColumn(name = "id_espece")
+    private EspecesModels espece;
 
-    @Column(name = "id_bassin")
-    private Long idBassin;
+    @ManyToOne
+    @JoinColumn(name = "id_bassin")
+    private Bassin bassin;
 
-    @Column(name = "id_stade_croissance")
-    private Long idStadeCroissance;
+    @ManyToOne
+    @JoinColumn(name = "id_stade_croissance")
+    private StadeCroissanceModels stadeCroissance;
 
-    @Column(name = "id_statut_lot")
-    private Long idStatutLot;
+    @ManyToOne
+    @JoinColumn(name = "id_statut_lot")
+    private StatutLotModels statutLot;
 
     @Column(name = "date_mise_en_charge")
     private LocalDate dateMiseEnCharge;
@@ -74,43 +85,36 @@ public class LotModels {
     }
 
 
-    public Long getIdEspece() {
-        return idEspece;
+    public EspecesModels getEspece() {
+        return espece;
     }
 
-
-    public void setIdEspece(Long idEspece) {
-        this.idEspece = idEspece;
+    public void setEspece(EspecesModels espece) {
+        this.espece = espece;
     }
 
-
-    public Long getIdBassin() {
-        return idBassin;
+    public Bassin getBassin() {
+        return bassin;
     }
 
-
-    public void setIdBassin(Long idBassin) {
-        this.idBassin = idBassin;
+    public void setBassin(Bassin bassin) {
+        this.bassin = bassin;
     }
 
-
-    public Long getIdStadeCroissance() {
-        return idStadeCroissance;
+    public StadeCroissanceModels getStadeCroissance() {
+        return stadeCroissance;
     }
 
-
-    public void setIdStadeCroissance(Long idStadeCroissance) {
-        this.idStadeCroissance = idStadeCroissance;
+    public void setStadeCroissance(StadeCroissanceModels stadeCroissance) {
+        this.stadeCroissance = stadeCroissance;
     }
 
-
-    public Long getIdStatutLot() {
-        return idStatutLot;
+    public StatutLotModels getStatutLot() {
+        return statutLot;
     }
 
-
-    public void setIdStatutLot(Long idStatutLot) {
-        this.idStatutLot = idStatutLot;
+    public void setStatutLot(StatutLotModels statutLot) {
+        this.statutLot = statutLot;
     }
 
 
