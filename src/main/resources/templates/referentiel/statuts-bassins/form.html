@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Statut Bassin Form</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="container mt-5">
+
+<h2 class="mb-4" th:text="${statut.id == null ? 'New Statut Bassin' : 'Edit Statut Bassin'}">
+    Statut Bassin Form
+</h2>
+
+<form th:action="${statut.id == null ? '/statuts-bassins' : '/statuts-bassins/' + statut.id}"
+      th:object="${statut}"
+      method="post"
+      class="col-md-6">
+
+    <input type="hidden" th:field="*{id}" />
+
+    <div class="mb-3">
+        <label for="libelle" class="form-label">Libelle :</label>
+        <select id="libelle" th:field="*{libelle}" class="form-select" required>
+            <option value="" disabled>Select a status...</option>
+            <option th:each="libelle : ${libelles}"
+                    th:value="${libelle}"
+                    th:text="${libelle}">
+                LIBRE
+            </option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a th:href="@{/statuts-bassins}" class="btn btn-secondary">Cancel</a>
+</form>
+
+</body>
+</html>
