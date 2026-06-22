@@ -12,7 +12,7 @@ public class JournalLot {
 
     @ManyToOne
     @JoinColumn(name = "id_lot", nullable = false)
-    private Lot lot;
+    private LotModels lot;
 
     @ManyToOne
     @JoinColumn(name = "id_type_evenement", nullable = false)
@@ -32,11 +32,11 @@ public class JournalLot {
         this.id = id;
     }
 
-    public Lot getLot() {
+    public LotModels getLot() {
         return lot;
     }
 
-    public void setLot(Lot lot) {
+    public void setLot(LotModels lot) {
         this.lot = lot;
     }
 

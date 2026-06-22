@@ -1,7 +1,7 @@
 package mg.itu.aquanova.production.services;
 
 import mg.itu.aquanova.production.models.JournalLot;
-import mg.itu.aquanova.production.models.Lot;
+import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.repositories.JournalLotRepository;
 import mg.itu.aquanova.production.repositories.TypeEvenementLotRepository;
@@ -19,7 +19,7 @@ public class JournalLotService {
         this.typeEvenementLotRepository = typeEvenementLotRepository;
     }
 
-    public void inscrireEvenement(Lot lot, TypeEvenementLot.LibelleEvenement typeEvt, String description) {
+    public void inscrireEvenement(LotModels lot, TypeEvenementLot.LibelleEvenement typeEvt, String description) {
         TypeEvenementLot type = typeEvenementLotRepository.findByLibelle(typeEvt)
                 .orElseThrow(() -> new RuntimeException("Type d'événement introuvable"));
         JournalLot journal = new JournalLot();
