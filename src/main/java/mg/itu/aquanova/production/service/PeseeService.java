@@ -2,7 +2,6 @@ package mg.itu.aquanova.production.service;
 
 import mg.itu.aquanova.production.models.Pese;
 import mg.itu.aquanova.production.repositories.PeseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +14,11 @@ import java.util.Optional;
 @Service
 public class PeseeService {
 
-    @Autowired
-    private PeseRepository peseeRepository;
+    private final PeseRepository peseeRepository;
+
+    public PeseeService(PeseRepository peseeRepository) {
+        this.peseeRepository = peseeRepository;
+    }
 
     public List<Pese> listerToutesLesPesees() {
         return peseeRepository.findAll();
