@@ -1,7 +1,6 @@
 package mg.itu.aquanova.production.controllers;
 
 import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,15 +11,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import mg.itu.aquanova.production.models.TransfertModels;
 import mg.itu.aquanova.production.services.TransfertService;
+import mg.itu.aquanova.referentiel.services.BassinService; 
+import mg.itu.aquanova.production.services.LotService; 
 
 @Controller
 @RequestMapping("/transferts")
 public class TransfertController {
 
     private final TransfertService transfertService;
+    private final BassinService bassinService; 
+    private final LotService lotService;       
 
-    public TransfertController(TransfertService transfertService) {
+    // Injection par constructeur globale
+    public TransfertController(TransfertService transfertService, BassinService bassinService, LotService lotService) {
         this.transfertService = transfertService;
+        this.bassinService = bassinService;
+        this.lotService = lotService;
     }
 
     @GetMapping
@@ -33,6 +39,10 @@ public class TransfertController {
     @GetMapping("/new")
     public String showCreateTransfertForm(Model model) {
         model.addAttribute("transfert", new TransfertModels());
+        
+        model.addAttribute("bassins", bassinService.getAllBassins());
+        model.addAttribute("lots", lotService.listerTous());
+        
         return "production/transferts/form";
     }
 
@@ -43,10 +53,7 @@ public class TransfertController {
     }
 
     @GetMapping("/{id}")
-    public String getTransfert(
-            @PathVariable("id") Long id,
-            Model model) {
-
+    public String getTransfert(@PathVariable("id") Long id, Model model) {
         TransfertModels transfert = transfertService.getTransfertById(id);
         if (transfert != null) {
             model.addAttribute("transfert", transfert);
@@ -57,20 +64,20 @@ public class TransfertController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteTransfert(
-            @PathVariable("id") Long id) {
-
+    public String deleteTransfert(@PathVariable("id") Long id) {
         transfertService.deleteTransfert(id);
         return "redirect:/transferts";
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditTransfertForm(
-            @PathVariable("id") Long id,
-            Model model) {
+    public String showEditTransfertForm(@PathVariable("id") Long id, Model model) {
         TransfertModels transfert = transfertService.getTransfertById(id);
         if (transfert != null) {
             model.addAttribute("transfert", transfert);
+            
+            model.addAttribute("bassins", bassinService.getAllBassins());
+            model.addAttribute("lots", lotService.listerTous());
+            
             return "production/transferts/form";
         } else {
             return "redirect:/transferts";
