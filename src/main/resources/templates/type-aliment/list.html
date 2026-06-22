@@ -1,0 +1,29 @@
+<h2>Liste des Types d'Aliments</h2>
+
+<a href="/type-aliment/new">Ajouter</a>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Actions</th>
+    </tr>
+
+```
+<tr th:each="t : ${types}">
+    <td th:text="${t.id}"></td>
+    <td th:text="${t.nom}"></td>
+
+    <td>
+        <a th:href="@{/type-aliment/{id}(id=${t.id})}">
+            Edit
+        </a>
+
+        <a th:href="@{/type-aliment/delete/{id}(id=${t.id})}">
+            Delete
+        </a>
+    </td>
+</tr>
+```
+
+</table>
