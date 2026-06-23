@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des récoltes</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+    </style>
+</head>
+<body>
+<h1>Liste des récoltes</h1>
+
+<p>
+    <a th:href="@{/recoltes/new}">Créer une récolte</a>
+</p>
+
+<form method="get" th:action="@{/recoltes}">
+    <div>
+        <label>Lot:
+            <select name="lotId">
+                <option value="">--</option>
+                <option th:each="lot : ${lots}"
+                        th:value="${lot.id}"
+                        th:text="${lot.code}"
+                        th:selected="${param.lotId} == ${lot.id}"></option>
+            </select>
+        </label>
+        <label>Type:
+            <select name="typeRecolteId">
+                <option value="">--</option>
+                <option th:each="type : ${typesRecolte}"
+                        th:value="${type.id}"
+                        th:text="${type.libelle}"
+                        th:selected="${param.typeRecolteId} == ${type.id}"></option>
+            </select>
+        </label>
+        <label>Du: <input type="date" name="dateFrom" th:value="${param.dateFrom}"></label>
+        <label>Au: <input type="date" name="dateTo" th:value="${param.dateTo}"></label>
+        <button type="submit">Filtrer</button>
+        <a th:href="@{/recoltes}">Réinitialiser</a>
+    </div>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Lot</th>
+        <th>Type</th>
+        <th>Date</th>
+        <th>Effectif récolté</th>
+        <th>Poids total</th>
+        <th>Poids moyen</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="recolte : ${recoltes}">
+        <td th:text="${recolte.id}"></td>
+        <td th:text="${recolte.lot != null ? recolte.lot.code : ''}"></td>
+        <td th:text="${recolte.typeRecolte != null ? recolte.typeRecolte.libelle : ''}"></td>
+        <td th:text="${recolte.dateRecolte}"></td>
+        <td th:text="${recolte.effectifRecolte}"></td>
+        <td th:text="${recolte.poidsTotal}"></td>
+        <td th:text="${recolte.poidsMoyen}"></td>
+        <td>
+            <a th:href="@{/recoltes/{id}(id=${recolte.id})}">Voir</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
