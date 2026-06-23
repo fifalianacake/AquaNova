@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.services.LotService;
+import mg.itu.aquanova.production.services.LotFilter;
 import mg.itu.aquanova.referentiel.services.EspecesService;
 import mg.itu.aquanova.referentiel.services.BassinService;
 import mg.itu.aquanova.referentiel.services.StadeCroissanceService;
@@ -45,60 +46,19 @@ public class LotController {
             @org.springframework.web.bind.annotation.RequestParam(required = false) Integer effectifMax,
             Model model
     ) {
-        java.util.List<LotModels> lots = service.listerTous();
+        LotFilter filter = new LotFilter();
+        filter.setId(id);
+        filter.setCode(code);
+        filter.setEspeceId(especeId);
+        filter.setBassinId(bassinId);
+        filter.setStadeId(stadeId);
+        filter.setStatutId(statutId);
+        filter.setDateFrom(dateFrom);
+        filter.setDateTo(dateTo);
+        filter.setEffectifMin(effectifMin);
+        filter.setEffectifMax(effectifMax);
 
-        java.util.stream.Stream<LotModels> stream = lots.stream();
-
-        if (id != null) {
-            stream = stream.filter(l -> l.getId() != null && l.getId().equals(id));
-        }
-        if (code != null && !code.isBlank()) {
-            String lower = code.toLowerCase();
-            stream = stream.filter(l -> l.getCode() != null && l.getCode().toLowerCase().contains(lower));
-        }
-        if (especeId != null) {
-            stream = stream.filter(l -> l.getEspece() != null && l.getEspece().getId() != null && l.getEspece().getId().equals(especeId));
-        }
-        if (bassinId != null) {
-            stream = stream.filter(l -> l.getBassin() != null && l.getBassin().getId() != null && l.getBassin().getId().equals(bassinId));
-        }
-        if (stadeId != null) {
-            stream = stream.filter(l -> l.getStadeCroissance() != null && l.getStadeCroissance().getId() != null && l.getStadeCroissance().getId().equals(stadeId));
-        }
-        if (statutId != null) {
-            stream = stream.filter(l -> l.getStatutLot() != null && l.getStatutLot().getId() != null && l.getStatutLot().getId().equals(statutId));
-        }
-
-        java.time.LocalDate fromDate = null;
-        java.time.LocalDate toDate = null;
-        try {
-            if (dateFrom != null && !dateFrom.isBlank()) fromDate = java.time.LocalDate.parse(dateFrom);
-        } catch (java.time.format.DateTimeParseException ex) {
-            fromDate = null;
-        }
-        try {
-            if (dateTo != null && !dateTo.isBlank()) toDate = java.time.LocalDate.parse(dateTo);
-        } catch (java.time.format.DateTimeParseException ex) {
-            toDate = null;
-        }
-        if (fromDate != null) {
-            java.time.LocalDate fd = fromDate;
-            stream = stream.filter(l -> l.getDateMiseEnCharge() != null && !l.getDateMiseEnCharge().isBefore(fd));
-        }
-        if (toDate != null) {
-            java.time.LocalDate td = toDate;
-            stream = stream.filter(l -> l.getDateMiseEnCharge() != null && !l.getDateMiseEnCharge().isAfter(td));
-        }
-        if (effectifMin != null) {
-            stream = stream.filter(l -> l.getEffectifActuel() != null && l.getEffectifActuel() >= effectifMin);
-        }
-        if (effectifMax != null) {
-            stream = stream.filter(l -> l.getEffectifActuel() != null && l.getEffectifActuel() <= effectifMax);
-        }
-
-        java.util.List<LotModels> filtered = stream.toList();
-
-        model.addAttribute("lots", filtered);
+        model.addAttribute("lots", service.lister(filter));
         model.addAttribute("especes", especesService.findAll());
         model.addAttribute("bassins", bassinService.getAllBassins());
         model.addAttribute("stades", stadeService.findAll());
