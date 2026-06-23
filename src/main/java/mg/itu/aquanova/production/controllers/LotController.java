@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.services.LotService;
@@ -31,8 +32,10 @@ public class LotController {
         this.statutService = statutService;
     }
 
-    @GetMapping("/lots")
+    @GetMapping("/lots/{id_page}")
     public String list(
+            @PathVariable(value = "id_page", required = false) Integer idPage,
+            @RequestParam(defaultValue = "10") Integer size,
             @org.springframework.web.bind.annotation.RequestParam(required = false) Long id,
             @org.springframework.web.bind.annotation.RequestParam(required = false) String code,
             @org.springframework.web.bind.annotation.RequestParam(required = false) Integer especeId,
@@ -96,9 +99,40 @@ public class LotController {
             stream = stream.filter(l -> l.getEffectifActuel() != null && l.getEffectifActuel() <= effectifMax);
         }
 
+        int page = (idPage == null) ? 1 : idPage;
+
         java.util.List<LotModels> filtered = stream.toList();
 
-        model.addAttribute("lots", filtered);
+        int totalElements = filtered.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        if (totalPages == 0) totalPages = 1;
+
+        int currentPageIndex = page - 1;
+        if (currentPageIndex < 0) currentPageIndex = 0;
+        if (currentPageIndex >= totalPages) currentPageIndex = totalPages - 1;
+
+        java.util.List<LotModels> paginatedList = filtered.stream()
+                .skip((long) currentPageIndex * size)
+                .limit(size)
+                .toList();
+
+        model.addAttribute("currentPage", currentPageIndex + 1);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalElements", totalElements);
+        model.addAttribute("size", size);
+
+        model.addAttribute("id", id);
+        model.addAttribute("code", code);
+        model.addAttribute("especeId", especeId);
+        model.addAttribute("bassinId", bassinId);
+        model.addAttribute("stadeId", stadeId);
+        model.addAttribute("statutId", statutId);
+        model.addAttribute("dateFrom", dateFrom);
+        model.addAttribute("dateTo", dateTo);
+        model.addAttribute("effectifMin", effectifMin);
+        model.addAttribute("effectifMax", effectifMax);
+
+        model.addAttribute("lots", paginatedList);
         model.addAttribute("especes", especesService.findAll());
         model.addAttribute("bassins", bassinService.getAllBassins());
         model.addAttribute("stades", stadeService.findAll());
