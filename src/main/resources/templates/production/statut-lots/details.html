@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails Statut Lot</title>
+</head>
+<body>
+<h1>Détails statut lot <span th:text="${statut.id}"></span></h1>
+<div>
+    <p><strong>Libelle:</strong> <span th:text="${statut.libelle}"></span></p>
+    <p><strong>Description:</strong> <span th:text="${statut.description}"></span></p>
+</div>
+<div>
+    <a th:href="@{/statut-lots}">Back to list</a>
+    <a th:href="@{'/statut-lots/' + ${statut.id} + '/edit'}">Edit</a>
+    <a th:href="@{'/statut-lots/' + ${statut.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
+</div>
+</body>
+</html>

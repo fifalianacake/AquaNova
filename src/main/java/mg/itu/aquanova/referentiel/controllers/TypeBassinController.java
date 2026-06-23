@@ -23,7 +23,7 @@ public class TypeBassinController {
 
     // 2. Afficher le formulaire d'ajout
     @GetMapping("/nouveau")
-    public String formulaireCreation(Model model) {
+    public String formulaireModification(Model model) {
         model.addAttribute("typeBassin", new TypeBassin());
         return "referentiel/types-bassins/saisie";
     }

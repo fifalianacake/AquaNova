@@ -1,8 +1,10 @@
 package mg.itu.aquanova.referentiel.services;
 
 import mg.itu.aquanova.referentiel.models.Bassin;
+import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.models.TypeBassin;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
+import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
 import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
 
 import org.springframework.stereotype.Service;
@@ -46,15 +48,18 @@ public class BassinService {
         bassinRepository.deleteById(id);
     }
 
+    public List<StatutBassin> getAllStatuts() {
+        return statutBassinRepository.findAll();
+    }
     // ==========================
     // Création avec validation
     // ==========================
 
     @Transactional
     public Bassin creerBassin(String reference,
-                              Integer idStatut,
-                              Long idType,
-                              BigDecimal capaciteM3) {
+                          Long idStatut,
+                          Long idType,
+                          BigDecimal capaciteM3) {
 
         if (reference == null || reference.trim().isEmpty()) {
             throw new IllegalArgumentException("La référence du bassin est obligatoire.");
@@ -79,10 +84,14 @@ public class BassinService {
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "Le type de bassin spécifié n'existe pas."));
+        StatutBassin statut = statutBassinRepository.findById(idStatut)
+        .orElseThrow(() ->
+                new IllegalArgumentException(
+                        "Le statut spécifié n'existe pas."));
 
         Bassin bassin = new Bassin();
         bassin.setReference(reference);
-        bassin.setIdStatut(idStatut);
+        bassin.setStatut(statut);
         bassin.setCapaciteM3(capaciteM3);
         bassin.setTypeBassin(typeBassin);
 

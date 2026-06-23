@@ -14,8 +14,9 @@ public class Bassin {
     @Column(nullable = false, unique = true, length = 50)
     private String reference;
 
-    @Column(name = "id_statut", nullable = false)
-    private Integer idStatut;
+    @ManyToOne
+    @JoinColumn(name = "id_statut", nullable = false)
+    private StatutBassin statut;
 
     @Column(name = "capacite_m3", nullable = false, precision = 10, scale = 2)
     private BigDecimal capaciteM3;
