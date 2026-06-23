@@ -85,4 +85,13 @@ public class PeseeService {
         }
         peseeRepository.deleteById(id);
     }
+
+
+
+    // Aider module Lot
+public BigDecimal getDernierPoidsMoyen(Long idLot) {
+    List<Pese> historique = this.peseeRepository.findByIdLotOrderByDatePeseeDesc(idLot);
+    if (historique.isEmpty()) return null;
+    return historique.get(0).getPoidsMoyen();
+}
 }
