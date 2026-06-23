@@ -7,7 +7,6 @@ import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
 import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
 import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,13 +16,15 @@ import java.util.List;
 @Service
 public class BassinService {
 
-    @Autowired
-    private BassinsRepository bassinRepository;
+    private final BassinsRepository bassinRepository;
 
-    @Autowired
-    private TypeBassinRepository typeBassinRepository;
-    @Autowired
-    private StatutBassinRepository statutBassinRepository;
+    private final TypeBassinRepository typeBassinRepository;
+
+    public BassinService(BassinsRepository bassinRepository,
+                         TypeBassinRepository typeBassinRepository) {
+        this.bassinRepository = bassinRepository;
+        this.typeBassinRepository = typeBassinRepository;
+    }
 
     // ==========================
     // Gestion des Bassins

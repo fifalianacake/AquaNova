@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enregistrer une pesée</title>
+</head>
+
+<body>
+    <h1>Enregistrer une pesée pour le lot <span th:text="${idLot}"></span></h1>
+
+    <form th:action="@{/production/pesee/enregistrer}" method="post">
+        <input type="hidden" name="idLot" th:value="${idLot}">
+
+        <div>
+            <label>Date de pesée :</label>
+            <input type="date" name="datePesee" required>
+        </div>
+        <div>
+            <label>Nombre d'échantillons :</label>
+            <input type="number" name="nbEchantillon" required>
+        </div>
+        <div>
+            <label>Poids Total (kg) :</label>
+            <input type="number" step="0.01" name="poidsTotal" required>
+        </div>
+        <div>
+            <label>Observation :</label>
+            <textarea name="observation"></textarea>
+        </div>
+        
+        <p>
+            <button type="submit">Enregistrer</button>
+            <a th:href="@{'/production/pesee/liste/' + ${idLot}}">Annuler</a>
+        </p>
+    </form>
+</body>
+
+</html>
