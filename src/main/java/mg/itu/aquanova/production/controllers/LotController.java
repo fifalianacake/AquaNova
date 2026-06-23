@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.services.LotService;
@@ -34,16 +35,16 @@ public class LotController {
 
     @GetMapping("/lots")
     public String list(
-            @org.springframework.web.bind.annotation.RequestParam(required = false) Long id,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) String code,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) Integer especeId,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) Long bassinId,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) Integer stadeId,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) Long statutId,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) String dateFrom,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) String dateTo,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) Integer effectifMin,
-            @org.springframework.web.bind.annotation.RequestParam(required = false) Integer effectifMax,
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) Integer especeId,
+            @RequestParam(required = false) Long bassinId,
+            @RequestParam(required = false) Integer stadeId,
+            @RequestParam(required = false) Long statutId,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo,
+            @RequestParam(required = false) Integer effectifMin,
+            @RequestParam(required = false) Integer effectifMax,
             Model model
     ) {
         LotFilter filter = new LotFilter();
