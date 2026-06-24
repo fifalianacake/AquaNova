@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Fiche Traitement</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .fiche-container { background: white; max-width: 600px; margin: 50px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .info-label { font-weight: bold; color: #555; }
+        .info-value { color: #111; }
+        .btn-box { display: flex; justify-content: space-between; margin-top: 30px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="fiche-container">
+        <h2>Fiche de Traitement d'Eau #<span id="txtId"></span></h2>
+        
+        <div class="info-row">
+            <div class="info-label">Date de l'action</div>
+            <div class="info-value" id="txtDate"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Bassin ciblé</div>
+            <div class="info-value" id="txtBassin"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Type de traitement appliqué</div>
+            <div class="info-value" id="txtType" style="font-weight: bold;"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Détails techniques</div>
+            <div class="info-value" id="txtDetail"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Observations enregistrées</div>
+            <div class="info-value" id="txtObservation"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Opérateur / Utilisateur</div>
+            <div class="info-value" id="txtUser"></div>
+        </div>
+
+        <div class="btn-box">
+            <a href="/traitements-eau" class="btn btn-secondary">Retour</a>
+            <button class="btn btn-danger" onclick="supprimer()">Supprimer</button>
+        </div>
+    </div>
+
+    <script>
+        const id = window.location.pathname.split("/").pop();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch(`/api/production/traitements-eau/${id}`)
+                .then(r => r.json())
+                .then(t => {
+                    document.getElementById("txtId").innerText = t.id;
+                    document.getElementById("txtDate").innerText = t.dateTraitement;
+                    document.getElementById("txtBassin").innerText = t.bassin ? t.bassin.nom : 'N/A';
+                    document.getElementById("txtType").innerText = t.typeTraitementEau.libelle;
+                    document.getElementById("txtDetail").innerText = t.detail;
+                    document.getElementById("txtObservation").innerText = t.observation || 'Aucune observation';
+                    document.getElementById("txtUser").innerText = t.utilisateur ? t.utilisateur.nom : 'N/A';
+                });
+        });
+
+        function supprimer() {
+            if(confirm("Voulez-vous vraiment effacer ce traitement de l'historique ?")) {
+                fetch(`/api/production/traitements-eau/${id}`, { method: 'DELETE' })
+                    .then(() => window.location.href = "/traitements-eau");
+            }
+        }
+    </script>
+</body>
+</html>

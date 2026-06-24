@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Référentiel des Traitements</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .split-container { display: flex; gap: 20px; margin-top: 20px; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-box { flex: 1; height: fit-content; }
+        .list-box { flex: 2; }
+        input, textarea { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-success { background-color: #28a745; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #eeedf2; color: #333; }
+    </style>
+</head>
+<body>
+
+    <h2>Configuration du Référentiel : Types de Traitements d'Eau</h2>
+
+    <div class="split-container">
+        <div class="box form-box">
+            <h3>Ajouter un Type</h3>
+            <form onsubmit="ajouterType(event)">
+                <label>Libellé (Code)</label>
+                <input type="text" id="libelle" placeholder="Ex: DESINFECTION_BASSIN" required>
+                
+                <label>Description</label>
+                <textarea id="description" rows="3" placeholder="Procédure standard..."></textarea>
+                
+                <button type="submit" class="btn btn-success">Enregistrer le Type</button>
+            </form>
+        </div>
+
+        <div class="box list-box">
+            <h3>Types Enregistrés</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Libellé</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody id="typeTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", chargerTypes);
+
+        function chargerTypes() {
+            fetch('/api/production/types-traitements-eau')
+                .then(r => r.json())
+                .then(types => {
+                    const tbody = document.getElementById('typeTableBody');
+                    tbody.innerHTML = '';
+                    types.forEach(t => {
+                        tbody.innerHTML += `<tr><td>${t.id}</td><td><strong>${t.libelle}</strong></td><td>${t.description || ''}</td></tr>`;
+                    });
+                });
+        }
+
+        function ajouterType(e) {
+            e.preventDefault();
+            const payload = {
+                libelle: document.getElementById('libelle').value.toUpperCase().replace(/ /g, "_"),
+                description: document.getElementById('description').value
+            };
+
+            fetch('/api/production/types-traitements-eau', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                document.getElementById('libelle').value = '';
+                document.getElementById('description').value = '';
+                chargerTypes();
+            });
+        }
+    </script>
+</body>
+</html>

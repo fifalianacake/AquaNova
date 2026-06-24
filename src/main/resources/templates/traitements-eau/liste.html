@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Historique des Traitements</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .filter-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filter-box input, .filter-box select { margin-right: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; float: right; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #343a40; color: white; text-transform: lowercase; }
+        tr:hover { background-color: #f1f1f1; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div>
+        <a href="/traitements-eau/new" class="btn btn-success">Saisir un traitement</a>
+        <h2>Traitements de l'Eau Appliqués</h2>
+    </div>
+
+    <div class="filter-box">
+        <input type="number" id="filtreId" placeholder="id" style="width: 100px;">
+        <select id="filtreBassin">
+            <option value="">-- bassin --</option>
+        </select>
+        <select id="filtreType">
+            <option value="">-- type traitement --</option>
+        </select>
+        <input type="date" id="filtreDebut" placeholder="date début">
+        <input type="date" id="filtreFin" placeholder="date fin">
+        <button class="btn btn-primary" onclick="chargerTraitements()">Filtrer</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>date</th>
+                <th>bassin</th>
+                <th>type traitement</th>
+                <th>détail</th>
+                <th>utilisateur</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Chargement des filtres depuis les référentiels
+            fetch('/api/production/types-traitements-eau').then(r => r.json()).then(data => {
+                data.forEach(t => document.getElementById('filtreType').innerHTML += `<option value="${t.id}">${t.libelle}</option>`);
+            });
+            fetch('/api/bassin').then(r => r.json()).then(data => {
+                data.forEach(b => document.getElementById('filtreBassin').innerHTML += `<option value="${b.id}">${b.nom}</option>`);
+            }).catch(() => console.log("Liaison Bassin indisponible"));
+
+            chargerTraitements();
+        });
+
+        function chargerTraitements() {
+            const id = document.getElementById('filtreId').value;
+            const bassin = document.getElementById('filtreBassin').value;
+            const type = document.getElementById('filtreType').value;
+            const debut = document.getElementById('filtreDebut').value;
+            const fin = document.getElementById('filtreFin').value;
+
+            // Envoi de tous les paramètres de filtrage à l'API Rest
+            let url = `/api/production/traitements-eau?id=${id}&bassinId=${bassin}&typeId=${type}&debut=${debut}&fin=${fin}`;
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(traitements => {
+                    const tbody = document.getElementById('tableBody');
+                    tbody.innerHTML = '';
+                    
+                    if (traitements.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #777;">Aucun traitement trouvé pour ces critères.</td></tr>';
+                        return;
+                    }
+
+                    traitements.forEach(t => {
+                        tbody.innerHTML += `
+                            <tr onclick="window.location.href='/traitements-eau/${t.id}'">
+                                <td>${t.id}</td>
+                                <td>${t.dateTraitement}</td>
+                                <td>${t.bassin ? t.bassin.nom : 'N/A'}</td>
+                                <td><strong>${t.typeTraitementEau.libelle}</strong></td>
+                                <td>${t.detail}</td>
+                                <td>${t.utilisateur ? t.utilisateur.nom : 'Utilisateur'}</td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+    </script>
+</body>
+</html>
