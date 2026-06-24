@@ -1,10 +1,12 @@
 package mg.itu.aquanova.production.models;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "mouvements_stock")
+@Table(name = "mouvement_stock")
 public class MouvementStock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +24,7 @@ public class MouvementStock {
     private TypeMouvement typeMouvement;
 
     @Column(nullable = false)
-    private Double quantite;
+    private BigDecimal quantite;
 
     private String commentaire;
 
