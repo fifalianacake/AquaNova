@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Fiche Mouvement</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .fiche-container { background: white; max-width: 600px; margin: 50px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .info-label { font-weight: bold; color: #555; }
+        .info-value { font-weight: normal; color: #111; }
+        .btn-box { display: flex; justify-content: space-between; margin-top: 30px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="fiche-container">
+        <h2>Détail du Mouvement #<span th:text="${mouvement.id}">0</span></h2>
+        
+        <div class="info-row">
+            <div class="info-label">Date du mouvement</div>
+            <div class="info-value" th:text="${mouvement.dateMouvement}">2026-06-23</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Aliment concerné</div>
+            <div class="info-value" th:text="${mouvement.aliment.nom}">Provende Alevin</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Type d'opération</div>
+            <div class="info-value" style="text-transform: uppercase; font-weight: bold;" th:text="${mouvement.typeMouvement}">SORTIE</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Quantité enregistrée</div>
+            <div class="info-value" th:text="${mouvement.quantite} + ' kg'">50 kg</div>
+        </div>
+
+        <div class="info-row" style="border-bottom: none;">
+            <div class="info-label">Commentaire</div>
+            <div class="info-value" th:text="${mouvement.commentaire != null and !mouvement.commentaire.isEmpty() ? mouvement.commentaire : 'Aucune remarque'}">Ration journalière du lot #4</div>
+        </div>
+
+        <div class="btn-box">
+            <a th:href="@{/stocks/mouvements}" class="btn btn-secondary">Retour</a>
+            <form th:action="@{/stocks/mouvements/delete/{id}(id=${mouvement.id})}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer définitivement ce mouvement ?');">
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
