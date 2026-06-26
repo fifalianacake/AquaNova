@@ -11,7 +11,10 @@
 <body>
 <h1>Liste des lots</h1>
 
-<div><a th:href="@{/lots/new}">Créer un nouveau lot</a></div>
+<div>
+    <a th:href="@{/lots/new}">Créer un nouveau lot</a>
+    <a th:href="@{/production/previsions-recoltes}">Prévision récoltes</a>
+</div>
 
 <form method="get" th:action="@{/lots}">
     <div>
