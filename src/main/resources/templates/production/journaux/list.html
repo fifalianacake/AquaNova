@@ -15,6 +15,41 @@
     <a th:href="@{/lots}">Retour à la liste des lots</a>
 </p>
 
+<form method="get" th:action="@{/journaux}">
+    <div>
+        <label>Lot:
+            <select name="lotId">
+                <option value="">-- Tous --</option>
+                <option th:each="lot : ${lots}"
+                        th:value="${lot.id}"
+                        th:text="${lot.code}"
+                        th:selected="${filter != null && filter.lotId != null && filter.lotId == lot.id}"></option>
+            </select>
+        </label>
+
+        <label>Type:
+            <select name="typeEvenement">
+                <option value="">-- Tous --</option>
+                <option th:each="type : ${typesEvenement}"
+                        th:value="${type}"
+                        th:text="${type}"
+                        th:selected="${filter != null && filter.typeEvenement == type}"></option>
+            </select>
+        </label>
+
+        <label>Du:
+            <input type="date" name="dateDebut" th:value="${filter != null ? filter.dateDebut : null}">
+        </label>
+
+        <label>Au:
+            <input type="date" name="dateFin" th:value="${filter != null ? filter.dateFin : null}">
+        </label>
+
+        <button type="submit">Filtrer</button>
+        <a th:href="@{/journaux}">Réinitialiser</a>
+    </div>
+</form>
+
 <table>
     <thead>
     <tr>

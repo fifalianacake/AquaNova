@@ -6,6 +6,7 @@ import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.repositories.JournalLotRepository;
 import mg.itu.aquanova.production.repositories.TypeEvenementLotRepository;
 import org.springframework.stereotype.Service;
+import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,7 +31,25 @@ public class JournalLotService {
         journalLotRepository.save(journal);
     }
 
-    public List<JournalLot> listerTous() { return journalLotRepository.findAll(); }
-    public List<JournalLot> obtenirJournalParLot(Long lotId) { return journalLotRepository.findByLotIdOrderByDateEvenementDesc(lotId); }
+    public List<JournalLot> listerTous() { return journalLotRepository.findAllByOrderByDateEvenementAsc(); }
+    public List<JournalLot> obtenirJournalParLot(Long lotId) { return journalLotRepository.findByLotIdOrderByDateEvenementAsc(lotId); }
+    public List<JournalLot> rechercher(JournalLotFilter filter) {
+        if (filter == null) {
+            return listerTous();
+        }
+
+        LocalDateTime dateDebut = filter.getDateDebut() != null
+                ? filter.getDateDebut().atStartOfDay()
+                : null;
+        LocalDateTime dateFin = filter.getDateFin() != null
+                ? filter.getDateFin().atTime(LocalTime.MAX)
+                : null;
+
+        return journalLotRepository.rechercher(
+                filter.getLotId(),
+                filter.getTypeEvenement(),
+                dateDebut,
+                dateFin);
+    }
     public void supprimer(Long id) { journalLotRepository.deleteById(id); }
 }
