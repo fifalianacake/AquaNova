@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Statut Bassin Details</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="container mt-5">
+
+<h2 class="mb-4">Statut Bassin Details</h2>
+
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th>
+        <td th:text="${statut.id}">1</td>
+    </tr>
+    <tr>
+        <th>Libelle</th>
+        <td th:text="${statut.libelle}">LIBRE</td>
+    </tr>
+</table>
+
+<a th:href="@{/statuts-bassins/{id}/edit(id=${statut.id})}" class="btn btn-warning">Edit</a>
+<a th:href="@{/statuts-bassins}" class="btn btn-secondary">Back</a>
+
+</body>
+</html>
