@@ -10,24 +10,26 @@
 <body>
     <h1>Enregistrer une pesée pour le lot <span th:text="${idLot}"></span></h1>
 
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
     <form th:action="@{/production/pesee/enregistrer}" method="post">
         <input type="hidden" name="idLot" th:value="${idLot}">
 
         <div>
             <label>Date de pesée :</label>
-            <input type="date" name="datePesee" required>
+            <input type="date" name="datePesee" th:value="${datePesee}" required>
         </div>
         <div>
             <label>Nombre d'échantillons :</label>
-            <input type="number" name="nbEchantillon" required>
+            <input type="number" name="nbEchantillon" th:value="${nbEchantillon}" required>
         </div>
         <div>
             <label>Poids Total (kg) :</label>
-            <input type="number" step="0.01" name="poidsTotal" required>
+            <input type="number" step="0.01" name="poidsTotal" th:value="${poidsTotal}" required>
         </div>
         <div>
             <label>Observation :</label>
-            <textarea name="observation"></textarea>
+            <textarea name="observation" th:text="${observation}"></textarea>
         </div>
         
         <p>

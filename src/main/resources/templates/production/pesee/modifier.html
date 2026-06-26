@@ -6,6 +6,8 @@
 </head>
 <body>
     <h1>Edit Weighing</h1>
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
     <form th:action="@{/production/pesee/modifier}" method="post">
         
         <input type="hidden" name="id" th:value="${pese.id}">
@@ -23,7 +25,7 @@
         <textarea name="observation" th:text="${pese.observation}"></textarea><br>
 
         <button type="submit">Update</button>
-        <a th:href="@{'/production/pesee/liste/' + ${pese.idLot}}">Cancel</a>
+        <a th:href="@{'/production/pesee/liste/' + ${pese.lot.id}}">Cancel</a>
     </form>
 </body>
 </html>

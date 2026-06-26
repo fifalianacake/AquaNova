@@ -12,8 +12,9 @@ public class Pese {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_lot", nullable = false)
-    private Long idLot;
+    @ManyToOne
+    @JoinColumn(name = "id_lot", nullable = false)
+    private LotModels lot;
 
     @Column(name = "date_pesee", nullable = false)
     private LocalDate datePesee;
@@ -38,12 +39,12 @@ public class Pese {
         this.id = id;
     }
 
-    public Long getIdLot() {
-        return idLot;
+    public LotModels getLot() {
+        return lot;
     }
 
-    public void setIdLot(Long idLot) {
-        this.idLot = idLot;
+    public void setLot(LotModels lot) {
+        this.lot = lot;
     }
 
     public LocalDate getDatePesee() {

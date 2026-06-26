@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -41,10 +42,20 @@ public class PeseeController {
                              @RequestParam LocalDate datePesee,
                              @RequestParam Integer nbEchantillon,
                              @RequestParam BigDecimal poidsTotal,
-                             @RequestParam(required = false) String observation) {
-        
-        this.peseeService.enregistrerPesee(idLot, datePesee, nbEchantillon, poidsTotal, observation);
-        return "redirect:/production/pesee/liste/" + idLot;
+                             @RequestParam(required = false) String observation,
+                             Model model) {
+        try {
+            this.peseeService.enregistrerPesee(idLot, datePesee, nbEchantillon, poidsTotal, observation);
+            return "redirect:/production/pesee/liste/" + idLot;
+        } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("idLot", idLot);
+            model.addAttribute("datePesee", datePesee);
+            model.addAttribute("nbEchantillon", nbEchantillon);
+            model.addAttribute("poidsTotal", poidsTotal);
+            model.addAttribute("observation", observation);
+            return "production/pesee/formulaire";
+        }
     }
 
     @GetMapping("/modifier/{id}")
@@ -60,16 +71,24 @@ public class PeseeController {
                            @RequestParam LocalDate datePesee,
                            @RequestParam Integer nbEchantillon,
                            @RequestParam BigDecimal poidsTotal,
-                           @RequestParam(required = false) String observation) {
-        
-        Pese updated = this.peseeService.modifierPesee(id, datePesee, nbEchantillon, poidsTotal, observation);
-        return "redirect:/production/pesee/liste/" + updated.getIdLot();
+                           @RequestParam(required = false) String observation,
+                           Model model) {
+        try {
+            Pese updated = this.peseeService.modifierPesee(id, datePesee, nbEchantillon, poidsTotal, observation);
+            return "redirect:/production/pesee/liste/" + updated.getLot().getId();
+        } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
+            Pese pese = this.peseeService.trouverParId(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Pesée introuvable"));
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("pese", pese);
+            return "production/pesee/modifier";
+        }
     }
 
     @GetMapping("/supprimer/{id}")
     public String supprimer(@PathVariable Long id) {
         Pese pese = this.peseeService.trouverParId(id).orElseThrow();
-        Long idLot = pese.getIdLot();
+        Long idLot = pese.getLot().getId();
         this.peseeService.supprimerPesee(id);
         return "redirect:/production/pesee/liste/" + idLot;
     }

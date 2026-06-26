@@ -10,7 +10,6 @@ import java.util.List;
 public interface PeseRepository extends JpaRepository<Pese, Long> {
     
     // Récupère les pesées d'un lot triées de la plus récente à la plus ancienne
-    List<Pese> findByIdLotOrderByDatePeseeDesc(Long idLot);
+    List<Pese> findByLotIdOrderByDatePeseeDesc(Long idLot);
 }
-
 
