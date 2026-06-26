@@ -63,6 +63,7 @@ public class TransfertService {
         Bassin bassinDestination = trouverBassin(transfert.getBassinDestination().getId());
 
         verifierLotSource(lotSource, bassinSource, transfert);
+        verifierDateApresMiseEnCharge(lotSource, transfert);
         verifierBassinDestinationLibre(bassinDestination);
 
         int effectifInitialSource = lotSource.getEffectifActuel();
@@ -101,14 +102,16 @@ public class TransfertService {
                 TypeEvenementLot.LibelleEvenement.TRANSFERT,
                 "Transfert " + (transfertTotal ? "total" : "partiel")
                         + " de " + transfert.getEffectif()
-                        + " individus vers le bassin " + bassinDestination.getReference());
+                        + " individus vers le bassin " + bassinDestination.getReference(),
+                transfert.getDateTransfert());
 
         if (!transfertTotal) {
             journalLotService.inscrireEvenement(
                     lotDestination,
                     TypeEvenementLot.LibelleEvenement.TRANSFERT,
                     "Création du lot par transfert partiel depuis " + lotSource.getCode()
-                            + ", effectif " + transfert.getEffectif());
+                            + ", effectif " + transfert.getEffectif(),
+                    transfert.getDateTransfert());
         }
 
         return transfertSauvegarde;
@@ -165,6 +168,12 @@ public class TransfertService {
         boolean transfertPartiel = transfert.getEffectif() < lotSource.getEffectifActuel();
         if (transfertPartiel && (transfert.getCodeLotDestination() == null || transfert.getCodeLotDestination().trim().isEmpty())) {
             throw new IllegalArgumentException("Le code du nouveau lot destination est obligatoire pour un transfert partiel.");
+        }
+    }
+
+    private void verifierDateApresMiseEnCharge(LotModels lotSource, TransfertModels transfert) {
+        if (lotSource.getDateMiseEnCharge() != null && transfert.getDateTransfert().isBefore(lotSource.getDateMiseEnCharge())) {
+            throw new IllegalArgumentException("La date de transfert ne peut pas être antérieure à la date de mise en charge du lot source.");
         }
     }
 

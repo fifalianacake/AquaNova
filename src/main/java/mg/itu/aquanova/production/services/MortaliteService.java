@@ -65,6 +65,7 @@ public class MortaliteService {
 
         LotModels lot = trouverLot(mortalite.getLot().getId());
         verifierLotNonCloture(lot);
+        verifierDateApresMiseEnCharge(lot, mortalite.getDateMortalite());
 
         MortaliteModels ancienneMortalite = null;
         int anciensMorts = 0;
@@ -104,7 +105,8 @@ public class MortaliteService {
                 TypeEvenementLot.LibelleEvenement.MORTALITE,
                 "Mortalité de " + mortalite.getNbMorts()
                         + " individus"
-                        + (mortalite.getCause() != null ? ", cause: " + mortalite.getCause() : ""));
+                        + (mortalite.getCause() != null ? ", cause: " + mortalite.getCause() : ""),
+                mortalite.getDateMortalite());
 
         return saved;
     }
@@ -199,6 +201,12 @@ public class MortaliteService {
     private void verifierLotNonCloture(LotModels lot) {
         if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
             throw new IllegalStateException("Impossible d'enregistrer une mortalité sur un lot clôturé.");
+        }
+    }
+
+    private void verifierDateApresMiseEnCharge(LotModels lot, LocalDate dateMortalite) {
+        if (lot.getDateMiseEnCharge() != null && dateMortalite.isBefore(lot.getDateMiseEnCharge())) {
+            throw new IllegalArgumentException("La date de mortalité ne peut pas être antérieure à la date de mise en charge du lot.");
         }
     }
 

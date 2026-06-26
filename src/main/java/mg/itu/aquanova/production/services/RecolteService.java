@@ -93,7 +93,8 @@ public class RecolteService {
                 "Récolte " + typeRecolte.getLibelle()
                         + " de " + effectifRecolte
                         + " individus, poids total " + poidsTotal
-                        + ", poids moyen " + poidsMoyen);
+                        + ", poids moyen " + poidsMoyen,
+                dateRecolte);
 
         return saved;
     }
@@ -146,6 +147,9 @@ public class RecolteService {
         }
         if (poidsTotal == null || poidsTotal <= 0) {
             throw new IllegalArgumentException("Le poids total doit être strictement positif.");
+        }
+        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
+            throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot déjà clôturé.");
         }
         if (lot.getEffectifActuel() == null || lot.getEffectifActuel() <= 0) {
             throw new IllegalStateException("Ce lot ne contient plus d'individus récoltables.");

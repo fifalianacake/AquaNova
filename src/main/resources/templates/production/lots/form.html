@@ -50,11 +50,11 @@
     </div>
     <div>
         <label>Effectif initial: <input type="number" th:field="*{effectifInitial}"/></label>
-        <label>Effectif actuel: <input type="number" th:field="*{effectifActuel}"/></label>
+        <label th:if="${lot.id != null}">Effectif actuel: <input type="number" th:field="*{effectifActuel}"/></label>
     </div>
     <div>
         <label>Poids moyen initial: <input type="number" step="0.01" th:field="*{poidsMoyenInitial}"/></label>
-        <label>Poids moyen actuel: <input type="number" step="0.01" th:field="*{poidsMoyenActuel}"/></label>
+        <label th:if="${lot.id != null}">Poids moyen actuel: <input type="number" step="0.01" th:field="*{poidsMoyenActuel}"/></label>
     </div>
     <div>
         <label>Observation: <textarea th:field="*{observation}"></textarea></label>

@@ -14,16 +14,29 @@ import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.StatutLotModels;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.repositories.StatutLotRepository;
+import mg.itu.aquanova.referentiel.models.Bassin;
+import mg.itu.aquanova.referentiel.models.LibelleStatutBassin;
+import mg.itu.aquanova.referentiel.models.StatutBassin;
+import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
+import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
 
 @Service
 public class LotService {
 
     private final LotRepository repository;
     private final StatutLotRepository statutLotRepository;
+    private final BassinsRepository bassinsRepository;
+    private final StatutBassinRepository statutBassinRepository;
 
-    public LotService(LotRepository repository, StatutLotRepository statutLotRepository) {
+    public LotService(
+            LotRepository repository,
+            StatutLotRepository statutLotRepository,
+            BassinsRepository bassinsRepository,
+            StatutBassinRepository statutBassinRepository) {
         this.repository = repository;
         this.statutLotRepository = statutLotRepository;
+        this.bassinsRepository = bassinsRepository;
+        this.statutBassinRepository = statutBassinRepository;
     }
 
     public List<LotModels> listerTous() {
@@ -107,6 +120,10 @@ public class LotService {
 
     public LotModels creer(LotModels lot) {
         validerLot(lot, null);
+        initialiserValeursActuelles(lot);
+        if (estActif(lot.getStatutLot())) {
+            marquerBassinOccupe(lot);
+        }
         return repository.save(lot);
     }
 
@@ -163,6 +180,21 @@ public class LotService {
 
     private boolean estActif(StatutLotModels statut) {
         return statut != null && statut.getLibelle() != StatutLotEnum.CLOTURE;
+    }
+
+    private void initialiserValeursActuelles(LotModels lot) {
+        lot.setEffectifActuel(lot.getEffectifInitial());
+        lot.setPoidsMoyenActuel(lot.getPoidsMoyenInitial());
+    }
+
+    private void marquerBassinOccupe(LotModels lot) {
+        Bassin bassin = bassinsRepository.findById(lot.getBassin().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Bassin introuvable: " + lot.getBassin().getId()));
+        StatutBassin statutOccupe = statutBassinRepository.findByLibelle(LibelleStatutBassin.OCCUPE)
+                .orElseThrow(() -> new EntityNotFoundException("Statut de bassin OCCUPE introuvable."));
+
+        bassin.setStatut(statutOccupe);
+        lot.setBassin(bassinsRepository.save(bassin));
     }
 
     private void verifierBassinDisponible(Long bassinId, Long idLotIgnore) {

@@ -6,6 +6,7 @@ import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.repositories.JournalLotRepository;
 import mg.itu.aquanova.production.repositories.TypeEvenementLotRepository;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,12 +22,20 @@ public class JournalLotService {
     }
 
     public void inscrireEvenement(LotModels lot, TypeEvenementLot.LibelleEvenement typeEvt, String description) {
+        inscrireEvenement(lot, typeEvt, description, LocalDateTime.now());
+    }
+
+    public void inscrireEvenement(LotModels lot, TypeEvenementLot.LibelleEvenement typeEvt, String description, LocalDate dateEvenement) {
+        inscrireEvenement(lot, typeEvt, description, dateEvenement.atStartOfDay());
+    }
+
+    public void inscrireEvenement(LotModels lot, TypeEvenementLot.LibelleEvenement typeEvt, String description, LocalDateTime dateEvenement) {
         TypeEvenementLot type = typeEvenementLotRepository.findByLibelle(typeEvt)
                 .orElseThrow(() -> new RuntimeException("Type d'événement introuvable"));
         JournalLot journal = new JournalLot();
         journal.setLot(lot);
         journal.setTypeEvenement(type);
-        journal.setDateEvenement(LocalDateTime.now());
+        journal.setDateEvenement(dateEvenement);
         journal.setDescription(description);
         journalLotRepository.save(journal);
     }

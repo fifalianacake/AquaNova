@@ -66,7 +66,8 @@ public class PeseeService {
                 TypeEvenementLot.LibelleEvenement.PESEE,
                 "Pesée de " + nbEchantillon
                         + " échantillons, poids total " + poidsTotal
-                        + ", poids moyen " + poidsMoyen);
+                        + ", poids moyen " + poidsMoyen,
+                datePesee);
 
         return saved;
     }
