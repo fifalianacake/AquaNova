@@ -1,5 +1,8 @@
 package mg.itu.aquanova.production.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,31 +38,19 @@ public class LotController {
 
     @GetMapping("/lots")
     public String list(
-            @RequestParam(required = false) Long id,
-            @RequestParam(required = false) String code,
-            @RequestParam(required = false) Integer especeId,
-            @RequestParam(required = false) Long bassinId,
-            @RequestParam(required = false) Integer stadeId,
-            @RequestParam(required = false) Long statutId,
-            @RequestParam(required = false) String dateFrom,
-            @RequestParam(required = false) String dateTo,
-            @RequestParam(required = false) Integer effectifMin,
-            @RequestParam(required = false) Integer effectifMax,
+            @PageableDefault(size = 10, page = 0, sort = "id") Pageable pageable,
+            @ModelAttribute("lotFilter") LotFilter filter,
             Model model
     ) {
-        LotFilter filter = new LotFilter();
-        filter.setId(id);
-        filter.setCode(code);
-        filter.setEspeceId(especeId);
-        filter.setBassinId(bassinId);
-        filter.setStadeId(stadeId);
-        filter.setStatutId(statutId);
-        filter.setDateFrom(dateFrom);
-        filter.setDateTo(dateTo);
-        filter.setEffectifMin(effectifMin);
-        filter.setEffectifMax(effectifMax);
+        Page<LotModels> lotPage = service.lister(filter, pageable);
 
-        model.addAttribute("lots", service.lister(filter));
+        model.addAttribute("lots", lotPage.getContent());
+        model.addAttribute("currentPage", lotPage.getNumber());
+        model.addAttribute("totalPages", lotPage.getTotalPages());
+        model.addAttribute("hasNext", lotPage.hasNext());
+        model.addAttribute("hasPrevious", lotPage.hasPrevious());
+
+        model.addAttribute("lots", lotPage.getContent());
         model.addAttribute("especes", especesService.findAll());
         model.addAttribute("bassins", bassinService.getAllBassins());
         model.addAttribute("stades", stadeService.findAll());
