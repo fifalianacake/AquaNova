@@ -87,5 +87,41 @@
     </tbody>
 </table>
 
+<div th:if="${totalPages > 0}" style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
+    
+    <span th:if="${hasPrevious}">
+        <a th:href="@{/lots(page=${currentPage - 1}, 
+                            id=${lotFilter.id}, 
+                            code=${lotFilter.code}, 
+                            especeId=${lotFilter.especeId}, 
+                            bassinId=${lotFilter.bassinId}, 
+                            stadeId=${lotFilter.stadeId}, 
+                            statutId=${lotFilter.statutId}, 
+                            dateFrom=${lotFilter.dateFrom}, 
+                            dateTo=${lotFilter.dateTo}, 
+                            effectifMin=${lotFilter.effectifMin}, 
+                            effectifMax=${lotFilter.effectifMax})}">&laquo; Précédent</a>
+    </span>
+    <span th:unless="${hasPrevious}" style="color: #999;">&laquo; Précédent</span>
+
+    <span th:text="'Page ' + ${currentPage + 1} + ' sur ' + ${totalPages}"></span>
+
+    <span th:if="${hasNext}">
+        <a th:href="@{/lots(page=${currentPage + 1}, 
+                            id=${lotFilter.id}, 
+                            code=${lotFilter.code}, 
+                            especeId=${lotFilter.especeId}, 
+                            bassinId=${lotFilter.bassinId}, 
+                            stadeId=${lotFilter.stadeId}, 
+                            statutId=${lotFilter.statutId}, 
+                            dateFrom=${lotFilter.dateFrom}, 
+                            dateTo=${lotFilter.dateTo}, 
+                            effectifMin=${lotFilter.effectifMin}, 
+                            effectifMax=${lotFilter.effectifMax})}">Suivant &raquo;</a>
+    </span>
+    <span th:unless="${hasNext}" style="color: #999;">Suivant &raquo;</span>
+
+</div>
+
 </body>
 </html>
