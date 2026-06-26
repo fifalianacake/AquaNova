@@ -1,7 +1,8 @@
 package mg.itu.aquanova.production.controllers;
 
 import mg.itu.aquanova.production.models.Pese;
-import mg.itu.aquanova.production.service.PeseeService;
+import mg.itu.aquanova.production.services.PeseeService;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

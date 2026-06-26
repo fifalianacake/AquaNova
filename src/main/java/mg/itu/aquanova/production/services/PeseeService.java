@@ -1,4 +1,4 @@
-package mg.itu.aquanova.production.service;
+package mg.itu.aquanova.production.services;
 
 import mg.itu.aquanova.production.models.Pese;
 import mg.itu.aquanova.production.repositories.PeseRepository;

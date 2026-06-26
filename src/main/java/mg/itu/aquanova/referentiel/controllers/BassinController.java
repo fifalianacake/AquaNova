@@ -2,6 +2,8 @@ package mg.itu.aquanova.referentiel.controllers;
 
 import mg.itu.aquanova.referentiel.models.Bassin;
 import mg.itu.aquanova.referentiel.services.BassinService;
+import mg.itu.aquanova.referentiel.services.StatutBassinService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/referentiel/bassins")
 public class BassinController {
 
-    @Autowired
-    private BassinService bassinService;
+    private final BassinService bassinService;
+    private final StatutBassinService statutBassinService;
+
+    BassinController(BassinService bassinService, StatutBassinService statutBassinService) {
+        this.bassinService = bassinService;
+        this.statutBassinService = statutBassinService;
+    }
 
     // 1. Afficher la liste de tous les bassins
     @GetMapping
@@ -26,7 +33,7 @@ public class BassinController {
     public String formulaireModification(Model model) {
         model.addAttribute("bassin", new Bassin());
         model.addAttribute("types", bassinService.getAllTypes());
-        model.addAttribute("statuts", bassinService.getAllStatuts());
+        model.addAttribute("statuts", statutBassinService.findAll());
         return "referentiel/bassins/saisie";
     }
 
@@ -35,7 +42,7 @@ public class BassinController {
     public String formulaireModification(@PathVariable Long id, Model model) {
         model.addAttribute("bassin", bassinService.getBassinById(id));
         model.addAttribute("types", bassinService.getAllTypes());
-        model.addAttribute("statuts", bassinService.getAllStatuts());
+        model.addAttribute("statuts", statutBassinService.findAll());
         return "referentiel/bassins/saisie";
     }
 

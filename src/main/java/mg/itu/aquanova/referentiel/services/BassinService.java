@@ -20,10 +20,13 @@ public class BassinService {
 
     private final TypeBassinRepository typeBassinRepository;
 
+    private final StatutBassinRepository statutBassinRepository;
+
     public BassinService(BassinsRepository bassinRepository,
-                         TypeBassinRepository typeBassinRepository) {
+                         TypeBassinRepository typeBassinRepository, StatutBassinRepository statutBassinRepository) {
         this.bassinRepository = bassinRepository;
         this.typeBassinRepository = typeBassinRepository;
+        this.statutBassinRepository = statutBassinRepository;
     }
 
     // ==========================
@@ -48,9 +51,6 @@ public class BassinService {
         bassinRepository.deleteById(id);
     }
 
-    public List<StatutBassin> getAllStatuts() {
-        return statutBassinRepository.findAll();
-    }
     // ==========================
     // Création avec validation
     // ==========================

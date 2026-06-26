@@ -31,7 +31,7 @@
             <label for="lotSource">Lot source</label>
             <select id="lotSource" th:field="*{lotSource}">
                 <option value="" disabled>-- Choisir un lot source --</option>
-                <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.libelle}"></option>
+                <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
             </select>
         </div>
 
@@ -39,7 +39,7 @@
             <label for="lotDestination">Lot destination</label>
             <select id="lotDestination" th:field="*{lotDestination}">
                 <option value="" disabled>-- Choisir un lot destination --</option>
-                <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.libelle}"></option>
+                <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
             </select>
         </div>
 
@@ -47,7 +47,7 @@
             <label for="bassinSource">Bassin source</label>
             <select id="bassinSource" th:field="*{bassinSource}">
                 <option value="" disabled>-- Choisir un bassin source --</option>
-                <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.libelle}"></option>
+                <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
         </div>
 
@@ -55,7 +55,7 @@
             <label for="bassinDestination">Bassin destination</label>
             <select id="bassinDestination" th:field="*{bassinDestination}">
                 <option value="" disabled>-- Choisir un bassin destination --</option>
-                <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.libelle}"></option>
+                <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
 
         </div>

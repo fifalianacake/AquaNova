@@ -42,23 +42,6 @@ public class Bassin {
         this.reference = reference;
     }
 
-    public Integer getIdStatut() {
-        return idStatut;
-    }
-
-    public void setIdStatut(Integer idStatut) {
-        this.idStatut = idStatut;
-    }
-
-    @Transient
-    public StatutBassin getStatut() {
-        return StatutBassin.fromId(idStatut);
-    }
-
-    public void setStatut(StatutBassin statut) {
-        this.idStatut = statut != null ? statut.getId() : null;
-    }
-
     public BigDecimal getCapaciteM3() {
         return capaciteM3;
     }
@@ -73,5 +56,13 @@ public class Bassin {
 
     public void setTypeBassin(TypeBassin typeBassin) {
         this.typeBassin = typeBassin;
+    }
+
+    public StatutBassin getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutBassin statut) {
+        this.statut = statut;
     }
 }

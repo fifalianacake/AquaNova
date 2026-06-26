@@ -5,15 +5,20 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.production.models.StatutLotEnum;
+import mg.itu.aquanova.production.models.StatutLotModels;
 import mg.itu.aquanova.production.repositories.LotRepository;
+import mg.itu.aquanova.production.repositories.StatutLotRepository;
 
 @Service
 public class LotService {
 
     private final LotRepository repository;
+    private final StatutLotRepository statutLotRepository;
 
-    public LotService(LotRepository repository) {
+    public LotService(LotRepository repository, StatutLotRepository statutLotRepository) {
         this.repository = repository;
+        this.statutLotRepository = statutLotRepository;
     }
 
     public List<LotModels> listerTous() {
@@ -81,10 +86,12 @@ public class LotService {
     }
 
     public LotModels creer(LotModels lot) {
+        validerLot(lot, null);
         return repository.save(lot);
     }
 
     public LotModels modifier(Long id, LotModels lot) {
+        validerLot(lot, id);
         LotModels exist = trouverParId(id);
         exist.setCode(lot.getCode());
         exist.setEspece(lot.getEspece());
@@ -103,5 +110,51 @@ public class LotService {
     public void supprimer(Long id) {
         LotModels l = trouverParId(id);
         repository.delete(l);
+    }
+
+    private void validerLot(LotModels lot, Long idLotIgnore) {
+        if (lot == null) {
+            throw new IllegalArgumentException("Le lot est obligatoire.");
+        }
+        if (lot.getCode() == null || lot.getCode().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le code du lot est obligatoire.");
+        }
+        if (lot.getEspece() == null || lot.getEspece().getId() == null) {
+            throw new IllegalArgumentException("Le lot doit être associé à une espèce.");
+        }
+        if (lot.getBassin() == null || lot.getBassin().getId() == null) {
+            throw new IllegalArgumentException("Le lot doit être associé à un bassin.");
+        }
+        if (lot.getStadeCroissance() == null || lot.getStadeCroissance().getId() == null) {
+            throw new IllegalArgumentException("Le lot doit être associé à un stade de croissance.");
+        }
+        if (lot.getStatutLot() == null || lot.getStatutLot().getId() == null) {
+            throw new IllegalArgumentException("Le lot doit être associé à un statut.");
+        }
+
+        StatutLotModels statut = statutLotRepository.findById(lot.getStatutLot().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Statut de lot introuvable: " + lot.getStatutLot().getId()));
+        lot.setStatutLot(statut);
+
+        if (estActif(statut)) {
+            verifierBassinDisponible(lot.getBassin().getId(), idLotIgnore);
+        }
+    }
+
+    private boolean estActif(StatutLotModels statut) {
+        return statut != null && statut.getLibelle() != StatutLotEnum.CLOTURE;
+    }
+
+    private void verifierBassinDisponible(Long bassinId, Long idLotIgnore) {
+        List<LotModels> lotsActifsDuBassin = repository.findByBassinIdAndStatutLotLibelleNot(
+                bassinId,
+                StatutLotEnum.CLOTURE);
+
+        boolean occupeParUnAutreLot = lotsActifsDuBassin.stream()
+                .anyMatch(lot -> idLotIgnore == null || !idLotIgnore.equals(lot.getId()));
+
+        if (occupeParUnAutreLot) {
+            throw new IllegalStateException("Ce bassin contient déjà un autre lot actif.");
+        }
     }
 }

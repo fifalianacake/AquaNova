@@ -21,6 +21,7 @@
 </div>
 <div>
     <a th:href="@{/lots}">Back to list</a>
+    <a th:href="@{/lots/{id}/journal(id=${lot.id})}">Journal</a>
     <a th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
     <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
 </div>

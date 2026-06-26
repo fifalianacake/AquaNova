@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/production/mortalites")
 public class MortaliteController {
 
-    @Autowired
-    private MortaliteService mortaliteService;
+    private final MortaliteService mortaliteService;
+
+    MortaliteController(MortaliteService mortaliteService) {
+        this.mortaliteService = mortaliteService;
+    }
 
     // 1. Afficher la liste de toutes les mortalités
     @GetMapping

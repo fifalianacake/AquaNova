@@ -34,10 +34,10 @@
                 <td th:text="${transfert.dateTransfert}"></td>
                 <td th:text="${transfert.effectif}"></td>
                 <td th:text="${transfert.poidsMoyen}"></td>
-                <td th:text="${transfert.lotSource}"></td>
-                <td th:text="${transfert.lotDestination}"></td>
-                <td th:text="${transfert.bassinSource}"></td>
-                <td th:text="${transfert.bassinDestination}"></td>
+                <td th:text="${transfert.lotSource != null ? transfert.lotSource.code : '-'}"></td>
+                <td th:text="${transfert.lotDestination != null ? transfert.lotDestination.code : '-'}"></td>
+                <td th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></td>
+                <td th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></td>
                 <td>
                     <a th:href="@{'/transferts/' + ${transfert.id} + '/edit'}">Modifier</a>
                     |

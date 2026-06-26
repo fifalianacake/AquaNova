@@ -14,10 +14,10 @@
         <p><strong>Date de transfert:</strong> <span th:text="${transfert.dateTransfert}"></span></p>
         <p><strong>Effectif:</strong> <span th:text="${transfert.effectif}"></span></p>
         <p><strong>Poids moyen:</strong> <span th:text="${transfert.poidsMoyen}"></span></p>
-        <p><strong>Lot source:</strong> <span th:text="${transfert.lotSource}"></span></p>
-        <p><strong>Lot destination:</strong> <span th:text="${transfert.lotDestination}"></span></p>
-        <p><strong>Bassin source:</strong> <span th:text="${transfert.bassinSource}"></span></p>
-        <p><strong>Bassin destination:</strong> <span th:text="${transfert.bassinDestination}"></span></p>
+        <p><strong>Lot source:</strong> <span th:text="${transfert.lotSource != null ? transfert.lotSource.code : '-'}"></span></p>
+        <p><strong>Lot destination:</strong> <span th:text="${transfert.lotDestination != null ? transfert.lotDestination.code : '-'}"></span></p>
+        <p><strong>Bassin source:</strong> <span th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></span></p>
+        <p><strong>Bassin destination:</strong> <span th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></span></p>
     </div>
     <div>
         <a th:href="@{/transferts}">Retour à la liste</a>

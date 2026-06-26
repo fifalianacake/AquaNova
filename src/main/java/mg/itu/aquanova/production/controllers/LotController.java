@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.persistence.EntityNotFoundException;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.production.services.LotFilter;
@@ -70,17 +71,21 @@ public class LotController {
     @GetMapping("/lots/new")
     public String createForm(Model model) {
         model.addAttribute("lot", new LotModels());
-        model.addAttribute("especes", especesService.findAll());
-        model.addAttribute("bassins", bassinService.getAllBassins());
-        model.addAttribute("stades", stadeService.findAll());
-        model.addAttribute("statuts", statutService.listerTous());
+        addFormLists(model);
         return "production/lots/form";
     }
 
     @PostMapping("/lots")
-    public String save(@ModelAttribute LotModels lot) {
-        service.creer(lot);
-        return "redirect:/lots";
+    public String save(@ModelAttribute LotModels lot, Model model) {
+        try {
+            service.creer(lot);
+            return "redirect:/lots";
+        } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("lot", lot);
+            addFormLists(model);
+            return "production/lots/form";
+        }
     }
 
     @GetMapping("/lots/{id}")
@@ -92,22 +97,34 @@ public class LotController {
     @GetMapping("/lots/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         model.addAttribute("lot", service.trouverParId(id));
-        model.addAttribute("especes", especesService.findAll());
-        model.addAttribute("bassins", bassinService.getAllBassins());
-        model.addAttribute("stades", stadeService.findAll());
-        model.addAttribute("statuts", statutService.listerTous());
+        addFormLists(model);
         return "production/lots/form";
     }
 
     @PostMapping("/lots/{id}")
-    public String update(@PathVariable Long id, @ModelAttribute LotModels lot) {
-        service.modifier(id, lot);
-        return "redirect:/lots";
+    public String update(@PathVariable Long id, @ModelAttribute LotModels lot, Model model) {
+        try {
+            service.modifier(id, lot);
+            return "redirect:/lots";
+        } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
+            lot.setId(id);
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("lot", lot);
+            addFormLists(model);
+            return "production/lots/form";
+        }
     }
 
     @GetMapping("/lots/{id}/delete")
     public String delete(@PathVariable Long id) {
         service.supprimer(id);
         return "redirect:/lots";
+    }
+
+    private void addFormLists(Model model) {
+        model.addAttribute("especes", especesService.findAll());
+        model.addAttribute("bassins", bassinService.getAllBassins());
+        model.addAttribute("stades", stadeService.findAll());
+        model.addAttribute("statuts", statutService.listerTous());
     }
 }

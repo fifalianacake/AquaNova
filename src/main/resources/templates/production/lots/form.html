@@ -7,6 +7,8 @@
 <body>
 <h1 th:text="${lot.id} == null ? 'Créer un lot' : 'Modifier le lot ' + ${lot.id}"></h1>
 
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
 <form th:action="${lot.id} == null ? @{/lots} : @{/lots/{id}(id=${lot.id})}" method="post" th:object="${lot}">
     <div>
         <label>Code: <input type="text" th:field="*{code}"/></label>
