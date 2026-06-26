@@ -8,63 +8,60 @@
 </head>
 
 <body>
-    <h1 th:text="${transfert != null ? 'Modifier le transfert' : 'Créer un nouveau transfert'}"></h1>
+    <h1>Créer un nouveau transfert</h1>
 
-    <form th:action="@{${transfert != null} ? '/transferts/edit/' + ${transfert.id} : '/transferts/save'}"
-        th:object="${transfert}" method="post">
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
+    <form th:action="@{/transferts/save}" th:object="${transfert}" method="post">
         <div>
             <label for="dateTransfert">Date de transfert</label>
-            <input type="datetime-local" id="dateTransfert" th:field="*{dateTransfert}">
+            <input type="date" id="dateTransfert" th:field="*{dateTransfert}" required>
         </div>
 
         <div>
             <label for="effectif">Effectif</label>
-            <input type="number" id="effectif" th:field="*{effectif}">
+            <input type="number" id="effectif" th:field="*{effectif}" min="1" required>
         </div>
 
         <div>
             <label for="poidsMoyen">Poids moyen</label>
-            <input type="number" step="0.01" id="poidsMoyen" th:field="*{poidsMoyen}">
+            <input type="number" step="0.01" id="poidsMoyen" th:field="*{poidsMoyen}" min="0.01" required>
         </div>
 
         <div>
             <label for="lotSource">Lot source</label>
-            <select id="lotSource" th:field="*{lotSource}">
-                <option value="" disabled>-- Choisir un lot source --</option>
+            <select id="lotSource" th:field="*{lotSource.id}" required>
+                <option value="">-- Choisir un lot source --</option>
                 <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
             </select>
         </div>
 
         <div>
-            <label for="lotDestination">Lot destination</label>
-            <select id="lotDestination" th:field="*{lotDestination}">
-                <option value="" disabled>-- Choisir un lot destination --</option>
-                <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
-            </select>
+            <label for="codeLotDestination">Code du nouveau lot destination</label>
+            <input type="text" id="codeLotDestination" th:field="*{codeLotDestination}">
         </div>
 
         <div>
             <label for="bassinSource">Bassin source</label>
-            <select id="bassinSource" th:field="*{bassinSource}">
-                <option value="" disabled>-- Choisir un bassin source --</option>
+            <select id="bassinSource" th:field="*{bassinSource.id}" required>
+                <option value="">-- Choisir un bassin source --</option>
                 <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
         </div>
 
         <div>
             <label for="bassinDestination">Bassin destination</label>
-            <select id="bassinDestination" th:field="*{bassinDestination}">
-                <option value="" disabled>-- Choisir un bassin destination --</option>
+            <select id="bassinDestination" th:field="*{bassinDestination.id}" required>
+                <option value="">-- Choisir un bassin destination --</option>
                 <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
-
         </div>
 
+        <div>
+            <button type="submit">Enregistrer</button>
+            <a th:href="@{/transferts}">Retour à la liste</a>
+        </div>
     </form>
-    <div>
-        <button type="submit">Enregistrer</button>
-        <a th:href="@{/transferts}">Retour à la liste</a>
-    </div>
 </body>
 
 </html>

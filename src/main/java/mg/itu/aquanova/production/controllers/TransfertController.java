@@ -1,6 +1,7 @@
 package mg.itu.aquanova.production.controllers;
 
 import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import jakarta.persistence.EntityNotFoundException;
 import mg.itu.aquanova.production.models.TransfertModels;
 import mg.itu.aquanova.production.services.TransfertService;
 import mg.itu.aquanova.referentiel.services.BassinService; 
@@ -39,17 +41,21 @@ public class TransfertController {
     @GetMapping("/new")
     public String showCreateTransfertForm(Model model) {
         model.addAttribute("transfert", new TransfertModels());
-        
-        model.addAttribute("bassins", bassinService.getAllBassins());
-        model.addAttribute("lots", lotService.listerTous());
-        
+        addFormLists(model);
         return "production/transferts/form";
     }
 
     @PostMapping("/save")
-    public String saveTransfert(@ModelAttribute("transfert") TransfertModels transfert) {
-        transfertService.saveTransfert(transfert);
-        return "redirect:/transferts";
+    public String saveTransfert(@ModelAttribute("transfert") TransfertModels transfert, Model model) {
+        try {
+            transfertService.saveTransfert(transfert);
+            return "redirect:/transferts";
+        } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("transfert", transfert);
+            addFormLists(model);
+            return "production/transferts/form";
+        }
     }
 
     @GetMapping("/{id}")
@@ -82,5 +88,10 @@ public class TransfertController {
         } else {
             return "redirect:/transferts";
         }
+    }
+
+    private void addFormLists(Model model) {
+        model.addAttribute("bassins", bassinService.getAllBassins());
+        model.addAttribute("lots", lotService.listerTous());
     }
 }

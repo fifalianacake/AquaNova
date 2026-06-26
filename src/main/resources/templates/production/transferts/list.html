@@ -39,9 +39,8 @@
                 <td th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></td>
                 <td th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></td>
                 <td>
-                    <a th:href="@{'/transferts/' + ${transfert.id} + '/edit'}">Modifier</a>
-                    |
-                    <a th:href="@{'/transferts/' + ${transfert.id} + '/delete'}"
+                    <a th:href="@{'/transferts/' + ${transfert.id}}">Voir</a>
+                    <a th:href="@{'/transferts/delete/' + ${transfert.id}}"
                         onclick="return confirm('Supprimer ce transfert ?');">Supprimer</a>
                 </td>
             </tr>
