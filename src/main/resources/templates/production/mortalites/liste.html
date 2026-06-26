@@ -10,9 +10,11 @@
 <body class="container mt-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Suivi des Mortalités</h2>
+        <h2 th:text="${titre != null ? titre : 'Suivi des Mortalités'}">Suivi des Mortalités</h2>
         <div>
-            <a th:href="@{/production/mortalites/nouveau}" class="btn btn-primary">Ajouter une Mortalité</a>
+            <a th:if="${lot != null}" th:href="@{/production/mortalites/nouveau/lot/{id}(id=${lot.id})}" class="btn btn-primary">Ajouter une Mortalité</a>
+            <a th:if="${lot == null}" th:href="@{/production/mortalites/nouveau}" class="btn btn-primary">Ajouter une Mortalité</a>
+            <a th:if="${lot != null}" th:href="@{/lots/{id}(id=${lot.id})}" class="btn btn-secondary">Retour au lot</a>
         </div>
     </div>
 
@@ -20,7 +22,7 @@
         <thead class="table-dark">
             <tr>
                 <th>ID</th>
-                <th>ID Lot</th>
+                <th>Lot</th>
                 <th>Date</th>
                 <th>Nombre de Morts</th>
                 <th>Cause</th>
@@ -30,7 +32,7 @@
         <tbody>
             <tr th:each="m : ${mortalites}">
                 <td th:text="${m.id}">1</td>
-                <td th:text="${m.idLot}">101</td>
+                <td th:text="${m.lot != null ? m.lot.code : '-'}">LOT-001</td>
                 <td th:text="${#temporals.format(m.dateMortalite, 'dd/MM/yyyy')}">01/01/2026</td>
                 <td th:text="${m.nbMorts}">5</td>
                 <td th:text="${m.cause != null ? m.cause : '-'}">Maladie</td>

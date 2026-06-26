@@ -12,13 +12,13 @@ import mg.itu.aquanova.production.models.MortaliteModels;
 public interface MortaliteRepository
         extends JpaRepository<MortaliteModels, Integer> {
 
-    List<MortaliteModels> findByIdLotOrderByDateMortaliteDesc(Integer idLot);
+    List<MortaliteModels> findByLotIdOrderByDateMortaliteDesc(Long lotId);
 
-    List<MortaliteModels> findByIdLotAndDateMortaliteBetweenOrderByDateMortaliteDesc(
-            Integer idLot,
+    List<MortaliteModels> findByLotIdAndDateMortaliteBetweenOrderByDateMortaliteDesc(
+            Long lotId,
             LocalDate dateDebut,
             LocalDate dateFin);
 
-    @Query("select coalesce(sum(m.nbMorts), 0) from MortaliteModels m where m.idLot = :idLot")
-    Integer sumNbMortsByIdLot(@Param("idLot") Integer idLot);
+    @Query("select coalesce(sum(m.nbMorts), 0) from MortaliteModels m where m.lot.id = :lotId")
+    Integer sumNbMortsByLotId(@Param("lotId") Long lotId);
 }
