@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Créer un nouveau transfert</h1>
+
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
+    <form th:action="@{/transferts/save}" th:object="${transfert}" method="post">
+        <div>
+            <label for="dateTransfert">Date de transfert</label>
+            <input type="date" id="dateTransfert" th:field="*{dateTransfert}" required>
+        </div>
+
+        <div>
+            <label for="effectif">Effectif</label>
+            <input type="number" id="effectif" th:field="*{effectif}" min="1" required>
+        </div>
+
+        <div>
+            <label for="poidsMoyen">Poids moyen</label>
+            <input type="number" step="0.01" id="poidsMoyen" th:field="*{poidsMoyen}" min="0.01" required>
+        </div>
+
+        <div>
+            <label for="lotSource">Lot source</label>
+            <select id="lotSource" th:field="*{lotSource.id}" required>
+                <option value="">-- Choisir un lot source --</option>
+                <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
+            </select>
+        </div>
+
+        <div>
+            <label for="codeLotDestination">Code du nouveau lot destination</label>
+            <input type="text" id="codeLotDestination" th:field="*{codeLotDestination}">
+        </div>
+
+        <div>
+            <label for="bassinSource">Bassin source</label>
+            <select id="bassinSource" th:field="*{bassinSource.id}" required>
+                <option value="">-- Choisir un bassin source --</option>
+                <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
+            </select>
+        </div>
+
+        <div>
+            <label for="bassinDestination">Bassin destination</label>
+            <select id="bassinDestination" th:field="*{bassinDestination.id}" required>
+                <option value="">-- Choisir un bassin destination --</option>
+                <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit">Enregistrer</button>
+            <a th:href="@{/transferts}">Retour à la liste</a>
+        </div>
+    </form>
+</body>
+
+</html>

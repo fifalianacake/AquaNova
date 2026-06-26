@@ -2,20 +2,23 @@ package mg.itu.aquanova.referentiel.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Table(name = "type_bassin")
 @Entity
-public class TypeBassin {
+@Table(name = "statut_bassin")
+public class StatutBassin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String libelle;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "libelle", nullable = false, unique = true, length = 20)
+    private LibelleStatutBassin libelle;
 
     public Long getId() {
         return id;
@@ -25,11 +28,13 @@ public class TypeBassin {
         this.id = id;
     }
 
-    public String getLibelle() {
+    public LibelleStatutBassin getLibelle() {
         return libelle;
     }
 
-    public void setLibelle(String libelle) {
+    public void setLibelle(LibelleStatutBassin libelle) {
         this.libelle = libelle;
     }
+
+    
 }

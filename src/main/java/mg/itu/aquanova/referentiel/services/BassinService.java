@@ -1,11 +1,12 @@
 package mg.itu.aquanova.referentiel.services;
 
 import mg.itu.aquanova.referentiel.models.Bassin;
+import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.models.TypeBassin;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
+import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
 import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +16,18 @@ import java.util.List;
 @Service
 public class BassinService {
 
-    @Autowired
-    private BassinsRepository bassinRepository;
+    private final BassinsRepository bassinRepository;
 
-    @Autowired
-    private TypeBassinRepository typeBassinRepository;
+    private final TypeBassinRepository typeBassinRepository;
+
+    private final StatutBassinRepository statutBassinRepository;
+
+    public BassinService(BassinsRepository bassinRepository,
+                         TypeBassinRepository typeBassinRepository, StatutBassinRepository statutBassinRepository) {
+        this.bassinRepository = bassinRepository;
+        this.typeBassinRepository = typeBassinRepository;
+        this.statutBassinRepository = statutBassinRepository;
+    }
 
     // ==========================
     // Gestion des Bassins
@@ -49,9 +57,9 @@ public class BassinService {
 
     @Transactional
     public Bassin creerBassin(String reference,
-                              Integer idStatut,
-                              Long idType,
-                              BigDecimal capaciteM3) {
+                          Long idStatut,
+                          Long idType,
+                          BigDecimal capaciteM3) {
 
         if (reference == null || reference.trim().isEmpty()) {
             throw new IllegalArgumentException("La référence du bassin est obligatoire.");
@@ -76,10 +84,14 @@ public class BassinService {
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "Le type de bassin spécifié n'existe pas."));
+        StatutBassin statut = statutBassinRepository.findById(idStatut)
+        .orElseThrow(() ->
+                new IllegalArgumentException(
+                        "Le statut spécifié n'existe pas."));
 
         Bassin bassin = new Bassin();
         bassin.setReference(reference);
-        bassin.setIdStatut(idStatut);
+        bassin.setStatut(statut);
         bassin.setCapaciteM3(capaciteM3);
         bassin.setTypeBassin(typeBassin);
 

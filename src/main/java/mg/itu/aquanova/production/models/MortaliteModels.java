@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -17,8 +19,9 @@ public class MortaliteModels {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "id_lot", nullable = false)
-    private Integer idLot;
+    @ManyToOne
+    @JoinColumn(name = "id_lot", nullable = false)
+    private LotModels lot;
 
     @Column(name = "date_mortalite", nullable = false)
     private LocalDate dateMortalite;
@@ -40,12 +43,12 @@ public class MortaliteModels {
         this.id = id;
     }
 
-    public Integer getIdLot() {
-        return idLot;
+    public LotModels getLot() {
+        return lot;
     }
 
-    public void setIdLot(Integer idLot) {
-        this.idLot = idLot;
+    public void setLot(LotModels lot) {
+        this.lot = lot;
     }
 
     public LocalDate getDateMortalite() {

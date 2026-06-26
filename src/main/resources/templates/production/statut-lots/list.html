@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste Statut Lots</title>
+</head>
+<body>
+<h1>Liste des Statuts de Lots</h1>
+<div><a th:href="@{/statut-lots/new}">Créer un nouveau statut</a></div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Libelle</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="s : ${statuts}">
+        <td th:text="${s.id}"></td>
+        <td th:text="${s.libelle}"></td>
+        <td th:text="${s.description}"></td>
+        <td>
+            <a th:href="@{'/statut-lots/' + ${s.id}}">View</a>
+            <a th:href="@{'/statut-lots/' + ${s.id} + '/edit'}">Edit</a>
+            <a th:href="@{'/statut-lots/' + ${s.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

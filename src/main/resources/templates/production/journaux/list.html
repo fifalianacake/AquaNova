@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Journaux des lots</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+<h1>Journaux des lots</h1>
+
+<p>
+    <a th:href="@{/lots}">Retour à la liste des lots</a>
+</p>
+
+<form method="get" th:action="@{/journaux}">
+    <div>
+        <label>Lot:
+            <select name="lotId">
+                <option value="">-- Tous --</option>
+                <option th:each="lot : ${lots}"
+                        th:value="${lot.id}"
+                        th:text="${lot.code}"
+                        th:selected="${filter != null && filter.lotId != null && filter.lotId == lot.id}"></option>
+            </select>
+        </label>
+
+        <label>Type:
+            <select name="typeEvenement">
+                <option value="">-- Tous --</option>
+                <option th:each="type : ${typesEvenement}"
+                        th:value="${type}"
+                        th:text="${type}"
+                        th:selected="${filter != null && filter.typeEvenement == type}"></option>
+            </select>
+        </label>
+
+        <label>Du:
+            <input type="date" name="dateDebut" th:value="${filter != null ? filter.dateDebut : null}">
+        </label>
+
+        <label>Au:
+            <input type="date" name="dateFin" th:value="${filter != null ? filter.dateFin : null}">
+        </label>
+
+        <button type="submit">Filtrer</button>
+        <a th:href="@{/journaux}">Réinitialiser</a>
+    </div>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Lot</th>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="journal : ${journaux}">
+        <td th:text="${#temporals.format(journal.dateEvenement, 'dd/MM/yyyy HH:mm')}"></td>
+        <td>
+            <a th:if="${journal.lot != null}"
+               th:href="@{/lots/{id}(id=${journal.lot.id})}"
+               th:text="${journal.lot.code}"></a>
+            <span th:if="${journal.lot == null}">-</span>
+        </td>
+        <td th:text="${journal.typeEvenement != null ? journal.typeEvenement.libelle : '-'}"></td>
+        <td th:text="${journal.description}"></td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(journaux)}">
+        <td colspan="4">Aucun événement enregistré.</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

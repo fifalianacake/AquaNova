@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Statuts Bassins</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="container mt-5">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Statuts Bassins</h2>
+    <a th:href="@{/statuts-bassins/new}" class="btn btn-primary">New</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+    <tr>
+        <th>ID</th>
+        <th>Libelle</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="statut : ${statuts}">
+        <td th:text="${statut.id}">1</td>
+        <td th:text="${statut.libelle}">LIBRE</td>
+        <td>
+            <a th:href="@{/statuts-bassins/{id}(id=${statut.id})}" class="btn btn-sm btn-info">Details</a>
+            <a th:href="@{/statuts-bassins/{id}/edit(id=${statut.id})}" class="btn btn-sm btn-warning">Edit</a>
+            <a th:href="@{/statuts-bassins/{id}/delete(id=${statut.id})}"
+               class="btn btn-sm btn-danger"
+               onclick="return confirm('Delete this status ?')">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
