@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "aliments")
-public class Aliment {
+public class AlimentModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class Aliment {
     @Column(name = "stock_actuel", precision = 10, scale = 2, nullable = false)
     private BigDecimal stockActuel = BigDecimal.ZERO;
 
-    public Aliment() {
+    public AlimentModel() {
     }
 
     public Integer getId() {

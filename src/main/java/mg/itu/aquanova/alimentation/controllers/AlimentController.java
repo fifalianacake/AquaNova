@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.alimentation.models.AlimentModel;
 import mg.itu.aquanova.alimentation.services.AlimentService;
 
 @Controller
@@ -27,33 +27,33 @@ public class AlimentController {
     public String list(@RequestParam(required = false) String q, Model model) {
         model.addAttribute("aliments", service.searchByNom(q));
         model.addAttribute("q", q);
-        return "aliments/list";
+        return "alimentation/aliments/list";
     }
 
     @GetMapping("/new")
     public String createForm(Model model) {
-        model.addAttribute("aliment", new Aliment());
-        return "aliments/form";
+        model.addAttribute("aliment", new AlimentModel());
+        return "alimentation/aliments/form";
     }
 
     @PostMapping
-    public String save(@ModelAttribute Aliment aliment) {
+    public String save(@ModelAttribute AlimentModel aliment) {
         service.save(aliment);
         return "redirect:/aliments";
     }
 
     @GetMapping("/{id}")
     public String details(@PathVariable Integer id, Model model) {
-        Aliment aliment = service.findById(id);
+        AlimentModel aliment = service.findById(id);
         model.addAttribute("aliment", aliment);
         model.addAttribute("stockActuel", service.getStockActuel(id));
-        return "aliments/details";
+        return "alimentation/aliments/details";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Integer id, Model model) {
         model.addAttribute("aliment", service.findById(id));
-        return "aliments/form";
+        return "alimentation/aliments/form";
     }
 
     @GetMapping("/delete/{id}")

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.alimentation.models.AlimentModel;
 import mg.itu.aquanova.alimentation.repositories.AlimentRepository;
 
 @Service
@@ -16,22 +16,22 @@ public class AlimentService {
         this.repo = repo;
     }
 
-    public List<Aliment> findAll() {
+    public List<AlimentModel> findAll() {
         return repo.findAll();
     }
 
-    public List<Aliment> searchByNom(String nom) {
+    public List<AlimentModel> searchByNom(String nom) {
         if (nom == null || nom.trim().isEmpty()) {
             return findAll();
         }
         return repo.findByNomContainingIgnoreCaseOrderByNomAsc(nom.trim());
     }
 
-    public Aliment findById(Integer id) {
+    public AlimentModel findById(Integer id) {
         return repo.findById(id).orElse(null);
     }
 
-    public Aliment save(Aliment aliment) {
+    public AlimentModel save(AlimentModel aliment) {
         validerAliment(aliment);
         normaliserAliment(aliment);
         return repo.save(aliment);
@@ -42,14 +42,14 @@ public class AlimentService {
     }
 
     public BigDecimal getStockActuel(Integer id) {
-        Aliment aliment = findById(id);
+        AlimentModel aliment = findById(id);
         if (aliment == null || aliment.getStockActuel() == null) {
             return BigDecimal.ZERO;
         }
         return aliment.getStockActuel();
     }
 
-    private void validerAliment(Aliment aliment) {
+    private void validerAliment(AlimentModel aliment) {
         if (aliment == null) {
             throw new IllegalArgumentException("L'aliment est obligatoire.");
         }
@@ -76,7 +76,7 @@ public class AlimentService {
         }
     }
 
-    private void normaliserAliment(Aliment aliment) {
+    private void normaliserAliment(AlimentModel aliment) {
         aliment.setNom(aliment.getNom().trim());
         aliment.setType(aliment.getType().trim());
 
