@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<h2>Nouveau mouvement</h2>
+
+<form method="post" action="/stocks/mouvements">
+
+    <label>Date</label>
+    <input type="date" name="dateMouvement" required/>
+
+    <label>Aliment</label>
+    <select name="aliment.id">
+        <option th:each="a : ${aliments}"
+                th:value="${a.id}"
+                th:text="${a.nom}">
+        </option>
+    </select>
+
+    <label>Type</label>
+    <select name="typeMouvement">
+        <option value="ENTREE">ENTREE</option>
+        <option value="SORTIE">SORTIE</option>
+        <option value="PERTE">PERTE</option>
+    </select>
+
+    <label>Quantité</label>
+    <input type="number" name="quantite" step="0.01" min="0.01" required/>
+
+    <label>Commentaire</label>
+    <input type="text" name="commentaire"/>
+
+    <button type="submit">Enregistrer</button>
+
+</form>
+
+<a href="/stocks/mouvements">Retour</a>
+
+</body>
+</html>

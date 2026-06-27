@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<h2>Détail stock</h2>
+
+<!-- MAIN INFO -->
+<p>Nom : <span th:text="${stock.nom}"></span></p>
+<p>Stock : <span th:text="${stock.stock}"></span> kg</p>
+<p>Seuil : <span th:text="${stock.seuil}"></span></p>
+
+<p th:if="${stock.alerte}" style="color:red;">
+    ⚠ Stock faible
+</p>
+
+<!-- DATE FILTER -->
+<form method="get">
+    <input type="date" name="date"/>
+    <button>Changer date</button>
+</form>
+
+<!-- RECENT MOVEMENTS -->
+<h3>Mouvements récents</h3>
+
+<table border="1">
+    <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Quantité</th>
+    </tr>
+
+    <tr th:each="m : ${mouvements}">
+        <td th:text="${m.dateMouvement}"></td>
+        <td th:text="${m.typeMouvement}"></td>
+        <td th:text="${m.quantite}"></td>
+    </tr>
+</table>
+
+<!-- BUTTONS -->
+<a href="/stocks">Retour</a>
+<a th:href="@{'/stocks/edit/' + ${stock.id}}">Modifier</a>
+<a th:href="@{'/stocks/delete/' + ${stock.id}}">Supprimer</a>
+
+</body>
+</html>
