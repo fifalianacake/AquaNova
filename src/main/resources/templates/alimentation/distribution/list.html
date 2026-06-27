@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des distributions</title>
+</head>
+<body>
+    
+    <h1>Liste des distributions</h1>
+
+    <p>
+        <a th:href="@{/alimentation/distribution/new}">Créer une nouvelle distribution</a>
+    </p>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date de distribution</th>
+                <th>Quantité (kg)</th>
+                <th>Ration Théorique</th>
+                <th>Lot</th>
+                <th>Aliment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="distribution : ${distributions}">
+                <td th:text="${distribution.id}"></td>
+                <td th:text="${distribution.dateDistribution}"></td>
+                <td th:text="${distribution.quantite}"></td>
+                <td th:text="${distribution.rationTheorique}"></td>
+                <td th:text="${distribution.lot != null ? distribution.lot.id : 'N/A'}"></td>
+                <td th:text="${distribution.aliment != null ? distribution.aliment.libelle : 'N/A'}"></td>
+                <td>
+                    <a th:href="@{/alimentation/distribution/edit/{id}(id=${distribution.id})}">Modifier</a>
+                    |
+                    <a th:href="@{/alimentation/distribution/delete/{id}(id=${distribution.id})}"
+                       onclick="return confirm('Supprimer cette distribution ?');">Supprimer</a>
+                </td>
+            </tr>
+        </tbody>
+    </table> </body>
+</html>
