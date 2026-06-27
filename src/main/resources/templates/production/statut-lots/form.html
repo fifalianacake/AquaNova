@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire Statut Lot</title>
+</head>
+<body>
+<h1 th:text="${statut.id} == null ? 'Créer un statut' : 'Modifier statut ' + ${statut.id}"></h1>
+
+<form th:action="${statut.id} == null ? @{/statut-lots} : @{/statut-lots/{id}(id=${statut.id})}" method="post" th:object="${statut}">
+    <div>
+        <label>Libelle:
+            <select th:field="*{libelle}">
+                <option th:each="val : ${libelles}" th:value="${val}" th:text="${val}"></option>
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Description: <textarea th:field="*{description}"></textarea></label>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+        <a th:href="@{/statut-lots}">Cancel</a>
+    </div>
+</form>
+</body>
+</html>

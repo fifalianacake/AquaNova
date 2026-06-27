@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des lots</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+    </style>
+</head>
+<body>
+<h1>Liste des lots</h1>
+
+<div>
+    <a th:href="@{/lots/new}">Créer un nouveau lot</a>
+    <a th:href="@{/production/previsions-recoltes}">Prévision récoltes</a>
+</div>
+
+<form method="get" th:action="@{/lots}">
+    <div>
+        <label>Id: <input type="number" name="id" th:value="${param.id}"></label>
+        <label>Code: <input type="text" name="code" th:value="${param.code}"></label>
+        <label>Espece:
+            <select name="especeId">
+                <option value="">--</option>
+                <option th:each="e : ${especes}" th:value="${e.id}" th:text="${e.nom}" th:selected="${param.especeId} == ${e.id}"></option>
+            </select>
+        </label>
+        <label>Bassin:
+            <select name="bassinId">
+                <option value="">--</option>
+                <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}" th:selected="${param.bassinId} == ${b.id}"></option>
+            </select>
+        </label>
+        <label>Stade:
+            <select name="stadeId">
+                <option value="">--</option>
+                <option th:each="s : ${stades}" th:value="${s.id}" th:text="${s.nom}" th:selected="${param.stadeId} == ${s.id}"></option>
+            </select>
+        </label>
+        <label>Statut:
+            <select name="statutId">
+                <option value="">--</option>
+                <option th:each="st : ${statuts}" th:value="${st.id}" th:text="${st.libelle}" th:selected="${param.statutId} == ${st.id}"></option>
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Date from: <input type="date" name="dateFrom" th:value="${param.dateFrom}"></label>
+        <label>Date to: <input type="date" name="dateTo" th:value="${param.dateTo}"></label>
+        <label>Effectif min: <input type="number" name="effectifMin" th:value="${param.effectifMin}"></label>
+        <label>Effectif max: <input type="number" name="effectifMax" th:value="${param.effectifMax}"></label>
+    </div>
+    <div>
+        <button type="submit">Search</button>
+        <a th:href="@{/lots}">Reset</a>
+    </div>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Code</th>
+        <th>Espece</th>
+        <th>Bassin</th>
+        <th>Stade</th>
+        <th>Statut</th>
+        <th>Date mise en charge</th>
+        <th>Effectif actuel</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="lot : ${lots}">
+        <td th:text="${lot.id}"></td>
+        <td th:text="${lot.code}"></td>
+        <td th:text="${lot.espece != null ? lot.espece.nom : ''}"></td>
+        <td th:text="${lot.bassin != null ? lot.bassin.reference : ''}"></td>
+    <td th:text="${lot.stadeCroissance != null ? lot.stadeCroissance.nom : ''}"></td>
+        <td th:text="${lot.statutLot != null ? lot.statutLot.libelle : ''}"></td>
+        <td th:text="${lot.dateMiseEnCharge}"></td>
+        <td th:text="${lot.effectifActuel}"></td>
+        <td>
+            <a th:href="@{'/lots/' + ${lot.id}}">View</a>
+            <a th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
+            <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${totalPages > 0}" style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
+    
+    <span th:if="${hasPrevious}">
+        <a th:href="@{/lots(page=${currentPage - 1}, 
+                            id=${lotFilter.id}, 
+                            code=${lotFilter.code}, 
+                            especeId=${lotFilter.especeId}, 
+                            bassinId=${lotFilter.bassinId}, 
+                            stadeId=${lotFilter.stadeId}, 
+                            statutId=${lotFilter.statutId}, 
+                            dateFrom=${lotFilter.dateFrom}, 
+                            dateTo=${lotFilter.dateTo}, 
+                            effectifMin=${lotFilter.effectifMin}, 
+                            effectifMax=${lotFilter.effectifMax})}">&laquo; Précédent</a>
+    </span>
+    <span th:unless="${hasPrevious}" style="color: #999;">&laquo; Précédent</span>
+
+    <span th:text="'Page ' + ${currentPage + 1} + ' sur ' + ${totalPages}"></span>
+
+    <span th:if="${hasNext}">
+        <a th:href="@{/lots(page=${currentPage + 1}, 
+                            id=${lotFilter.id}, 
+                            code=${lotFilter.code}, 
+                            especeId=${lotFilter.especeId}, 
+                            bassinId=${lotFilter.bassinId}, 
+                            stadeId=${lotFilter.stadeId}, 
+                            statutId=${lotFilter.statutId}, 
+                            dateFrom=${lotFilter.dateFrom}, 
+                            dateTo=${lotFilter.dateTo}, 
+                            effectifMin=${lotFilter.effectifMin}, 
+                            effectifMax=${lotFilter.effectifMax})}">Suivant &raquo;</a>
+    </span>
+    <span th:unless="${hasNext}" style="color: #999;">Suivant &raquo;</span>
+
+</div>
+
+</body>
+</html>

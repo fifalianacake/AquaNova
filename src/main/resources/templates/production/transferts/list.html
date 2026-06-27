@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des transferts</title>
+</head>
+
+<body>
+    <h1>Liste des transferts</h1>
+
+    <p>
+        <a th:href="@{/transferts/new}">Creer un nouveau transfert</a>
+    </p>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date de transfert</th>
+                <th>Effectif</th>
+                <th>Poids moyen</th>
+                <th>Lot source</th>
+                <th>Lot destination</th>
+                <th>Bassin source</th>
+                <th>Bassin destination</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="transfert : ${transferts}">
+                <td th:text="${transfert.id}"></td>
+                <td th:text="${transfert.dateTransfert}"></td>
+                <td th:text="${transfert.effectif}"></td>
+                <td th:text="${transfert.poidsMoyen}"></td>
+                <td th:text="${transfert.lotSource != null ? transfert.lotSource.code : '-'}"></td>
+                <td th:text="${transfert.lotDestination != null ? transfert.lotDestination.code : '-'}"></td>
+                <td th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></td>
+                <td th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></td>
+                <td>
+                    <a th:href="@{'/transferts/' + ${transfert.id}}">Voir</a>
+                    <a th:href="@{'/transferts/delete/' + ${transfert.id}}"
+                        onclick="return confirm('Supprimer ce transfert ?');">Supprimer</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>

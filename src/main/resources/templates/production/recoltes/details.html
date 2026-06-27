@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail récolte</title>
+</head>
+<body>
+<h1>Détail de la récolte</h1>
+
+<p>ID: <span th:text="${recolte.id}"></span></p>
+<p>Lot: <span th:text="${recolte.lot != null ? recolte.lot.code : ''}"></span></p>
+<p>Type: <span th:text="${recolte.typeRecolte != null ? recolte.typeRecolte.libelle : ''}"></span></p>
+<p>Date: <span th:text="${recolte.dateRecolte}"></span></p>
+<p>Effectif récolté: <span th:text="${recolte.effectifRecolte}"></span></p>
+<p>Poids total: <span th:text="${recolte.poidsTotal}"></span></p>
+<p>Poids moyen: <span th:text="${recolte.poidsMoyen}"></span></p>
+
+<p>
+    <a th:href="@{/recoltes}">Retour à la liste</a>
+</p>
+
+</body>
+</html>

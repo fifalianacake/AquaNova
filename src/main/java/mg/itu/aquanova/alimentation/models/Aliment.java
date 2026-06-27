@@ -1,5 +1,6 @@
 package mg.itu.aquanova.alimentation.models;
 
+
 import java.math.BigDecimal;
 
 import jakarta.persistence.Column;

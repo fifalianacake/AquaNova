@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire Lot</title>
+</head>
+<body>
+<h1 th:text="${lot.id} == null ? 'Créer un lot' : 'Modifier le lot ' + ${lot.id}"></h1>
+
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
+<form th:action="${lot.id} == null ? @{/lots} : @{/lots/{id}(id=${lot.id})}" method="post" th:object="${lot}">
+    <div>
+        <label>Code: <input type="text" th:field="*{code}"/></label>
+    </div>
+    <div>
+        <label>Espece:
+            <select th:field="*{espece.id}">
+                <option value="">--</option>
+                <option th:each="e : ${especes}" th:value="${e.id}" th:text="${e.nom}"></option>
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Bassin:
+            <select th:field="*{bassin.id}">
+                <option value="">--</option>
+                <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}"></option>
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Stade:
+            <select th:field="*{stadeCroissance.id}">
+                <option value="">--</option>
+                <option th:each="s : ${stades}" th:value="${s.id}" th:text="${s.nom}"></option>
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Statut:
+            <select th:field="*{statutLot.id}">
+                <option value="">--</option>
+                <option th:each="st : ${statuts}" th:value="${st.id}" th:text="${st.libelle}"></option>
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Date mise en charge: <input type="date" th:field="*{dateMiseEnCharge}"/></label>
+    </div>
+    <div>
+        <label>Effectif initial: <input type="number" th:field="*{effectifInitial}"/></label>
+        <label th:if="${lot.id != null}">Effectif actuel: <input type="number" th:field="*{effectifActuel}"/></label>
+    </div>
+    <div>
+        <label>Poids moyen initial: <input type="number" step="0.01" th:field="*{poidsMoyenInitial}"/></label>
+        <label th:if="${lot.id != null}">Poids moyen actuel: <input type="number" step="0.01" th:field="*{poidsMoyenActuel}"/></label>
+    </div>
+    <div>
+        <label>Observation: <textarea th:field="*{observation}"></textarea></label>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+        <a th:href="@{/lots}">Cancel</a>
+    </div>
+</form>
+
+</body>
+</html>

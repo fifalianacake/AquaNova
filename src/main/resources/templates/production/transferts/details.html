@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Details du transfert</title>
+</head>
+
+<body>
+    <h1>Détails du transfert</h1>
+    <div>
+        <p><strong>ID:</strong> <span th:text="${transfert.id}"></span></p>
+        <p><strong>Date de transfert:</strong> <span th:text="${transfert.dateTransfert}"></span></p>
+        <p><strong>Effectif:</strong> <span th:text="${transfert.effectif}"></span></p>
+        <p><strong>Poids moyen:</strong> <span th:text="${transfert.poidsMoyen}"></span></p>
+        <p><strong>Lot source:</strong> <span th:text="${transfert.lotSource != null ? transfert.lotSource.code : '-'}"></span></p>
+        <p><strong>Lot destination:</strong> <span th:text="${transfert.lotDestination != null ? transfert.lotDestination.code : '-'}"></span></p>
+        <p><strong>Bassin source:</strong> <span th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></span></p>
+        <p><strong>Bassin destination:</strong> <span th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></span></p>
+    </div>
+    <div>
+        <a th:href="@{/transferts}">Retour à la liste</a>
+    </div>
+</body>
+
+</html>

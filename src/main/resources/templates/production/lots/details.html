@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails Lot</title>
+</head>
+<body>
+<h1>Détails du lot <span th:text="${lot.id}"></span></h1>
+<div>
+    <p><strong>Code:</strong> <span th:text="${lot.code}"></span></p>
+    <p><strong>Espece:</strong> <span th:text="${lot.espece != null ? lot.espece.nom : ''}"></span></p>
+    <p><strong>Bassin:</strong> <span th:text="${lot.bassin != null ? lot.bassin.reference : ''}"></span></p>
+    <p><strong>Stade:</strong> <span th:text="${lot.stadeCroissance != null ? lot.stadeCroissance.nom : ''}"></span></p>
+    <p><strong>Statut:</strong> <span th:text="${lot.statutLot != null ? lot.statutLot.libelle : ''}"></span></p>
+    <p><strong>Date mise en charge:</strong> <span th:text="${lot.dateMiseEnCharge}"></span></p>
+    <p><strong>Effectif initial:</strong> <span th:text="${lot.effectifInitial}"></span></p>
+    <p><strong>Effectif actuel:</strong> <span th:text="${lot.effectifActuel}"></span></p>
+    <p><strong>Poids moyen initial:</strong> <span th:text="${lot.poidsMoyenInitial}"></span></p>
+    <p><strong>Poids moyen actuel:</strong> <span th:text="${lot.poidsMoyenActuel}"></span></p>
+    <p><strong>Observation:</strong> <span th:text="${lot.observation}"></span></p>
+</div>
+<div>
+    <a th:href="@{/lots}">Back to list</a>
+    <a th:href="@{/lots/{id}/journal(id=${lot.id})}">Journal</a>
+    <a th:href="@{/production/mortalites/lot/{id}(id=${lot.id})}">Mortalités</a>
+    <a th:href="@{/production/previsions-recoltes(lotId=${lot.id})}">Prévision récolte</a>
+    <a th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
+    <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
+</div>
+</body>
+</html>
