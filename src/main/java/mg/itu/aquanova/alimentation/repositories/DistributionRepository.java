@@ -1,8 +1,9 @@
-package mg.itu.aquanova.alimentation.distribution.repositories;
+package mg.itu.aquanova.alimentation.repositories;
 
-import mg.itu.aquanova.alimentation.distribution.models.DistributionModels;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import mg.itu.aquanova.alimentation.models.DistributionModels;
 
 import java.util.List;
 

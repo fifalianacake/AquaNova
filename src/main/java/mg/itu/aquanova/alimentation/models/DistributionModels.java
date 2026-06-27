@@ -1,4 +1,4 @@
-package mg.itu.aquanova.alimentation.distribution.models;
+package mg.itu.aquanova.alimentation.models;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;

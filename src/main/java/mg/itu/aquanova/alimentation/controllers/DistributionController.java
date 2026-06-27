@@ -1,4 +1,4 @@
-package mg.itu.aquanova.alimentation.distribution.controllers;
+package mg.itu.aquanova.alimentation.controllers;
 
 import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.ui.Model;
 
-import mg.itu.aquanova.alimentation.distribution.models.DistributionModels;
-import mg.itu.aquanova.alimentation.distribution.services.DistributionService;
+import mg.itu.aquanova.alimentation.models.DistributionModels;
+import mg.itu.aquanova.alimentation.services.DistributionService;
 
 @RequestMapping("/alimentation/distribution")
 @Controller
@@ -51,7 +51,7 @@ public class DistributionController {
         model.addAttribute("distribution", distribution);
         model.addAttribute("lots", distributionService.getAllDistributions()); // Assuming you have a method to get all lots
         model.addAttribute("aliments", distributionService.getAllDistributions()); // Assuming you have
-        
+
         return "alimentation/distribution/form";
     }
 
