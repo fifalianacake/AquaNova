@@ -23,15 +23,15 @@ public class BassinService {
     private final StatutBassinRepository statutBassinRepository;
 
     public BassinService(BassinsRepository bassinRepository,
-                         TypeBassinRepository typeBassinRepository, StatutBassinRepository statutBassinRepository) {
+            TypeBassinRepository typeBassinRepository, StatutBassinRepository statutBassinRepository) {
         this.bassinRepository = bassinRepository;
         this.typeBassinRepository = typeBassinRepository;
         this.statutBassinRepository = statutBassinRepository;
     }
 
-    // ==========================
-    // Gestion des Bassins
-    // ==========================
+    public List<Bassin> findAll() {
+        return bassinRepository.findAll();
+    }
 
     public List<Bassin> getAllBassins() {
         return bassinRepository.findAll();
@@ -39,8 +39,7 @@ public class BassinService {
 
     public Bassin getBassinById(Long id) {
         return bassinRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Bassin introuvable avec l'ID : " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable avec l'ID : " + id));
     }
 
     public void saveBassin(Bassin bassin) {
@@ -57,9 +56,9 @@ public class BassinService {
 
     @Transactional
     public Bassin creerBassin(String reference,
-                          Long idStatut,
-                          Long idType,
-                          BigDecimal capaciteM3) {
+            Long idStatut,
+            Long idType,
+            BigDecimal capaciteM3) {
 
         if (reference == null || reference.trim().isEmpty()) {
             throw new IllegalArgumentException("La référence du bassin est obligatoire.");
@@ -81,12 +80,10 @@ public class BassinService {
         }
 
         TypeBassin typeBassin = typeBassinRepository.findById(idType)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Le type de bassin spécifié n'existe pas."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Le type de bassin spécifié n'existe pas."));
         StatutBassin statut = statutBassinRepository.findById(idStatut)
-        .orElseThrow(() ->
-                new IllegalArgumentException(
+                .orElseThrow(() -> new IllegalArgumentException(
                         "Le statut spécifié n'existe pas."));
 
         Bassin bassin = new Bassin();
@@ -108,9 +105,8 @@ public class BassinService {
 
     public TypeBassin getTypeBassinById(Long id) {
         return typeBassinRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Type de bassin introuvable : " + id));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Type de bassin introuvable : " + id));
     }
 
     public void saveTypeBassin(TypeBassin typeBassin) {
