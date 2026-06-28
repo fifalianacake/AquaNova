@@ -49,7 +49,7 @@ public class MouvementController {
         model.addAttribute("mouvement", new MouvementStock());
         model.addAttribute("aliments", alimentService.findAll());
 
-        return "mouvements/new";
+        return "mouvements/form";
     }
 
     @PostMapping
@@ -64,13 +64,10 @@ public class MouvementController {
     public String edit(@PathVariable Long id,
             Model model) {
 
-        model.addAttribute("mouvement",
-                service.findById(id));
+        model.addAttribute("mouvement", service.findById(id));
+        model.addAttribute("aliments", alimentService.findAll());
 
-        model.addAttribute("aliments",
-                alimentService.findAll());
-
-        return "mouvements/new";
+        return "mouvements/form";
     }
 
     @PostMapping("/edit/{id}")
@@ -84,11 +81,9 @@ public class MouvementController {
         return "redirect:/stocks/mouvements";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
-
         service.delete(id);
-
         return "redirect:/stocks/mouvements";
     }
 

@@ -23,10 +23,6 @@ public class ReleveEauController {
     @Autowired
     private BassinService bassinService;
 
-    /*
-     * LIST
-     */
-
     @GetMapping
     public String list(Long id,
             String bassin,
@@ -53,10 +49,6 @@ public class ReleveEauController {
         return "sanitaire/releves/list";
     }
 
-    /*
-     * NEW FORM
-     */
-
     @GetMapping("/new")
     public String createForm(Model model,
             HttpSession session) {
@@ -77,12 +69,8 @@ public class ReleveEauController {
         model.addAttribute("releve", releve);
         model.addAttribute("bassins", bassinService.getAllBassins());
 
-        return "sanitaire/releves/new";
+        return "sanitaire/releves/form";
     }
-
-    /*
-     * SAVE
-     */
 
     @PostMapping
     public String save(@ModelAttribute ReleveEau releve,
@@ -105,10 +93,6 @@ public class ReleveEauController {
         return "redirect:/releves-eau";
     }
 
-    /*
-     * DETAIL
-     */
-
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id,
             Model model,
@@ -121,6 +105,57 @@ public class ReleveEauController {
                 service.getById(id));
 
         return "sanitaire/releves/detail";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable Long id,
+            Model model,
+            HttpSession session) {
+
+        if (session.getAttribute("user") == null)
+            return "redirect:/login";
+
+        String role = (String) session.getAttribute("role");
+        if (!"ADMIN".equals(role))
+            return "redirect:/releves-eau";
+
+        model.addAttribute("releve", service.getById(id));
+        model.addAttribute("bassins", bassinService.getAllBassins());
+
+        return "sanitaire/releves/form";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String update(@PathVariable Long id,
+            @ModelAttribute ReleveEau releve,
+            HttpSession session) {
+
+        if (session.getAttribute("user") == null)
+            return "redirect:/login";
+
+        String role = (String) session.getAttribute("role");
+        if (!"ADMIN".equals(role))
+            return "redirect:/releves-eau";
+
+        UserModels user = (UserModels) session.getAttribute("user");
+
+        releve.setId(id);
+        releve.setUser(user);
+
+        service.update(releve);
+
+        return "redirect:/releves-eau";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable Long id, HttpSession session) {
+        if (session.getAttribute("user") == null)
+            return "redirect:/login";
+        if (!"ADMIN".equals(session.getAttribute("role")))
+            return "redirect:/releves-eau";
+
+        service.delete(id);
+        return "redirect:/releves-eau";
     }
 
 }

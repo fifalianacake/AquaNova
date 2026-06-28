@@ -1,0 +1,28 @@
+<form method="post"
+    th:action="${mouvement.id} == null ? @{/stocks/mouvements} : @{'/stocks/mouvements/edit/' + ${mouvement.id}}"
+    th:object="${mouvement}">
+
+    <label>Date</label>
+    <input type="date" th:field="*{dateMouvement}" required />
+
+    <label>Aliment</label>
+    <select th:field="*{aliment.id}">
+        <option th:each="a : ${aliments}" th:value="${a.id}" th:text="${a.nom}">
+        </option>
+    </select>
+
+    <label>Type</label>
+    <select th:field="*{typeMouvement}">
+        <option value="ENTREE">ENTREE</option>
+        <option value="SORTIE">SORTIE</option>
+        <option value="PERTE">PERTE</option>
+    </select>
+
+    <label>Quantité</label>
+    <input type="number" step="0.01" th:field="*{quantite}" required />
+
+    <label>Commentaire</label>
+    <input type="text" th:field="*{commentaire}" />
+
+    <button type="submit">Enregistrer</button>
+</form>
