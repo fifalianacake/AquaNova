@@ -5,5 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import mg.itu.aquanova.referentiel.models.TypeAlimentModels;
 
 public interface TypeAlimentRepository
-        extends JpaRepository<TypeAlimentModels, Integer> {
+                extends JpaRepository<TypeAlimentModels, Integer> {
+
+        TypeAlimentModels findById(int id);
 }

@@ -1,45 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des distributions</title>
+    <title>Liste des Distributions</title>
 </head>
 <body>
-    
-    <h1>Liste des distributions</h1>
 
-    <p>
-        <a th:href="@{/alimentation/distribution/new}">Créer une nouvelle distribution</a>
-    </p>
+    <h2>Liste des Distributions d'Alimentation</h2>
+    
+    <a th:href="@{/alimentation/distribution/new}">Nouvelle Distribution</a>
+    <br/><br/>
 
     <table border="1">
-        <thead>
+        <thead border="1">
             <tr>
-                <th>ID</th>
-                <th>Date de distribution</th>
-                <th>Quantité (kg)</th>
-                <th>Ration Théorique</th>
-                <th>Lot</th>
+                <th>Date</th>
+                <th>ID Lot</th>
                 <th>Aliment</th>
+                <th>Ration Théorique</th>
+                <th>Quantité Distribuée</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <tr th:each="distribution : ${distributions}">
-                <td th:text="${distribution.id}"></td>
-                <td th:text="${distribution.dateDistribution}"></td>
-                <td th:text="${distribution.quantite}"></td>
-                <td th:text="${distribution.rationTheorique}"></td>
-                <td th:text="${distribution.lot != null ? distribution.lot.id : 'N/A'}"></td>
-                <td th:text="${distribution.aliment != null ? distribution.aliment.libelle : 'N/A'}"></td>
+            <tr th:if="${#lists.isEmpty(distributions)}">
+                <td>Aucune donnée disponible</td>
+            </tr>
+            
+            <tr th:each="dist : ${distributions}">
+                <td th:text="${dist.dateDistribution}">01/01/2026 08:00</td>
+                <td th:text="${dist.lot.id}">1</td>
+                <td th:text="${dist.aliment.nom}">Granulé</td>
+                <td th:text="${dist.rationTheorique + ' kg'}">0.00 kg</td>
+                <td th:text="${dist.quantite + ' kg'}">0.00 kg</td>
                 <td>
-                    <a th:href="@{/alimentation/distribution/edit/{id}(id=${distribution.id})}">Modifier</a>
-                    |
-                    <a th:href="@{/alimentation/distribution/delete/{id}(id=${distribution.id})}"
-                       onclick="return confirm('Supprimer cette distribution ?');">Supprimer</a>
+                    <a th:href="@{/alimentation/distribution/edit/{id}(id=${dist.id})}">Modifier</a>
+                    | 
+                    <a th:href="@{/alimentation/distribution/delete/{id}(id=${dist.id})}" 
+                       onclick="return confirm('Supprimer ?')">Supprimer</a>
                 </td>
             </tr>
         </tbody>
-    </table> </body>
+    </table>
+
+</body>
 </html>

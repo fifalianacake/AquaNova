@@ -2,9 +2,10 @@ package mg.itu.aquanova.alimentation.models;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import mg.itu.aquanova.production.models.LotModels;
-import mg.itu.aquanova.referentiel.models.TypeAlimentModels;
+import mg.itu.aquanova.stock.models.Aliment;
 
 @Entity
 @Table(name = "distribution")
@@ -15,7 +16,7 @@ public class DistributionModels {
     private Long id;
 
     @Column(name = "date_distribution", nullable = false)
-    private LocalDate dateDistribution;
+    private LocalDateTime dateDistribution;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_lot", nullable = false)
@@ -23,18 +24,21 @@ public class DistributionModels {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_aliment", nullable = false)
-    private TypeAlimentModels aliment;
+    private Aliment aliment;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = true, precision = 10, scale = 2)
     private BigDecimal quantite;
 
     @Column(name = "ration_theorique", precision = 10, scale = 2)
     private BigDecimal rationTheorique;
 
+    // @Enumerated(EnumType.STRING)
+    // @Column(name = "statut", nullable = false)
+    // private StatutDistributionModels statut = StatutDistributionModels.EN_ATTENTE;
+
     public DistributionModels() {
     }
 
-    // Getters et Setters
     public Long getId() {
         return id;
     }
@@ -43,11 +47,11 @@ public class DistributionModels {
         this.id = id;
     }
 
-    public LocalDate getDateDistribution() {
+    public LocalDateTime getDateDistribution() {
         return dateDistribution;
     }
 
-    public void setDateDistribution(LocalDate dateDistribution) {
+    public void setDateDistribution(LocalDateTime dateDistribution) {
         this.dateDistribution = dateDistribution;
     }
 
@@ -59,11 +63,11 @@ public class DistributionModels {
         this.lot = lot;
     }
 
-    public TypeAlimentModels getAliment() {
+    public Aliment getAliment() {
         return aliment;
     }
 
-    public void setAliment(TypeAlimentModels aliment) {
+    public void setAliment(Aliment aliment) {
         this.aliment = aliment;
     }
 
@@ -82,4 +86,5 @@ public class DistributionModels {
     public void setRationTheorique(BigDecimal rationTheorique) {
         this.rationTheorique = rationTheorique;
     }
+    
 }
