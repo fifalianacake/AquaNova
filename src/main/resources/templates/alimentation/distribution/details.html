@@ -13,12 +13,16 @@
 
     <div>
         <p><strong>ID :</strong> <span th:text="${distribution.id}"></span></p>
+        <p><strong>Statut :</strong> <span
+                th:text="${distribution.statut != null ? distribution.statut.name() : 'Non défini'}"></span></p>
         <p><strong>Date de distribution :</strong> <span th:text="${distribution.dateDistribution}"></span></p>
         <p><strong>Lot concerné :</strong> <span
                 th:text="${distribution.lot != null ? 'Lot #' + distribution.lot.id : 'Non défini'}"></span></p>
         <p><strong>Aliment distribué :</strong> <span
-                th:text="${distribution.aliment != null ? distribution.aliment.libelle : 'Non défini'}"></span></p>
-        <p><strong>Quantité réelle distribuée :</strong> <span th:text="${distribution.quantite} + ' kg'"></span></p>
+                th:text="${distribution.aliment != null ? distribution.aliment.nom : 'Non défini'}"></span></p>
+        <p><strong>Quantité réelle distribuée :</strong> <span
+                th:text="${distribution.quantite != null ? distribution.quantite + ' kg' : 'Non encore distribué'}"></span>
+        </p>
         <p><strong>Ration théorique prévue :</strong> <span
                 th:text="${distribution.rationTheorique != null ? distribution.rationTheorique + ' kg' : 'Aucune'}"></span>
         </p>
