@@ -1,4 +1,4 @@
-package mg.itu.aquanova.stock.models;
+package mg.itu.aquanova.alimentation.models;
 
 import jakarta.persistence.*;
 import mg.itu.aquanova.referentiel.models.TypeAlimentModels;

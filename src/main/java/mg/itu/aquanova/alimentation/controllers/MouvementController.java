@@ -1,13 +1,13 @@
-package mg.itu.aquanova.stock.controllers;
+package mg.itu.aquanova.alimentation.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import mg.itu.aquanova.stock.models.MouvementStock;
-import mg.itu.aquanova.stock.services.MouvementService;
-import mg.itu.aquanova.stock.services.AlimentService;
+import mg.itu.aquanova.alimentation.models.MouvementStock;
+import mg.itu.aquanova.alimentation.services.MouvementService;
+import mg.itu.aquanova.alimentation.services.AlimentService;
 
 @Controller
 @RequestMapping("/stocks/mouvements")

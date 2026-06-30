@@ -1,4 +1,4 @@
-package mg.itu.aquanova.stock.models;
+package mg.itu.aquanova.alimentation.models;
 
 public enum TypeMouvement {
     ENTREE,

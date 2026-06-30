@@ -1,4 +1,4 @@
-package mg.itu.aquanova.stock.services;
+package mg.itu.aquanova.alimentation.services;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.stock.models.*;
-import mg.itu.aquanova.stock.repositories.MouvementStockRepository;
+import mg.itu.aquanova.alimentation.models.*;
+import mg.itu.aquanova.alimentation.repositories.MouvementStockRepository;
 
 @Service
 public class MouvementService {

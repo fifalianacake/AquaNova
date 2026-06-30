@@ -1,4 +1,4 @@
-package mg.itu.aquanova.stock.dto;
+package mg.itu.aquanova.alimentation.dto;
 
 public class StockDTO {
 

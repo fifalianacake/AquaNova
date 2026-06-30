@@ -1,4 +1,4 @@
-package mg.itu.aquanova.stock.controllers;
+package mg.itu.aquanova.alimentation.controllers;
 
 import java.time.LocalDate;
 
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import mg.itu.aquanova.stock.services.StockService;
+import mg.itu.aquanova.alimentation.services.StockService;
 
 @Controller
 @RequestMapping("/stocks")

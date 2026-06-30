@@ -1,10 +1,10 @@
-package mg.itu.aquanova.stock.repositories;
+package mg.itu.aquanova.alimentation.repositories;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import mg.itu.aquanova.stock.models.MouvementStock;
+import mg.itu.aquanova.alimentation.models.MouvementStock;
 
 public interface StockRepository extends JpaRepository<MouvementStock, Long> {
 

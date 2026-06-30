@@ -1,4 +1,4 @@
-package mg.itu.aquanova.stock.services;
+package mg.itu.aquanova.alimentation.services;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.stock.dto.StockDTO;
-import mg.itu.aquanova.stock.models.Aliment;
-import mg.itu.aquanova.stock.models.MouvementStock;
-import mg.itu.aquanova.stock.models.TypeMouvement;
-import mg.itu.aquanova.stock.repositories.AlimentRepository;
-import mg.itu.aquanova.stock.repositories.StockRepository;
+import mg.itu.aquanova.alimentation.dto.StockDTO;
+import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.alimentation.models.MouvementStock;
+import mg.itu.aquanova.alimentation.models.TypeMouvement;
+import mg.itu.aquanova.alimentation.repositories.AlimentRepository;
+import mg.itu.aquanova.alimentation.repositories.StockRepository;
 
 @Service
 public class StockService {

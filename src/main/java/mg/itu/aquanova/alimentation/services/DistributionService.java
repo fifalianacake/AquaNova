@@ -10,11 +10,11 @@ import mg.itu.aquanova.production.models.Pese;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.repositories.PeseRepository;
 import mg.itu.aquanova.referentiel.repositories.TypeAlimentRepository;
-import mg.itu.aquanova.stock.models.Aliment;
-import mg.itu.aquanova.stock.models.MouvementStock;
-import mg.itu.aquanova.stock.models.TypeMouvement;
-import mg.itu.aquanova.stock.repositories.AlimentRepository;
-import mg.itu.aquanova.stock.services.MouvementService;
+import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.alimentation.models.MouvementStock;
+import mg.itu.aquanova.alimentation.models.TypeMouvement;
+import mg.itu.aquanova.alimentation.repositories.AlimentRepository;
+import mg.itu.aquanova.alimentation.services.MouvementService;
 
 import org.springframework.transaction.annotation.Transactional;
 

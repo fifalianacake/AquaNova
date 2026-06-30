@@ -1,12 +1,12 @@
-package mg.itu.aquanova.stock.services;
+package mg.itu.aquanova.alimentation.services;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.stock.models.Aliment;
-import mg.itu.aquanova.stock.repositories.AlimentRepository;
+import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.alimentation.repositories.AlimentRepository;
 
 @Service
 public class AlimentService {
@@ -14,23 +14,19 @@ public class AlimentService {
     @Autowired
     private AlimentRepository repo;
 
- 
     public List<Aliment> findAll() {
         return repo.findAll();
     }
 
-   
     public Aliment findById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aliment introuvable : " + id));
     }
 
-  
     public Aliment create(Aliment aliment) {
         return repo.save(aliment);
     }
 
-  
     public Aliment update(Aliment aliment) {
 
         if (!repo.existsById(aliment.getId())) {
@@ -40,7 +36,6 @@ public class AlimentService {
         return repo.save(aliment);
     }
 
-   
     public void delete(Long id) {
 
         if (!repo.existsById(id)) {
