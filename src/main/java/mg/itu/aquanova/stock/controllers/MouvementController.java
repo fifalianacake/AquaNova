@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import mg.itu.aquanova.stock.models.MouvementStock;
-import mg.itu.aquanova.stock.repositories.MouvementLotRepository;
 import mg.itu.aquanova.stock.services.MouvementService;
 import mg.itu.aquanova.stock.services.AlimentService;
 
@@ -19,9 +18,6 @@ public class MouvementController {
 
     @Autowired
     private AlimentService alimentService;
-
-    @Autowired
-    private MouvementLotRepository mouvementLotRepo;
 
     @GetMapping
     public String list(Long id,
@@ -44,8 +40,8 @@ public class MouvementController {
         model.addAttribute("mouvement",
                 service.findById(id));
 
-        model.addAttribute("lots",
-                mouvementLotRepo.findByMouvementId(id));
+        // model.addAttribute("lots",
+        // mouvementLotRepo.findByMouvementId(id));
 
         return "mouvements/detail";
     }
@@ -60,11 +56,20 @@ public class MouvementController {
     }
 
     @PostMapping
-    public String save(@ModelAttribute MouvementStock mouvement) {
+    public String save(@ModelAttribute MouvementStock mouvement, Model model) {
 
-        service.create(mouvement);
+        try {
+            service.create(mouvement);
+            return "redirect:/stocks/mouvements";
 
-        return "redirect:/stocks/mouvements";
+        } catch (RuntimeException e) {
+
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("mouvement", mouvement);
+            model.addAttribute("aliments", alimentService.findAll());
+
+            return "mouvements/form";
+        }
     }
 
     @GetMapping("/edit/{id}")

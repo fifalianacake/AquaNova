@@ -1,3 +1,6 @@
+<div th:if="${error}" style="color:red;">
+    <p th:text="${error}"></p>
+</div>
 <form method="post"
     th:action="${mouvement.id} == null ? @{/stocks/mouvements} : @{'/stocks/mouvements/edit/' + ${mouvement.id}}"
     th:object="${mouvement}">

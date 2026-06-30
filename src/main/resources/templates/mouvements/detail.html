@@ -18,21 +18,7 @@
         <button type="submit">Supprimer</button>
     </form>
 
-    <h3>Détail FIFO (lots utilisés)</h3>
 
-    <table border="1">
-        <tr>
-            <th>Lot ID</th>
-            <th>Date entrée</th>
-            <th>Quantité prise</th>
-        </tr>
-
-        <tr th:each="l : ${lots}">
-            <td th:text="${l.lot.id}"></td>
-            <td th:text="${l.lot.dateEntree}"></td>
-            <td th:text="${l.quantite}"></td>
-        </tr>
-    </table>
 
 </body>
 

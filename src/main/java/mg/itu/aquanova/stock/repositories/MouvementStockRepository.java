@@ -9,4 +9,5 @@ import org.springframework.data.repository.query.Param;
 import mg.itu.aquanova.stock.models.*;
 
 public interface MouvementStockRepository extends JpaRepository<MouvementStock, Long> {
+    List<MouvementStock> findByAlimentId(Long alimentId);
 }

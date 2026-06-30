@@ -1,15 +1,14 @@
 package mg.itu.aquanova.stock.services;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mg.itu.aquanova.stock.models.*;
-import mg.itu.aquanova.stock.repositories.MouvementLotRepository;
 import mg.itu.aquanova.stock.repositories.MouvementStockRepository;
-import mg.itu.aquanova.stock.repositories.StockLotRepository;
 
 @Service
 public class MouvementService {
@@ -17,19 +16,72 @@ public class MouvementService {
     @Autowired
     private MouvementStockRepository repo;
 
-    @Autowired
-    private StockService stockService;
+    public MouvementStock create(MouvementStock m) {
 
-    @Autowired
-    private StockLotRepository lotRepo;
+        validate(m);
 
-    @Autowired
-    private MouvementLotRepository mouvementLotRepo;
+        if (m.getTypeMouvement() != TypeMouvement.ENTREE) {
+            checkFIFOAvailability(m);
+        }
 
-    // public MouvementStock create(MouvementStock m) {
-    // validate(m);
-    // return repo.save(m);
-    // }
+        return repo.save(m);
+    }
+
+    private void checkFIFOAvailability(MouvementStock m) {
+
+        double remaining = m.getQuantite();
+
+        List<MouvementStock> entries = repo.findByAlimentId(m.getAliment().getId())
+                .stream()
+                .filter(x -> x.getTypeMouvement() == TypeMouvement.ENTREE)
+                .sorted((a, b) -> a.getDateMouvement().compareTo(b.getDateMouvement()))
+                .toList();
+
+        double totalAvailable = entries.stream()
+                .mapToDouble(MouvementStock::getQuantite)
+                .sum();
+
+        if (totalAvailable < remaining) {
+            throw new RuntimeException("Stock insuffisant pour FIFO");
+        }
+    }
+
+ 
+    private void applyFIFO(MouvementStock m) {
+
+        double remaining = m.getQuantite();
+
+        List<MouvementStock> entries = repo
+                .findByAlimentId(m.getAliment().getId())
+                .stream()
+                .filter(x -> x.getTypeMouvement() == TypeMouvement.ENTREE)
+                .sorted(Comparator.comparing(MouvementStock::getDateMouvement))
+                .toList();
+
+        for (MouvementStock entry : entries) {
+
+            if (remaining <= 0)
+                break;
+
+            double available = entry.getQuantite();
+
+            if (available <= 0)
+                continue;
+
+            double taken = Math.min(available, remaining);
+
+            // simulate consumption
+            entry.setQuantite(available - taken);
+            repo.save(entry);
+
+            remaining -= taken;
+        }
+
+        if (remaining > 0) {
+            throw new RuntimeException("Stock insuffisant (FIFO)");
+        }
+    }
+
 
     public MouvementStock update(MouvementStock m) {
         validate(m);
@@ -59,135 +111,41 @@ public class MouvementService {
                 : null;
 
         return repo.findAll().stream()
-                .filter(m -> id == null || m.getId().equals(id))
-                .filter(m -> t == null || m.getTypeMouvement() == t)
-                .filter(m -> aliment == null
+                .filter(mv -> id == null || mv.getId().equals(id))
+                .filter(mv -> t == null || mv.getTypeMouvement() == t)
+                .filter(mv -> aliment == null
                         || aliment.isBlank()
-                        || m.getAliment().getNom().toLowerCase()
+                        || mv.getAliment().getNom().toLowerCase()
                                 .contains(aliment.toLowerCase()))
-                .filter(m -> s == null || !m.getDateMouvement().isBefore(s))
-                .filter(m -> e == null || !m.getDateMouvement().isAfter(e))
+                .filter(mv -> s == null || !mv.getDateMouvement().isBefore(s))
+                .filter(mv -> e == null || !mv.getDateMouvement().isAfter(e))
                 .toList();
     }
 
-    // private void validate(MouvementStock m) {
-
-    // if (m.getQuantite() <= 0)
-    // throw new RuntimeException("Quantité invalide");
-
-    // if (m.getTypeMouvement() == TypeMouvement.SORTIE) {
-    // Double stock = stockService.getStockAtDate(
-    // m.getAliment().getId(),
-    // m.getDateMouvement());
-
-    // if (stock < m.getQuantite())
-    // throw new RuntimeException("Stock insuffisant");
-    // }
-    // }
-
+   
     public Double getStock(Long alimentId) {
-        return lotRepo
-                .findByAlimentIdAndQuantiteRestanteGreaterThanOrderByDateEntreeAsc(
-                        alimentId, 0.0)
-                .stream()
-                .mapToDouble(StockLot::getQuantiteRestante)
-                .sum();
-    }
 
-    public MouvementStock findById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mouvement introuvable"));
-    }
+        double stock = 0;
 
-    private void handleEntree(MouvementStock m) {
+        for (MouvementStock m : repo.findByAlimentId(alimentId)) {
 
-        StockLot lot = new StockLot();
-        lot.setAliment(m.getAliment());
-        lot.setQuantiteInitiale(m.getQuantite());
-        lot.setQuantiteRestante(m.getQuantite());
-        lot.setDateEntree(m.getDateMouvement());
-
-        lotRepo.save(lot);
-
-        // link movement ↔ lot
-        MouvementLot ml = new MouvementLot();
-        ml.setMouvement(m);
-        ml.setLot(lot);
-        ml.setQuantite(m.getQuantite());
-
-        mouvementLotRepo.save(ml);
-    }
-
-    private void handleSortie(MouvementStock m) {
-
-        double remaining = m.getQuantite();
-
-        var lots = lotRepo
-                .findByAlimentIdAndQuantiteRestanteGreaterThanOrderByDateEntreeAsc(
-                        m.getAliment().getId(), 0.0);
-
-        for (StockLot lot : lots) {
-
-            if (remaining <= 0)
-                break;
-
-            double available = lot.getQuantiteRestante();
-            double taken = Math.min(available, remaining);
-
-            lot.setQuantiteRestante(available - taken);
-            lotRepo.save(lot);
-
-            MouvementLot ml = new MouvementLot();
-            ml.setMouvement(m);
-            ml.setLot(lot);
-            ml.setQuantite(taken);
-
-            mouvementLotRepo.save(ml);
-
-            remaining -= taken;
+            if (m.getTypeMouvement() == TypeMouvement.ENTREE)
+                stock += m.getQuantite();
+            else
+                stock -= m.getQuantite();
         }
 
-        if (remaining > 0) {
-            throw new RuntimeException("Stock insuffisant (FIFO)");
-        }
+        return stock;
     }
 
     private void validate(MouvementStock m) {
 
         if (m.getQuantite() == null || m.getQuantite() <= 0)
             throw new RuntimeException("Quantité invalide");
-
-        if (m.getTypeMouvement() == TypeMouvement.SORTIE
-                || m.getTypeMouvement() == TypeMouvement.PERTE) {
-
-            double total = lotRepo
-                    .findByAlimentIdAndQuantiteRestanteGreaterThanOrderByDateEntreeAsc(
-                            m.getAliment().getId(), 0.0)
-                    .stream()
-                    .mapToDouble(StockLot::getQuantiteRestante)
-                    .sum();
-
-            if (m.getQuantite() > total) {
-                throw new RuntimeException("Stock insuffisant");
-            }
-        }
     }
 
-    public MouvementStock create(MouvementStock m) {
-
-        validate(m);
-
-        MouvementStock saved = repo.save(m);
-
-        if (m.getTypeMouvement() == TypeMouvement.ENTREE) {
-            handleEntree(saved);
-        }
-
-        if (m.getTypeMouvement() == TypeMouvement.SORTIE
-                || m.getTypeMouvement() == TypeMouvement.PERTE) {
-            handleSortie(saved);
-        }
-
-        return saved;
+    public MouvementStock findById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mouvement introuvable"));
     }
 }
