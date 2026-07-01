@@ -34,7 +34,7 @@ public class Maintenance {
     private BigDecimal cout;
 
     @Enumerated(EnumType.STRING)
-    private StatutInterventionEnum libelle;
+    private StatutInterventionEnum statutIntervention;
 
     @Column(name = "date_resolution")
     private LocalDate dateResolution;
