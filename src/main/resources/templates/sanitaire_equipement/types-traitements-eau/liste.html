@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Types de traitements eau</title>
+</head>
+<body>
+    <div>
+        <h2>Types de traitements de l'eau</h2>
+        <div>
+            <a th:href="@{/traitements-eau}">Traitements</a>
+            <a th:href="@{/types-traitements-eau/new}">Nouveau type</a>
+        </div>
+    </div>
+
+    <section>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Libellé</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="type : ${types}">
+                    <td th:text="${type.id}"></td>
+                    <td th:text="${type.libelle}"></td>
+                    <td th:text="${type.description ?: '-'}"></td>
+                    <td>
+                        <div>
+                            <a th:href="@{/types-traitements-eau/{id}(id=${type.id})}">Voir</a>
+                            <a th:href="@{/types-traitements-eau/edit/{id}(id=${type.id})}">Modifier</a>
+                            <form th:action="@{/types-traitements-eau/delete/{id}(id=${type.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Supprimer ce type de traitement ?')">
+                                <button type="submit">Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(types)}">
+                    <td colspan="4">Aucun type de traitement enregistré.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>
