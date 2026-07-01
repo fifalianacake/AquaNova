@@ -2,6 +2,8 @@ package mg.itu.aquanova.sanitaire_equipement.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,24 +16,25 @@ public class CategorieMaintenance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,length = 100)
-    private String libelle;
+    @Enumerated(EnumType.STRING)
+    private CategorieMaintenanceEnum libelle;
 
     @Column(length = 255)
     private String description;
 
-    public CategorieMaintenance(Long id, String libelle, String description) {
+    public CategorieMaintenance(Long id, CategorieMaintenanceEnum libelle, String description) {
         this.id = id;
         this.libelle = libelle;
         this.description = description;
     }
+
     public CategorieMaintenance() {
     }
     
     public void setId(Long id) {
         this.id = id;
     }
-    public void setLibelle(String libelle) {
+    public void setLibelle(CategorieMaintenanceEnum libelle) {
         this.libelle = libelle;
     }
     public void setDescription(String description) {
@@ -41,7 +44,7 @@ public class CategorieMaintenance {
     public Long getId() {
         return id;
     }
-    public String getLibelle() {
+    public CategorieMaintenanceEnum getLibelle() {
         return libelle;
     }
     public String getDescription() {

@@ -33,8 +33,8 @@ public class Maintenance {
     @Column(precision = 10, scale = 2)
     private BigDecimal cout;
 
-    @Column(name = "statut_intervention", length = 50)
-    private String statutIntervention; 
+    @Enumerated(EnumType.STRING)
+    private StatutInterventionEnum libelle;
 
     @Column(name = "date_resolution")
     private LocalDate dateResolution;
@@ -44,7 +44,7 @@ public class Maintenance {
 
     public Maintenance(Long id, Equipement equipement, Utilisateur utilisateur,
             CategorieMaintenance categorieMaintenance, LocalDate dateMaintenance, String description, BigDecimal cout,
-            String statutIntervention, LocalDate dateResolution, String observation) {
+            StatutInterventionEnum statutIntervention, LocalDate dateResolution, String observation) {
         this.id = id;
         this.equipement = equipement;
         this.utilisateur = utilisateur;
@@ -115,11 +115,11 @@ public class Maintenance {
         this.cout = cout;
     }
 
-    public String getStatutIntervention() {
+    public StatutInterventionEnum getStatutIntervention() {
         return statutIntervention;
     }
 
-    public void setStatutIntervention(String statutIntervention) {
+    public void setStatutIntervention(StatutInterventionEnum statutIntervention) {
         this.statutIntervention = statutIntervention;
     }
 
