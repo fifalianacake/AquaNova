@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Fiche Traitement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f6f9;
+        }
+
+        .fiche-container {
+            background: white;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .info-value {
+            color: #111;
+        }
+
+        .btn-box {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="fiche-container">
+        <h2>Fiche de Traitement d'Eau #<span th:text="${traitement.id}"></span></h2>
+
+        <div class="info-row">
+            <div class="info-label">Date de l'action</div>
+            <div class="info-value" th:text="${traitement.dateTraitement}"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Bassin ciblé</div>
+            <div class="info-value" th:text="${traitement.bassin != null ? traitement.bassin.nom : 'N/A'}"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Type de traitement appliqué</div>
+            <div class="info-value" th:text="${traitement.typeTraitementEau.libelle}" style="font-weight: bold;"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Détails techniques</div>
+            <div class="info-value" th:text="${traitement.detail}"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Observations enregistrées</div>
+            <div class="info-value" th:text="${traitement.observation ?: 'Aucune observation'}"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Opérateur / Utilisateur</div>
+            <div class="info-value" th:text="${traitement.utilisateur != null ? traitement.utilisateur.nom : 'N/A'}">
+            </div>
+        </div>
+
+        <div class="btn-box">
+            <a th:href="@{/traitements-eau}" class="btn btn-secondary">Retour</a>
+            <form th:action="@{/traitements-eau/delete/{id}(id=${traitement.id})}" method="post"
+                onsubmit="return confirm('Voulez-vous vraiment effacer ce traitement ?')">
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>
