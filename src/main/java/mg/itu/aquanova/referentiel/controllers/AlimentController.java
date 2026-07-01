@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import mg.itu.aquanova.alimentation.services.MouvementService;
 import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.services.AlimentService;
 
@@ -19,9 +20,11 @@ import mg.itu.aquanova.referentiel.services.AlimentService;
 public class AlimentController {
 
     private final AlimentService service;
+    private final MouvementService mvtService;
 
-    public AlimentController(AlimentService service) {
+    public AlimentController(AlimentService service, MouvementService mvtService) {
         this.service = service;
+        this.mvtService = mvtService;
     }
 
     @GetMapping
@@ -47,7 +50,7 @@ public class AlimentController {
     public String details(@PathVariable Long id, Model model) {
         Aliment aliment = service.findById(id);
         model.addAttribute("aliment", aliment);
-        model.addAttribute("stockActuel", service.getStockActuel(id));
+        model.addAttribute("stockActuel", mvtService.getStock(id));
         return "alimentation/aliments/details";
     }
 
