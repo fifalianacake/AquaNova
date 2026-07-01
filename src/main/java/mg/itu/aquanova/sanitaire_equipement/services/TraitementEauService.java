@@ -1,4 +1,4 @@
-package mg.itu.aquanova.production.services;
+package mg.itu.aquanova.sanitaire_equipement.services;
 
 import mg.itu.aquanova.sanitaire_equipement.models.TraitementEau;
 import mg.itu.aquanova.sanitaire_equipement.repositories.TraitementEauRepository;

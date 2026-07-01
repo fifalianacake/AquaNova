@@ -25,6 +25,6 @@ public interface TraitementEauRepository extends JpaRepository<TraitementEau, Lo
         @Param("bassinId") Long bassinId,
         @Param("typeId") Long typeId,
         @Param("debut") LocalDate debut,
-        @Param;("fin") LocalDate fin
+        @Param("fin") LocalDate fin
     );
 }

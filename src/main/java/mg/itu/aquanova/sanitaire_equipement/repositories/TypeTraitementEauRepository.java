@@ -1,4 +1,4 @@
-package mg.itu.aquanova.production.repositories;
+package mg.itu.aquanova.sanitaire_equipement.repositories;
 
 import mg.itu.aquanova.sanitaire_equipement.models.TypeTraitementEau;
 import org.springframework.data.jpa.repository.JpaRepository;
