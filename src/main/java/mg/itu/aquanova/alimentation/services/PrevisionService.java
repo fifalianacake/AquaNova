@@ -1,8 +1,8 @@
 package mg.itu.aquanova.alimentation.services;
 
-import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.alimentation.models.PrevisionResult;
-import mg.itu.aquanova.alimentation.repositories.AlimentRepository;
+import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
