@@ -1,6 +1,5 @@
 package mg.itu.aquanova.referentiel.services;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
