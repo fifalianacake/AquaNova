@@ -9,10 +9,10 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import mg.itu.aquanova.alimentation.dto.StockDTO;
-import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.alimentation.models.MouvementStock;
 import mg.itu.aquanova.alimentation.models.TypeMouvement;
-import mg.itu.aquanova.alimentation.repositories.AlimentRepository;
+import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 import mg.itu.aquanova.alimentation.repositories.StockRepository;
 
 @Service

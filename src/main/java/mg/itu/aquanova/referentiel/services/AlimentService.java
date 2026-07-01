@@ -1,12 +1,12 @@
-package mg.itu.aquanova.alimentation.services;
+package mg.itu.aquanova.referentiel.services;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.alimentation.models.Aliment;
-import mg.itu.aquanova.alimentation.repositories.AlimentRepository;
+import mg.itu.aquanova.referentiel.models.Aliment;
+import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 
 @Service
 public class AlimentService {

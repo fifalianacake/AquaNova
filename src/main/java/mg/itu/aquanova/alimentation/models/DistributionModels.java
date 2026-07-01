@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import mg.itu.aquanova.production.models.LotModels;
-import mg.itu.aquanova.alimentation.models.Aliment;
+import mg.itu.aquanova.referentiel.models.Aliment;
 
 @Entity
 @Table(name = "distribution")

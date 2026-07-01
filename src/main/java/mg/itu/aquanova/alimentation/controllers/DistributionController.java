@@ -13,7 +13,7 @@ import mg.itu.aquanova.alimentation.dto.DistributionDTO;
 import mg.itu.aquanova.alimentation.models.DistributionModels;
 import mg.itu.aquanova.alimentation.services.DistributionService;
 import mg.itu.aquanova.production.services.LotService;
-import mg.itu.aquanova.alimentation.services.AlimentService;
+import mg.itu.aquanova.referentiel.services.AlimentService;
 
 @RequestMapping("/alimentation/distribution")
 @Controller

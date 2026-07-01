@@ -1,7 +1,6 @@
-package mg.itu.aquanova.alimentation.models;
+package mg.itu.aquanova.referentiel.models;
 
 import jakarta.persistence.*;
-import mg.itu.aquanova.referentiel.models.TypeAlimentModels;
 
 @Entity
 @Table(name = "aliment")

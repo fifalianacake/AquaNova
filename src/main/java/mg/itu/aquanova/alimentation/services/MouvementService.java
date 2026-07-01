@@ -29,24 +29,29 @@ public class MouvementService {
 
     private void checkFIFOAvailability(MouvementStock m) {
 
-        double remaining = m.getQuantite();
+        LocalDate date = m.getDateMouvement();
+        Long alimentId = m.getAliment().getId();
 
-        List<MouvementStock> entries = repo.findByAlimentId(m.getAliment().getId())
+        double stockAtDate = repo.findByAlimentId(alimentId)
                 .stream()
-                .filter(x -> x.getTypeMouvement() == TypeMouvement.ENTREE)
-                .sorted((a, b) -> a.getDateMouvement().compareTo(b.getDateMouvement()))
-                .toList();
-
-        double totalAvailable = entries.stream()
-                .mapToDouble(MouvementStock::getQuantite)
+                // ONLY movements before or equal to the date
+                .filter(x -> !x.getDateMouvement().isAfter(date))
+                .mapToDouble(x -> {
+                    if (x.getTypeMouvement() == TypeMouvement.ENTREE)
+                        return x.getQuantite();
+                    else
+                        return -x.getQuantite();
+                })
                 .sum();
 
-        if (totalAvailable < remaining) {
-            throw new RuntimeException("Stock insuffisant pour FIFO");
+        if (stockAtDate < m.getQuantite()) {
+            throw new RuntimeException(
+                    "Stock insuffisant à la date " + date +
+                            " | Disponible: " + stockAtDate +
+                            " | Demandé: " + m.getQuantite());
         }
     }
 
- 
     private void applyFIFO(MouvementStock m) {
 
         double remaining = m.getQuantite();
@@ -78,14 +83,44 @@ public class MouvementService {
         }
 
         if (remaining > 0) {
-            throw new RuntimeException("Stock insuffisant (FIFO)");
+            throw new RuntimeException("Stock insuffisant, reste: " + remaining);
         }
     }
 
-
     public MouvementStock update(MouvementStock m) {
+
         validate(m);
+
+        if (m.getTypeMouvement() != TypeMouvement.ENTREE) {
+            checkStockAtDateExcludingSelf(m);
+        }
+
         return repo.save(m);
+    }
+
+    private void checkStockAtDateExcludingSelf(MouvementStock m) {
+
+        LocalDate date = m.getDateMouvement();
+        Long alimentId = m.getAliment().getId();
+
+        double stockAtDate = repo.findByAlimentId(alimentId)
+                .stream()
+                .filter(x -> !x.getId().equals(m.getId()))
+                .filter(x -> !x.getDateMouvement().isAfter(date))
+                .mapToDouble(x -> {
+                    if (x.getTypeMouvement() == TypeMouvement.ENTREE)
+                        return x.getQuantite();
+                    else
+                        return -x.getQuantite();
+                })
+                .sum();
+
+        if (stockAtDate < m.getQuantite()) {
+            throw new RuntimeException(
+                    "Stock insuffisant à la date " + date +
+                            " | Disponible: " + stockAtDate +
+                            " | Demandé: " + m.getQuantite());
+        }
     }
 
     public void delete(Long id) {
@@ -122,7 +157,6 @@ public class MouvementService {
                 .toList();
     }
 
-   
     public Double getStock(Long alimentId) {
 
         double stock = 0;

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import mg.itu.aquanova.alimentation.models.MouvementStock;
 import mg.itu.aquanova.alimentation.services.MouvementService;
-import mg.itu.aquanova.alimentation.services.AlimentService;
+import mg.itu.aquanova.referentiel.services.AlimentService;
 
 @Controller
 @RequestMapping("/stocks/mouvements")
@@ -84,13 +84,23 @@ public class MouvementController {
 
     @PostMapping("/edit/{id}")
     public String update(@PathVariable Long id,
-            @ModelAttribute MouvementStock mouvement) {
+            @ModelAttribute MouvementStock mouvement,
+            Model model) {
 
-        mouvement.setId(id);
+        try {
+            mouvement.setId(id);
+            service.update(mouvement);
 
-        service.update(mouvement);
+            return "redirect:/stocks/mouvements";
 
-        return "redirect:/stocks/mouvements";
+        } catch (RuntimeException e) {
+
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("mouvement", mouvement);
+            model.addAttribute("aliments", alimentService.findAll());
+
+            return "alimentation/mouvements/form";
+        }
     }
 
     @PostMapping("/delete/{id}")

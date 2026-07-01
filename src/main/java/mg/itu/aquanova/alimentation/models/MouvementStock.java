@@ -2,6 +2,7 @@ package mg.itu.aquanova.alimentation.models;
 
 import java.time.LocalDate;
 import jakarta.persistence.*;
+import mg.itu.aquanova.referentiel.models.Aliment;
 
 @Entity
 @Table(name = "mouvement_stock")
