@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <h1>Fiche Équipement : <span th:text="${equipement.nom}"></span></h1>
+    <ul>
+        <li><strong>Type :</strong> <span th:text="${equipement.typeEquipement.libelle}"></span></li>
+        <li><strong>Statut :</strong> <span th:text="${equipement.statut}"></span></li>
+        <li><strong>Bassin :</strong> <span th:text="${equipement.bassin != null ? equipement.bassin.nom : 'Non affecté'}"></span></li>
+        <li><strong>Installation :</strong> <span th:text="${equipement.dateInstallation}"></span></li>
+    </ul>
+    
+    <a href="/equipements">Retour à la liste</a>
+</body>
+</html>
