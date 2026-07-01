@@ -44,7 +44,7 @@ public class TransfertModels {
     private Integer effectif;
 
     @Column(name = "poids_moyen", nullable = false, precision = 10, scale = 2)
-    private java.math.BigDecimal poidsMoyen;
+    private Double poidsMoyen;
 
     @Transient
     private String codeLotDestination;
@@ -105,11 +105,11 @@ public class TransfertModels {
         this.effectif = effectif;
     }
 
-    public java.math.BigDecimal getPoidsMoyen() {
+    public Double getPoidsMoyen() {
         return poidsMoyen;
     }
 
-    public void setPoidsMoyen(java.math.BigDecimal poidsMoyen) {
+    public void setPoidsMoyen(Double poidsMoyen) {
         this.poidsMoyen = poidsMoyen;
     }
 

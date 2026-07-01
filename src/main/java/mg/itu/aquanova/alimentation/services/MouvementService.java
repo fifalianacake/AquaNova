@@ -32,7 +32,7 @@ public class MouvementService {
         LocalDate date = m.getDateMouvement();
         Long alimentId = m.getAliment().getId();
 
-        double stockAtDate = repo.findByAlimentId(alimentId)
+        Double stockAtDate = repo.findByAlimentId(alimentId)
                 .stream()
                 // ONLY movements before or equal to the date
                 .filter(x -> !x.getDateMouvement().isAfter(date))
@@ -54,7 +54,7 @@ public class MouvementService {
 
     private void applyFIFO(MouvementStock m) {
 
-        double remaining = m.getQuantite();
+        Double remaining = m.getQuantite();
 
         List<MouvementStock> entries = repo
                 .findByAlimentId(m.getAliment().getId())
@@ -68,12 +68,12 @@ public class MouvementService {
             if (remaining <= 0)
                 break;
 
-            double available = entry.getQuantite();
+            Double available = entry.getQuantite();
 
             if (available <= 0)
                 continue;
 
-            double taken = Math.min(available, remaining);
+            Double taken = Math.min(available, remaining);
 
             // simulate consumption
             entry.setQuantite(available - taken);
@@ -103,7 +103,7 @@ public class MouvementService {
         LocalDate date = m.getDateMouvement();
         Long alimentId = m.getAliment().getId();
 
-        double stockAtDate = repo.findByAlimentId(alimentId)
+        Double stockAtDate = repo.findByAlimentId(alimentId)
                 .stream()
                 .filter(x -> !x.getId().equals(m.getId()))
                 .filter(x -> !x.getDateMouvement().isAfter(date))
@@ -159,7 +159,7 @@ public class MouvementService {
 
     public Double getStock(Long alimentId) {
 
-        double stock = 0;
+        Double stock = 0.0;
 
         for (MouvementStock m : repo.findByAlimentId(alimentId)) {
 

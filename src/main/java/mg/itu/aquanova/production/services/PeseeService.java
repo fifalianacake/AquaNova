@@ -10,8 +10,6 @@ import mg.itu.aquanova.production.repositories.PeseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -43,11 +41,11 @@ public class PeseeService {
 
     // CREATE
     @Transactional
-    public Pese enregistrerPesee(Long idLot, LocalDate datePesee, Integer nbEchantillon, BigDecimal poidsTotal, String observation) {
+    public Pese enregistrerPesee(Long idLot, LocalDate datePesee, Integer nbEchantillon, Double poidsTotal, String observation) {
         LotModels lot = validerEtTrouverLot(idLot, datePesee);
         validerMesures(nbEchantillon, poidsTotal);
 
-        BigDecimal poidsMoyen = poidsTotal.divide(BigDecimal.valueOf(nbEchantillon), 3, RoundingMode.HALF_UP);
+        Double poidsMoyen = round3(poidsTotal / nbEchantillon);
 
         Pese pesee = new Pese();
         pesee.setLot(lot);
@@ -58,7 +56,7 @@ public class PeseeService {
         pesee.setObservation(observation);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
+        lot.setPoidsMoyenActuel(poidsMoyen);
         lotRepository.save(lot);
 
         journalLotService.inscrireEvenement(
@@ -74,13 +72,13 @@ public class PeseeService {
 
     // UPDATE
     @Transactional
-    public Pese modifierPesee(Long id, LocalDate datePesee, Integer nbEchantillon, BigDecimal poidsTotal, String observation) {
+    public Pese modifierPesee(Long id, LocalDate datePesee, Integer nbEchantillon, Double poidsTotal, String observation) {
         Pese pesee = peseeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pesée introuvable avec l'ID : " + id));
 
         LocalDate nouvelleDate = datePesee != null ? datePesee : pesee.getDatePesee();
         Integer nouveauNbEchantillon = nbEchantillon != null ? nbEchantillon : pesee.getNbEchantillon();
-        BigDecimal nouveauPoidsTotal = poidsTotal != null ? poidsTotal : pesee.getPoidsTotalEchantillon();
+        Double nouveauPoidsTotal = poidsTotal != null ? poidsTotal : pesee.getPoidsTotalEchantillon();
 
         LotModels lot = validerEtTrouverLot(pesee.getLot(), nouvelleDate);
         validerMesures(nouveauNbEchantillon, nouveauPoidsTotal);
@@ -90,11 +88,11 @@ public class PeseeService {
         pesee.setNbEchantillon(nouveauNbEchantillon);
         pesee.setPoidsTotalEchantillon(nouveauPoidsTotal);
 
-        BigDecimal poidsMoyen = pesee.getPoidsTotalEchantillon().divide(BigDecimal.valueOf(pesee.getNbEchantillon()), 3, RoundingMode.HALF_UP);
+        Double poidsMoyen = round3(pesee.getPoidsTotalEchantillon() / pesee.getNbEchantillon());
         pesee.setPoidsMoyen(poidsMoyen);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
+        lot.setPoidsMoyenActuel(poidsMoyen);
         lotRepository.save(lot);
 
         return saved;
@@ -112,7 +110,7 @@ public class PeseeService {
 
 
 // Aider module Lot
-public BigDecimal getDernierPoidsMoyen(Long idLot) {
+public Double getDernierPoidsMoyen(Long idLot) {
     List<Pese> historique = this.peseeRepository.findByLotIdOrderByDatePeseeDesc(idLot);
     if (historique.isEmpty()) return null;
     return historique.get(0).getPoidsMoyen();
@@ -146,12 +144,16 @@ public BigDecimal getDernierPoidsMoyen(Long idLot) {
         return validerEtTrouverLot(lot.getId(), datePesee);
     }
 
-    private void validerMesures(Integer nbEchantillon, BigDecimal poidsTotal) {
+    private void validerMesures(Integer nbEchantillon, Double poidsTotal) {
         if (nbEchantillon == null || nbEchantillon <= 0) {
             throw new IllegalArgumentException("Le nombre d'échantillons doit être supérieur à 0.");
         }
-        if (poidsTotal == null || poidsTotal.compareTo(BigDecimal.ZERO) <= 0) {
+        if (poidsTotal == null || poidsTotal <= 0) {
             throw new IllegalArgumentException("Le poids total de l'échantillon doit être supérieur à 0.");
         }
+    }
+
+    private Double round3(Double value) {
+        return Math.round(value * 1000.0) / 1000.0;
     }
 }

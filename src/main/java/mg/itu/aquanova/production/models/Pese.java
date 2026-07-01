@@ -1,7 +1,6 @@
 package mg.itu.aquanova.production.models;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -23,10 +22,10 @@ public class Pese {
     private Integer nbEchantillon;
 
     @Column(name = "poids_total_echantillon", nullable = false, precision = 10, scale = 2)
-    private BigDecimal poidsTotalEchantillon;
+    private Double poidsTotalEchantillon;
 
     @Column(name = "poids_moyen", nullable = false, precision = 10, scale = 3)
-    private BigDecimal poidsMoyen; // Ce champ sera calculé automatiquement
+    private Double poidsMoyen; // Ce champ sera calculé automatiquement
 
     @Column(columnDefinition = "TEXT")
     private String observation;
@@ -63,19 +62,19 @@ public class Pese {
         this.nbEchantillon = nbEchantillon;
     }
 
-    public BigDecimal getPoidsTotalEchantillon() {
+    public Double getPoidsTotalEchantillon() {
         return poidsTotalEchantillon;
     }
 
-    public void setPoidsTotalEchantillon(BigDecimal poidsTotalEchantillon) {
+    public void setPoidsTotalEchantillon(Double poidsTotalEchantillon) {
         this.poidsTotalEchantillon = poidsTotalEchantillon;
     }
 
-    public BigDecimal getPoidsMoyen() {
+    public Double getPoidsMoyen() {
         return poidsMoyen;
     }
 
-    public void setPoidsMoyen(BigDecimal poidsMoyen) {
+    public void setPoidsMoyen(Double poidsMoyen) {
         this.poidsMoyen = poidsMoyen;
     }
 

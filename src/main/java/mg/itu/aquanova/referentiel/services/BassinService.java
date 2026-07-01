@@ -10,7 +10,6 @@ import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -58,7 +57,7 @@ public class BassinService {
     public Bassin creerBassin(String reference,
             Long idStatut,
             Long idType,
-            BigDecimal capaciteM3) {
+            Double capaciteM3) {
 
         if (reference == null || reference.trim().isEmpty()) {
             throw new IllegalArgumentException("La référence du bassin est obligatoire.");
@@ -68,8 +67,7 @@ public class BassinService {
             throw new IllegalArgumentException("Le statut du bassin est obligatoire.");
         }
 
-        if (capaciteM3 == null ||
-                capaciteM3.compareTo(BigDecimal.ZERO) <= 0) {
+        if (capaciteM3 == null || capaciteM3 <= 0) {
             throw new IllegalArgumentException(
                     "La capacité en m³ doit être strictement supérieure à 0.");
         }

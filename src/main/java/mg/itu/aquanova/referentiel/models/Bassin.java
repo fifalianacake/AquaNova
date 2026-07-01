@@ -1,7 +1,6 @@
 package mg.itu.aquanova.referentiel.models;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 
 
 @Entity
@@ -19,7 +18,7 @@ public class Bassin {
     private StatutBassin statut;
 
     @Column(name = "capacite_m3", nullable = false, precision = 10, scale = 2)
-    private BigDecimal capaciteM3;
+    private Double capaciteM3;
 
     // Jointure : Plusieurs bassins peuvent avoir le même type
     @ManyToOne
@@ -42,11 +41,11 @@ public class Bassin {
         this.reference = reference;
     }
 
-    public BigDecimal getCapaciteM3() {
+    public Double getCapaciteM3() {
         return capaciteM3;
     }
 
-    public void setCapaciteM3(BigDecimal capaciteM3) {
+    public void setCapaciteM3(Double capaciteM3) {
         this.capaciteM3 = capaciteM3;
     }
 

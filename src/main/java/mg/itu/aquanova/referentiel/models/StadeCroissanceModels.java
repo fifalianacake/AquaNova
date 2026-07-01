@@ -1,7 +1,5 @@
 package mg.itu.aquanova.referentiel.models;
 
-import java.math.BigDecimal;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -16,10 +14,10 @@ public class StadeCroissanceModels {
     private String nom;
 
     @Column(name = "poids_min", precision = 10, scale = 2)
-    private BigDecimal poidsMin;
+    private Double poidsMin;
 
     @Column(name = "poids_max", precision = 10, scale = 2)
-    private BigDecimal poidsMax;
+    private Double poidsMax;
 
     public StadeCroissanceModels() {
     }
@@ -40,19 +38,19 @@ public class StadeCroissanceModels {
         this.nom = nom;
     }
 
-    public BigDecimal getPoidsMin() {
+    public Double getPoidsMin() {
         return poidsMin;
     }
 
-    public void setPoidsMin(BigDecimal poidsMin) {
+    public void setPoidsMin(Double poidsMin) {
         this.poidsMin = poidsMin;
     }
 
-    public BigDecimal getPoidsMax() {
+    public Double getPoidsMax() {
         return poidsMax;
     }
 
-    public void setPoidsMax(BigDecimal poidsMax) {
+    public void setPoidsMax(Double poidsMax) {
         this.poidsMax = poidsMax;
     }
 }

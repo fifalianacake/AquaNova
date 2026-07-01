@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -87,7 +86,7 @@ public class DistributionService {
         distribution.setQuantite(distributionDTO.getQuantite());
 
         Double rationTheorique = CalculRationTheorique(distributionDTO);
-        distribution.setRationTheorique(BigDecimal.valueOf(rationTheorique));
+        distribution.setRationTheorique(rationTheorique);
 
         distributionRepository.save(distribution);
     }
@@ -97,7 +96,7 @@ public class DistributionService {
         Double total = 0.0;
 
         List<Pese> listPese = peseRepository.findByLotIdOrderByDatePeseeDesc(lot.getId());
-        Double poidsMoyenActuel = lot.getPoidsMoyenActuel() != null ? lot.getPoidsMoyenActuel().doubleValue() : 0.0;
+        Double poidsMoyenActuel = lot.getPoidsMoyenActuel() != null ? lot.getPoidsMoyenActuel() : 0.0;
         Double poidsMoyenAvant = 0.0;
 
         Long jourEcoule = 0L;
@@ -106,14 +105,14 @@ public class DistributionService {
 
             Pese dernierPese = listPese.get(0);
 
-            poidsMoyenAvant = dernierPese.getPoidsMoyen() != null ? dernierPese.getPoidsMoyen().doubleValue() : 0.0;
+            poidsMoyenAvant = dernierPese.getPoidsMoyen() != null ? dernierPese.getPoidsMoyen() : 0.0;
 
             jourEcoule = java.time.temporal.ChronoUnit.DAYS.between(dernierPese.getDatePesee(),
                     java.time.LocalDate.now());
 
         } else {
 
-            poidsMoyenAvant = lot.getPoidsMoyenInitial() != null ? lot.getPoidsMoyenInitial().doubleValue() : 0.0;
+            poidsMoyenAvant = lot.getPoidsMoyenInitial() != null ? lot.getPoidsMoyenInitial() : 0.0;
 
             if (lot.getDateMiseEnCharge() != null) {
                 jourEcoule = java.time.temporal.ChronoUnit.DAYS.between(lot.getDateMiseEnCharge(),
@@ -206,8 +205,7 @@ public class DistributionService {
         distribution.setQuantite(distributionDTO.getQuantite());
 
         Double rationTheorique = CalculRationTheorique(distributionDTO);
-        BigDecimal rationTheoriqueBD = BigDecimal.valueOf(rationTheorique);
-        distribution.setRationTheorique(rationTheoriqueBD);
+        distribution.setRationTheorique(rationTheorique);
 
         distributionRepository.save(distribution);
 
@@ -215,7 +213,7 @@ public class DistributionService {
 
         mouvementStock.setAliment(aliment);
         mouvementStock.setTypeMouvement(TypeMouvement.SORTIE);
-        mouvementStock.setQuantite(distributionDTO.getQuantite().doubleValue());
+        mouvementStock.setQuantite(distributionDTO.getQuantite());
         mouvementStock.setCommentaire("Distribution aliment dans le lot #" + distribution.getLot().getId());
 
         mouvementStockService.create(mouvementStock);

@@ -1,7 +1,6 @@
 package mg.itu.aquanova.alimentation.models;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import mg.itu.aquanova.production.models.LotModels;
@@ -27,10 +26,10 @@ public class DistributionModels {
     private Aliment aliment;
 
     @Column(nullable = true, precision = 10, scale = 2)
-    private BigDecimal quantite;
+    private Double quantite;
 
     @Column(name = "ration_theorique", precision = 10, scale = 2)
-    private BigDecimal rationTheorique;
+    private Double rationTheorique;
 
     // @Enumerated(EnumType.STRING)
     // @Column(name = "statut", nullable = false)
@@ -71,19 +70,19 @@ public class DistributionModels {
         this.aliment = aliment;
     }
 
-    public BigDecimal getQuantite() {
+    public Double getQuantite() {
         return quantite;
     }
 
-    public void setQuantite(BigDecimal quantite) {
+    public void setQuantite(Double quantite) {
         this.quantite = quantite;
     }
 
-    public BigDecimal getRationTheorique() {
+    public Double getRationTheorique() {
         return rationTheorique;
     }
 
-    public void setRationTheorique(BigDecimal rationTheorique) {
+    public void setRationTheorique(Double rationTheorique) {
         this.rationTheorique = rationTheorique;
     }
     

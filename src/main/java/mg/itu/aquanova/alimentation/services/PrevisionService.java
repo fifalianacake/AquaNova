@@ -5,8 +5,6 @@ import mg.itu.aquanova.alimentation.models.PrevisionResult;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
 import org.springframework.stereotype.Service;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -29,7 +27,7 @@ public class PrevisionService {
         this.stockService = stockService;
     }
 
-    public BigDecimal calculateConsumption(Long alimentId, LocalDate dateDebut, LocalDate dateFin) {
+    public Double calculateConsumption(Long alimentId, LocalDate dateDebut, LocalDate dateFin) {
         if (dateDebut == null || dateFin == null) {
             throw new IllegalArgumentException("dateDebut et dateFin sont obligatoires");
         }
@@ -37,49 +35,41 @@ public class PrevisionService {
             throw new IllegalArgumentException("dateDebut doit être avant dateFin");
         }
 
-        BigDecimal totalDistribue = this.distributionRepository
+        Double totalDistribue = this.distributionRepository
                 .sumQuantiteByAlimentIdAndDateBetween(alimentId, dateDebut, dateFin);
 
         if (totalDistribue == null) {
-            totalDistribue = BigDecimal.ZERO;
+            totalDistribue = 0.0;
         }
         long joursCalendaires = ChronoUnit.DAYS.between(dateDebut, dateFin) + 1;
         if (joursCalendaires <= 0) {
-            return BigDecimal.ZERO;
+            return 0.0;
         }
-        return totalDistribue.divide(
-                BigDecimal.valueOf(joursCalendaires),
-                2,
-                RoundingMode.HALF_UP
-        );
+        return round2(totalDistribue / joursCalendaires);
     }
 
-    public LocalDate calculateRuptureDate(LocalDate dateReference, BigDecimal stock, BigDecimal consoJour) {
+    public LocalDate calculateRuptureDate(LocalDate dateReference, Double stock, Double consoJour) {
         if (dateReference == null) {
             throw new IllegalArgumentException("dateReference est obligatoire");
         }
-        if (consoJour == null || consoJour.compareTo(BigDecimal.ZERO) == 0) {
+        if (stock == null || consoJour == null || consoJour == 0.0) {
             return null;
         }
 
-        long joursRestants = stock
-                .divide(consoJour, 0, RoundingMode.FLOOR)
-                .longValue();
+        long joursRestants = (long) Math.floor(stock / consoJour);
 
         return dateReference.plusDays(joursRestants);
     }
 
-    public BigDecimal suggestPurchase(BigDecimal stock, BigDecimal consoJour, int horizonJours) {
-        if (consoJour == null || consoJour.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
+    public Double suggestPurchase(Double stock, Double consoJour, int horizonJours) {
+        if (stock == null || consoJour == null || consoJour == 0.0) {
+            return 0.0;
         }
 
-        BigDecimal stockIdeal = consoJour.multiply(BigDecimal.valueOf(horizonJours));
-        BigDecimal suggestion = stockIdeal.subtract(stock);
+        Double stockIdeal = consoJour * horizonJours;
+        Double suggestion = stockIdeal - stock;
 
-        return suggestion.compareTo(BigDecimal.ZERO) > 0
-                ? suggestion.setScale(2, RoundingMode.HALF_UP)
-                : BigDecimal.ZERO;
+        return suggestion > 0.0 ? round2(suggestion) : 0.0;
     }
 
     public List<PrevisionResult> getPrevisions(Long alimentId, LocalDate dateReference, Integer horizonJours) {
@@ -100,16 +90,14 @@ public class PrevisionService {
                 continue;
             }
 
-            BigDecimal stock = this.stockService.getStockAtDate(aliment.getId(), dateReference);
-            BigDecimal consoJour = this.calculateConsumption(aliment.getId(), dateDebutAnalyse, dateReference);
+            Double stock = this.stockService.getStockAtDate(aliment.getId(), dateReference);
+            Double consoJour = this.calculateConsumption(aliment.getId(), dateDebutAnalyse, dateReference);
             LocalDate dateRupture = this.calculateRuptureDate(dateReference, stock, consoJour);
-            BigDecimal suggestion = this.suggestPurchase(stock, consoJour, horizon);
+            Double suggestion = this.suggestPurchase(stock, consoJour, horizon);
 
             Long joursRestants = null;
-            if (consoJour.compareTo(BigDecimal.ZERO) > 0) {
-                joursRestants = stock
-                        .divide(consoJour, 0, RoundingMode.FLOOR)
-                        .longValue();
+            if (consoJour != null && consoJour > 0.0) {
+                joursRestants = (long) Math.floor(stock / consoJour);
             }
 
             PrevisionResult result = new PrevisionResult();
@@ -138,17 +126,21 @@ public class PrevisionService {
         return this.alimentRepository.findAll();
     }
 
-    public BigDecimal getStockTotal(LocalDate dateReference) {
+    public Double getStockTotal(LocalDate dateReference) {
         if (dateReference == null) {
             throw new IllegalArgumentException("dateReference est obligatoire");
         }
 
-        BigDecimal total = BigDecimal.ZERO;
+        Double total = 0.0;
 
         for (Aliment aliment : this.alimentRepository.findAll()) {
-            total = total.add(this.stockService.getStockAtDate(aliment.getId(), dateReference));
+            total += this.stockService.getStockAtDate(aliment.getId(), dateReference);
         }
 
-        return total.setScale(2, RoundingMode.HALF_UP);
+        return round2(total);
+    }
+
+    private Double round2(Double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }

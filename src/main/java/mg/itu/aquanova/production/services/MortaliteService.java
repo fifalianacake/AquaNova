@@ -1,7 +1,5 @@
 package mg.itu.aquanova.production.services;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -131,7 +129,7 @@ public class MortaliteService {
         return effectifVivant;
     }
 
-    public BigDecimal calculerTauxSurvie(Integer effectifVivant, Integer effectifInitial) {
+    public Double calculerTauxSurvie(Integer effectifVivant, Integer effectifInitial) {
         validerEffectifInitial(effectifInitial);
         if (effectifVivant == null || effectifVivant < 0) {
             throw new IllegalArgumentException("L'effectif vivant doit être positif ou nul.");
@@ -140,28 +138,26 @@ public class MortaliteService {
             throw new IllegalArgumentException("L'effectif vivant ne peut pas dépasser l'effectif initial.");
         }
 
-        return BigDecimal.valueOf(effectifVivant)
-                .multiply(BigDecimal.valueOf(100))
-                .divide(BigDecimal.valueOf(effectifInitial), 2, RoundingMode.HALF_UP);
+        return round2((effectifVivant * 100.0) / effectifInitial);
     }
 
-    public BigDecimal calculerTauxSurvieByLot(Long lotId, Integer effectifInitial) {
+    public Double calculerTauxSurvieByLot(Long lotId, Integer effectifInitial) {
         Integer effectifVivant = calculerEffectifVivant(lotId, effectifInitial);
         return calculerTauxSurvie(effectifVivant, effectifInitial);
     }
 
-    public BigDecimal calculerBiomasseActive(Integer effectifVivant, BigDecimal poidsMoyen) {
+    public Double calculerBiomasseActive(Integer effectifVivant, Double poidsMoyen) {
         if (effectifVivant == null || effectifVivant < 0) {
             throw new IllegalArgumentException("L'effectif vivant doit être positif ou nul.");
         }
-        if (poidsMoyen == null || poidsMoyen.compareTo(BigDecimal.ZERO) <= 0) {
+        if (poidsMoyen == null || poidsMoyen <= 0) {
             throw new IllegalArgumentException("Le poids moyen doit être strictement positif.");
         }
 
-        return poidsMoyen.multiply(BigDecimal.valueOf(effectifVivant));
+        return poidsMoyen * effectifVivant;
     }
 
-    public BigDecimal calculerBiomasseActiveByLot(Long lotId, Integer effectifInitial, BigDecimal poidsMoyen) {
+    public Double calculerBiomasseActiveByLot(Long lotId, Integer effectifInitial, Double poidsMoyen) {
         Integer effectifVivant = calculerEffectifVivant(lotId, effectifInitial);
         return calculerBiomasseActive(effectifVivant, poidsMoyen);
     }
@@ -230,5 +226,9 @@ public class MortaliteService {
         if (mortalite.getCause() != null && mortalite.getCause().trim().isEmpty()) {
             mortalite.setCause(null);
         }
+    }
+
+    private Double round2(Double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }

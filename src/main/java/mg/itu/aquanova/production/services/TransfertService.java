@@ -1,6 +1,5 @@
 package mg.itu.aquanova.production.services;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -144,7 +143,7 @@ public class TransfertService {
         if (transfert.getEffectif() == null || transfert.getEffectif() <= 0) {
             throw new IllegalArgumentException("L'effectif transféré doit être strictement positif.");
         }
-        if (transfert.getPoidsMoyen() == null || transfert.getPoidsMoyen().compareTo(BigDecimal.ZERO) <= 0) {
+        if (transfert.getPoidsMoyen() == null || transfert.getPoidsMoyen() <= 0) {
             throw new IllegalArgumentException("Le poids moyen doit être strictement positif.");
         }
     }
@@ -203,8 +202,8 @@ public class TransfertService {
         lotDestination.setDateMiseEnCharge(transfert.getDateTransfert());
         lotDestination.setEffectifInitial(transfert.getEffectif());
         lotDestination.setEffectifActuel(transfert.getEffectif());
-        lotDestination.setPoidsMoyenInitial(transfert.getPoidsMoyen().doubleValue());
-        lotDestination.setPoidsMoyenActuel(transfert.getPoidsMoyen().doubleValue());
+        lotDestination.setPoidsMoyenInitial(transfert.getPoidsMoyen());
+        lotDestination.setPoidsMoyenActuel(transfert.getPoidsMoyen());
         lotDestination.setObservation("Créé par transfert partiel depuis le lot " + lotSource.getCode());
         return lotRepository.save(lotDestination);
     }

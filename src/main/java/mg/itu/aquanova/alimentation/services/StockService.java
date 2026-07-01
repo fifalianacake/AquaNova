@@ -52,7 +52,7 @@ public class StockService {
         Aliment aliment = alimentRepository.findById(id)
                 .orElseThrow();
 
-        double stock = 0;
+        Double stock = 0.0;
 
         for (MouvementStock m : repo.findByAlimentId(id)) {
 
@@ -73,13 +73,13 @@ public class StockService {
                 100.0);
     }
 
-    public double getStockAtDate(Long id, LocalDate date) {
+    public Double getStockAtDate(Long id, LocalDate date) {
         return getStock(id, date).getStock();
     }
 
-    public double totalStock(LocalDate date) {
+    public Double totalStock(LocalDate date) {
 
-        double total = 0;
+        Double total = 0.0;
 
         for (Aliment a : alimentRepository.findAll()) {
             total += getStockAtDate(a.getId(), date);
