@@ -12,6 +12,7 @@ public class PrevisionResult {
     private Long joursRestants;
     private LocalDate dateRupture;
     private BigDecimal quantiteSuggereePurchase;
+    private String alerte;
 
     public PrevisionResult() {}
 
@@ -45,4 +46,16 @@ public class PrevisionResult {
 
     public BigDecimal getQuantiteSuggereePurchase() { return quantiteSuggereePurchase; }
     public void setQuantiteSuggereePurchase(BigDecimal quantiteSuggereePurchase) { this.quantiteSuggereePurchase = quantiteSuggereePurchase; }
+
+    public BigDecimal getQuantiteRestante() { return stockRestant; }
+    public void setQuantiteRestante(BigDecimal quantiteRestante) { this.stockRestant = quantiteRestante; }
+
+    public BigDecimal getConsommationJour() { return consommationParJour; }
+    public void setConsommationJour(BigDecimal consommationJour) { this.consommationParJour = consommationJour; }
+
+    public BigDecimal getSuggestionQuantiteAchat() { return quantiteSuggereePurchase; }
+    public void setSuggestionQuantiteAchat(BigDecimal suggestionQuantiteAchat) { this.quantiteSuggereePurchase = suggestionQuantiteAchat; }
+
+    public String getAlerte() { return alerte; }
+    public void setAlerte(String alerte) { this.alerte = alerte; }
 }
