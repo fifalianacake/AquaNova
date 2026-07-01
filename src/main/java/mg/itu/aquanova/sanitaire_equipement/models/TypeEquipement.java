@@ -1,4 +1,4 @@
-package mg.itu.aquanova.sanitaireequipement.models;
+package mg.itu.aquanova.sanitaire_equipement.models;
 
 import jakarta.persistence.*;
 

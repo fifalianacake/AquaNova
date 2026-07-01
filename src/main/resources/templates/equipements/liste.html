@@ -1,31 +1,144 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Parc Matériel</title>
+</head>
 <body>
-    <h1>Parc Matériel</h1>
-    <a href="/equipements/new">+ Nouvel Équipement</a>
-    
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th><th>Nom</th><th>Type</th><th>Statut</th><th>Bassin</th><th>Installation</th><th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="e : ${equipements}">
-                <td th:text="${e.id}"></td>
-                <td th:text="${e.nom}"></td>
-                <td th:text="${e.typeEquipement.libelle}"></td>
-                <td th:text="${e.statut}"></td>
-                <td th:text="${e.bassin != null ? e.bassin.nom : 'Général'}"></td>
-                <td th:text="${e.dateInstallation}"></td>
-                <td>
-                    <a th:href="@{'/equipements/' + ${e.id}}">Voir</a>
-                    <form th:action="@{'/equipements/delete/' + ${e.id}}" method="post" style="display:inline;">
-                        <button type="submit" onclick="return confirm('Confirmer la suppression ?')">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+
+<h1>Parc Matériel</h1>
+
+<a th:href="@{/equipements/new}">
+    + Nouvel Équipement
+</a>
+
+<hr>
+
+
+
+<form th:action="@{/equipements}" method="get">
+
+    <label>Nom :</label>
+    <input type="text"
+           name="nom"
+           th:value="${param.nom}"
+           placeholder="Nom de l'équipement"/>
+
+    <label>Type :</label>
+    <select name="type">
+
+        <option value="">Tous</option>
+
+        <option th:each="t : ${types}"
+                th:value="${t.id}"
+                th:text="${t.libelle}"
+                th:selected="${param.type != null and param.type[0] == t.id.toString()}">
+        </option>
+
+    </select>
+
+    <label>Statut :</label>
+    <select name="statut">
+
+        <option value="">Tous</option>
+
+        <option th:each="s : ${statuts}"
+                th:value="${s}"
+                th:text="${s}"
+                th:selected="${param.statut != null and param.statut[0] == s.toString()}">
+        </option>
+
+    </select>
+
+    <button type="submit">
+        Rechercher
+    </button>
+
+    <a th:href="@{/equipements}">
+        Réinitialiser
+    </a>
+
+</form>
+
+<hr>
+
+<table border="1" cellpadding="5">
+
+    <thead>
+
+    <tr>
+
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Type</th>
+        <th>Statut</th>
+        <th>Bassin</th>
+        <th>Date installation</th>
+        <th>Dernière maintenance</th>
+        <th>Actions</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody>
+
+    <tr th:if="${#lists.isEmpty(equipements)}">
+        <td colspan="8">
+            Aucun équipement trouvé.
+        </td>
+    </tr>
+
+    <tr th:each="e : ${equipements}">
+
+        <td th:text="${e.id}"></td>
+
+        <td th:text="${e.nom}"></td>
+
+        <td th:text="${e.typeEquipement.libelle}"></td>
+
+        <td th:text="${e.statut}"></td>
+
+        <td th:text="${e.bassin != null ? e.bassin.nom : 'Général'}"></td>
+
+        <td th:text="${e.dateInstallation}"></td>
+
+        <td th:text="${e.derniereMaintenance != null ? e.derniereMaintenance : '-'}"></td>
+
+        <td>
+
+            <a th:href="@{/equipements/{id}(id=${e.id})}">
+                Voir
+            </a>
+
+            |
+
+            <a th:href="@{/equipements/edit/{id}(id=${e.id})}">
+                Modifier
+            </a>
+
+            |
+
+            <form th:action="@{/equipements/delete/{id}(id=${e.id})}"
+                  method="post"
+                  style="display:inline;">
+
+                <button type="submit"
+                        onclick="return confirm('Voulez-vous supprimer cet équipement ?');">
+
+                    Supprimer
+
+                </button>
+
+            </form>
+
+        </td>
+
+    </tr>
+
+    </tbody>
+
+</table>
+
 </body>
 </html>

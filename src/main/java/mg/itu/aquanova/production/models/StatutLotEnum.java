@@ -5,3 +5,5 @@ public enum StatutLotEnum {
     RECOLTE_PARTIELLE,
     CLOTURE
 }
+
+

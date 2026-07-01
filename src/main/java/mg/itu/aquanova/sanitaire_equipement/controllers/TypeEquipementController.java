@@ -1,10 +1,11 @@
-package mg.itu.aquanova.sanitaireequipement.controllers;
+package mg.itu.aquanova.sanitaire_equipement.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import mg.itu.aquanova.sanitaireequipement.models.TypeEquipement;
-import mg.itu.aquanova.sanitaireequipement.services.TypeEquipementService;
+
+import mg.itu.aquanova.sanitaire_equipement.models.TypeEquipement;
+import mg.itu.aquanova.sanitaire_equipement.services.TypeEquipementService;
 
 @Controller
 @RequestMapping("/types-equipements")

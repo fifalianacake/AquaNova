@@ -12,9 +12,7 @@
 
         <label>Statut :</label>
         <select th:field="*{statut}" required>
-            <option value="DISPONIBLE">DISPONIBLE</option>
-            <option value="EN_SERVICE">EN_SERVICE</option>
-            <option value="EN_PANNE">EN_PANNE</option>
+            <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
         </select><br/>
 
         <label>Date Installation :</label> <input type="date" th:field="*{dateInstallation}" required /><br/>

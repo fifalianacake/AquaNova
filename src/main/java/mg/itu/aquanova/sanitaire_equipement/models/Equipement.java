@@ -1,4 +1,4 @@
-package mg.itu.aquanova.sanitaireequipement.models;
+package mg.itu.aquanova.sanitaire_equipement.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -21,9 +21,9 @@ public class Equipement {
     @ManyToOne
     @JoinColumn(name = "id_bassin") 
     private Bassin bassin;
-
-    private String statut; // DISPONIBLE, EN_SERVICE, EN_PANNE, EN_MAINTENANCE, HORS_SERVICE
-
+    @Enumerated(EnumType.STRING)
+ @Column(nullable = false)
+private StatutEquipement statut;
     @Column(name = "date_installation")
     private LocalDate dateInstallation;
 
@@ -43,8 +43,8 @@ public class Equipement {
     public void setTypeEquipement(TypeEquipement typeEquipement) { this.typeEquipement = typeEquipement; }
     public Bassin getBassin() { return bassin; }
     public void setBassin(Bassin bassin) { this.bassin = bassin; }
-    public String getStatut() { return statut; }
-    public void setStatut(String statut) { this.statut = statut; }
+    public StatutEquipement getStatut() { return statut; }
+    public void setStatut(StatutEquipement statut) { this.statut = statut; }
     public LocalDate getDateInstallation() { return dateInstallation; }
     public void setDateInstallation(LocalDate dateInstallation) { this.dateInstallation = dateInstallation; }
     public LocalDate getDerniereMaintenance() { return derniereMaintenance; }

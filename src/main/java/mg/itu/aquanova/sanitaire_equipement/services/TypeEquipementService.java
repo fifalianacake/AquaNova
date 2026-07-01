@@ -1,10 +1,12 @@
 
-package mg.itu.aquanova.sanitaireequipement.services;
+package mg.itu.aquanova.sanitaire_equipement.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import mg.itu.aquanova.sanitaireequipement.models.TypeEquipement;
-import mg.itu.aquanova.sanitaireequipement.repositories.TypeEquipementRepository;
+
+import mg.itu.aquanova.sanitaire_equipement.models.TypeEquipement;
+import mg.itu.aquanova.sanitaire_equipement.repositories.TypeEquipementRepository;
+
 import java.util.List;
 
 @Service
