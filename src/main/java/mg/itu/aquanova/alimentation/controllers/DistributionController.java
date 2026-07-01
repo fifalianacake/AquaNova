@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ui.Model;
 
 import mg.itu.aquanova.alimentation.dto.DistributionDTO;
-import mg.itu.aquanova.alimentation.models.DistributionModels;
+import mg.itu.aquanova.alimentation.models.Distribution;
 import mg.itu.aquanova.alimentation.services.DistributionService;
 import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.referentiel.services.AlimentService;
@@ -55,7 +55,7 @@ public class DistributionController {
 
     @GetMapping("/edit/{id}")
     public String editDistributionForm(@PathVariable Long id, Model model) {
-        DistributionModels distribution = distributionService.getDistributionById(id);
+        Distribution distribution = distributionService.getDistributionById(id);
 
         DistributionDTO distributionDTO = new DistributionDTO();
 
@@ -76,7 +76,7 @@ public class DistributionController {
 
     @GetMapping("/{id}")
     public String viewDistribution(@PathVariable Long id, Model model) {
-        DistributionModels distribution = distributionService.getDistributionById(id);
+        Distribution distribution = distributionService.getDistributionById(id);
         model.addAttribute("distribution", distribution);
         return "alimentation/distribution/details";
     }

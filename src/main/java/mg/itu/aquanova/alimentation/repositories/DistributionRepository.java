@@ -5,16 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import mg.itu.aquanova.alimentation.models.DistributionModels;
+import mg.itu.aquanova.alimentation.models.Distribution;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface DistributionRepository extends JpaRepository<DistributionModels, Long> {
+public interface DistributionRepository extends JpaRepository<Distribution, Long> {
     
-    List<DistributionModels> findByLotId(Long lotId);
-
     @Query("""
             SELECT COALESCE(SUM(d.quantite), 0)
             FROM DistributionModels d
@@ -26,4 +24,6 @@ public interface DistributionRepository extends JpaRepository<DistributionModels
             @Param("alimentId") Long alimentId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);
+
+    List<Distribution> findByLotId(Long lotId);
 }

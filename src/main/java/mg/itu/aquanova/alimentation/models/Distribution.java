@@ -1,21 +1,22 @@
 package mg.itu.aquanova.alimentation.models;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.referentiel.models.Aliment;
 
 @Entity
 @Table(name = "distribution")
-public class DistributionModels {
+public class Distribution {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "date_distribution", nullable = false)
-    private LocalDateTime dateDistribution;
+    private LocalDate dateDistribution;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_lot", nullable = false)
@@ -35,7 +36,7 @@ public class DistributionModels {
     // @Column(name = "statut", nullable = false)
     // private StatutDistributionModels statut = StatutDistributionModels.EN_ATTENTE;
 
-    public DistributionModels() {
+    public Distribution() {
     }
 
     public Long getId() {
@@ -46,11 +47,11 @@ public class DistributionModels {
         this.id = id;
     }
 
-    public LocalDateTime getDateDistribution() {
+    public LocalDate getDateDistribution() {
         return dateDistribution;
     }
 
-    public void setDateDistribution(LocalDateTime dateDistribution) {
+    public void setDateDistribution(LocalDate dateDistribution) {
         this.dateDistribution = dateDistribution;
     }
 
