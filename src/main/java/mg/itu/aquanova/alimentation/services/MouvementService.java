@@ -9,12 +9,16 @@ import org.springframework.stereotype.Service;
 
 import mg.itu.aquanova.alimentation.models.*;
 import mg.itu.aquanova.alimentation.repositories.MouvementStockRepository;
+import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 
 @Service
 public class MouvementService {
 
     @Autowired
     private MouvementStockRepository repo;
+
+    @Autowired
+    private AlimentRepository alimentRepository;
 
     public MouvementStock create(MouvementStock m) {
 
@@ -90,6 +94,7 @@ public class MouvementService {
     public MouvementStock update(MouvementStock m) {
 
         validate(m);
+        validateUpdate(m);
 
         if (m.getTypeMouvement() != TypeMouvement.ENTREE) {
             checkStockAtDateExcludingSelf(m);
@@ -174,8 +179,40 @@ public class MouvementService {
 
     private void validate(MouvementStock m) {
 
-        if (m.getQuantite() == null || m.getQuantite() <= 0)
-            throw new RuntimeException("Quantité invalide");
+        if (m == null) {
+            throw new IllegalArgumentException("Le mouvement est obligatoire");
+        }
+
+        if (m.getDateMouvement() == null) {
+            throw new IllegalArgumentException("La date du mouvement est obligatoire");
+        }
+
+        if (m.getAliment() == null || m.getAliment().getId() == null) {
+            throw new IllegalArgumentException("L'aliment est obligatoire");
+        }
+
+        if (!alimentRepository.existsById(m.getAliment().getId())) {
+            throw new IllegalArgumentException("Aliment introuvable : " + m.getAliment().getId());
+        }
+
+        if (m.getTypeMouvement() == null) {
+            throw new IllegalArgumentException("Le type de mouvement est obligatoire");
+        }
+
+        if (m.getQuantite() == null || m.getQuantite() <= 0
+                || m.getQuantite().isNaN() || m.getQuantite().isInfinite()) {
+            throw new IllegalArgumentException("Quantité invalide");
+        }
+    }
+
+    private void validateUpdate(MouvementStock m) {
+        if (m.getId() == null) {
+            throw new IllegalArgumentException("L'identifiant du mouvement est obligatoire pour la modification");
+        }
+
+        if (!repo.existsById(m.getId())) {
+            throw new IllegalArgumentException("Mouvement introuvable : " + m.getId());
+        }
     }
 
     public MouvementStock findById(Long id) {
