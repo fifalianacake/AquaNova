@@ -21,6 +21,10 @@ public class Aliment {
     @JoinColumn(name = "id_type_aliment")
     private TypeAlimentModels typeAliment;
 
+    @ManyToOne
+    @JoinColumn(name = "id_stade_croissance")
+    private StadeCroissanceModels stadeCroissance;
+
     public Aliment() {
     }
 
@@ -64,4 +68,13 @@ public class Aliment {
     public void setTypeAliment(TypeAlimentModels typeAliment) {
         this.typeAliment = typeAliment;
     }
+
+    public StadeCroissanceModels getStadeCroissance() {
+        return stadeCroissance;
+    }
+
+    public void setStadeCroissance(StadeCroissanceModels stadeCroissance) {
+        this.stadeCroissance = stadeCroissance;
+    }
+
 }
