@@ -48,4 +48,29 @@ public class AlimentService {
     public boolean exists(Long id) {
         return repo.existsById(id);
     }
+
+    public List<Aliment> searchByNom(String nom) {
+        if (nom == null || nom.trim().isEmpty()) {
+            return findAll();
+        }
+        return repo.findByNomContainingIgnoreCaseOrderByNomAsc(nom.trim());
+    }
+
+    private void validerAliment(Aliment aliment) {
+        if (aliment == null) {
+            throw new IllegalArgumentException("L'aliment est obligatoire.");
+        }
+        if (aliment.getNom() == null || aliment.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom de l'aliment est obligatoire.");
+        }
+        if (aliment.getTypeAliment() == null) {
+            throw new IllegalArgumentException("Le type de l'aliment est obligatoire.");
+        }
+    }
+
+    private void normaliserAliment(Aliment aliment) {
+        aliment.setNom(aliment.getNom().trim());
+        aliment.setTypeAliment(aliment.getTypeAliment());
+    }
+
 }
