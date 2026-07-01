@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import mg.itu.aquanova.alimentation.models.AlimentModel;
+import mg.itu.aquanova.alimentation.models.Aliment;
 import mg.itu.aquanova.alimentation.services.AlimentService;
 
 @Controller
@@ -32,19 +32,19 @@ public class AlimentController {
 
     @GetMapping("/new")
     public String createForm(Model model) {
-        model.addAttribute("aliment", new AlimentModel());
+        model.addAttribute("aliment", new Aliment());
         return "alimentation/aliments/form";
     }
 
     @PostMapping
-    public String save(@ModelAttribute AlimentModel aliment) {
+    public String save(@ModelAttribute Aliment aliment) {
         service.save(aliment);
         return "redirect:/aliments";
     }
 
     @GetMapping("/{id}")
     public String details(@PathVariable Integer id, Model model) {
-        AlimentModel aliment = service.findById(id);
+        Aliment aliment = service.findById(id);
         model.addAttribute("aliment", aliment);
         model.addAttribute("stockActuel", service.getStockActuel(id));
         return "alimentation/aliments/details";

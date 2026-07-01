@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import mg.itu.aquanova.alimentation.models.AlimentModel;
+import mg.itu.aquanova.alimentation.models.Aliment;
 
-public interface AlimentRepository extends JpaRepository<AlimentModel, Integer> {
+public interface AlimentRepository extends JpaRepository<Aliment, Integer> {
 
-    List<AlimentModel> findByNomContainingIgnoreCaseOrderByNomAsc(String nom);
+    List<Aliment> findByNomContainingIgnoreCaseOrderByNomAsc(String nom);
 }
