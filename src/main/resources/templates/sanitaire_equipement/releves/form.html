@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <h2>Nouveau relevé d'eau</h2>
+
+    <form method="post" th:action="${releve.id} == null ? @{/releves-eau} : @{'/releves-eau/edit/' + ${releve.id}}"
+        th:object="${releve}">
+
+        <p>
+            <label>Bassin</label>
+            <select th:field="*{bassin.id}" required>
+                <option value="">Choisir</option>
+                <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}">
+                </option>
+            </select>
+        </p>
+
+        <p>
+            <label>Date</label>
+            <input type="date" th:field="*{dateReleve}" required />
+        </p>
+
+        <p>
+            <label>Température</label>
+            <input type="number" step="0.1" th:field="*{temperature}" required />
+        </p>
+
+        <p>
+            <label>pH</label>
+            <input type="number" step="0.1" th:field="*{ph}" required />
+        </p>
+
+        <p>
+            <label>Oxygène</label>
+            <input type="number" step="0.1" th:field="*{oxygene}" required />
+        </p>
+
+        <p>
+            <label>Observation</label>
+            <textarea th:field="*{observation}"></textarea>
+        </p>
+
+        <button type="submit">Enregistrer</button>
+    </form>
+
+    <br>
+
+    <a href="/releves-eau">
+        Retour
+    </a>
+
+</body>
+
+</html>

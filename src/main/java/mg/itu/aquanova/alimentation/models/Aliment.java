@@ -1,0 +1,68 @@
+package mg.itu.aquanova.alimentation.models;
+
+import jakarta.persistence.*;
+import mg.itu.aquanova.referentiel.models.TypeAlimentModels;
+
+@Entity
+@Table(name = "aliment")
+public class Aliment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nom;
+
+    @Column(name = "prix_unitaire")
+    private Double prixUnitaire;
+
+    private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "id_type_aliment")
+    private TypeAlimentModels typeAliment;
+
+    public Aliment() {
+    }
+
+    // getters & setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public Double getPrixUnitaire() {
+        return prixUnitaire;
+    }
+
+    public void setPrixUnitaire(Double prixUnitaire) {
+        this.prixUnitaire = prixUnitaire;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public TypeAlimentModels getTypeAliment() {
+        return typeAliment;
+    }
+
+    public void setTypeAliment(TypeAlimentModels typeAliment) {
+        this.typeAliment = typeAliment;
+    }
+}
