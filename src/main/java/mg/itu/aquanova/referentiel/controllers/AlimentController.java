@@ -31,13 +31,13 @@ public class AlimentController {
     public String list(@RequestParam(required = false) String q, Model model) {
         model.addAttribute("aliments", service.searchByNom(q));
         model.addAttribute("q", q);
-        return "alimentation/aliments/list";
+        return "referentiel/aliments/list";
     }
 
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("aliment", new Aliment());
-        return "alimentation/aliments/form";
+        return "referentiel/aliments/form";
     }
 
     @PostMapping
@@ -51,13 +51,13 @@ public class AlimentController {
         Aliment aliment = service.findById(id);
         model.addAttribute("aliment", aliment);
         model.addAttribute("stockActuel", mvtService.getStock(id));
-        return "alimentation/aliments/details";
+        return "referentiel/aliments/details";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Long id, Model model) {
         model.addAttribute("aliment", service.findById(id));
-        return "alimentation/aliments/form";
+        return "referentiel/aliments/form";
     }
 
     @GetMapping("/delete/{id}")
