@@ -46,7 +46,7 @@ public class ReleveEauController {
                         minPh, maxPh,
                         minOxy, maxOxy));
 
-        return "sanitaire/releves/list";
+        return "sanitaire_equipement/releves/list";
     }
 
     @GetMapping("/new")
@@ -69,7 +69,7 @@ public class ReleveEauController {
         model.addAttribute("releve", releve);
         model.addAttribute("bassins", bassinService.getAllBassins());
 
-        return "sanitaire/releves/form";
+        return "sanitaire_equipement/releves/form";
     }
 
     @PostMapping
@@ -104,7 +104,7 @@ public class ReleveEauController {
         model.addAttribute("releve",
                 service.getById(id));
 
-        return "sanitaire/releves/detail";
+        return "sanitaire_equipement/releves/detail";
     }
 
     @GetMapping("/edit/{id}")
@@ -122,7 +122,7 @@ public class ReleveEauController {
         model.addAttribute("releve", service.getById(id));
         model.addAttribute("bassins", bassinService.getAllBassins());
 
-        return "sanitaire/releves/form";
+        return "sanitaire_equipement/releves/form";
     }
 
     @PostMapping("/edit/{id}")

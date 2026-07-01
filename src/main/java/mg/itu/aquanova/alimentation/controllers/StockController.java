@@ -27,7 +27,7 @@ public class StockController {
         model.addAttribute("total", service.totalStock(d));
         model.addAttribute("date", d);
 
-        return "stocks/list";
+        return "alimentation/stocks/list";
     }
 
     @GetMapping("/{id}")
@@ -41,6 +41,6 @@ public class StockController {
         model.addAttribute("mouvements", service.getHistorique(id));
         model.addAttribute("mouvements", service.getHistorique(id));
 
-        return "stocks/detail";
+        return "alimentation/stocks/detail";
     }
 }

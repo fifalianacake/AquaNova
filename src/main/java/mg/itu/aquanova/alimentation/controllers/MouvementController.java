@@ -30,7 +30,7 @@ public class MouvementController {
         model.addAttribute("mouvements",
                 service.search(id, type, aliment, start, end));
 
-        return "mouvements/list";
+        return "alimentation/mouvements/list";
     }
 
     @GetMapping("/{id}")
@@ -43,7 +43,7 @@ public class MouvementController {
         // model.addAttribute("lots",
         // mouvementLotRepo.findByMouvementId(id));
 
-        return "mouvements/detail";
+        return "alimentation/mouvements/detail";
     }
 
     @GetMapping("/new")
@@ -52,7 +52,7 @@ public class MouvementController {
         model.addAttribute("mouvement", new MouvementStock());
         model.addAttribute("aliments", alimentService.findAll());
 
-        return "mouvements/form";
+        return "alimentation/mouvements/form";
     }
 
     @PostMapping
@@ -68,7 +68,7 @@ public class MouvementController {
             model.addAttribute("mouvement", mouvement);
             model.addAttribute("aliments", alimentService.findAll());
 
-            return "mouvements/form";
+            return "alimentation/mouvements/form";
         }
     }
 
@@ -79,7 +79,7 @@ public class MouvementController {
         model.addAttribute("mouvement", service.findById(id));
         model.addAttribute("aliments", alimentService.findAll());
 
-        return "mouvements/form";
+        return "alimentation/mouvements/form";
     }
 
     @PostMapping("/edit/{id}")
