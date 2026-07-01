@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails de l'Aliment</title>
+</head>
+<body>
+
+    <h2>Détails de l'Aliment</h2>
+
+    <div th:if="${aliment != null}">
+        <ul>
+            <li><strong>ID :</strong> <span th:text="${aliment.id}">1</span></li>
+            <li><strong>Nom :</strong> <span th:text="${aliment.nom}">Nom de l'aliment</span></li>
+            <li><strong>Stock Actuel :</strong> <span th:text="${stockActuel}">0</span></li>
+        </ul>
+
+        <p>
+            <a th:href="@{/aliments}">Retour à la liste</a> | 
+            <a th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier cet aliment</a> | 
+            <a th:href="@{/aliments/delete/{id}(id=${aliment.id})}" 
+               th:onclick="return confirm('Confirmer la suppression ?');">Supprimer</a>
+        </p>
+    </div>
+
+    <div th:unless="${aliment != null}">
+        <p>Aliment introuvable.</p>
+        <p><a th:href="@{/aliments}">Retour à la liste</a></p>
+    </div>
+
+</body>
+</html>
