@@ -104,9 +104,20 @@ public class MouvementController {
     }
 
     @PostMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        service.delete(id);
-        return "redirect:/stocks/mouvements";
+    public String delete(@PathVariable Long id,
+            Model model) {
+
+        try {
+            service.delete(id);
+            return "redirect:/stocks/mouvements";
+
+        } catch (RuntimeException e) {
+
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("mouvements", service.search(null, null, null, null, null));
+
+            return "alimentation/mouvements/list";
+        }
     }
 
 }

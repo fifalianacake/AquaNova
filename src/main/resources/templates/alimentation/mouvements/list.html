@@ -2,6 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <body>
+    <div th:if="${error}" style="color:red;">
+        <p th:text="${error}"></p>
+    </div>
 
     <h2>Mouvements de stock</h2>
 

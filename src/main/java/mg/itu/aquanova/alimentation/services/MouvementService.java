@@ -24,9 +24,13 @@ public class MouvementService {
 
         validate(m);
 
-        if (m.getTypeMouvement() != TypeMouvement.ENTREE) {
-            checkFIFOAvailability(m);
-        }
+        List<MouvementStock> all = repo.findByAlimentId(m.getAliment().getId());
+
+        // simulate insertion
+        all.add(m);
+
+        // validate FULL timeline (past + future)
+        validateTimelineList(all);
 
         return repo.save(m);
     }
@@ -91,14 +95,45 @@ public class MouvementService {
         }
     }
 
+    private void validateTimelineList(List<MouvementStock> list) {
+
+        list = list.stream()
+                .sorted(Comparator.comparing(MouvementStock::getDateMouvement))
+                .toList();
+
+        double stock = 0;
+
+        for (MouvementStock m : list) {
+
+            if (m.getTypeMouvement() == TypeMouvement.ENTREE)
+                stock += m.getQuantite();
+            else
+                stock -= m.getQuantite();
+
+            if (stock < 0) {
+                throw new RuntimeException(
+                        "Stock devient négatif à la date "
+                                + m.getDateMouvement());
+            }
+        }
+    }
+
     public MouvementStock update(MouvementStock m) {
 
         validate(m);
         validateUpdate(m);
 
-        if (m.getTypeMouvement() != TypeMouvement.ENTREE) {
-            checkStockAtDateExcludingSelf(m);
+        List<MouvementStock> all = repo.findByAlimentId(m.getAliment().getId());
+
+        // replace the edited movement in memory
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getId().equals(m.getId())) {
+                all.set(i, m);
+                break;
+            }
         }
+
+        validateTimelineList(all);
 
         return repo.save(m);
     }
@@ -129,6 +164,15 @@ public class MouvementService {
     }
 
     public void delete(Long id) {
+
+        MouvementStock toDelete = findById(id);
+
+        List<MouvementStock> all = repo.findByAlimentId(toDelete.getAliment().getId());
+
+        all.removeIf(m -> m.getId().equals(id));
+
+        validateTimelineList(all);
+
         repo.deleteById(id);
     }
 
