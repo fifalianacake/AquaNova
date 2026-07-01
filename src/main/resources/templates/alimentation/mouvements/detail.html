@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <h2>Détail mouvement</h2>
+
+    <p>ID : <span th:text="${mouvement.id}"></span></p>
+    <p>Date : <span th:text="${mouvement.dateMouvement}"></span></p>
+    <p>Aliment : <span th:text="${mouvement.aliment.nom}"></span></p>
+    <p>Type : <span th:text="${mouvement.typeMouvement}"></span></p>
+    <p>Quantité : <span th:text="${mouvement.quantite}"></span></p>
+    <p>Commentaire : <span th:text="${mouvement.commentaire}"></span></p>
+
+    <a href="/stocks/mouvements">Retour</a>
+    <a th:href="@{'/stocks/mouvements/edit/' + ${mouvement.id}}">Modifier</a>
+    <form th:action="@{'/stocks/mouvements/delete/' + ${mouvement.id}}" method="post">
+        <button type="submit">Supprimer</button>
+    </form>
+
+
+
+</body>
+
+</html>

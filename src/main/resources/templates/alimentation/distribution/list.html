@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Distributions</title>
+</head>
+<body>
+
+    <h2>Liste des Distributions d'Alimentation</h2>
+    
+    <a th:href="@{/alimentation/distribution/new}">Nouvelle Distribution</a>
+    <br/><br/>
+
+    <table border="1">
+        <thead border="1">
+            <tr>
+                <th>Date</th>
+                <th>ID Lot</th>
+                <th>Aliment</th>
+                <th>Ration Théorique</th>
+                <th>Quantité Distribuée</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(distributions)}">
+                <td>Aucune donnée disponible</td>
+            </tr>
+            
+            <tr th:each="dist : ${distributions}">
+                <td th:text="${dist.dateDistribution}">01/01/2026 08:00</td>
+                <td th:text="${dist.lot.id}">1</td>
+                <td th:text="${dist.aliment.nom}">Granulé</td>
+                <td th:text="${dist.rationTheorique + ' kg'}">0.00 kg</td>
+                <td th:text="${dist.quantite + ' kg'}">0.00 kg</td>
+                <td>
+                    <a th:href="@{/alimentation/distribution/edit/{id}(id=${dist.id})}">Modifier</a>
+                    | 
+                    <a th:href="@{/alimentation/distribution/delete/{id}(id=${dist.id})}" 
+                       onclick="return confirm('Supprimer ?')">Supprimer</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
