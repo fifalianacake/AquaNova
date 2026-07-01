@@ -1,4 +1,4 @@
-package mg.itu.aquanova.sanitaire.services;
+package mg.itu.aquanova.sanitaire_equipement.services;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.sanitaire.models.ReleveEau;
-import mg.itu.aquanova.sanitaire.repositories.ReleveEauRepository;
+import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
+import mg.itu.aquanova.sanitaire_equipement.repositories.ReleveEauRepository;
 
 @Service
 public class ReleveEauService {

@@ -1,4 +1,4 @@
-package mg.itu.aquanova.sanitaire.models;
+package mg.itu.aquanova.sanitaire_equipement.models;
 
 import java.time.LocalDate;
 

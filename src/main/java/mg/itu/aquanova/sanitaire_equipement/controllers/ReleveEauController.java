@@ -1,4 +1,4 @@
-package mg.itu.aquanova.sanitaire.controllers;
+package mg.itu.aquanova.sanitaire_equipement.controllers;
 
 import java.time.LocalDate;
 
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
 import mg.itu.aquanova.referentiel.services.BassinService;
-import mg.itu.aquanova.sanitaire.models.ReleveEau;
-import mg.itu.aquanova.sanitaire.services.ReleveEauService;
+import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
+import mg.itu.aquanova.sanitaire_equipement.services.ReleveEauService;
 import mg.itu.aquanova.security.models.UserModels;
 
 @Controller
