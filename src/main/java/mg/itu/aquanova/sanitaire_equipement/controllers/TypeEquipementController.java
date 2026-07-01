@@ -18,7 +18,8 @@ public class TypeEquipementController {
     @GetMapping
     public String lister(Model model) {
         model.addAttribute("types", service.listerTous());
-        return "types-equipements/liste";
+        model.addAttribute("typeEquipement", new TypeEquipement());
+        return "sanitaire_equipement/equipements/types";
     }
 
     @PostMapping("/save")

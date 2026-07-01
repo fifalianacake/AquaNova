@@ -46,7 +46,7 @@ public String lister(
     model.addAttribute("types", typeService.listerTous());
     model.addAttribute("statuts", StatutEquipement.values());
 
-    return "equipements/liste";
+    return "sanitaire_equipement/equipements/liste";
 }
 
    @GetMapping("/new")
@@ -58,7 +58,7 @@ public String formulaire(Model model){
 
     model.addAttribute("statuts", StatutEquipement.values());
 
-    return "equipements/form";
+    return "sanitaire_equipement/equipements/form";
 }
 
     @PostMapping("/save")
@@ -67,10 +67,25 @@ public String formulaire(Model model){
         return "redirect:/equipements";
     }
 
+    @GetMapping("/edit/{id}")
+    public String formulaireModification(@PathVariable Long id, Model model) {
+        model.addAttribute("equipement", equipementService.trouverParId(id));
+        model.addAttribute("types", typeService.listerTous());
+        model.addAttribute("statuts", StatutEquipement.values());
+
+        return "sanitaire_equipement/equipements/form";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String modifier(@PathVariable Long id, @ModelAttribute Equipement equipement) {
+        equipementService.modifier(id, equipement);
+        return "redirect:/equipements/" + id;
+    }
+
     @GetMapping("/{id}")
     public String fiche(@PathVariable Long id, Model model) {
         model.addAttribute("equipement", equipementService.trouverParId(id));
-        return "equipements/fiche";
+        return "sanitaire_equipement/equipements/fiche";
     }
 
     @PostMapping("/delete/{id}")

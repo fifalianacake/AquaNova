@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <h1>Saisie Équipement</h1>
-    <form th:action="@{/equipements/save}" th:object="${equipement}" method="post">
+    <h1 th:text="${equipement.id != null} ? 'Modification Équipement' : 'Saisie Équipement'">
+        Saisie Équipement
+    </h1>
+
+    <form th:action="${equipement.id == null} ? @{/equipements/save} : @{/equipements/edit/{id}(id=${equipement.id})}"
+          th:object="${equipement}"
+          method="post">
         <label>Nom :</label> <input type="text" th:field="*{nom}" required /><br/>
         
         <label>Type :</label>
@@ -19,7 +24,11 @@
         
         <label>Observation :</label> <textarea th:field="*{observation}"></textarea><br/>
         
-        <button type="submit">Enregistrer</button>
+        <button type="submit" th:text="${equipement.id != null} ? 'Modifier' : 'Enregistrer'">
+            Enregistrer
+        </button>
     </form>
+
+    <a th:href="@{/equipements}">Retour</a>
 </body>
 </html>

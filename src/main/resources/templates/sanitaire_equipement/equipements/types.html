@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <h1>Types d'équipements</h1>
+
+    <form th:action="@{/types-equipements/save}" th:object="${typeEquipement}" method="post">
+        <label>Libellé :</label>
+        <input type="text" th:field="*{libelle}" required>
+
+        <button type="submit">Enregistrer</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Libellé</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(types)}">
+                <td colspan="2">Aucun type d'équipement trouvé.</td>
+            </tr>
+            <tr th:each="type : ${types}">
+                <td th:text="${type.id}"></td>
+                <td th:text="${type.libelle}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
