@@ -61,6 +61,7 @@ public class DistributionService {
 
     @Transactional
     public void saveOrUpdateDistribution(DistributionDTO distributionDTO) {
+        validateDistributionDTO(distributionDTO);
         Distribution distribution = new Distribution();
 
         if (distributionDTO.getId() != null) {
@@ -83,7 +84,7 @@ public class DistributionService {
         distribution.setAliment(aliment);
         distribution.setQuantite(distributionDTO.getQuantite());
 
-        Double rationTheorique = CalculRationTheoriqueCible(distributionDTO);
+        BigDecimal rationTheorique = CalculRationTheoriqueCible(distributionDTO);
 
         distribution.setRationTheorique(rationTheorique);
 
@@ -91,6 +92,7 @@ public class DistributionService {
     }
 
     public Distribution saveDistribution(DistributionDTO distributionDTO) {
+        validateDistributionDTO(distributionDTO);
 
         Distribution distribution = new Distribution();
 
@@ -110,7 +112,7 @@ public class DistributionService {
         distribution.setAliment(aliment);
         distribution.setQuantite(distributionDTO.getQuantite());
 
-        Double rationTheorique = CalculRationTheoriqueCible(distributionDTO);
+        BigDecimal rationTheorique = CalculRationTheoriqueCible(distributionDTO);
 
         distribution.setRationTheorique(rationTheorique);
 
@@ -127,10 +129,29 @@ public class DistributionService {
     private MouvementStock createMouvementStock(Distribution distribution) {
         MouvementStock mouvementStock = new MouvementStock();
         mouvementStock.setAliment(distribution.getAliment());
+        mouvementStock.setDateMouvement(distribution.getDateDistribution());
         mouvementStock.setTypeMouvement(TypeMouvement.SORTIE);
         mouvementStock.setQuantite(distribution.getQuantite().doubleValue());
         mouvementStock.setCommentaire("Distribution aliment dans le lot #" + distribution.getLot().getId());
         return mouvementStock;
+    }
+
+    private void validateDistributionDTO(DistributionDTO distributionDTO) {
+        if (distributionDTO == null) {
+            throw new IllegalArgumentException("La distribution est obligatoire");
+        }
+        if (distributionDTO.getDateDistribution() == null) {
+            throw new IllegalArgumentException("La date de distribution est obligatoire");
+        }
+        if (distributionDTO.getIdLot() == null) {
+            throw new IllegalArgumentException("ID du lot est requis");
+        }
+        if (distributionDTO.getIdAliment() == null) {
+            throw new IllegalArgumentException("ID de l'aliment est requis");
+        }
+        if (distributionDTO.getQuantite() == null || distributionDTO.getQuantite().signum() <= 0) {
+            throw new IllegalArgumentException("La quantité distribuée doit être supérieure à 0");
+        }
     }
 
     public Double calculGPQCible(DistributionDTO distributionDTO) {
@@ -188,7 +209,7 @@ public class DistributionService {
         return gainCible;
     }
 
-    public Double CalculRationTheoriqueCible(DistributionDTO distributionDTO) {
+    public BigDecimal CalculRationTheoriqueCible(DistributionDTO distributionDTO) {
         Double rationTheoriqueCible = 0.0;
 
         Double gainCible = calculGainCible(distributionDTO);
@@ -217,7 +238,7 @@ public class DistributionService {
         }
 
         rationTheoriqueCible = gainCible.doubleValue() * ica;
-        return rationTheoriqueCible;
+        return BigDecimal.valueOf(rationTheoriqueCible);
 
     }
 

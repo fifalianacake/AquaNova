@@ -10,6 +10,7 @@ import mg.itu.aquanova.production.repositories.PeseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -43,20 +44,20 @@ public class PeseeService {
     @Transactional
     public Pese enregistrerPesee(Long idLot, LocalDate datePesee, Integer nbEchantillon, Double poidsTotal, String observation) {
         LotModels lot = validerEtTrouverLot(idLot, datePesee);
-        validerMesures(nbEchantillon, poidsTotal);
-
-        Double poidsMoyen = round3(poidsTotal / nbEchantillon);
+        BigDecimal poidsTotalDecimal = poidsTotal != null ? BigDecimal.valueOf(poidsTotal) : null;
+        validerMesures(nbEchantillon, poidsTotalDecimal);
+        BigDecimal poidsMoyen = BigDecimal.valueOf(round3(poidsTotal / nbEchantillon));
 
         Pese pesee = new Pese();
         pesee.setLot(lot);
         pesee.setDatePesee(datePesee);
         pesee.setNbEchantillon(nbEchantillon);
-        pesee.setPoidsTotalEchantillon(poidsTotal);
+        pesee.setPoidsTotalEchantillon(poidsTotalDecimal);
         pesee.setPoidsMoyen(poidsMoyen);
         pesee.setObservation(observation);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen);
+        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
         lotRepository.save(lot);
 
         journalLotService.inscrireEvenement(
@@ -78,7 +79,9 @@ public class PeseeService {
 
         LocalDate nouvelleDate = datePesee != null ? datePesee : pesee.getDatePesee();
         Integer nouveauNbEchantillon = nbEchantillon != null ? nbEchantillon : pesee.getNbEchantillon();
-        Double nouveauPoidsTotal = poidsTotal != null ? poidsTotal : pesee.getPoidsTotalEchantillon();
+        BigDecimal nouveauPoidsTotal = poidsTotal != null
+                ? BigDecimal.valueOf(poidsTotal)
+                : pesee.getPoidsTotalEchantillon();
 
         LotModels lot = validerEtTrouverLot(pesee.getLot(), nouvelleDate);
         validerMesures(nouveauNbEchantillon, nouveauPoidsTotal);
@@ -88,11 +91,12 @@ public class PeseeService {
         pesee.setNbEchantillon(nouveauNbEchantillon);
         pesee.setPoidsTotalEchantillon(nouveauPoidsTotal);
 
-        Double poidsMoyen = round3(pesee.getPoidsTotalEchantillon() / pesee.getNbEchantillon());
+        BigDecimal poidsMoyen = BigDecimal.valueOf(
+                round3(pesee.getPoidsTotalEchantillon().doubleValue() / pesee.getNbEchantillon()));
         pesee.setPoidsMoyen(poidsMoyen);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen);
+        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
         lotRepository.save(lot);
 
         return saved;
@@ -113,7 +117,7 @@ public class PeseeService {
 public Double getDernierPoidsMoyen(Long idLot) {
     List<Pese> historique = this.peseeRepository.findByLotIdOrderByDatePeseeDesc(idLot);
     if (historique.isEmpty()) return null;
-    return historique.get(0).getPoidsMoyen();
+    return historique.get(0).getPoidsMoyen().doubleValue();
 }
 
     private LotModels validerEtTrouverLot(Long idLot, LocalDate datePesee) {
@@ -144,11 +148,11 @@ public Double getDernierPoidsMoyen(Long idLot) {
         return validerEtTrouverLot(lot.getId(), datePesee);
     }
 
-    private void validerMesures(Integer nbEchantillon, Double poidsTotal) {
+    private void validerMesures(Integer nbEchantillon, BigDecimal poidsTotal) {
         if (nbEchantillon == null || nbEchantillon <= 0) {
             throw new IllegalArgumentException("Le nombre d'échantillons doit être supérieur à 0.");
         }
-        if (poidsTotal == null || poidsTotal <= 0) {
+        if (poidsTotal == null || poidsTotal.signum() <= 0) {
             throw new IllegalArgumentException("Le poids total de l'échantillon doit être supérieur à 0.");
         }
     }

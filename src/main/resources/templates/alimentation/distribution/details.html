@@ -13,8 +13,6 @@
 
     <div>
         <p><strong>ID :</strong> <span th:text="${distribution.id}"></span></p>
-        <p><strong>Statut :</strong> <span
-                th:text="${distribution.statut != null ? distribution.statut.name() : 'Non défini'}"></span></p>
         <p><strong>Date de distribution :</strong> <span th:text="${distribution.dateDistribution}"></span></p>
         <p><strong>Lot concerné :</strong> <span
                 th:text="${distribution.lot != null ? 'Lot #' + distribution.lot.id : 'Non défini'}"></span></p>

@@ -143,7 +143,7 @@ public class TransfertService {
         if (transfert.getEffectif() == null || transfert.getEffectif() <= 0) {
             throw new IllegalArgumentException("L'effectif transféré doit être strictement positif.");
         }
-        if (transfert.getPoidsMoyen() == null || transfert.getPoidsMoyen() <= 0) {
+        if (transfert.getPoidsMoyen() == null || transfert.getPoidsMoyen().signum() <= 0) {
             throw new IllegalArgumentException("Le poids moyen doit être strictement positif.");
         }
     }
@@ -202,8 +202,8 @@ public class TransfertService {
         lotDestination.setDateMiseEnCharge(transfert.getDateTransfert());
         lotDestination.setEffectifInitial(transfert.getEffectif());
         lotDestination.setEffectifActuel(transfert.getEffectif());
-        lotDestination.setPoidsMoyenInitial(transfert.getPoidsMoyen());
-        lotDestination.setPoidsMoyenActuel(transfert.getPoidsMoyen());
+        lotDestination.setPoidsMoyenInitial(transfert.getPoidsMoyen().doubleValue());
+        lotDestination.setPoidsMoyenActuel(transfert.getPoidsMoyen().doubleValue());
         lotDestination.setObservation("Créé par transfert partiel depuis le lot " + lotSource.getCode());
         return lotRepository.save(lotDestination);
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import mg.itu.aquanova.alimentation.models.Distribution;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,13 +15,13 @@ import java.util.List;
 public interface DistributionRepository extends JpaRepository<Distribution, Long> {
     
     @Query("""
-            SELECT COALESCE(SUM(d.quantite), 0)
-            FROM DistributionModels d
+            SELECT SUM(d.quantite)
+            FROM Distribution d
             WHERE d.aliment.id = :alimentId
               AND d.dateDistribution >= :dateDebut
               AND d.dateDistribution <= :dateFin
             """)
-    Double sumQuantiteByAlimentIdAndDateBetween(
+    BigDecimal sumQuantiteByAlimentIdAndDateBetween(
             @Param("alimentId") Long alimentId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);

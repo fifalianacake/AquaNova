@@ -1,6 +1,7 @@
 package mg.itu.aquanova.production.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import mg.itu.aquanova.referentiel.models.*;
 
 @Entity
@@ -44,7 +45,7 @@ public class TransfertModels {
     private Integer effectif;
 
     @Column(name = "poids_moyen", nullable = false, precision = 10, scale = 2)
-    private Double poidsMoyen;
+    private BigDecimal poidsMoyen;
 
     @Transient
     private String codeLotDestination;
@@ -105,11 +106,11 @@ public class TransfertModels {
         this.effectif = effectif;
     }
 
-    public Double getPoidsMoyen() {
+    public BigDecimal getPoidsMoyen() {
         return poidsMoyen;
     }
 
-    public void setPoidsMoyen(Double poidsMoyen) {
+    public void setPoidsMoyen(BigDecimal poidsMoyen) {
         this.poidsMoyen = poidsMoyen;
     }
 

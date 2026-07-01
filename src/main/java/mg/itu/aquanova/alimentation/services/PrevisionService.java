@@ -5,6 +5,7 @@ import mg.itu.aquanova.alimentation.models.PrevisionResult;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
 import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -35,12 +36,14 @@ public class PrevisionService {
             throw new IllegalArgumentException("dateDebut doit être avant dateFin");
         }
 
-        Double totalDistribue = this.distributionRepository
+        BigDecimal totalDistribueDecimal = this.distributionRepository
                 .sumQuantiteByAlimentIdAndDateBetween(alimentId, dateDebut, dateFin);
 
-        if (totalDistribue == null) {
-            totalDistribue = 0.0;
+        Double totalDistribue = 0.0;
+        if (totalDistribueDecimal != null) {
+            totalDistribue = totalDistribueDecimal.doubleValue();
         }
+
         long joursCalendaires = ChronoUnit.DAYS.between(dateDebut, dateFin) + 1;
         if (joursCalendaires <= 0) {
             return 0.0;

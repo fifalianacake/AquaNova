@@ -10,6 +10,7 @@ import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -87,7 +88,7 @@ public class BassinService {
         Bassin bassin = new Bassin();
         bassin.setReference(reference);
         bassin.setStatut(statut);
-        bassin.setCapaciteM3(capaciteM3);
+        bassin.setCapaciteM3(BigDecimal.valueOf(capaciteM3));
         bassin.setTypeBassin(typeBassin);
 
         return bassinRepository.save(bassin);

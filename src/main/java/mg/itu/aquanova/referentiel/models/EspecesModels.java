@@ -1,5 +1,7 @@
 package mg.itu.aquanova.referentiel.models;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +20,7 @@ public class EspecesModels {
     private String nom;
 
     @Column(name = "poids_cible_moyen", precision = 6, scale = 2)
-    private Double poidsCibleMoyen;
+    private BigDecimal poidsCibleMoyen;
 
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
@@ -42,11 +44,11 @@ public class EspecesModels {
         this.nom = nom;
     }
 
-    public Double getPoidsCibleMoyen() {
+    public BigDecimal getPoidsCibleMoyen() {
         return poidsCibleMoyen;
     }
 
-    public void setPoidsCibleMoyen(Double poidsCibleMoyen) {
+    public void setPoidsCibleMoyen(BigDecimal poidsCibleMoyen) {
         this.poidsCibleMoyen = poidsCibleMoyen;
     }
 

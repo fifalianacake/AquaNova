@@ -45,7 +45,10 @@ public class PrevisionRecolteService {
             return null;
         }
 
-        return round3((dernierePesee.getPoidsMoyen() - premierePesee.getPoidsMoyen()) / nombreJours);
+        return round3(
+                (dernierePesee.getPoidsMoyen().doubleValue()
+                        - premierePesee.getPoidsMoyen().doubleValue())
+                        / nombreJours);
     }
 
     public LocalDate estimerDateRecolte(Long lotId) {
@@ -122,14 +125,16 @@ public class PrevisionRecolteService {
         if (pesees.isEmpty()) {
             return null;
         }
-        return pesees.get(0).getPoidsMoyen();
+        return pesees.get(0).getPoidsMoyen().doubleValue();
     }
 
     private Double resolvePoidsCible(LotModels lot) {
         if (lot.getEspece() == null) {
             return null;
         }
-        return lot.getEspece().getPoidsCibleMoyen();
+        return lot.getEspece().getPoidsCibleMoyen() != null
+                ? lot.getEspece().getPoidsCibleMoyen().doubleValue()
+                : null;
     }
 
     private boolean estProcheDuPoidsCible(Double poidsMoyenActuel, Double poidsCible) {

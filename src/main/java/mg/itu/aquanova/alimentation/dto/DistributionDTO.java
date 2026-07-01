@@ -1,5 +1,6 @@
 package mg.itu.aquanova.alimentation.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class DistributionDTO {
@@ -8,14 +9,14 @@ public class DistributionDTO {
     private LocalDate dateDistribution;
     private Long idLot;
     private Long idAliment;
-    private Double quantite;
-    private Double rationTheorique;
+    private BigDecimal quantite;
+    private BigDecimal rationTheorique;
 
     public DistributionDTO() {
     }
 
-    public DistributionDTO(Long id, LocalDate dateDistribution, Long idLot, Long idAliment, Double quantite,
-            Double rationTheorique) {
+    public DistributionDTO(Long id, LocalDate dateDistribution, Long idLot, Long idAliment, BigDecimal quantite,
+            BigDecimal rationTheorique) {
         this.id = id;
         this.dateDistribution = dateDistribution;
         this.idLot = idLot;
@@ -56,19 +57,19 @@ public class DistributionDTO {
         this.idAliment = idAliment;
     }
 
-    public Double getQuantite() {
+    public BigDecimal getQuantite() {
         return quantite;
     }
 
-    public void setQuantite(Double quantite) {
+    public void setQuantite(BigDecimal quantite) {
         this.quantite = quantite;
     }
 
-    public Double getRationTheorique() {
+    public BigDecimal getRationTheorique() {
         return rationTheorique;
     }
 
-    public void setRationTheorique(Double rationTheorique) {
+    public void setRationTheorique(BigDecimal rationTheorique) {
         this.rationTheorique = rationTheorique;
     }
 

@@ -27,10 +27,10 @@ public class Distribution {
     private Aliment aliment;
 
     @Column(nullable = true, precision = 10, scale = 2)
-    private Double quantite;
+    private BigDecimal quantite;
 
     @Column(name = "ration_theorique", precision = 10, scale = 2)
-    private Double rationTheorique;
+    private BigDecimal rationTheorique;
 
     // @Enumerated(EnumType.STRING)
     // @Column(name = "statut", nullable = false)
@@ -71,19 +71,19 @@ public class Distribution {
         this.aliment = aliment;
     }
 
-    public Double getQuantite() {
+    public BigDecimal getQuantite() {
         return quantite;
     }
 
-    public void setQuantite(Double quantite) {
+    public void setQuantite(BigDecimal quantite) {
         this.quantite = quantite;
     }
 
-    public Double getRationTheorique() {
+    public BigDecimal getRationTheorique() {
         return rationTheorique;
     }
 
-    public void setRationTheorique(Double rationTheorique) {
+    public void setRationTheorique(BigDecimal rationTheorique) {
         this.rationTheorique = rationTheorique;
     }
     
