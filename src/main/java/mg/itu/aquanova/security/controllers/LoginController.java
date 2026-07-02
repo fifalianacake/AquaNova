@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 import mg.itu.aquanova.security.models.UserRoleModels;
 import mg.itu.aquanova.security.services.UserRoleService;
 import mg.itu.aquanova.security.services.UserService;
@@ -31,7 +31,7 @@ public class LoginController {
             HttpSession session,
             Model model) {
 
-        UserModels user = userService.getUserByEmail(email);
+        User user = userService.getUserByEmail(email);
 
         if (user == null) {
             model.addAttribute("error", "Utilisateur introuvable");

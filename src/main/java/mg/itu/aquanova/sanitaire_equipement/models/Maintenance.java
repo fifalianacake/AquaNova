@@ -1,6 +1,8 @@
 package mg.itu.aquanova.sanitaire_equipement.models;
 
 import jakarta.persistence.*;
+import mg.itu.aquanova.security.models.User;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -18,7 +20,7 @@ public class Maintenance {
 
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
-    private Utilisateur utilisateur; // Ou "User" selon le nom de ta classe
+    private User utilisateur; // Ou "User" selon le nom de ta classe
 
     @ManyToOne
     @JoinColumn(name = "id_categorie_maintenance", nullable = false)
@@ -42,7 +44,7 @@ public class Maintenance {
     @Column(columnDefinition = "TEXT")
     private String observation;
 
-    public Maintenance(Long id, Equipement equipement, Utilisateur utilisateur,
+    public Maintenance(Long id, Equipement equipement, User utilisateur,
             CategorieMaintenance categorieMaintenance, LocalDate dateMaintenance, String description, BigDecimal cout,
             StatutInterventionEnum statutIntervention, LocalDate dateResolution, String observation) {
         this.id = id;
@@ -75,11 +77,11 @@ public class Maintenance {
         this.equipement = equipement;
     }
 
-    public Utilisateur getUtilisateur() {
+    public User getUtilisateur() {
         return utilisateur;
     }
 
-    public void setUtilisateur(Utilisateur utilisateur) {
+    public void setUtilisateur(User utilisateur) {
         this.utilisateur = utilisateur;
     }
 

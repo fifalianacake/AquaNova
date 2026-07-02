@@ -1,7 +1,7 @@
 package mg.itu.aquanova.sanitaire_equipement.models;
 
 import mg.itu.aquanova.referentiel.models.Bassin;
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -18,7 +18,7 @@ public class TraitementEau {
 
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
-    private UserModels utilisateur;
+    private User utilisateur;
 
     @ManyToOne
     @JoinColumn(name = "id_type_traitement_eau", nullable = false)
@@ -39,8 +39,8 @@ public class TraitementEau {
     public Bassin getBassin() { return bassin; }
     public void setBassin(Bassin bassin) { this.bassin = bassin; }
 
-    public UserModels getUtilisateur() { return utilisateur; }
-    public void setUtilisateur(UserModels utilisateur) { this.utilisateur = utilisateur; }
+    public User getUtilisateur() { return utilisateur; }
+    public void setUtilisateur(User utilisateur) { this.utilisateur = utilisateur; }
 
     public TypeTraitementEau getTypeTraitementEau() { return typeTraitementEau; }
     public void setTypeTraitementEau(TypeTraitementEau typeTraitementEau) { this.typeTraitementEau = typeTraitementEau; }

@@ -16,4 +16,5 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
     List<Maintenance> findByCategorieMaintenanceId(Long idCategorie);
     List<Maintenance> findByStatutInterventionAndCategorieMaintenanceId(StatutInterventionEnum statut, Long idCategorie);
     List<Maintenance> findByEquipementIdAndStatutInterventionIn(Long idEquipement, Collection<StatutInterventionEnum> statuts);
+    boolean existsByEquipementId(Long id);
 }

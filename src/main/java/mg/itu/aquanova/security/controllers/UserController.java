@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 import mg.itu.aquanova.security.services.UserService;
 
 @Controller
@@ -24,19 +24,19 @@ public class UserController {
 
     @GetMapping
     public String getAllUsers(Model model) {
-        List<UserModels> users = userService.getAllUsers();
+        List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
         return "security/users/list";
     }
 
     @GetMapping("/new")
     public String showCreateUserForm(Model model) {
-        model.addAttribute("user", new UserModels());
+        model.addAttribute("user", new User());
         return "security/users/form"; 
     }
 
     @PostMapping("/save")
-    public String saveUser(@ModelAttribute("user") UserModels user) {
+    public String saveUser(@ModelAttribute("user") User user) {
         userService.saveUser(user);
 
         return "redirect:/users";

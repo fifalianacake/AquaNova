@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import mg.itu.aquanova.sanitaire_equipement.models.Maintenance;
 import mg.itu.aquanova.sanitaire_equipement.services.MaintenanceService;
 import mg.itu.aquanova.sanitaire_equipement.services.CategorieMaintenanceService;
+import mg.itu.aquanova.sanitaire_equipement.services.EquipementService;
 import mg.itu.aquanova.sanitaire_equipement.services.MaintenanceFilter;
 
 @Controller
@@ -54,9 +55,8 @@ public class MaintenanceController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("maintenance", new Maintenance());
-        model.addAttribute("equipements", equipementService.listerTout());
-        model.addAttribute("categories", categorieMaintenanceService.getAll());
-        return "maintenance/form";
+        addFormAttributes(model);
+        return "sanitaire_equipement/maintenance/form";
     }
 
     @PostMapping("/save")
@@ -67,7 +67,8 @@ public class MaintenanceController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("maintenance", maintenance);
             model.addAttribute("errorMessage", e.getMessage());
-            return "maintenance/form"; 
+            addFormAttributes(model);
+            return "sanitaire_equipement/maintenance/form"; 
         }
     }
 
@@ -91,6 +92,7 @@ public class MaintenanceController {
         } catch (Exception e) {
             model.addAttribute("maintenance", maintenance);
             model.addAttribute("errorMessage", e.getMessage());
+            addFormAttributes(model);
             return "sanitaire_equipement/maintenance/form";
         }
     }
@@ -116,4 +118,9 @@ public class MaintenanceController {
     //     model.addAttribute("maintenances", maintenanceService.getByEquipement(idEquipement));
     //     return "maintenance/historique_equipement";
     // }
+
+    private void addFormAttributes(Model model) {
+        model.addAttribute("equipements", equipementService.listerTout());
+        model.addAttribute("categories", categorieMaintenanceService.getAll());
+    }
 }

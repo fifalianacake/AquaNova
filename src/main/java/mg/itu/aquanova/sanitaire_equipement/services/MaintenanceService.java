@@ -1,6 +1,7 @@
 package mg.itu.aquanova.sanitaire_equipement.services;
 
 import mg.itu.aquanova.sanitaire_equipement.models.Maintenance;
+import mg.itu.aquanova.sanitaire_equipement.models.StatutEquipement;
 import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenanceEnum;
 import mg.itu.aquanova.sanitaire_equipement.models.Equipement;
 import mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum;
@@ -176,7 +177,7 @@ public class MaintenanceService {
                 .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
         
         repository.deleteById(id);
-        updateStatutEquipement(maintenance.getEquipement(), StatutEquipement.DISPONIBLE);
+        updateStatutEquipement(maintenance, StatutEquipement.DISPONIBLE);
     }
 
     public List<Maintenance> getByEquipement(Long idEquipement) {

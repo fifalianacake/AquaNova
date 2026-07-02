@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import jakarta.persistence.*;
 import mg.itu.aquanova.referentiel.models.Bassin;
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 
 
 
@@ -22,7 +22,7 @@ public class ReleveEau {
 
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
-    private UserModels user;
+    private User user;
 
     private Double temperature;
 
@@ -52,7 +52,7 @@ public class ReleveEau {
         this.bassin = bassin;
     }
 
-    public UserModels getUser() {
+    public User getUser() {
         return user;
     }
 
@@ -60,7 +60,7 @@ public class ReleveEau {
         this.id = id;
     }
 
-    public void setUser(UserModels user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

@@ -4,7 +4,7 @@ import mg.itu.aquanova.sanitaire_equipement.models.TraitementEau;
 import mg.itu.aquanova.sanitaire_equipement.services.TraitementEauService;
 import mg.itu.aquanova.sanitaire_equipement.services.TypeTraitementEauService;
 import mg.itu.aquanova.referentiel.services.BassinService;
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,7 +75,7 @@ public class TraitementEauController {
             @ModelAttribute("traitement") TraitementEau traitement,
             Model model,
             HttpSession session) {
-        UserModels user = (UserModels) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -123,7 +123,7 @@ public class TraitementEauController {
             @ModelAttribute("traitement") TraitementEau traitement,
             Model model,
             HttpSession session) {
-        UserModels user = (UserModels) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }

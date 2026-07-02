@@ -19,9 +19,9 @@
             <label>Équipement * :</label><br>
             <select th:field="*{equipement.id}" required>
                 <option value="">-- Choisir un équipement --</option>
-                <option th:each="eq : ${equipements}" 
-                        th:value="${eq.id}" 
-                        th:text="'ID #' + ${eq.id} + ' - ' + ${eq.nom}"></option>
+                <option th:each="equipement : ${equipements}" 
+                        th:value="${equipement.id}" 
+                        th:text="'ID #' + ${equipement.id} + ' - ' + ${equipement.nom}"></option>
             </select>
         </p>
 

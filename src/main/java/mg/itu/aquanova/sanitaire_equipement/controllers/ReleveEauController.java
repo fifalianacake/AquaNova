@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import mg.itu.aquanova.referentiel.services.BassinService;
 import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
 import mg.itu.aquanova.sanitaire_equipement.services.ReleveEauService;
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 
 @Controller
 @RequestMapping("/releves-eau")
@@ -53,7 +53,7 @@ public class ReleveEauController {
     public String createForm(Model model,
             HttpSession session) {
 
-        UserModels user = (UserModels) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
 
         if (user == null)
             return "redirect:/login";
@@ -76,7 +76,7 @@ public class ReleveEauController {
     public String save(@ModelAttribute ReleveEau releve,
             HttpSession session) {
 
-        UserModels user = (UserModels) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
 
         if (user == null)
             return "redirect:/login";
@@ -137,7 +137,7 @@ public class ReleveEauController {
         if (!"ADMIN".equals(role))
             return "redirect:/releves-eau";
 
-        UserModels user = (UserModels) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
 
         releve.setId(id);
         releve.setUser(user);
