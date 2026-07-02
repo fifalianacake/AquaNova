@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard ventes</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Dashboard ventes</h1>
+        <nav>
+            <a th:href="@{/ventes}">Liste des ventes</a>
+            <a th:href="@{/ventes/new}">Nouvelle vente</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Filtres</h2>
+            <form th:action="@{/ventes/dashboard}" method="get">
+                <div>
+                    <label for="debut">Date début</label>
+                    <input id="debut" type="date" name="debut" th:value="${debut}">
+                </div>
+                <div>
+                    <label for="fin">Date fin</label>
+                    <input id="fin" type="date" name="fin" th:value="${fin}">
+                </div>
+                <button type="submit">Afficher</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Statistiques</h2>
+            <div>
+                <article>
+                    <h3>Chiffre d'affaires</h3>
+                    <p th:text="${stats.chiffreAffaires != null ? stats.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</p>
+                </article>
+                <article>
+                    <h3>Volume écoulé</h3>
+                    <p th:text="${stats.volumeEcoule != null ? stats.volumeEcoule + ' kg' : '0 kg'}">0 kg</p>
+                </article>
+                <article>
+                    <h3>Nombre de ventes</h3>
+                    <p th:text="${stats.nombreVentes != null ? stats.nombreVentes : 0}">0</p>
+                </article>
+                <article>
+                    <h3>Prix moyen par kg</h3>
+                    <p th:text="${stats.prixMoyenKg != null ? stats.prixMoyenKg + ' Ar/kg' : '0 Ar/kg'}">0 Ar/kg</p>
+                </article>
+            </div>
+        </section>
+
+        <section>
+            <h2>Graphiques</h2>
+            <article>
+                <h3>Chiffre d'affaires par jour</h3>
+                <canvas id="caParJourChart"></canvas>
+            </article>
+            <article>
+                <h3>Volume vendu par lot</h3>
+                <canvas id="volumeParLotChart"></canvas>
+            </article>
+            <article>
+                <h3>Chiffre d'affaires par client</h3>
+                <canvas id="caClientChart"></canvas>
+            </article>
+            <article>
+                <h3>Top 5 clients par CA</h3>
+                <canvas id="top5Chart"></canvas>
+            </article>
+        </section>
+
+        <section>
+            <h2>Top clients</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Nombre de ventes</th>
+                        <th>Volume acheté</th>
+                        <th>Chiffre d'affaires</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="client : ${topClients}">
+                        <td th:text="${client.clientNom}">Client</td>
+                        <td th:text="${client.nombreVentes}">0</td>
+                        <td th:text="${client.volumeAchete != null ? client.volumeAchete + ' kg' : '0 kg'}">0 kg</td>
+                        <td th:text="${client.chiffreAffaires != null ? client.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(topClients)}">
+                        <td colspan="4">Aucun client trouvé.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Volumes par lot et récolte</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lot</th>
+                        <th>Récolte</th>
+                        <th>Poids vendu</th>
+                        <th>Effectif vendu</th>
+                        <th>Montant total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ligne : ${parLot}">
+                        <td th:text="${ligne.lotNom}">Lot</td>
+                        <td th:text="${ligne.recolteReference}">Récolte</td>
+                        <td th:text="${ligne.poidsVendu != null ? ligne.poidsVendu + ' kg' : '0 kg'}">0 kg</td>
+                        <td th:text="${ligne.effectifVendu != null ? ligne.effectifVendu : 0}">0</td>
+                        <td th:text="${ligne.montantTotal != null ? ligne.montantTotal + ' Ar' : '0 Ar'}">0 Ar</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(parLot)}">
+                        <td colspan="5">Aucune donnée trouvée.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script th:inline="javascript">
+        const caParJourLabels = JSON.parse(/*[[${caParJourLabels}]]*/ '[]');
+        const caParJourValues = JSON.parse(/*[[${caParJourValues}]]*/ '[]');
+        const volumeParLotLabels = JSON.parse(/*[[${volumeParLotLabels}]]*/ '[]');
+        const volumeParLotValues = JSON.parse(/*[[${volumeParLotValues}]]*/ '[]');
+        const caClientLabels = JSON.parse(/*[[${caClientLabels}]]*/ '[]');
+        const caClientValues = JSON.parse(/*[[${caClientValues}]]*/ '[]');
+        const top5Labels = JSON.parse(/*[[${top5Labels}]]*/ '[]');
+        const top5Values = JSON.parse(/*[[${top5Values}]]*/ '[]');
+
+        new Chart(document.getElementById('caParJourChart'), {
+            type: 'line',
+            data: {
+                labels: caParJourLabels,
+                datasets: [{
+                    label: "Chiffre d'affaires",
+                    data: caParJourValues
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('volumeParLotChart'), {
+            type: 'bar',
+            data: {
+                labels: volumeParLotLabels,
+                datasets: [{
+                    label: 'Volume vendu',
+                    data: volumeParLotValues
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('caClientChart'), {
+            type: 'doughnut',
+            data: {
+                labels: caClientLabels,
+                datasets: [{
+                    label: "Chiffre d'affaires",
+                    data: caClientValues
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('top5Chart'), {
+            type: 'bar',
+            data: {
+                labels: top5Labels,
+                datasets: [{
+                    label: "Chiffre d'affaires",
+                    data: top5Values
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
