@@ -1,6 +1,7 @@
 package mg.itu.aquanova.sanitaire_equipement.services;
 
 import mg.itu.aquanova.sanitaire_equipement.models.Maintenance;
+import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenanceEnum;
 import mg.itu.aquanova.sanitaire_equipement.models.Equipement;
 import mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum;
 import mg.itu.aquanova.sanitaire_equipement.repositories.MaintenanceRepository;
@@ -129,9 +130,15 @@ public class MaintenanceService {
         }
         
         validerMaintenance(maintenance);
-        
+
+        if(maintenance.getCategorieMaintenance().getLibelle() == CategorieMaintenanceEnum.PANNE) {
+            updateStatutEquipement(maintenance, StatutEquipement.EN_PANNE);
+        } else {
+            updateStatutEquipement(maintenance, StatutEquipement.EN_MAINTENANCE);
+        }
+
         Maintenance savedMaintenance = repository.save(maintenance);
-        updateStatutEquipement(savedMaintenance.getEquipement());
+        
         return savedMaintenance;
     }
 
