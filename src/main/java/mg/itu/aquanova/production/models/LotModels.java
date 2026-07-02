@@ -85,7 +85,7 @@ public class LotModels {
     }
 
 
-    public EspecesModels getEspece() {
+    public String getEspece() {
         return espece;
     }
 
