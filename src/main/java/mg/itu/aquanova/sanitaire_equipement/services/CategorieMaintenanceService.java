@@ -1,6 +1,6 @@
 package mg.itu.aquanova.sanitaire_equipement.services;
 
-import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenance; 
+import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenance;
 import mg.itu.aquanova.sanitaire_equipement.repositories.CategorieMaintenanceRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,18 +30,19 @@ public class CategorieMaintenanceService {
 
     public CategorieMaintenance update(Long id, CategorieMaintenance updatedCategorie) {
         return repository.findById(id)
-                .map(existingCategorie -> {
-                    
-                    return repository.save(existingCategorie);
+                .map(existing -> {
+                    existing.setLibelle(updatedCategorie.getLibelle());
+                    existing.setDescription(updatedCategorie.getDescription());
+                    return repository.save(existing);
                 })
-                .orElseThrow(() -> new RuntimeException("Catégorie de maintenance introuvable avec l'id : " + id));
+                .orElseThrow(() -> new RuntimeException("Catégorie introuvable avec l'id : " + id));
     }
 
     public void delete(Long id) {
         if (repository.existsById(id)) {
             repository.deleteById(id);
         } else {
-            throw new RuntimeException("Impossible de supprimer : Catégorie de maintenance introuvable avec l'id : " + id);
+            throw new RuntimeException("Impossible de supprimer : Catégorie introuvable avec l'id : " + id);
         }
     }
 }
