@@ -79,8 +79,27 @@ public class VenteService {
             throw new RuntimeException("Impossible de modifier une vente validée.");
         }
 
+        // Empêche toute modification de la récolte / du statut via champs cachés
+        vente.setRecolte(ancienne.getRecolte());
+        vente.setStatutVente(ancienne.getStatutVente());
+
+        if (vente.getClient() == null || vente.getClient().trim().isEmpty()) throw new RuntimeException("Client obligatoire");
+        if (vente.getDateVente() == null) throw new RuntimeException("Date obligatoire");
+        if (vente.getPoidsVendu() == null || vente.getPoidsVendu() <= 0) throw new RuntimeException("Poids vendu doit être > 0");
+        if (vente.getPrixUnitaire() == null || vente.getPrixUnitaire() <= 0) throw new RuntimeException("Prix unitaire doit être > 0");
+        if (vente.getEffectifVendu() != null && vente.getEffectifVendu() <= 0) throw new RuntimeException("Effectif vendu doit être > 0");
+
         Double dispoPoids = calculerPoidsDisponibleRecolte(vente.getRecolte(), vente.getId());
-        if (vente.getPoidsVendu() > dispoPoids) throw new RuntimeException("Poids indisponible.");
+        if (vente.getPoidsVendu() > dispoPoids) {
+            throw new RuntimeException("Poids indisponible. Reste seulement: " + dispoPoids + " kg");
+        }
+
+        if (vente.getEffectifVendu() != null) {
+            Integer dispoEffectif = calculerEffectifDisponibleRecolte(vente.getRecolte(), vente.getId());
+            if (vente.getEffectifVendu() > dispoEffectif) {
+                throw new RuntimeException("Effectif insuffisant. Reste seulement: " + dispoEffectif + " pièces");
+            }
+        }
 
         return repository.save(vente);
     }
