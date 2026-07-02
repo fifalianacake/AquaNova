@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Saisie Vente</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .form-container { background: white; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-box { display: flex; justify-content: space-between; margin-top: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; font-weight: bold; }
+        .btn-primary { background-color: #28a745; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .error { color: red; background: #fce8e6; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Saisie de Vente Associée</h2>
+        
+        <div class="error" th:if="${erreur}" th:text="${erreur}"></div>
+
+        <form th:action="@{/ventes}" th:object="${vente}" method="post">
+            
+            <div class="form-group">
+                <label>Client *</label>
+                <input type="text" th:field="*{client}" placeholder="Nom du client" required>
+            </div>
+
+            <div class="form-group">
+                <label>Récolte d'origine *</label>
+                <select th:field="*{recolte.id}" required>
+                    <option value="">-- Sélectionner la récolte --</option>
+                    <option th:each="r : ${recoltes}" th:value="${r.id}" 
+                            th:text="'Récolte #' + ${r.id} + ' [Poids total: ' + ${r.poidsTotal} + 'kg]'"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Date de la vente *</label>
+                <input type="date" th:field="*{dateVente}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Poids vendu (kg) *</label>
+                <input type="number" step="0.01" th:field="*{poidsVendu}" min="0.01" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+                <label>Prix unitaire (Ar) *</label>
+                <input type="number" step="0.01" th:field="*{prixUnitaire}" min="0.01" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+                <label>Effectif vendu (Optionnel)</label>
+                <input type="number" th:field="*{effectifVendu}" min="1" placeholder="Nombre de pièces">
+            </div>
+
+            <div class="form-group">
+                <label>Observation</label>
+                <textarea th:field="*{observation}" rows="3" placeholder="Notes complémentaires..."></textarea>
+            </div>
+
+            <div class="btn-box">
+                <a th:href="@{/ventes}" class="btn btn-secondary">Retour</a>
+                <button type="submit" class="btn btn-primary">Enregistrer la vente</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
