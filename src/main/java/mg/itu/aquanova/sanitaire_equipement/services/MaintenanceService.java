@@ -58,6 +58,11 @@ public class MaintenanceService {
         }
     }
 
+    public Maintenance findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
+    }
+
     public Page<Maintenance> lister(MaintenanceFilter filter, Pageable pageable) {
         List<Maintenance> maintenances = repository.findAll();
         Stream<Maintenance> stream = maintenances.stream();
