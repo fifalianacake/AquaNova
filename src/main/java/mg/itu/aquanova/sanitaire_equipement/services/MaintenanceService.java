@@ -152,7 +152,7 @@ public class MaintenanceService {
                     existing.setObservation(updatedMaintenance.getObservation());
                     
                     Maintenance saved = repository.save(existing);
-                    updateStatutEquipement(saved.getEquipement());
+                    updateStatutEquipement(saved, StatutEquipement.DISPONIBLE);
                     return saved;
                 })
                 .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
@@ -164,7 +164,7 @@ public class MaintenanceService {
                 .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
         
         repository.deleteById(id);
-        updateStatutEquipement(maintenance.getEquipement());
+        updateStatutEquipement(maintenance.getEquipement(), StatutEquipement.DISPONIBLE);
     }
 
     public List<Maintenance> getByEquipement(Long idEquipement) {
@@ -191,7 +191,7 @@ public class MaintenanceService {
                     Maintenance saved = repository.save(maintenance);
                     
                     updateDerniereMaintenanceEquipement(saved.getEquipement(), saved.getDateResolution());
-                    updateStatutEquipement(saved.getEquipement());
+                    updateStatutEquipement(saved, StatutEquipement.DISPONIBLE);
                     
                     return saved;
                 })
@@ -204,8 +204,7 @@ public class MaintenanceService {
         }
     }
 
-    // Eto mila atao verification kely concernant l equipement
-    public void updateStatutEquipement(Maintenance maintenance, StatutEquipementEnum statut) {
+    public void updateStatutEquipement(Maintenance maintenance, StatutEquipement statut) {
         if (maintenance.getEquipement() != null) {
             maintenance.getEquipement().setStatut(statut);
         }
