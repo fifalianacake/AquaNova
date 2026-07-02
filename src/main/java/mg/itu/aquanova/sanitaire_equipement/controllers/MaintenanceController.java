@@ -54,7 +54,7 @@ public class MaintenanceController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("maintenance", new Maintenance());
-        model.addAttribute("equipements", equipementService.findAll());
+        model.addAttribute("equipements", equipementService.listerTout());
         model.addAttribute("categories", categorieMaintenanceService.getAll());
         return "maintenance/form";
     }
