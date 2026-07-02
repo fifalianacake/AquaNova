@@ -3,7 +3,7 @@ package mg.itu.aquanova.vente.controllers;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
-import mg.itu.aquanova.production.services.RecolteService; 
+import mg.itu.aquanova.production.services.RecolteService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +18,8 @@ public class VenteController {
     private final StatutVenteRepository statutRepository;
     private final RecolteService recolteService; // Ajouté ici
 
-    public VenteController(VenteService service, StatutVenteRepository statutRepository, RecolteService recolteService) {
+    public VenteController(VenteService service, StatutVenteRepository statutRepository,
+            RecolteService recolteService) {
         this.service = service;
         this.statutRepository = statutRepository;
         this.recolteService = recolteService;
@@ -45,12 +46,13 @@ public class VenteController {
         model.addAttribute("currentFin", fin);
         model.addAttribute("currentStatutId", statutId);
         return "ventes/liste";
+    }
 
     @GetMapping("/new")
     public String afficherFormulaire(Model model) {
         Vente v = new Vente();
         v.setDateVente(LocalDate.now());
-        
+
         model.addAttribute("vente", v);
         model.addAttribute("recoltes", recolteService.getAllRecoltes()); // Utilise le getAllRecoltes() de Tommy
         return "ventes/formulaire";
