@@ -48,7 +48,7 @@ public class MaintenanceController {
         model.addAttribute("page", pageMaintenances);
         
         model.addAttribute("filter", filter); 
-        return "sanitaire/maintenance/list"; 
+        return "sanitaire_equipement/maintenance/list"; 
     }
 
     @GetMapping("/new")
@@ -80,7 +80,7 @@ public class MaintenanceController {
         }
         
         model.addAttribute("maintenance", maintenance);
-        return "sanitaire/maintenance/detail";
+        return "sanitaire_equipement/maintenance/detail";
     }
 
     @PostMapping("/update/{id}")
@@ -91,7 +91,7 @@ public class MaintenanceController {
         } catch (Exception e) {
             model.addAttribute("maintenance", maintenance);
             model.addAttribute("errorMessage", e.getMessage());
-            return "sanitaire/maintenance/form";
+            return "sanitaire_equipement/maintenance/form";
         }
     }
 
@@ -111,9 +111,9 @@ public class MaintenanceController {
         return "redirect:/maintenances";
     }
 
-    @GetMapping("/equipement/{idEquipement}")
-    public String getHistoriqueEquipement(@PathVariable("idEquipement") Long idEquipement, Model model) {
-        model.addAttribute("maintenances", maintenanceService.getByEquipement(idEquipement));
-        return "maintenance/historique_equipement";
-    }
+    // @GetMapping("/equipement/{idEquipement}")
+    // public String getHistoriqueEquipement(@PathVariable("idEquipement") Long idEquipement, Model model) {
+    //     model.addAttribute("maintenances", maintenanceService.getByEquipement(idEquipement));
+    //     return "maintenance/historique_equipement";
+    // }
 }
