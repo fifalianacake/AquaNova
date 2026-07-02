@@ -59,13 +59,26 @@ public class VenteController {
     @PostMapping
     public String enregistrer(@ModelAttribute("vente") Vente vente, Model model) {
         try {
-            if (vente.getId() == null) service.create(vente);
-            else service.update(vente);
+            if (vente.getRecolte() != null && vente.getRecolte().getId() != null) {
+                vente.setRecolte(recolteService.getRecolteById(vente.getRecolte().getId()));
+            }
+
+            if (vente.getId() == null) {
+                service.create(vente);
+            } else {
+                service.update(vente);
+            }
+
             return "redirect:/ventes";
         } catch (RuntimeException e) {
             model.addAttribute("erreur", e.getMessage());
-            model.addAttribute("recoltes", recolteService.getAllRecoltes());
-            return "ventes/formulaire";
+
+            if (vente.getId() == null) {
+                model.addAttribute("recoltes", recolteService.getAllRecoltes());
+                return "ventes/formulaire";
+            }
+
+            return "ventes/edit";
         }
     }
 
