@@ -204,18 +204,10 @@ public class MaintenanceService {
         }
     }
 
-    public void updateStatutEquipement(Equipement equipement) {
-        if (equipement != null) {
-            List<Maintenance> actives = repository.findByEquipementIdAndStatutInterventionIn(
-                    equipement.getId(), 
-                    List.of(StatutInterventionEnum.OUVERTE, StatutInterventionEnum.EN_COURS)
-            );
-            
-            if (!actives.isEmpty()) {
-                System.out.println("Équipement " + equipement.getId() + " marqué comme en maintenance active.");
-            } else {
-                System.out.println("Équipement " + equipement.getId() + " marqué comme opérationnel.");
-            }
+    // Eto mila atao verification kely concernant l equipement
+    public void updateStatutEquipement(Maintenance maintenance, StatutEquipementEnum statut) {
+        if (maintenance.getEquipement() != null) {
+            maintenance.getEquipement().setStatut(statut);
         }
     }
 }
