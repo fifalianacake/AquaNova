@@ -1,8 +1,7 @@
 package mg.itu.aquanova.referentiel.models;
 
-import java.math.BigDecimal;
-
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "stade_croissance")

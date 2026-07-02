@@ -1,7 +1,5 @@
 package mg.itu.aquanova.production.services;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -17,8 +15,8 @@ import mg.itu.aquanova.production.repositories.PeseRepository;
 
 @Service
 public class PrevisionRecolteService {
-    private static final BigDecimal ZERO = BigDecimal.ZERO;
-    private static final BigDecimal SEUIL_PROCHE_RECOLTE = new BigDecimal("0.90");
+    private static final Double ZERO = 0.0;
+    private static final Double SEUIL_PROCHE_RECOLTE = 0.90;
 
     private final LotRepository lotRepository;
     private final PeseRepository peseRepository;
@@ -28,13 +26,13 @@ public class PrevisionRecolteService {
         this.peseRepository = peseRepository;
     }
 
-    public BigDecimal calculerCroissanceMoyenne(Long lotId) {
+    public Double calculerCroissanceMoyenne(Long lotId) {
         LotModels lot = lotRepository.findById(lotId)
                 .orElseThrow(() -> new IllegalArgumentException("Lot introuvable: " + lotId));
         return calculerCroissanceMoyenne(lot);
     }
 
-    public BigDecimal calculerCroissanceMoyenne(LotModels lot) {
+    public Double calculerCroissanceMoyenne(LotModels lot) {
         List<Pese> pesees = peseRepository.findByLotIdOrderByDatePeseeAsc(lot.getId());
         if (pesees.size() < 2) {
             return null;
@@ -47,9 +45,10 @@ public class PrevisionRecolteService {
             return null;
         }
 
-        return dernierePesee.getPoidsMoyen()
-                .subtract(premierePesee.getPoidsMoyen())
-                .divide(BigDecimal.valueOf(nombreJours), 3, RoundingMode.HALF_UP);
+        return round3(
+                (dernierePesee.getPoidsMoyen().doubleValue()
+                        - premierePesee.getPoidsMoyen().doubleValue())
+                        / nombreJours);
     }
 
     public LocalDate estimerDateRecolte(Long lotId) {
@@ -83,21 +82,21 @@ public class PrevisionRecolteService {
         result.setPoidsMoyenActuel(resolvePoidsMoyenActuel(lot));
         result.setPoidsCible(resolvePoidsCible(lot));
 
-        if (result.getPoidsCible() == null || result.getPoidsCible().compareTo(ZERO) <= 0) {
+        if (result.getPoidsCible() == null || result.getPoidsCible() <= ZERO) {
             result.setAlerte("Poids cible non renseigné pour l'espèce.");
             return result;
         }
-        if (result.getPoidsMoyenActuel() == null || result.getPoidsMoyenActuel().compareTo(ZERO) <= 0) {
+        if (result.getPoidsMoyenActuel() == null || result.getPoidsMoyenActuel() <= ZERO) {
             result.setAlerte("Poids moyen actuel non disponible.");
             return result;
         }
 
         result.setProcheRecolte(estProcheDuPoidsCible(result.getPoidsMoyenActuel(), result.getPoidsCible()));
 
-        BigDecimal croissanceMoyenne = calculerCroissanceMoyenne(lot);
+        Double croissanceMoyenne = calculerCroissanceMoyenne(lot);
         result.setCroissanceMoyenneJournaliere(croissanceMoyenne);
 
-        if (result.getPoidsMoyenActuel().compareTo(result.getPoidsCible()) >= 0) {
+        if (result.getPoidsMoyenActuel() >= result.getPoidsCible()) {
             result.setDateRecolteEstimee(LocalDate.now());
             result.setAlerte("Poids cible atteint ou dépassé.");
             return result;
@@ -106,38 +105,40 @@ public class PrevisionRecolteService {
             result.setAlerte("Pas assez de pesées pour estimer la date de récolte.");
             return result;
         }
-        if (croissanceMoyenne.compareTo(ZERO) <= 0) {
+        if (croissanceMoyenne <= ZERO) {
             result.setAlerte("Croissance moyenne insuffisante ou négative.");
             return result;
         }
 
-        BigDecimal poidsRestant = result.getPoidsCible().subtract(result.getPoidsMoyenActuel());
-        long joursRestants = poidsRestant.divide(croissanceMoyenne, 0, RoundingMode.CEILING).longValue();
+        Double poidsRestant = result.getPoidsCible() - result.getPoidsMoyenActuel();
+        long joursRestants = (long) Math.ceil(poidsRestant / croissanceMoyenne);
         result.setDateRecolteEstimee(LocalDate.now().plusDays(joursRestants));
         return result;
     }
 
-    private BigDecimal resolvePoidsMoyenActuel(LotModels lot) {
+    private Double resolvePoidsMoyenActuel(LotModels lot) {
         if (lot.getPoidsMoyenActuel() != null) {
-            return BigDecimal.valueOf(lot.getPoidsMoyenActuel());
+            return lot.getPoidsMoyenActuel();
         }
 
         List<Pese> pesees = peseRepository.findByLotIdOrderByDatePeseeDesc(lot.getId());
         if (pesees.isEmpty()) {
             return null;
         }
-        return pesees.get(0).getPoidsMoyen();
+        return pesees.get(0).getPoidsMoyen().doubleValue();
     }
 
-    private BigDecimal resolvePoidsCible(LotModels lot) {
+    private Double resolvePoidsCible(LotModels lot) {
         if (lot.getEspece() == null) {
             return null;
         }
-        return lot.getEspece().getPoidsCibleMoyen();
+        return lot.getEspece().getPoidsCibleMoyen() != null
+                ? lot.getEspece().getPoidsCibleMoyen().doubleValue()
+                : null;
     }
 
-    private boolean estProcheDuPoidsCible(BigDecimal poidsMoyenActuel, BigDecimal poidsCible) {
-        return poidsMoyenActuel.compareTo(poidsCible.multiply(SEUIL_PROCHE_RECOLTE)) >= 0;
+    private boolean estProcheDuPoidsCible(Double poidsMoyenActuel, Double poidsCible) {
+        return poidsMoyenActuel >= poidsCible * SEUIL_PROCHE_RECOLTE;
     }
 
     private boolean estLotActif(LotModels lot) {
@@ -170,5 +171,9 @@ public class PrevisionRecolteService {
             return false;
         }
         return filter.getDateFin() == null || !prevision.getDateRecolteEstimee().isAfter(filter.getDateFin());
+    }
+
+    private Double round3(Double value) {
+        return Math.round(value * 1000.0) / 1000.0;
     }
 }

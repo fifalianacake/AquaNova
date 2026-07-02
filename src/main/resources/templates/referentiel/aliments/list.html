@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Aliments</title>
+</head>
+<body>
+
+    <h2>Gestion des Aliments</h2>
+
+    <p>
+        <a th:href="@{/aliments/new}">+ Créer un nouvel aliment</a>
+    </p>
+
+    <form th:action="@{/aliments}" method="get">
+        <label for="search">Rechercher par nom :</label>
+        <input type="text" id="search" name="q" th:value="${q}" placeholder="Nom de l'aliment..." />
+        <button type="submit">Rechercher</button>
+        <a th:if="${q != null}" th:href="@{/aliments}">Annuler la recherche</a>
+    </form>
+
+    <br/>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(aliments)}">
+                <td colspan="3">Aucun aliment trouvé.</td>
+            </tr>
+            <tr th:each="aliment : ${aliments}">
+                <td th:text="${aliment.id}">1</td>
+                <td th:text="${aliment.nom}">Exemple Aliment</td>
+                <td>
+                    <a th:href="@{/aliments/{id}(id=${aliment.id})}">Voir</a> | 
+                    <a th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier</a> | 
+                    <a th:href="@{/aliments/delete/{id}(id=${aliment.id})}" 
+                       th:onclick="return confirm('Supprimer cet aliment ?');">Supprimer</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

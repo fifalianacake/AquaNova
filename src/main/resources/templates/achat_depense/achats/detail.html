@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche achat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background: #f5f5f5; }
+        .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0; }
+        .error { color: #b00020; }
+        .success { color: #006b1b; }
+        dt { font-weight: bold; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<h1 th:text="${'Achat #' + achat.id}">Fiche achat</h1>
+
+<div class="success" th:if="${success}" th:text="${success}"></div>
+<div class="error" th:if="${error}" th:text="${error}"></div>
+
+<dl>
+    <dt>Date</dt><dd th:text="${achat.dateAchat}"></dd>
+    <dt>Fournisseur</dt><dd th:text="${achat.fournisseur != null ? achat.fournisseur.nom : '-'}"></dd>
+    <dt>Catégorie</dt><dd th:text="${achat.categorieDepense != null ? achat.categorieDepense.code + ' - ' + achat.categorieDepense.libelle : '-'}"></dd>
+    <dt>Référence facture</dt><dd th:text="${achat.referenceFacture}"></dd>
+    <dt>Montant total</dt><dd th:text="${achat.montantTotal}"></dd>
+    <dt>Statut</dt><dd th:text="${achat.statutAchat}"></dd>
+    <dt>Observation</dt><dd th:text="${achat.observation}"></dd>
+</dl>
+
+<div class="actions">
+    <a th:href="@{/achats}">Retour liste</a>
+    <a th:href="@{/achats/intrants/new}">Nouvel achat d'intrants</a>
+
+    <form th:if="${achat.statutAchat.name() == 'BROUILLON'}" method="post" th:action="@{/achats/{id}/valider(id=${achat.id})}">
+        <button type="submit">Valider et alimenter le stock</button>
+    </form>
+
+    <form th:if="${achat.statutAchat.name() == 'BROUILLON'}" method="post" th:action="@{/achats/{id}/annuler(id=${achat.id})}"
+          onsubmit="return confirm('Annuler cet achat ?')">
+        <button type="submit">Annuler</button>
+    </form>
+</div>
+
+<h2>Lignes d'achat</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Désignation</th>
+        <th>Intrant</th>
+        <th>Quantité</th>
+        <th>Prix unitaire</th>
+        <th>Montant ligne</th>
+        <th>Stock</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="ligne : ${achat.lignes}">
+        <td th:text="${ligne.id}"></td>
+        <td th:text="${ligne.designation}"></td>
+        <td th:text="${ligne.intrant != null ? ligne.intrant.nom : '-'}"></td>
+        <td th:text="${ligne.quantite + ' ' + ligne.unite}"></td>
+        <td th:text="${ligne.prixUnitaire}"></td>
+        <td th:text="${ligne.montantLigne}"></td>
+        <td>
+            <a th:if="${ligne.intrant != null}" th:href="@{/intrants/{id}/stock(id=${ligne.intrant.id})}">Voir stock</a>
+            <span th:unless="${ligne.intrant != null}">-</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

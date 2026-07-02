@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Controller
@@ -41,7 +40,7 @@ public class PeseeController {
     public String enregistrer(@RequestParam Long idLot,
                              @RequestParam LocalDate datePesee,
                              @RequestParam Integer nbEchantillon,
-                             @RequestParam BigDecimal poidsTotal,
+                             @RequestParam Double poidsTotal,
                              @RequestParam(required = false) String observation,
                              Model model) {
         try {
@@ -70,7 +69,7 @@ public class PeseeController {
     public String modifier(@RequestParam Long id,
                            @RequestParam LocalDate datePesee,
                            @RequestParam Integer nbEchantillon,
-                           @RequestParam BigDecimal poidsTotal,
+                           @RequestParam Double poidsTotal,
                            @RequestParam(required = false) String observation,
                            Model model) {
         try {

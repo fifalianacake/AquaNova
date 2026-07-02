@@ -3,11 +3,11 @@ package mg.itu.aquanova.security.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserModels, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
     
-    UserModels findByEmail(String email);
+    User findByEmail(String email);
 
 }

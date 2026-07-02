@@ -1,15 +1,14 @@
 package mg.itu.aquanova.production.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import mg.itu.aquanova.production.models.LotModels;
 
 public class PrevisionRecolteResult {
     private LotModels lot;
-    private BigDecimal poidsMoyenActuel;
-    private BigDecimal poidsCible;
-    private BigDecimal croissanceMoyenneJournaliere;
+    private Double poidsMoyenActuel;
+    private Double poidsCible;
+    private Double croissanceMoyenneJournaliere;
     private LocalDate dateRecolteEstimee;
     private boolean procheRecolte;
     private String alerte;
@@ -22,27 +21,27 @@ public class PrevisionRecolteResult {
         this.lot = lot;
     }
 
-    public BigDecimal getPoidsMoyenActuel() {
+    public Double getPoidsMoyenActuel() {
         return poidsMoyenActuel;
     }
 
-    public void setPoidsMoyenActuel(BigDecimal poidsMoyenActuel) {
+    public void setPoidsMoyenActuel(Double poidsMoyenActuel) {
         this.poidsMoyenActuel = poidsMoyenActuel;
     }
 
-    public BigDecimal getPoidsCible() {
+    public Double getPoidsCible() {
         return poidsCible;
     }
 
-    public void setPoidsCible(BigDecimal poidsCible) {
+    public void setPoidsCible(Double poidsCible) {
         this.poidsCible = poidsCible;
     }
 
-    public BigDecimal getCroissanceMoyenneJournaliere() {
+    public Double getCroissanceMoyenneJournaliere() {
         return croissanceMoyenneJournaliere;
     }
 
-    public void setCroissanceMoyenneJournaliere(BigDecimal croissanceMoyenneJournaliere) {
+    public void setCroissanceMoyenneJournaliere(Double croissanceMoyenneJournaliere) {
         this.croissanceMoyenneJournaliere = croissanceMoyenneJournaliere;
     }
 

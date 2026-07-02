@@ -1,6 +1,5 @@
 package mg.itu.aquanova.production.services;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -144,7 +143,7 @@ public class TransfertService {
         if (transfert.getEffectif() == null || transfert.getEffectif() <= 0) {
             throw new IllegalArgumentException("L'effectif transféré doit être strictement positif.");
         }
-        if (transfert.getPoidsMoyen() == null || transfert.getPoidsMoyen().compareTo(BigDecimal.ZERO) <= 0) {
+        if (transfert.getPoidsMoyen() == null || transfert.getPoidsMoyen().signum() <= 0) {
             throw new IllegalArgumentException("Le poids moyen doit être strictement positif.");
         }
     }

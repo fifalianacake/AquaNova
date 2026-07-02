@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Fiche type de traitement eau</title>
+</head>
+<body>
+    <h2>Type de traitement eau</h2>
+
+    <section>
+        <div>
+            <span>ID</span>
+            <span th:text="${typeTraitement.id}"></span>
+        </div>
+
+        <div>
+            <span>Libellé</span>
+            <span th:text="${typeTraitement.libelle}"></span>
+        </div>
+
+        <div>
+            <span>Description</span>
+            <span th:text="${typeTraitement.description ?: '-'}"></span>
+        </div>
+
+        <div>
+            <a th:href="@{/types-traitements-eau}">Retour</a>
+            <a th:href="@{/types-traitements-eau/edit/{id}(id=${typeTraitement.id})}">Modifier</a>
+            <form th:action="@{/types-traitements-eau/delete/{id}(id=${typeTraitement.id})}"
+                  method="post"
+                  onsubmit="return confirm('Supprimer ce type de traitement ?')">
+                <button type="submit">Supprimer</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>

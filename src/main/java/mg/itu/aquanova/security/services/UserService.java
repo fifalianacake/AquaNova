@@ -2,7 +2,7 @@ package mg.itu.aquanova.security.services;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import mg.itu.aquanova.security.models.UserModels;
+import mg.itu.aquanova.security.models.User;
 import mg.itu.aquanova.security.repositories.UserRepository;
 
 @Service
@@ -14,15 +14,15 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<UserModels> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public UserModels getUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public UserModels saveUser(UserModels user) {
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
@@ -30,7 +30,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public UserModels getUserById(Long id) {
+    public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 }

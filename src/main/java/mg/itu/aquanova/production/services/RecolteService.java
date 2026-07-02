@@ -69,7 +69,7 @@ public class RecolteService {
 
         validerRecolte(lot, typeRecolte, dateRecolte, effectifRecolte, poidsTotal);
 
-        double poidsMoyen = poidsTotal / effectifRecolte;
+        Double poidsMoyen = poidsTotal / effectifRecolte;
         int nouvelEffectif = lot.getEffectifActuel() - effectifRecolte;
 
         Recoltes recolte = new Recoltes();

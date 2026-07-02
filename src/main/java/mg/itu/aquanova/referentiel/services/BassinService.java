@@ -23,15 +23,15 @@ public class BassinService {
     private final StatutBassinRepository statutBassinRepository;
 
     public BassinService(BassinsRepository bassinRepository,
-                         TypeBassinRepository typeBassinRepository, StatutBassinRepository statutBassinRepository) {
+            TypeBassinRepository typeBassinRepository, StatutBassinRepository statutBassinRepository) {
         this.bassinRepository = bassinRepository;
         this.typeBassinRepository = typeBassinRepository;
         this.statutBassinRepository = statutBassinRepository;
     }
 
-    // ==========================
-    // Gestion des Bassins
-    // ==========================
+    public List<Bassin> findAll() {
+        return bassinRepository.findAll();
+    }
 
     public List<Bassin> getAllBassins() {
         return bassinRepository.findAll();
@@ -39,8 +39,7 @@ public class BassinService {
 
     public Bassin getBassinById(Long id) {
         return bassinRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Bassin introuvable avec l'ID : " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable avec l'ID : " + id));
     }
 
     public void saveBassin(Bassin bassin) {
@@ -57,9 +56,9 @@ public class BassinService {
 
     @Transactional
     public Bassin creerBassin(String reference,
-                          Long idStatut,
-                          Long idType,
-                          BigDecimal capaciteM3) {
+            Long idStatut,
+            Long idType,
+            Double capaciteM3) {
 
         if (reference == null || reference.trim().isEmpty()) {
             throw new IllegalArgumentException("La référence du bassin est obligatoire.");
@@ -69,8 +68,7 @@ public class BassinService {
             throw new IllegalArgumentException("Le statut du bassin est obligatoire.");
         }
 
-        if (capaciteM3 == null ||
-                capaciteM3.compareTo(BigDecimal.ZERO) <= 0) {
+        if (capaciteM3 == null || capaciteM3 <= 0) {
             throw new IllegalArgumentException(
                     "La capacité en m³ doit être strictement supérieure à 0.");
         }
@@ -81,18 +79,16 @@ public class BassinService {
         }
 
         TypeBassin typeBassin = typeBassinRepository.findById(idType)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Le type de bassin spécifié n'existe pas."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Le type de bassin spécifié n'existe pas."));
         StatutBassin statut = statutBassinRepository.findById(idStatut)
-        .orElseThrow(() ->
-                new IllegalArgumentException(
+                .orElseThrow(() -> new IllegalArgumentException(
                         "Le statut spécifié n'existe pas."));
 
         Bassin bassin = new Bassin();
         bassin.setReference(reference);
         bassin.setStatut(statut);
-        bassin.setCapaciteM3(capaciteM3);
+        bassin.setCapaciteM3(BigDecimal.valueOf(capaciteM3));
         bassin.setTypeBassin(typeBassin);
 
         return bassinRepository.save(bassin);
@@ -108,9 +104,8 @@ public class BassinService {
 
     public TypeBassin getTypeBassinById(Long id) {
         return typeBassinRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Type de bassin introuvable : " + id));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Type de bassin introuvable : " + id));
     }
 
     public void saveTypeBassin(TypeBassin typeBassin) {

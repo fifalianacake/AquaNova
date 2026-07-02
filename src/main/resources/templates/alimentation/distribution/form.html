@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${distribution.id != null} ? 'Modifier la distribution' : 'Nouvelle distribution'"></title>
+</head>
+
+<body>
+
+    <h1 th:text="${distribution.id != null} ? 'Modifier la distribution' : 'Créer une nouvelle distribution'"></h1>
+
+    <form th:action="@{/alimentation/distribution/save}" th:object="${distribution}" method="post">
+
+        <input type="hidden" th:field="*{id}" />
+
+        <div>
+            <label for="dateDistribution">Date de distribution :</label>
+            <input type="date" id="dateDistribution" th:field="*{dateDistribution}" required />
+        </div>
+
+        <br />
+
+        <div>
+            <label for="lot">Lot concerné :</label>
+            <select id="lot" th:field="*{idLot}" required>
+                <option value="">-- Sélectionner un lot --</option>
+                <option th:each="l : ${lots}" th:value="${l.id}" th:text="'Lot #' + ${l.id}"></option>
+            </select>
+        </div>
+
+        <br />
+
+        <div>
+            <label for="aliment">Aliment en Stock :</label>
+            <select th:field="*{idAliment}" class="form-control" id="aliment" required>
+                <option value="">-- Choisir un aliment --</option>
+                <option th:each="al : ${aliments}" th:value="${al.id}" th:text="${al.nom}"> </option>
+            </select>
+        </div>
+
+        <br />
+
+        <div>
+            <label for="quantite">Quantité distribuée (kg) :</label>
+            <input type="number" step="0.01" id="quantite" th:field="*{quantite}" />
+        </div>
+
+        <br />
+
+        <div>
+            <label for="rationTheorique">Ration théorique :</label>
+            <input type="number" step="0.01" id="rationTheorique" th:field="*{rationTheorique}" />
+        </div>
+
+        <br />
+
+        <button type="submit">Enregistrer</button>
+        <a th:href="@{/alimentation/distribution}">Annuler</a>
+    </form>
+
+</body>
+
+</html>

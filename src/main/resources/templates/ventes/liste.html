@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Gestion des Ventes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .filter-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filter-box input, .filter-box select { margin-right: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: bold; display: inline-block; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; float: right; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #343a40; color: white; }
+        tr:hover { background-color: #f1f1f1; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div>
+        <a th:href="@{/ventes/new}" class="btn btn-success">Saisir une vente</a>
+        <h2>Registre des Ventes Associées aux Récoltes</h2>
+    </div>
+
+    <div class="filter-box">
+        <form th:action="@{/ventes}" method="get">
+            <input type="number" name="id" placeholder="ID Vente" th:value="${currentId}" style="width: 90px;">
+            <input type="text" name="client" placeholder="Nom Client" th:value="${currentClient}">
+            <input type="number" name="recolteId" placeholder="ID Récolte" th:value="${currentRecolteId}" style="width: 100px;">
+            <input type="number" name="lotId" placeholder="ID Lot d'origine" th:value="${currentLotId}" style="width: 130px;">
+            <input type="date" name="debut" th:value="${currentDebut}">
+            <input type="date" name="fin" th:value="${currentFin}">
+            <select name="statutId">
+                <option value="">-- Statut --</option>
+                <option th:each="s : ${statuts}" th:value="${s.id}" th:text="${s.libelle}" th:selected="${s.id == currentStatutId}"></option>
+            </select>
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Récolte</th>
+                <th>Lot d'origine</th>
+                <th>Poids vendu</th>
+                <th>Prix unitaire</th>
+                <th>Montant total</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="v : ${ventes}" th:onclick="|window.location.href='@{/ventes/}' + ${v.id}|">
+                <td th:text="${v.id}"></td>
+                <td th:text="${v.dateVente}"></td>
+                <td th:text="${v.client}"></td>
+                <td th:text="${'Récolte #' + v.recolte.id}"></td>
+                <td th:text="${v.recolte.lot != null ? 'Lot #' + v.recolte.lot.id : 'N/A'}"></td>
+                <td th:text="${v.poidsVendu + ' kg'}"></td>
+                <td th:text="${v.prixUnitaire + ' Ar'}"></td>
+                <td th:text="${v.montantTotal + ' Ar'}" style="font-weight: bold; color: #0056b3;"></td>
+                <td th:text="${v.statutVente.libelle}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(ventes)}">
+                <td colspan="9" style="text-align:center; color: #777; padding: 20px;">Aucune vente enregistrée.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

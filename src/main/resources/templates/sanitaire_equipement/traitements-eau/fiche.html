@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Fiche Traitement</title>
+</head>
+<body>
+
+    <div>
+        <h2>Fiche de Traitement d'Eau #<span th:text="${traitement.id}"></span></h2>
+        
+        <div>
+            <div>Date de l'action</div>
+            <div th:text="${traitement.dateTraitement}"></div>
+        </div>
+        <div>
+            <div>Bassin ciblé</div>
+            <div th:text="${traitement.bassin != null ? traitement.bassin.reference : 'N/A'}"></div>
+        </div>
+        <div>
+            <div>Type de traitement appliqué</div>
+            <div th:text="${traitement.typeTraitementEau.libelle}"></div>
+        </div>
+        <div>
+            <div>Détails techniques</div>
+            <div th:text="${traitement.detail}"></div>
+        </div>
+        <div>
+            <div>Observations enregistrées</div>
+            <div th:text="${traitement.observation ?: 'Aucune observation'}"></div>
+        </div>
+        <div>
+            <div>Opérateur / Utilisateur</div>
+            <div th:text="${traitement.utilisateur != null ? traitement.utilisateur.name : 'N/A'}"></div>
+        </div>
+
+        <div>
+            <a th:href="@{/traitements-eau}">Retour</a>
+            <a th:href="@{/traitements-eau/edit/{id}(id=${traitement.id})}">Modifier</a>
+            <form th:action="@{/traitements-eau/delete/{id}(id=${traitement.id})}" method="post" onsubmit="return confirm('Voulez-vous vraiment effacer ce traitement ?')">
+                <button type="submit">Supprimer</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

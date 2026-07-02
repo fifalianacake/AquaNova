@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <h1 th:text="${equipement.id != null} ? 'Modification Équipement' : 'Saisie Équipement'">
+        Saisie Équipement
+    </h1>
+
+    <form th:action="${equipement.id == null} ? @{/equipements/save} : @{/equipements/edit/{id}(id=${equipement.id})}"
+          th:object="${equipement}"
+          method="post">
+        <label>Nom :</label> <input type="text" th:field="*{nom}" required /><br/>
+        
+        <label>Type :</label>
+        <select th:field="*{typeEquipement.id}" required>
+            <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
+        </select><br/>
+
+        <label>Statut :</label>
+        <select th:field="*{statut}" required>
+            <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
+        </select><br/>
+
+        <label>Date Installation :</label> <input type="date" th:field="*{dateInstallation}" required /><br/>
+        
+        <label>Observation :</label> <textarea th:field="*{observation}"></textarea><br/>
+        
+        <button type="submit" th:text="${equipement.id != null} ? 'Modifier' : 'Enregistrer'">
+            Enregistrer
+        </button>
+    </form>
+
+    <a th:href="@{/equipements}">Retour</a>
+</body>
+</html>

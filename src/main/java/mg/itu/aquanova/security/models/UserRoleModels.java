@@ -12,7 +12,7 @@ public class UserRoleModels {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false)
-    private UserModels user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_role", nullable = false)
@@ -21,7 +21,7 @@ public class UserRoleModels {
     public UserRoleModels() {
     }
 
-    public UserRoleModels(UserModels user, RoleModels role) {
+    public UserRoleModels(User user, RoleModels role) {
         this.user = user;
         this.role = role;
     }
@@ -34,11 +34,11 @@ public class UserRoleModels {
         this.id = id;
     }
 
-    public UserModels getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(UserModels user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
