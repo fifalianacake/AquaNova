@@ -107,8 +107,35 @@
             Page <span th:text="${page.number + 1}">1</span> sur <span th:text="${page.totalPages}">5</span>
         </p>
         <div>
-            <a th:href="@{/maintenances(page=${page.number - 1})}" th:if="${page.hasPrevious()}">Précédent</a>
-            <a th:href="@{/maintenances(page=${page.number + 1})}" th:if="${page.hasNext()}">Suivant</a>
+            <a th:href="@{/maintenances(
+                    page=${page.number - 1}, 
+                    id=${filter.id}, 
+                    idEquipement=${filter.idEquipement}, 
+                    idUser=${filter.idUser}, 
+                    idCategorieMaintenance=${filter.idCategorieMaintenance}, 
+                    statutIntervention=${filter.statutIntervention}, 
+                    cout=${filter.cout}, 
+                    debutDateMaintenance=${filter.debutDateMaintenance}, 
+                    finDateMaintenance=${filter.finDateMaintenance}, 
+                    debutDateResolution=${filter.debutDateResolution}, 
+                    finDateResolution=${filter.finDateResolution}
+            )}" 
+            th:if="${page.hasPrevious()}">Précédent</a>
+
+            <a th:href="@{/maintenances(
+                    page=${page.number + 1}, 
+                    id=${filter.id}, 
+                    idEquipement=${filter.idEquipement}, 
+                    idUser=${filter.idUser}, 
+                    idCategorieMaintenance=${filter.idCategorieMaintenance}, 
+                    statutIntervention=${filter.statutIntervention}, 
+                    cout=${filter.cout}, 
+                    debutDateMaintenance=${filter.debutDateMaintenance}, 
+                    finDateMaintenance=${filter.finDateMaintenance}, 
+                    debutDateResolution=${filter.debutDateResolution}, 
+                    finDateResolution=${filter.finDateResolution}
+            )}" 
+            th:if="${page.hasNext()}">Suivant</a>
         </div>
     </div>
 
