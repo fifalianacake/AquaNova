@@ -38,6 +38,8 @@ public class ClientExportController {
             HttpServletResponse response) throws Exception {
 
         Client client = clientService.trouverParId(id);
+        
+      
         List<Vente> ventes = venteService.getByClient(id);
 
         pdfService.export(client, ventes, response);

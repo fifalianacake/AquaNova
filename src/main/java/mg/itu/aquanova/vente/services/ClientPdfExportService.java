@@ -1,6 +1,7 @@
 package mg.itu.aquanova.vente.services;
 
 import java.awt.Color;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ import mg.itu.aquanova.vente.models.Vente;
 @Service
 public class ClientPdfExportService {
 
+    private static final DateTimeFormatter DATE_FORMATTER = 
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     public void export(Client client,
                        List<Vente> ventes,
                        HttpServletResponse response) throws Exception {
@@ -29,7 +33,8 @@ public class ClientPdfExportService {
 
         response.setHeader(
                 "Content-Disposition",
-                "attachment; filename=client_" + client.getId() + "_" + client.getNom().replace(" ", "_") + ".pdf");
+                "attachment; filename=client_" + client.getId() + "_" + 
+                client.getNom().replace(" ", "_") + ".pdf");
 
         Document document = new Document();
 
@@ -59,7 +64,11 @@ public class ClientPdfExportService {
 
         ajouterLigne(table, "ID", client.getId().toString());
         ajouterLigne(table, "Nom", client.getNom());
-        ajouterLigne(table, "Type", client.getTypeClient().getLibelle());
+        
+        String typeClient = client.getTypeClient() != null ? 
+                client.getTypeClient().getLibelle() : "-";
+        ajouterLigne(table, "Type", typeClient);
+        
         ajouterLigne(table, "Contact", client.getContact() != null ? client.getContact() : "-");
         ajouterLigne(table, "Email", client.getEmail() != null ? client.getEmail() : "-");
         ajouterLigne(table, "Adresse", client.getAdresse() != null ? client.getAdresse() : "-");
@@ -96,7 +105,7 @@ public class ClientPdfExportService {
         double prixMoyenKg = totalPoids > 0 ? totalMontant / totalPoids : 0;
 
         ajouterLigne(statsTable, "Nombre total d'achats", String.valueOf(nbVentes));
-        ajouterLigne(statsTable, "Poids total acheté", String.format("%.2f kg", totalPoids));
+        ajouterLigne(statsTable, "Poids total achete", String.format("%.2f kg", totalPoids));
         ajouterLigne(statsTable, "Chiffre d'affaires total", String.format("%.2f MGA", totalMontant));
         ajouterLigne(statsTable, "Panier moyen", String.format("%.2f MGA", moyenne));
         ajouterLigne(statsTable, "Prix moyen au kg", String.format("%.2f MGA/kg", prixMoyenKg));
@@ -138,7 +147,6 @@ public class ClientPdfExportService {
             PdfPTable histoTable = new PdfPTable(6);
             histoTable.setWidthPercentage(100);
 
-            // En-têtes
             Font headerFont =
                     FontFactory.getFont(
                             FontFactory.HELVETICA_BOLD,
@@ -169,7 +177,6 @@ public class ClientPdfExportService {
             h6.setBackgroundColor(new Color(0, 102, 204));
             histoTable.addCell(h6);
 
-            // Donnes
             Font cellFont =
                     FontFactory.getFont(
                             FontFactory.HELVETICA,
@@ -178,11 +185,18 @@ public class ClientPdfExportService {
             for (Vente vente : ventes) {
 
                 histoTable.addCell(new PdfPCell(new Phrase(vente.getId().toString(), cellFont)));
-                histoTable.addCell(new PdfPCell(new Phrase(vente.getDateVente().toString(), cellFont)));
+                
+                String dateStr = vente.getDateVente() != null ? 
+                        vente.getDateVente().format(DATE_FORMATTER) : "-";
+                histoTable.addCell(new PdfPCell(new Phrase(dateStr, cellFont)));
+                
                 histoTable.addCell(new PdfPCell(new Phrase(String.format("%.2f", vente.getPoidsVendu()), cellFont)));
                 histoTable.addCell(new PdfPCell(new Phrase(String.format("%.2f", vente.getPrixUnitaire()), cellFont)));
                 histoTable.addCell(new PdfPCell(new Phrase(String.format("%.2f", vente.getMontantTotal()), cellFont)));
-                histoTable.addCell(new PdfPCell(new Phrase(vente.getStatutVente().getLibelle(), cellFont)));
+                
+                String statut = vente.getStatutVente() != null && vente.getStatutVente().getCode() != null ?
+                        vente.getStatutVente().getCode().name() : "-";
+                histoTable.addCell(new PdfPCell(new Phrase(statut, cellFont)));
             }
 
             document.add(histoTable);
@@ -197,7 +211,7 @@ public class ClientPdfExportService {
                         10,
                         Color.GRAY);
 
-        Paragraph footerP = new Paragraph("Document généré par AquaNova", footer);
+        Paragraph footerP = new Paragraph("Document genere par AquaNova", footer);
         footerP.setAlignment(Paragraph.ALIGN_CENTER);
 
         document.add(footerP);

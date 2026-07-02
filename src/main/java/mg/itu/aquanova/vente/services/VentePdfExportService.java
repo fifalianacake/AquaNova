@@ -1,6 +1,7 @@
 package mg.itu.aquanova.vente.services;
 
 import java.awt.Color;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,9 @@ import mg.itu.aquanova.vente.models.Vente;
 
 @Service
 public class VentePdfExportService {
+
+    private static final DateTimeFormatter DATE_FORMATTER = 
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public void export(Vente vente,
                        HttpServletResponse response) throws Exception {
@@ -55,19 +59,58 @@ public class VentePdfExportService {
         table.setWidthPercentage(100);
 
         ajouterLigne(table, "ID Vente", vente.getId().toString());
-        ajouterLigne(table, "Date vente", vente.getDateVente().toString());
-        ajouterLigne(table, "Client", vente.getClient().getNom());
-        ajouterLigne(table, "Type Client", vente.getClient().getTypeClient().getLibelle());
-        ajouterLigne(table, "Contact", vente.getClient().getContact() != null ? vente.getClient().getContact() : "-");
-        ajouterLigne(table, "Email", vente.getClient().getEmail() != null ? vente.getClient().getEmail() : "-");
-        ajouterLigne(table, "Récolte", vente.getRecolte().getId().toString());
-        ajouterLigne(table, "Lot", vente.getRecolte().getLot() != null ? vente.getRecolte().getLot().getCodeLot() : "-");
-        ajouterLigne(table, "Espèce", vente.getRecolte().getLot() != null ? vente.getRecolte().getLot().getEspece() : "-");
+        
+        // Formatage de la date
+        String dateFormatee = vente.getDateVente() != null ? 
+                vente.getDateVente().format(DATE_FORMATTER) : "-";
+        ajouterLigne(table, "Date vente", dateFormatee);
+        
+        // Client
+        String nomClient = vente.getClient() != null ? 
+                vente.getClient().getNom() : "-";
+        ajouterLigne(table, "Client", nomClient);
+        
+        // Type Client
+        String typeClient = vente.getClient() != null && vente.getClient().getTypeClient() != null ?
+                vente.getClient().getTypeClient().getLibelle() : "-";
+        ajouterLigne(table, "Type Client", typeClient);
+        
+        // Contact
+        String contact = vente.getClient() != null && vente.getClient().getContact() != null ?
+                vente.getClient().getContact() : "-";
+        ajouterLigne(table, "Contact", contact);
+        
+        // RECOLTE
+        String recolteId = vente.getRecolte() != null ? 
+                vente.getRecolte().getId().toString() : "-";
+        ajouterLigne(table, "Récolte", recolteId);
+        
+        // Lot
+        String lot = "-";
+        String espece = "-";
+        if (vente.getRecolte() != null && vente.getRecolte().getLot() != null) {
+            lot = vente.getRecolte().getLot().getCodeLot() != null ? 
+                    vente.getRecolte().getLot().getCodeLot() : "-";
+            espece = vente.getRecolte().getLot().getEspece() != null ?
+                    vente.getRecolte().getLot().getEspece() : "-";
+        }
+        ajouterLigne(table, "Lot", lot);
+        ajouterLigne(table, "Espèce", espece);
+        
         ajouterLigne(table, "Poids vendu", vente.getPoidsVendu() + " kg");
-        ajouterLigne(table, "Effectif", vente.getEffectifVendu() != null ? vente.getEffectifVendu() + " unités" : "-");
+        
+        String effectif = vente.getEffectifVendu() != null ? 
+                vente.getEffectifVendu() + " unités" : "-";
+        ajouterLigne(table, "Effectif", effectif);
+        
         ajouterLigne(table, "Prix unitaire", vente.getPrixUnitaire() + " MGA/kg");
         ajouterLigne(table, "Montant total", vente.getMontantTotal() + " MGA");
-        ajouterLigne(table, "Statut", vente.getStatutVente().getLibelle());
+        
+        // Statut 
+        String statut = vente.getStatutVente() != null && vente.getStatutVente().getCode() != null ?
+                vente.getStatutVente().getCode().name() : "-";
+        ajouterLigne(table, "Statut", statut);
+        
         ajouterLigne(table, "Observation", vente.getObservation() == null ? "-" : vente.getObservation());
 
         document.add(table);
@@ -81,7 +124,7 @@ public class VentePdfExportService {
                         10,
                         Color.GRAY);
 
-        Paragraph footerP = new Paragraph("Document généré par AquaNova - Merci de votre confiance !", footer);
+        Paragraph footerP = new Paragraph("Document genere par AquaNova - Merci de votre confiance !", footer);
         footerP.setAlignment(Paragraph.ALIGN_CENTER);
 
         document.add(footerP);

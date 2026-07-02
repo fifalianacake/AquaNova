@@ -39,11 +39,20 @@ public class HistoriqueExportController {
 
         String clientNom = null;
 
-        // Récupeer les ventes avec filtres
-        List<Vente> ventes = venteService.search(dateDebut, dateFin, clientId, statut);
+        // RECUPERER avec filtres
+        List<Vente> ventes = venteService.search(
+                null, // id
+                null, // client (String)
+                null, // recolteId
+                null, // lotId
+                dateDebut != null ? dateDebut.toLocalDate() : null,
+                dateFin != null ? dateFin.toLocalDate() : null,
+                null  // statutId
+        );
 
         if (clientId != null) {
-            clientNom = venteService.getClientNom(clientId);
+           
+            clientNom = clientService.trouverParId(clientId).getNom();
         }
 
         pdfService.exportHistorique(ventes, dateDebut, dateFin, clientNom, response);

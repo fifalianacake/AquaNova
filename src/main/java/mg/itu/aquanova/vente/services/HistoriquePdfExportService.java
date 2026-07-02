@@ -2,6 +2,7 @@ package mg.itu.aquanova.vente.services;
 
 import java.awt.Color;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ import mg.itu.aquanova.vente.models.Vente;
 @Service
 public class HistoriquePdfExportService {
 
+    private static final DateTimeFormatter DATE_FORMATTER = 
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     public void exportHistorique(
             List<Vente> ventes,
             LocalDateTime dateDebut,
@@ -32,7 +36,8 @@ public class HistoriquePdfExportService {
 
         response.setHeader(
                 "Content-Disposition",
-                "attachment; filename=historique_ventes.pdf");
+                "attachment; filename=historique_ventes_" + 
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".pdf");
 
         Document document = new Document();
 
@@ -72,10 +77,10 @@ public class HistoriquePdfExportService {
                         12);
 
         if (dateDebut != null) {
-            document.add(new Paragraph("Date début : " + dateDebut.toString(), filterValueFont));
+            document.add(new Paragraph("Date début : " + dateDebut.format(DATE_FORMATTER), filterValueFont));
         }
         if (dateFin != null) {
-            document.add(new Paragraph("Date fin : " + dateFin.toString(), filterValueFont));
+            document.add(new Paragraph("Date fin : " + dateFin.format(DATE_FORMATTER), filterValueFont));
         }
         if (clientNom != null && !clientNom.isEmpty()) {
             document.add(new Paragraph("Client : " + clientNom, filterValueFont));
@@ -90,7 +95,7 @@ public class HistoriquePdfExportService {
                         14,
                         new Color(0, 102, 204));
 
-        Paragraph statsP = new Paragraph("RÉSUMÉ STATISTIQUE", statsTitre);
+        Paragraph statsP = new Paragraph("RESUME STATISTIQUE", statsTitre);
         statsP.setAlignment(Paragraph.ALIGN_CENTER);
 
         document.add(statsP);
@@ -147,7 +152,6 @@ public class HistoriquePdfExportService {
             PdfPTable table = new PdfPTable(8);
             table.setWidthPercentage(100);
 
-            // En-têtes
             Font headerFont =
                     FontFactory.getFont(
                             FontFactory.HELVETICA_BOLD,
@@ -163,7 +167,6 @@ public class HistoriquePdfExportService {
                 table.addCell(cell);
             }
 
-            // Données
             Font cellFont =
                     FontFactory.getFont(
                             FontFactory.HELVETICA,
@@ -172,19 +175,29 @@ public class HistoriquePdfExportService {
             for (Vente vente : ventes) {
 
                 table.addCell(new PdfPCell(new Phrase(vente.getId().toString(), cellFont)));
-                table.addCell(new PdfPCell(new Phrase(vente.getDateVente().toString(), cellFont)));
-                table.addCell(new PdfPCell(new Phrase(vente.getClient().getNom(), cellFont)));
+                
+                String dateStr = vente.getDateVente() != null ? 
+                        vente.getDateVente().format(DATE_FORMATTER) : "-";
+                table.addCell(new PdfPCell(new Phrase(dateStr, cellFont)));
+                
+                String nomClient = vente.getClient() != null ? 
+                        vente.getClient().getNom() : "-";
+                table.addCell(new PdfPCell(new Phrase(nomClient, cellFont)));
 
                 String lot = "-";
-                if (vente.getRecolte().getLot() != null) {
-                    lot = vente.getRecolte().getLot().getCodeLot();
+                if (vente.getRecolte() != null && vente.getRecolte().getLot() != null) {
+                    lot = vente.getRecolte().getLot().getCodeLot() != null ? 
+                            vente.getRecolte().getLot().getCodeLot() : "-";
                 }
                 table.addCell(new PdfPCell(new Phrase(lot, cellFont)));
 
                 table.addCell(new PdfPCell(new Phrase(String.format("%.2f", vente.getPoidsVendu()), cellFont)));
                 table.addCell(new PdfPCell(new Phrase(String.format("%.2f", vente.getPrixUnitaire()), cellFont)));
                 table.addCell(new PdfPCell(new Phrase(String.format("%.2f", vente.getMontantTotal()), cellFont)));
-                table.addCell(new PdfPCell(new Phrase(vente.getStatutVente().getLibelle(), cellFont)));
+                
+                String statut = vente.getStatutVente() != null && vente.getStatutVente().getCode() != null ?
+                        vente.getStatutVente().getCode().name() : "-";
+                table.addCell(new PdfPCell(new Phrase(statut, cellFont)));
             }
 
             document.add(table);
@@ -199,7 +212,8 @@ public class HistoriquePdfExportService {
                         10,
                         Color.GRAY);
 
-        Paragraph footerP = new Paragraph("Document généré par AquaNova - " + LocalDateTime.now().toString(), footer);
+        Paragraph footerP = new Paragraph("Document genere par AquaNova - Merci de votre confiance  - " + 
+                LocalDateTime.now().format(DATE_FORMATTER), footer);
         footerP.setAlignment(Paragraph.ALIGN_CENTER);
 
         document.add(footerP);
