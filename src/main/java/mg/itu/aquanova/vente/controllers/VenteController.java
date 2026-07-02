@@ -37,8 +37,14 @@ public class VenteController {
 
         model.addAttribute("ventes", service.search(id, client, recolteId, lotId, debut, fin, statutId));
         model.addAttribute("statuts", statutRepository.findAll());
+        model.addAttribute("currentId", id);
+        model.addAttribute("currentClient", client);
+        model.addAttribute("currentRecolteId", recolteId);
+        model.addAttribute("currentLotId", lotId);
+        model.addAttribute("currentDebut", debut);
+        model.addAttribute("currentFin", fin);
+        model.addAttribute("currentStatutId", statutId);
         return "ventes/liste";
-    }
 
     @GetMapping("/new")
     public String afficherFormulaire(Model model) {
