@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface VenteRepository extends JpaRepository<Vente, Long> {
 
-    @Query("SELECT v FROM Vente v WHERE v.recolte.id = :recolteId AND v.statutVente.code <> 'ANNULEE'")
+    @Query("SELECT v FROM Vente v WHERE v.recolte.id = :recolteId AND v.statutVente.code <> mg.itu.aquanova.vente.models.StatutVenteEnum.ANNULEE")
     List<Vente> findActiveVentesByRecolte(@Param("recolteId") Long recolteId);
 
     @Query("SELECT v FROM Vente v WHERE " +
