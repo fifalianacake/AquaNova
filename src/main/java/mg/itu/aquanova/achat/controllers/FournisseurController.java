@@ -1,7 +1,11 @@
 package mg.itu.aquanova.achat.controllers;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,18 +21,19 @@ import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.Fournisseur;
 import mg.itu.aquanova.achat.models.TypeFournisseur;
 import mg.itu.aquanova.achat.services.FournisseurService;
-import mg.itu.aquanova.export_pdf.models.FichePdf;
-import mg.itu.aquanova.export_pdf.services.ExportServicePdf;
+import mg.itu.aquanova.export_pdf.models.FichePdfData;
+import mg.itu.aquanova.export_pdf.models.PdfResponses;
+import mg.itu.aquanova.export_pdf.services.PdfExportService;
 
 @Controller
 public class FournisseurController {
 
     private final FournisseurService service;
-    private final ExportServicePdf exportServicePdf;
+    private final PdfExportService pdfExportService;
 
-    public FournisseurController(FournisseurService service, ExportServicePdf exportServicePdf) {
+    public FournisseurController(FournisseurService service, PdfExportService pdfExportService) {
         this.service = service;
-        this.exportServicePdf = exportServicePdf;
+        this.pdfExportService = pdfExportService;
     }
 
     @GetMapping("/fournisseurs")
@@ -95,16 +100,60 @@ public class FournisseurController {
     }
 
     
-    @GetMapping("/fournisseurs/{id}/export/pdf")
-    public void exporterFichePdf(@PathVariable("id") Long id, HttpServletResponse response) throws Exception {
-        Fournisseur fournisseur = service.trouverParId(id);
-        List<Achat> achats = service.listerAchatsParFournisseur(id);
+@GetMapping("/fournisseurs/{id}/export/pdf")
+public ResponseEntity<byte[]> exporterFicheFournisseurPdf(@PathVariable("id") Long id) {
+    // 1. Récupération des données métiers depuis ton service habituel
+    Fournisseur fournisseur = service.trouverParId(id);
+    
+    // Imaginons que tu récupères la liste d'achats liée via ton service
+    List<Achat> achats = service.listerAchatsParFournisseur(id);
 
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "inline; filename=fiche_fournisseur.pdf");
+    // 2. Préparation des champs de la section principale (Informations Générales)
+    Map<String, String> infosGenerales = new LinkedHashMap<>();
+    infosGenerales.put("ID du fournisseur", fournisseur.getId().toString());
+    infosGenerales.put("Type", fournisseur.getTypeFournisseur() != null ? fournisseur.getTypeFournisseur().name() : "-");
+    infosGenerales.put("Contact référent", fournisseur.getContact());
+    infosGenerales.put("Adresse Email", fournisseur.getEmail());
+    infosGenerales.put("Adresse physique", fournisseur.getAdresse());
+    infosGenerales.put("NIF / STAT", fournisseur.getNifStat());
+    infosGenerales.put("Statut de l'activité", fournisseur.getActif() ? "Actif (Ouvert)" : "Inactif (Désactivé)");
+    infosGenerales.put("Observation", fournisseur.getObservation());
 
-        FichePdf fiche = new FichePdf(fournisseur, "Historique des achats", achats);
+    // 3. Préparation des lignes du tableau de l'historique d'achats
+    java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        exportServicePdf.genererFiche(fiche, response.getOutputStream());
+    List<List<String>> lignesAchats = achats.stream().map(achat -> {
+    // On prépare chaque variable sous forme de String pure
+    String ref = (achat.getReferenceFacture() != null) ? achat.getReferenceFacture() : "-";
+    
+    String date = "-";
+    if (achat.getDateAchat() != null) {
+        // Si c'est un LocalDateTime ou LocalDate
+        date = achat.getDateAchat().format(formatter); 
+        // Si c'est une java.util.Date classique, utilise plutôt :
+        // date = new java.text.SimpleDateFormat("dd/MM/yyyy").format(achat.getDateAchat());
     }
+    
+    String montant = (achat.getMontantTotal() != null) ? achat.getMontantTotal().toString() + " Ar" : "0 Ar";
+    String statut = (achat.getStatutAchat() != null) ? achat.getStatutAchat().name() : "-";
+
+    // On retourne explicitement une liste de String
+    return List.of(ref, date, montant, statut);
+    }).collect(Collectors.toList());
+
+    // 4. Construction de l'objet de données fluide (le DTO)
+    FichePdfData pdfData = FichePdfData.of("Fiche Fournisseur : " + fournisseur.getNom())
+        .sousTitre("Code interne AquaNova : #FOURN-" + fournisseur.getId())
+        .section("Informations Générales", infosGenerales)
+        .table("Historique des achats effectués", 
+               List.of("Référence Achat", "Date", "Montant Total", "Statut"), 
+               lignesAchats);
+
+    // 5. Génération du tableau d'octets (byte[]) par ton service partagé
+    byte[] pdfBytes = pdfExportService.genererFiche(pdfData);
+
+    // 6. Envoi de la réponse avec les bons en-têtes grâce à ta classe utilitaire
+    String nomFichier = "fiche_fournisseur_" + id + ".pdf";
+    return PdfResponses.attachment(pdfBytes, nomFichier);
+}
 }
