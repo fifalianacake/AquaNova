@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Catégories Clients</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4" style="max-width: 600px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Types de Clients</h2>
+        <a th:href="@{/clients}" class="btn btn-secondary">Retour aux clients</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Code Interne</th>
+                <th>Libellé de la catégorie</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="t : ${types}">
+                <td th:text="${t.id}"></td>
+                <td th:text="${t.code}"></td>
+                <td th:text="${t.libelle}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

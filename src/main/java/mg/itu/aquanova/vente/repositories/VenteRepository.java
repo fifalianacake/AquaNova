@@ -4,17 +4,24 @@ import mg.itu.aquanova.vente.models.Vente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+@Repository
 public interface VenteRepository extends JpaRepository<Vente, Long> {
 
     @Query("SELECT v FROM Vente v WHERE v.recolte.id = :recolteId AND v.statutVente.code <> mg.itu.aquanova.vente.models.StatutVenteEnum.ANNULEE")
     List<Vente> findActiveVentesByRecolte(@Param("recolteId") Long recolteId);
 
+    // Nouvelle méthode ultra-rapide pour l'historique de Sarobidy
+    @Query("SELECT v FROM Vente v WHERE v.client.id = :clientId ORDER BY v.dateVente DESC")
+    List<Vente> findByClientId(@Param("clientId") Long clientId);
+
     @Query("SELECT v FROM Vente v WHERE " +
            "(:id IS NULL OR v.id = :id) AND " +
-           "(:client IS NULL OR LOWER(v.client) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
+           // CORRIGÉ ICI : on passe par v.client.nom au lieu de v.client
+           "(:client IS NULL OR LOWER(v.client.nom) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
            "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
            "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
            "(:debut IS NULL OR v.dateVente >= :debut) AND " +
