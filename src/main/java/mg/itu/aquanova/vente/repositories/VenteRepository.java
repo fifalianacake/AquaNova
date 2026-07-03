@@ -18,23 +18,28 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
     @Query("SELECT v FROM Vente v WHERE v.client.id = :clientId ORDER BY v.dateVente DESC")
     List<Vente> findByClientId(@Param("clientId") Long clientId);
 
-    @Query("SELECT v FROM Vente v WHERE " +
-           "(:id IS NULL OR v.id = :id) AND " +
-           // CORRIGÉ ICI : on passe par v.client.nom au lieu de v.client
-           "(:client IS NULL OR LOWER(v.client.nom) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
-           "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
-           "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
-           "(:debut IS NULL OR v.dateVente >= :debut) AND " +
-           "(:fin IS NULL OR v.dateVente <= :fin) AND " +
-           "(:statutId IS NULL OR v.statutVente.id = :statutId) " +
-           "ORDER BY v.dateVente DESC")
+    @Query("""
+                SELECT v FROM Vente v
+                JOIN v.client c
+                JOIN v.recolte r
+                WHERE (:id IS NULL OR v.id = :id)
+                  AND (
+                        :client IS NULL
+                        OR LOWER(c.nom) LIKE CONCAT('%', LOWER(CAST(:client AS string)), '%')
+                      )
+                  AND (:recolteId IS NULL OR r.id = :recolteId)
+                  AND (:lotId IS NULL OR r.lot.id = :lotId)
+                  AND (:debut IS NULL OR v.dateVente >= :debut)
+                  AND (:fin IS NULL OR v.dateVente <= :fin)
+                  AND (:statutId IS NULL OR v.statutVente.id = :statutId)
+                ORDER BY v.dateVente DESC
+            """)
     List<Vente> filtrerVentes(
-        @Param("id") Long id,
-        @Param("client") String client,
-        @Param("recolteId") Long recolteId,
-        @Param("lotId") Long lotId,
-        @Param("debut") LocalDate debut,
-        @Param("fin") LocalDate fin,
-        @Param("statutId") Long statutId
-    );
+            @Param("id") Long id,
+            @Param("client") String client,
+            @Param("recolteId") Long recolteId,
+            @Param("lotId") Long lotId,
+            @Param("debut") LocalDate debut,
+            @Param("fin") LocalDate fin,
+            @Param("statutId") Long statutId);
 }
