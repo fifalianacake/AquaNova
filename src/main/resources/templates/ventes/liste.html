@@ -31,6 +31,8 @@
             <input type="number" name="lotId" placeholder="ID Lot d'origine" th:value="${currentLotId}" style="width: 130px;">
             <input type="date" name="debut" th:value="${currentDebut}">
             <input type="date" name="fin" th:value="${currentFin}">
+            <input type="number" name="montantMin" step="0.01" placeholder="Montant min" th:value="${currentMontantMin}" style="width: 120px;">
+            <input type="number" name="montantMax" step="0.01" placeholder="Montant max" th:value="${currentMontantMax}" style="width: 120px;">
             <select name="statutId">
                 <option value="">-- Statut --</option>
                 <option th:each="s : ${statuts}" th:value="${s.id}" th:text="${s.libelle}" th:selected="${s.id == currentStatutId}"></option>

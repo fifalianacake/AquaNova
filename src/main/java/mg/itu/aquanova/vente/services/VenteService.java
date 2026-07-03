@@ -1,6 +1,7 @@
 package mg.itu.aquanova.vente.services;
 
 import mg.itu.aquanova.vente.models.Vente;
+import mg.itu.aquanova.vente.dto.TransactionFilterDTO;
 import mg.itu.aquanova.vente.models.StatutVente;
 import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.repositories.VenteRepository;
@@ -90,7 +91,7 @@ public class VenteService {
         vente.setRecolte(ancienne.getRecolte());
         vente.setStatutVente(ancienne.getStatutVente());
 
-        if (vente.getClient() == null || vente.getClient().trim().isEmpty())
+        if (vente.getClient() == null || vente.getClient().getNom().trim().isEmpty())
             throw new RuntimeException("Client obligatoire");
         if (vente.getDateVente() == null)
             throw new RuntimeException("Date obligatoire");
@@ -130,12 +131,41 @@ public class VenteService {
         repository.save(v);
     }
 
+    public List<Vente> search(TransactionFilterDTO filters) {
+        if (filters == null) {
+            filters = new TransactionFilterDTO();
+        }
+
+        return repository.searchTransactions(
+                filters.getId(),
+                filters.getClient(),
+                filters.getIdRecolte(),
+                filters.getIdLot(),
+                filters.getDateDebut(),
+                filters.getDateFin(),
+                filters.getStatutId(),
+                filters.getMontantMin() != null ? filters.getMontantMin().doubleValue() : null,
+                filters.getMontantMax() != null ? filters.getMontantMax().doubleValue() : null);
+    }
+
     public List<Vente> search(Long id, String client, Long recolteId, Long lotId, LocalDate debut, LocalDate fin,
             Long statutId) {
-        return repository.filtrerVentes(id, client, recolteId, lotId, debut, fin, statutId);
+        TransactionFilterDTO filters = new TransactionFilterDTO();
+        filters.setId(id);
+        filters.setClient(client);
+        filters.setIdRecolte(recolteId);
+        filters.setIdLot(lotId);
+        filters.setDateDebut(debut);
+        filters.setDateFin(fin);
+        filters.setStatutId(statutId);
+        return search(filters);
     }
 
     public Vente trouverParId(Long id) {
         return repository.findById(id).orElseThrow();
+    }
+
+    public List<Vente> getByClient(Long id) {
+        return repository.findByClientId(id);
     }
 }

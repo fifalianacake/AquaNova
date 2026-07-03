@@ -66,8 +66,7 @@ public class ClientExportController {
                     client.getTypeClient().getLibelle() : "-",
                 "Contact", client.getContact() != null ? client.getContact() : "-",
                 "Email", client.getEmail() != null ? client.getEmail() : "-",
-                "Adresse", client.getAdresse() != null ? client.getAdresse() : "-",
-                "Observation", client.getObservation() != null ? client.getObservation() : "-"
+                "Adresse", client.getAdresse() != null ? client.getAdresse() : "-"
             ))
             
             // Section 2 : Statistiques d'achat

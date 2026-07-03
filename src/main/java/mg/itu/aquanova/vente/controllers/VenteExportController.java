@@ -66,7 +66,7 @@ public class VenteExportController {
                 "Récolte", vente.getRecolte() != null ? 
                     vente.getRecolte().getId().toString() : "-",
                 "Lot", vente.getRecolte() != null && vente.getRecolte().getLot() != null ? 
-                    vente.getRecolte().getLot().getCodeLot() : "-",
+                    vente.getRecolte().getLot().getCode() : "-",
                 "Poids vendu", vente.getPoidsVendu() != null ? 
                     vente.getPoidsVendu() + " kg" : "-",
                 "Effectif", vente.getEffectifVendu() != null ? 

@@ -25,17 +25,7 @@ public class HistoriqueVenteService {
     }
 
     public List<Vente> searchTransactions(TransactionFilterDTO filters) {
-        return venteRepository.searchTransactions(
-                filters.getId(),
-                filters.getClient(),
-                filters.getIdRecolte(),
-                filters.getIdLot(),
-                filters.getDateDebut(),
-                filters.getDateFin(),
-                filters.getStatutId(),
-                filters.getMontantMin() != null ? filters.getMontantMin().doubleValue() : null,
-                filters.getMontantMax() != null ? filters.getMontantMax().doubleValue() : null);
-
+        return venteService.search(filters);
     }
 
     public Vente getJournalByVente(Long venteId) {

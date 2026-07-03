@@ -1,5 +1,6 @@
 package mg.itu.aquanova.vente.controllers;
 
+import mg.itu.aquanova.vente.dto.TransactionFilterDTO;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
@@ -8,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Controller
@@ -34,9 +36,22 @@ public class VenteController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin,
             @RequestParam(required = false) Long statutId,
+            @RequestParam(required = false) BigDecimal montantMin,
+            @RequestParam(required = false) BigDecimal montantMax,
             Model model) {
 
-        model.addAttribute("ventes", service.search(id, client, recolteId, lotId, debut, fin, statutId));
+        TransactionFilterDTO filters = new TransactionFilterDTO();
+        filters.setId(id);
+        filters.setClient(client);
+        filters.setIdRecolte(recolteId);
+        filters.setIdLot(lotId);
+        filters.setDateDebut(debut);
+        filters.setDateFin(fin);
+        filters.setStatutId(statutId);
+        filters.setMontantMin(montantMin);
+        filters.setMontantMax(montantMax);
+
+        model.addAttribute("ventes", service.search(filters));
         model.addAttribute("statuts", statutRepository.findAll());
         model.addAttribute("currentId", id);
         model.addAttribute("currentClient", client);
@@ -45,6 +60,8 @@ public class VenteController {
         model.addAttribute("currentDebut", debut);
         model.addAttribute("currentFin", fin);
         model.addAttribute("currentStatutId", statutId);
+        model.addAttribute("currentMontantMin", montantMin);
+        model.addAttribute("currentMontantMax", montantMax);
         return "ventes/liste";
     }
 

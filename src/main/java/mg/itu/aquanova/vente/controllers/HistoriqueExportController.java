@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import mg.itu.aquanova.export_pdf.models.FichePdfData;
+import mg.itu.aquanova.export_pdf.models.ListePdfData;
 import mg.itu.aquanova.export_pdf.services.PdfExportService;
 import mg.itu.aquanova.export_pdf.models.PdfResponses;
 import mg.itu.aquanova.vente.models.Vente;
@@ -76,7 +77,7 @@ public class HistoriqueExportController {
                     v.getDateVente().format(DATE_FORMATTER) : "-");
             ligne.add(v.getClient() != null ? v.getClient().getNom() : "-");
             ligne.add(v.getRecolte() != null && v.getRecolte().getLot() != null ? 
-                    v.getRecolte().getLot().getCodeLot() : "-");
+                    v.getRecolte().getLot().getCode() : "-");
             ligne.add(v.getPoidsVendu() != null ? 
                     String.format("%.2f", v.getPoidsVendu()) : "-");
             ligne.add(v.getPrixUnitaire() != null ? 

@@ -52,8 +52,7 @@ public class RecolteService {
             Long lotId,
             Long typeRecolteId,
             LocalDate dateRecolte,
-            Integer effectifRecolte,
-            Double poidsTotal) {
+            Integer effectifRecolte) {
 
         if (lotId == null) {
             throw new IllegalArgumentException("Le lot est obligatoire.");
@@ -67,9 +66,10 @@ public class RecolteService {
         TypeRecoltes typeRecolte = typeRecoltesRepository.findById(typeRecolteId)
                 .orElseThrow(() -> new EntityNotFoundException("Type de récolte introuvable avec l'id : " + typeRecolteId));
 
-        validerRecolte(lot, typeRecolte, dateRecolte, effectifRecolte, poidsTotal);
+        validerRecolte(lot, typeRecolte, dateRecolte, effectifRecolte);
 
-        Double poidsMoyen = poidsTotal / effectifRecolte;
+        Double poidsMoyen = lot.getPoidsMoyenActuel();
+        Double poidsTotal = calculerPoidsTotalRecolte(lot, effectifRecolte);
         int nouvelEffectif = lot.getEffectifActuel() - effectifRecolte;
 
         Recoltes recolte = new Recoltes();
@@ -81,7 +81,6 @@ public class RecolteService {
         recolte.setPoidsMoyen(poidsMoyen);
 
         lot.setEffectifActuel(nouvelEffectif);
-        lot.setPoidsMoyenActuel(poidsMoyen);
         appliquerStatutsApresRecolte(lot, nouvelEffectif);
 
         Recoltes saved = recoltesRepository.save(recolte);
@@ -136,17 +135,13 @@ public class RecolteService {
             LotModels lot,
             TypeRecoltes typeRecolte,
             LocalDate dateRecolte,
-            Integer effectifRecolte,
-            Double poidsTotal) {
+            Integer effectifRecolte) {
 
         if (dateRecolte == null) {
             throw new IllegalArgumentException("La date de récolte est obligatoire.");
         }
         if (effectifRecolte == null || effectifRecolte <= 0) {
             throw new IllegalArgumentException("L'effectif récolté doit être strictement positif.");
-        }
-        if (poidsTotal == null || poidsTotal <= 0) {
-            throw new IllegalArgumentException("Le poids total doit être strictement positif.");
         }
         if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
             throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot déjà clôturé.");
@@ -164,6 +159,13 @@ public class RecolteService {
                 && !effectifRecolte.equals(lot.getEffectifActuel())) {
             throw new IllegalArgumentException("Une récolte totale doit porter sur tout l'effectif actuel du lot.");
         }
+        if (lot.getPoidsMoyenActuel() == null || lot.getPoidsMoyenActuel() <= 0) {
+            throw new IllegalStateException("Le poids moyen actuel du lot doit être renseigné pour calculer le poids récolté.");
+        }
+    }
+
+    private Double calculerPoidsTotalRecolte(LotModels lot, Integer effectifRecolte) {
+        return lot.getPoidsMoyenActuel() * effectifRecolte;
     }
 
     private void appliquerStatutsApresRecolte(LotModels lot, int nouvelEffectif) {
