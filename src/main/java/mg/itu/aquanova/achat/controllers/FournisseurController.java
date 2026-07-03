@@ -12,18 +12,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.Fournisseur;
 import mg.itu.aquanova.achat.models.TypeFournisseur;
 import mg.itu.aquanova.achat.services.FournisseurService;
+import mg.itu.aquanova.export_pdf.models.FichePdf;
+import mg.itu.aquanova.export_pdf.services.ExportServicePdf;
 
 @Controller
 public class FournisseurController {
 
     private final FournisseurService service;
+    private final ExportServicePdf exportServicePdf;
 
-    public FournisseurController(FournisseurService service) {
+    public FournisseurController(FournisseurService service, ExportServicePdf exportServicePdf) {
         this.service = service;
+        this.exportServicePdf = exportServicePdf;
     }
 
     @GetMapping("/fournisseurs")
@@ -87,5 +92,19 @@ public class FournisseurController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/fournisseurs";
         }
+    }
+
+    
+    @GetMapping("/fournisseurs/{id}/export/pdf")
+    public void exporterFichePdf(@PathVariable("id") Long id, HttpServletResponse response) throws Exception {
+        Fournisseur fournisseur = service.trouverParId(id);
+        List<Achat> achats = service.listerAchatsParFournisseur(id);
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "inline; filename=fiche_fournisseur.pdf");
+
+        FichePdf fiche = new FichePdf(fournisseur, "Historique des achats", achats);
+
+        exportServicePdf.genererFiche(fiche, response.getOutputStream());
     }
 }
