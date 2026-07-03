@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${fournisseur.id == null} ? 'Saisie Fournisseur' : 'Modification Fournisseur'">Formulaire Fournisseur</title>
+</head>
+<body>
+
+    <h1 th:text="${fournisseur.id == null} ? 'Ajouter un fournisseur' : 'Modifier le fournisseur'">Formulaire</h1>
+
+    <form th:action="@{/fournisseurs}" th:object="${fournisseur}" method="post">
+        
+        <input type="hidden" th:field="*{id}" />
+
+        <div>
+            <label for="nom">Nom * (Obligatoire) :</label>
+            <input type="text" id="nom" th:field="*{nom}" required maxlength="150" />
+        </div>
+
+        <div>
+            <label for="typeFournisseur">Type Fournisseur * (Obligatoire) :</label>
+            <select id="typeFournisseur" th:field="*{typeFournisseur}" required>
+                <option value="">-- Choisir un type --</option>
+                <option th:each="type : ${typesFournisseur}" th:value="${type}" th:text="${type}"></option>
+            </select>
+        </div>
+
+        <div>
+            <label for="contact">Contact (Recommandé) :</label>
+            <input type="text" id="contact" th:field="*{contact}" maxlength="100" />
+        </div>
+
+        <div>
+            <label for="email">Email :</label>
+            <input type="email" id="email" th:field="*{email}" maxlength="150" />
+        </div>
+
+        <div>
+            <label for="adresse">Adresse :</label>
+            <textarea id="adresse" th:field="*{adresse}"></textarea>
+        </div>
+
+        <div>
+            <label for="nifStat">NIF / STAT :</label>
+            <input type="text" id="nifStat" th:field="*{nifStat}" maxlength="100" />
+        </div>
+
+        <div>
+            <label for="actif">Actif :</label>
+            <input type="checkbox" id="actif" th:field="*{actif}" />
+        </div>
+
+        <div>
+            <label for="observation">Observation :</label>
+            <textarea id="observation" th:field="*{observation}"></textarea>
+        </div>
+
+        <div>
+            <button type="submit">Enregistrer</button>
+            <a th:href="@{/fournisseurs}">Annuler</a>
+        </div>
+    </form>
+
+</body>
+</html>
