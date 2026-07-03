@@ -13,21 +13,42 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
     List<Vente> findActiveVentesByRecolte(@Param("recolteId") Long recolteId);
 
     @Query("SELECT v FROM Vente v WHERE " +
-           "(:id IS NULL OR v.id = :id) AND " +
-           "(:client IS NULL OR LOWER(v.client) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
-           "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
-           "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
-           "(:debut IS NULL OR v.dateVente >= :debut) AND " +
-           "(:fin IS NULL OR v.dateVente <= :fin) AND " +
-           "(:statutId IS NULL OR v.statutVente.id = :statutId) " +
-           "ORDER BY v.dateVente DESC")
+            "(:id IS NULL OR v.id = :id) AND " +
+            "(:client IS NULL OR LOWER(v.client) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
+            "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
+            "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
+            "(:debut IS NULL OR v.dateVente >= :debut) AND " +
+            "(:fin IS NULL OR v.dateVente <= :fin) AND " +
+            "(:statutId IS NULL OR v.statutVente.id = :statutId) " +
+            "ORDER BY v.dateVente DESC")
     List<Vente> filtrerVentes(
-        @Param("id") Long id,
-        @Param("client") String client,
-        @Param("recolteId") Long recolteId,
-        @Param("lotId") Long lotId,
-        @Param("debut") LocalDate debut,
-        @Param("fin") LocalDate fin,
-        @Param("statutId") Long statutId
-    );
+            @Param("id") Long id,
+            @Param("client") String client,
+            @Param("recolteId") Long recolteId,
+            @Param("lotId") Long lotId,
+            @Param("debut") LocalDate debut,
+            @Param("fin") LocalDate fin,
+            @Param("statutId") Long statutId);
+
+    @Query("SELECT v FROM Vente v WHERE " +
+            "(:id IS NULL OR v.id = :id) AND " +
+            "(:client IS NULL OR LOWER(v.client) LIKE LOWER(CONCAT('%', cast(:client as string), '%'))) AND " +
+            "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
+            "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
+            "(:debut IS NULL OR v.dateVente >= :debut) AND " +
+            "(:fin IS NULL OR v.dateVente <= :fin) AND " +
+            "(:statutId IS NULL OR v.statutVente.id = :statutId) AND " +
+            "(:montantMin IS NULL OR (v.poidsVendu * v.prixUnitaire) >= :montantMin) AND " +
+            "(:montantMax IS NULL OR (v.poidsVendu * v.prixUnitaire) <= :montantMax) " +
+            "ORDER BY v.dateVente DESC")
+    List<Vente> searchTransactions(
+            @Param("id") Long id,
+            @Param("client") String client,
+            @Param("recolteId") Long recolteId,
+            @Param("lotId") Long lotId,
+            @Param("debut") LocalDate debut,
+            @Param("fin") LocalDate fin,
+            @Param("statutId") Long statutId,
+            @Param("montantMin") Double montantMin,
+            @Param("montantMax") Double montantMax);
 }
