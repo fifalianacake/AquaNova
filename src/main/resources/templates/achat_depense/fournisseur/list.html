@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des fournisseurs</title>
+</head>
+<body>
+
+    <h1>Liste des fournisseurs</h1>
+
+    <p><a th:href="@{/fournisseurs/new}">+ Ajouter un nouveau fournisseur</a></p>
+
+    <div th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <h2>Filtres de recherche</h2>
+    <form th:action="@{/fournisseurs}" method="get">
+        <label for="filtreId">ID :</label>
+        <input type="number" id="filtreId" name="id" th:value="${param.id}">
+
+        <label for="filtreNom">Nom :</label>
+        <input type="text" id="filtreNom" name="nom" th:value="${param.nom}">
+
+        <label for="filtreType">Type fournisseur :</label>
+        <input type="text" id="filtreType" name="typeFournisseur" th:value="${param.typeFournisseur}">
+
+        <label for="filtreContact">Contact :</label>
+        <input type="text" id="filtreContact" name="contact" th:value="${param.contact}">
+
+        <label for="filtreActif">Statut :</label>
+        <select id="filtreActif" name="actif">
+            <option value="">Tous</option>
+            <option value="true" th:selected="${param.actif != null && param.actif[0] == 'true'}">Actif</option>
+            <option value="false" th:selected="${param.actif != null && param.actif[0] == 'false'}">Inactif</option>
+        </select>
+
+        <button type="submit">Filtrer</button>
+        <a th:href="@{/fournisseurs}">Réinitialiser</a>
+    </form>
+
+    <h2>Résultats</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Adresse</th>
+                <th>Actif</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="f : ${fournisseurs}">
+                <td th:text="${f.id}"></td>
+                <td th:text="${f.nom}"></td>
+                <td th:text="${f.typeFournisseur}"></td>
+                <td th:text="${f.contact}"></td>
+                <td th:text="${f.email}"></td>
+                <td th:text="${f.adresse}"></td>
+                <td th:text="${f.actif ? 'Oui' : 'Non'}"></td>
+                <td>
+                    <a th:href="@{/fournisseurs/{id}(id=${f.id})}">Consulter</a> | 
+                    <a th:href="@{/fournisseurs/{id}/edit(id=${f.id})}">Modifier</a> |
+                    <form th:action="@{/fournisseurs/{id}/desactiver(id=${f.id})}" method="post" style="display:inline;">
+                        <button type="submit" th:if="${f.actif}" onclick="return confirm('Désactiver ce fournisseur ?');">Désactiver</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(fournisseurs)}">
+                <td colspan="8">Aucun fournisseur trouvé.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
