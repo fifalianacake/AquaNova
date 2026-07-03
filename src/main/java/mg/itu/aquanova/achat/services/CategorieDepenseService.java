@@ -69,6 +69,10 @@ public class CategorieDepenseService {
         return categorie != null && categorie.getCode() != null && CODES_ACHAT_INTRANTS.contains(categorie.getCode());
     }
 
+    public boolean estCategorieAchatAlevin(CategorieDepense categorie) {
+        return categorie != null && categorie.getCode() != null && categorie.getCode().equals("ACHAT_ALEVINS");
+    }
+
     public void normaliser(CategorieDepense categorie) {
         categorie.setCode(categorie.getCode().toUpperCase().trim());
         categorie.setLibelle(categorie.getLibelle().trim());
