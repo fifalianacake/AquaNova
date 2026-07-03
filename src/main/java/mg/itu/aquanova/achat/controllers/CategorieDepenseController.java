@@ -33,19 +33,20 @@ public class CategorieDepenseController {
         // this.achatService = achatService;
     }
 
+    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/categories-depenses")
     public String liste(
             Model model) {
         model.addAttribute("categories", categorieDepenseService.listerTous());
         
-        return "achat_depense/intrants/list";
+        return "achat_depense/categories_depenses/list";
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/categories-depenses/new")
     public String formulaireCreation(Model model) {
         model.addAttribute("categorie", new CategorieDepense());
-        return "achat_depense/categories-depenses/form";
+        return "achat_depense/categories_depenses/form";
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
@@ -59,7 +60,7 @@ public class CategorieDepenseController {
     @GetMapping("/categories-depenses/{id}/edit")
     public String formulaireModification(@PathVariable Long id, Model model) {
         model.addAttribute("categorie", categorieDepenseService.trouverParId(id));
-        return "achat_depense/categories-depenses/form";
+        return "achat_depense/categories_depenses/form";
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
@@ -72,7 +73,7 @@ public class CategorieDepenseController {
             categorieDepense.setId(id);
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("categorie", categorieDepense);
-            return "achat_depense/categories-depenses/form";
+            return "achat_depense/categories_depenses/form";
         }
     }
 
