@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail type d'événement</title>
+</head>
+<body>
+<h1>Détail type d'événement</h1>
+
+<p><strong>ID:</strong> <span th:text="${type.id}"></span></p>
+<p><strong>Code:</strong> <span th:text="${type.code}"></span></p>
+<p><strong>Libellé:</strong> <span th:text="${type.libelle}"></span></p>
+
+<div>
+    <a th:href="@{/production/types-evenements/{id}/edit(id=${type.id})}">Modifier</a>
+    <a th:href="@{/production/types-evenements}">Retour</a>
+</div>
+</body>
+</html>

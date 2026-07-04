@@ -15,8 +15,9 @@ public class Vente {
     @JoinColumn(name = "id_recolte", nullable = false)
     private Recoltes recolte; // Modifié en Recoltes
 
-    @Column(nullable = false)
-    private String client;
+    @ManyToOne
+    @JoinColumn(name = "id_client")
+    private Client client;
 
     @Column(name = "date_vente", nullable = false)
     private LocalDate dateVente;
@@ -41,8 +42,8 @@ public class Vente {
     public void setId(Long id) { this.id = id; }
     public Recoltes getRecolte() { return recolte; }
     public void setRecolte(Recoltes recolte) { this.recolte = recolte; }
-    public String getClient() { return client; }
-    public void setClient(String client) { this.client = client; }
+    public Client getClient() { return client; }
+    public void setClient(Client client) { this.client = client; }
     public LocalDate getDateVente() { return dateVente; }
     public void setDateVente(LocalDate dateVente) { this.dateVente = dateVente; }
     public Double getPoidsVendu() { return poidsVendu; }
