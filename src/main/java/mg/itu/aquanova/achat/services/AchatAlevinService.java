@@ -7,33 +7,30 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import mg.itu.aquanova.achat.dto.AchatAlevinForm;
-import mg.itu.aquanova.achat.dto.AchatIntrantForm;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.CategorieDepense;
 import mg.itu.aquanova.achat.models.Fournisseur;
-import mg.itu.aquanova.achat.models.Intrant;
 import mg.itu.aquanova.achat.models.LigneAchat;
 import mg.itu.aquanova.achat.models.StatutAchat;
 import mg.itu.aquanova.achat.repositories.AchatRepository;
 import mg.itu.aquanova.achat.repositories.CategorieDepenseRepository;
 import mg.itu.aquanova.achat.repositories.FournisseurRepository;
-import mg.itu.aquanova.achat.repositories.IntrantRepository;
 import mg.itu.aquanova.achat.repositories.MouvementStockIntrantRepository;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.StatutLotModels;
 import mg.itu.aquanova.production.repositories.LotRepository;
+import mg.itu.aquanova.production.repositories.StatutLotRepository;
 import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.referentiel.models.Bassin;
 import mg.itu.aquanova.referentiel.models.EspecesModels;
-import mg.itu.aquanova.referentiel.models.StadeCroissanceModels;
+import mg.itu.aquanova.referentiel.models.LibelleStatutBassin;
+import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
 import mg.itu.aquanova.referentiel.repositories.EspecesRepository;
-import mg.itu.aquanova.referentiel.services.BassinService;
+import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
 
 @Service
 public class AchatAlevinService {
@@ -46,7 +43,9 @@ public class AchatAlevinService {
     private final EspecesRepository especesRepository;
     private final MouvementStockIntrantRepository mouvementRepository;
     private final BassinsRepository bassinsRepository;
+    private final StatutBassinRepository statutBassinRepository;
     private final LotService lotService;
+    private final StatutLotRepository statutLotRepository;
 
     public AchatAlevinService(
             AchatRepository achatRepository,
@@ -57,7 +56,9 @@ public class AchatAlevinService {
             EspecesRepository especesRepository,
             MouvementStockIntrantRepository mouvementRepository,
             BassinsRepository bassinsRepository,
-            LotService lotService) {
+            StatutBassinRepository statutBassinRepository,
+            LotService lotService,
+            StatutLotRepository statutLotRepository) {
         this.achatRepository = achatRepository;
         this.fournisseurRepository = fournisseurRepository;
         this.categorieDepenseRepository = categorieDepenseRepository;
@@ -66,7 +67,9 @@ public class AchatAlevinService {
         this.especesRepository = especesRepository;
         this.mouvementRepository = mouvementRepository;
         this.bassinsRepository = bassinsRepository;
+        this.statutBassinRepository = statutBassinRepository;
         this.lotService = lotService;
+        this.statutLotRepository = statutLotRepository;
     }
 
     @Transactional
@@ -104,23 +107,31 @@ public class AchatAlevinService {
 
         LotModels lot = new LotModels();
         lot.setEspece(especes);
-        lot.setCode(String.format("LOT-%03d", this.lotRepository.count()));
+        lot.setCode(String.format("LOT-%03d", lotRepository.count()));
 
-        Optional<Bassin> bassin = this.bassinsRepository.findFirstByStatutNomIgnoreCase("LIBRE");
-        if(!bassin.isPresent()) {
-            throw new IllegalArgumentException("Aucun bassin n'est libre pour effectuer cette achat d'Alevin");
+        Optional<StatutBassin> statutBassinOptional = statutBassinRepository.findByLibelle(LibelleStatutBassin.LIBRE);
+        if(!statutBassinOptional.isPresent()) {
+            throw new IllegalArgumentException("Veuillez bien verifier le statut du bassin"); 
+        }
+        Optional<Bassin> bassinOptional = bassinsRepository.findByStatut(statutBassinOptional.orElse(null));
+        if(!bassinOptional.isPresent()) {
+            throw new IllegalArgumentException("Aucun bassin n'est libre pour effectuer cette achat d'Alevin"); 
+        }
+        Optional<StatutLotModels> statutLotOptional = statutLotRepository.findByLibelle(StatutLotEnum.EN_CROISSANCE);
+        if(!statutLotOptional.isPresent()) {
+            throw new IllegalArgumentException("Veuillez bien verifiez le statut du lot");
         }
 
-        lot.setBassin(bassin.orElse(null));
+        lot.setBassin(bassinOptional.orElse(null));
         lot.setStadeCroissance(null);
-        lot.setStatutLot(null);
+        lot.setStatutLot(statutLotOptional.orElse(null));
         lot.setDateMiseEnCharge(LocalDate.now());
         lot.setEffectifInitial(form.getEffectif());
         lot.setEffectifActuel(form.getEffectif());
-        lot.setPoidsMoyenInitial(form.getPoidsMoyen());
-        lot.setPoidsMoyenActuel(form.getPoidsMoyen());
+        lot.setPoidsMoyenInitial(form.getPoidsMoyen().doubleValue());
+        lot.setPoidsMoyenActuel(form.getPoidsMoyen().doubleValue());
 
-        this.lotService.validerLot(lot, null);
+        lotService.validerLot(lot, null);
 
         ligne.setLot(lot);
         achat.addLigne(ligne);
