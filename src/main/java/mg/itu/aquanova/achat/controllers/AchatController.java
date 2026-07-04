@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import mg.itu.aquanova.achat.dto.AchatAlevinFilter;
 import mg.itu.aquanova.achat.dto.AchatAlevinForm;
 import mg.itu.aquanova.achat.dto.AchatIntrantFilter;
 import mg.itu.aquanova.achat.dto.AchatIntrantForm;
@@ -62,9 +63,11 @@ public class AchatController {
     @GetMapping("/achats")
     public String liste(
             @ModelAttribute("filter") AchatIntrantFilter filter,
+            @ModelAttribute("filterAlevin") AchatAlevinFilter filterAlevin,
             @PageableDefault(size = 10, sort = "dateAchat") Pageable pageable,
             Model model) {
         model.addAttribute("achats", achatIntrantService.listerAchatsIntrants(filter, pageable));
+        model.addAttribute("achatsAlevin", achatAlevinService.listerAchatsAlevin(filterAlevin, pageable));
         addListAttributes(model);
         return "achat_depense/achats/list";
     }
@@ -113,18 +116,18 @@ public class AchatController {
         }
     }
 
-    @GetMapping("/achats/alevins/{id}/pdf")
-    @ResponseBody
-    public ResponseEntity<byte[]> telechargerPdf(@PathVariable Long id) {
-        Achat achat = achatAlevinService.getById(id);
+    // @GetMapping("/achats/alevins/{id}/pdf")
+    // @ResponseBody
+    // public ResponseEntity<byte[]> telechargerPdf(@PathVariable Long id) {
+    //     Achat achat = achatAlevinService.getById(id);
         
-        byte[] pdfContents = achatService.intoPdfAlevin(achat);
+    //     byte[] pdfContents = achatService.intoPdfAlevin(achat);
         
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"achat-alevin-" + id + ".pdf\"")
-                .body(pdfContents);
-    }
+    //     return ResponseEntity.ok()
+    //             .contentType(MediaType.APPLICATION_PDF)
+    //             .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"achat-alevin-" + id + ".pdf\"")
+    //             .body(pdfContents);
+    // }
 
     @GetMapping("/achats/{id}")
     public String fiche(@PathVariable Long id, Model model) {
