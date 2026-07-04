@@ -72,6 +72,11 @@ public class AchatAlevinService {
         this.statutLotRepository = statutLotRepository;
     }
 
+    public Achat getById(Long id) {
+        return this.achatRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Achat introuvable avec l'ID : " + id));
+    }
+
     @Transactional
     public Achat creerAchatAlevin(AchatAlevinForm form) {
         validerFormulaire(form);
