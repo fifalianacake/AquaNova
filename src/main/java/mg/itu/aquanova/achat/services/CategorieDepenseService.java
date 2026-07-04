@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import mg.itu.aquanova.achat.models.CategorieDepense;
-import mg.itu.aquanova.achat.models.Intrant;
 import mg.itu.aquanova.achat.repositories.CategorieDepenseRepository;
 
 @Service
