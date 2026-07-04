@@ -12,13 +12,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import mg.itu.aquanova.achat.dto.AchatAlevinForm;
 import mg.itu.aquanova.achat.dto.AchatIntrantFilter;
 import mg.itu.aquanova.achat.dto.AchatIntrantForm;
 import mg.itu.aquanova.achat.models.StatutAchat;
+import mg.itu.aquanova.achat.services.AchatAlevinService;
 import mg.itu.aquanova.achat.services.AchatIntrantService;
 import mg.itu.aquanova.achat.services.CategorieDepenseService;
 import mg.itu.aquanova.achat.services.FournisseurService;
 import mg.itu.aquanova.achat.services.IntrantService;
+import mg.itu.aquanova.referentiel.services.EspecesService;
 
 @Controller
 public class AchatController {
@@ -26,19 +29,25 @@ public class AchatController {
     private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
 
     private final AchatIntrantService achatIntrantService;
+    private final AchatAlevinService achatAlevinService;
     private final FournisseurService fournisseurService;
     private final CategorieDepenseService categorieDepenseService;
     private final IntrantService intrantService;
+    private final EspecesService especesService;
 
     public AchatController(
             AchatIntrantService achatIntrantService,
+            AchatAlevinService achatAlevinService,
             FournisseurService fournisseurService,
             CategorieDepenseService categorieDepenseService,
-            IntrantService intrantService) {
+            IntrantService intrantService,
+            EspecesService especesService) {
         this.achatIntrantService = achatIntrantService;
+        this.achatAlevinService = achatAlevinService;
         this.fournisseurService = fournisseurService;
         this.categorieDepenseService = categorieDepenseService;
         this.intrantService = intrantService;
+        this.especesService = especesService;
     }
 
     @GetMapping("/achats")
@@ -54,7 +63,7 @@ public class AchatController {
     @GetMapping("/achats/intrants/new")
     public String formulaireAchatIntrant(Model model) {
         model.addAttribute("achatIntrantForm", new AchatIntrantForm());
-        addFormAttributes(model);
+        addFormIntrantAttributes(model);
         return "achat_depense/achats/form-intrant";
     }
 
@@ -68,8 +77,30 @@ public class AchatController {
         } catch (IllegalArgumentException | IllegalStateException ex) {
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("achatIntrantForm", form);
-            addFormAttributes(model);
+            addFormIntrantAttributes(model);
             return "achat_depense/achats/form-intrant";
+        }
+    }
+
+    @GetMapping("/achats/alevins/new")
+    public String formulaireAchatAlevin(Model model) {
+        model.addAttribute("achatAlevinForm", new AchatAlevinForm());
+        addFormAlevinAttributes(model);
+        return "achat_depense/achats/form-alevin";
+    }
+
+    @PostMapping("/achats/alevins")
+    public String creerAchatAlevin(
+            @ModelAttribute("achatAlevinForm") AchatAlevinForm form,
+            Model model) {
+        try {
+            var achat = achatAlevinService.creerAchatAlevin(form);
+            return "redirect:/achats/" + achat.getId();
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("achatAlevinForm", form);
+            addFormAlevinAttributes(model);
+            return "achat_depense/achats/form-alevin";
         }
     }
 
@@ -109,9 +140,16 @@ public class AchatController {
         model.addAttribute("pageSizes", PAGE_SIZES);
     }
 
-    private void addFormAttributes(Model model) {
+    private void addFormIntrantAttributes(Model model) {
         model.addAttribute("fournisseurs", fournisseurService.listerActifs());
         model.addAttribute("categoriesDepense", categorieDepenseService.listerCategoriesAchatIntrants());
         model.addAttribute("intrants", intrantService.listerActifs());
     }
+
+    private void addFormAlevinAttributes(Model model) {
+        model.addAttribute("fournisseurs", fournisseurService.listerActifs());
+        model.addAttribute("categoriesDepense", categorieDepenseService.trouverParCode("ACHAT_ALEVINS"));
+        model.addAttribute("especes", especesService.findAll());
+    }
+
 }

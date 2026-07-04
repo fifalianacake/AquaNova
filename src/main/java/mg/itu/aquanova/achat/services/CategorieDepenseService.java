@@ -47,6 +47,11 @@ public class CategorieDepenseService {
                 .orElseThrow(() -> new EntityNotFoundException("Catégorie de dépense introuvable : " + id));
     }
 
+    public CategorieDepense trouverParCode(String code) {
+        return repository.findByCode(code)
+                .orElseThrow(() -> new EntityNotFoundException("Catégorie de dépense introuvable : " + code));
+    }
+
     @Transactional
     public CategorieDepense modifier(Long id, CategorieDepense categorie) {
         CategorieDepense existant = trouverParId(id);
