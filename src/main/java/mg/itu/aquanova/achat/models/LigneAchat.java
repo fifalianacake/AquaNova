@@ -2,6 +2,7 @@ package mg.itu.aquanova.achat.models;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -54,7 +55,7 @@ public class LigneAchat {
     @JoinColumn(name = "id_espece")
     private EspecesModels espece;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_lot")
     private LotModels lot;
 

@@ -149,7 +149,7 @@ public class LotService {
         repository.delete(l);
     }
 
-    private void validerLot(LotModels lot, Long idLotIgnore) {
+    public void validerLot(LotModels lot, Long idLotIgnore) {
         if (lot == null) {
             throw new IllegalArgumentException("Le lot est obligatoire.");
         }

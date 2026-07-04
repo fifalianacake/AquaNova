@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${categorie.id != null} ? 'Modifier la Catégorie' : 'Nouvelle Catégorie'">Gestion Catégorie</title>
+</head>
+<body>
+
+    <h1 th:text="${categorie.id != null} ? 'Modifier la Catégorie' : 'Créer une Catégorie'">Gestion Catégorie</h1>
+
+    <div th:if="${error}" style="color: red;">
+        <p th:text="${error}"></p>
+    </div>
+
+    <form th:action="${categorie.id != null} ? @{/categories-depenses/{id}(id=${categorie.id})} : @{/categories-depenses}" 
+          th:object="${categorie}" 
+          method="POST">
+
+        <input type="hidden" th:field="*{id}" />
+
+        <div>
+            <label for="code">Code :</label>
+            <input type="text" id="code" th:field="*{code}" required placeholder="Ex: ACHAT_ALEVINS" />
+        </div>
+        <br/>
+
+        <div>
+            <label for="libelle">Libellé :</label>
+            <input type="text" id="libelle" th:field="*{libelle}" required placeholder="Ex: Achat d'alevins" />
+        </div>
+        <br/>
+
+        <div>
+            <label for="description">Description :</label>
+            <textarea id="description" th:field="*{description}" rows="4" cols="30" placeholder="Description de la catégorie..."></textarea>
+        </div>
+        <br/>
+
+        <div>
+            <label for="typeCategorie">Type de catégorie :</label>
+            <select id="typeCategorie" th:field="*{typeCategorie}" required>
+                <option th:value="'ACHAT'" th:text="'ACHAT'">ACHAT</option>
+                <option th:value="'DEPENSE'" th:text="'DEPENSE'">DEPENSE</option>
+                <option th:value="'MIXTE'" th:text="'MIXTE'">MIXTE</option>
+            </select>
+        </div>
+        <br/>
+
+        <div>
+            <button type="submit" th:text="${categorie.id != null} ? 'Enregistrer les modifications' : 'Créer la catégorie'"></button>
+            <a th:href="@{/categories-depenses}">Annuler</a>
+        </div>
+
+    </form>
+
+</body>
+</html>
