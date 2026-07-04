@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Types de récolte</title>
+</head>
+<body>
+<h1>Types de récolte</h1>
+
+<div>
+    <a th:href="@{/type-recoltes/new}">Créer un type de récolte</a>
+    <a th:href="@{/recoltes}">Retour aux récoltes</a>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Libellé</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="type : ${types}">
+        <td th:text="${type.id}"></td>
+        <td th:text="${type.libelle}"></td>
+        <td th:text="${type.description}"></td>
+        <td>
+            <a th:href="@{/type-recoltes/{id}(id=${type.id})}">Voir</a>
+            <a th:href="@{/type-recoltes/{id}/edit(id=${type.id})}">Modifier</a>
+            <a th:href="@{/type-recoltes/{id}/delete(id=${type.id})}"
+               onclick="return confirm('Supprimer ce type de récolte ?')">Supprimer</a>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(types)}">
+        <td colspan="4">Aucun type de récolte enregistré.</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

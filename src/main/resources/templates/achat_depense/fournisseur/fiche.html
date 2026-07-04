@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche Fournisseur</title>
+</head>
+<body>
+
+    <h1>Fiche Fournisseur</h1>
+
+    <p>
+        <a th:href="@{/fournisseurs}">Retour à la liste</a> | 
+        <a th:href="@{/fournisseurs/{id}/edit(id=${fournisseur.id})}">Modifier ce fournisseur</a> |
+        <a th:href="@{/fournisseurs/{id}/export/pdf(id=${fournisseur.id})}" target="_blank">Exporter en PDF</a>
+    </p>
+
+    <h2>Informations Générales</h2>
+    <ul>
+        <li><strong>ID :</strong> <span th:text="${fournisseur.id}"></span></li>
+        <li><strong>Nom :</strong> <span th:text="${fournisseur.nom}"></span></li>
+        <li><strong>Type :</strong> <span th:text="${fournisseur.typeFournisseur}"></span></li>
+        <li><strong>Contact :</strong> <span th:text="${fournisseur.contact}"></span></li>
+        <li><strong>Email :</strong> <span th:text="${fournisseur.email}"></span></li>
+        <li><strong>Adresse :</strong> <span th:text="${fournisseur.adresse}"></span></li>
+        <li><strong>NIF / STAT :</strong> <span th:text="${fournisseur.nifStat}"></span></li>
+        <li><strong>Statut :</strong> <span th:text="${fournisseur.actif ? 'Actif' : 'Inactif'}"></span></li>
+        <li><strong>Observation :</strong> <span th:text="${fournisseur.observation}"></span></li>
+    </ul>
+
+    <h2>Historique des Achats</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Référence Achat</th>
+                <th>Date</th>
+                <th>Montant Total</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="achat : ${achats}">
+                <td th:text="${achat.reference}"></td>
+                <td th:text="${#dates.format(achat.dateAchat, 'dd/MM/yyyy')}"></td>
+                <td th:text="${achat.montantTotal}"></td>
+                <td th:text="${achat.statut}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(achats)}">
+                <td colspan="4">Aucun achat enregistré pour ce fournisseur.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

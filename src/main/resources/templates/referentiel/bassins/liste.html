@@ -36,7 +36,7 @@
                 <td th:text="${b.capaciteM3}">50.0</td>
                 <td>
                     <span th:text="${b.statut.libelle}"
-                        th:classappend="${b.statut.name() == 'LIBRE' ? 'badge bg-success' : (b.statut.name() == 'OCCUPE' ? 'badge bg-warning text-dark' : 'badge bg-danger')}">
+                        th:classappend="${b.statut.libelle == T(mg.itu.aquanova.referentiel.models.LibelleStatutBassin).LIBRE ? 'badge bg-success' : (b.statut.libelle == T(mg.itu.aquanova.referentiel.models.LibelleStatutBassin).OCCUPE ? 'badge bg-warning text-dark' : 'badge bg-danger')}">
                         Libre
                     </span>
                 </td>

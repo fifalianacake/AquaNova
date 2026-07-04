@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail type de récolte</title>
+</head>
+<body>
+<h1>Détail type de récolte</h1>
+
+<p><strong>ID:</strong> <span th:text="${type.id}"></span></p>
+<p><strong>Libellé:</strong> <span th:text="${type.libelle}"></span></p>
+<p><strong>Description:</strong> <span th:text="${type.description}"></span></p>
+
+<div>
+    <a th:href="@{/type-recoltes/{id}/edit(id=${type.id})}">Modifier</a>
+    <a th:href="@{/type-recoltes}">Retour</a>
+</div>
+</body>
+</html>
