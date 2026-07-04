@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche dépense</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0; }
+        dt { font-weight: bold; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<h1 th:text="${'Dépense #' + depense.id}">Fiche dépense</h1>
+
+<dl>
+    <dt>Date</dt><dd th:text="${depense.dateDepense}"></dd>
+    <dt>Catégorie</dt><dd th:text="${depense.categorieDepense != null ? depense.categorieDepense.code + ' - ' + depense.categorieDepense.libelle : '-'}"></dd>
+    <dt>Libellé</dt><dd th:text="${depense.libelle}"></dd>
+    <dt>Montant</dt><dd th:text="${depense.montant}"></dd>
+    <dt>Mode paiement</dt><dd th:text="${depense.modePaiement ?: '-'}"></dd>
+    <dt>Référence</dt><dd th:text="${depense.reference ?: '-'}"></dd>
+    <dt>Observation</dt><dd th:text="${depense.observation ?: '-'}"></dd>
+</dl>
+
+<div class="actions">
+    <a th:href="@{/depenses}">Retour liste</a>
+    <a th:href="@{/depenses/{id}/edit(id=${depense.id})}">Modifier</a>
+    <form method="post" th:action="@{/depenses/{id}/delete(id=${depense.id})}"
+          onsubmit="return confirm('Supprimer cette dépense ?')">
+        <button type="submit">Supprimer</button>
+    </form>
+</div>
+
+</body>
+</html>
