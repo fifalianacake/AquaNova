@@ -4,10 +4,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.achat.dto.AchatAlevinFilter;
 import mg.itu.aquanova.achat.dto.AchatAlevinForm;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.CategorieDepense;
@@ -75,6 +80,58 @@ public class AchatAlevinService {
     public Achat getById(Long id) {
         return this.achatRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Achat introuvable avec l'ID : " + id));
+    }
+
+    public Page<Achat> listerAchatsAlevin(AchatAlevinFilter filter, Pageable pageable) {
+        return achatRepository.findAll(specificationAchatsAlevins(filter), pageable);
+    }
+
+    private Specification<Achat> specificationAchatsAlevins(AchatAlevinFilter filter) {
+        return (root, query, cb) -> {
+            if (query != null) {
+                query.distinct(true);
+            }
+
+            var predicates = cb.conjunction();
+            var lignes = root.join("lignes", JoinType.LEFT);
+            predicates = cb.and(predicates, cb.isNotNull(lignes.get("espece").get("id")));
+
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getFournisseurId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("fournisseur").get("id"), filter.getFournisseurId()));
+            }
+            if (filter.getCategorieDepenseId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("categorieDepense").get("id"), filter.getCategorieDepenseId()));
+            }
+            if (filter.getEspeceId() != null) {
+                predicates = cb.and(predicates, cb.equal(lignes.get("intrant").get("id"), filter.getEspeceId()));
+            }
+            if (filter.getStatutAchat() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("statutAchat"), filter.getStatutAchat()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateAchat"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateAchat"), filter.getDateFin()));
+            }
+            if (filter.getMontantMin() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("montantTotal"), filter.getMontantMin()));
+            }
+            if (filter.getMontantMax() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("montantTotal"), filter.getMontantMax()));
+            }
+            if (filter.getReferenceFacture() != null && !filter.getReferenceFacture().isBlank()) {
+                predicates = cb.and(predicates, cb.like(cb.lower(root.get("referenceFacture")), "%" + filter.getReferenceFacture().trim().toLowerCase() + "%"));
+            }
+
+            return predicates;
+        };
     }
 
     @Transactional
