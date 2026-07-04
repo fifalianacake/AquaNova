@@ -37,12 +37,17 @@
         </select>
     </label>
 
+    <!-- SECTION MODIFIÉE : Catégorie fixée en lecture seule -->
     <label>Catégorie de dépense *
-        <select th:field="*{categorieDepenseId}" required>
-            <option value="">-- Choisir --</option>
+        <!-- Champ caché pour renvoyer la valeur au serveur -->
+        <input type="hidden" th:field="*{categorieDepenseId}" />
+        
+        <!-- Select visible mais bloqué (sans th:field pour ne pas écraser le hidden, on utilise th:value ou la boucle standard) -->
+        <select class="readonly-field" disabled>
             <option th:each="c : ${categoriesDepense}"
                     th:value="${c.id}"
-                    th:text="${c.code + ' - ' + c.libelle}"></option>
+                    th:text="${c.code + ' - ' + c.libelle}"
+                    th:selected="${achatAlevinForm.categorieDepenseId == c.id}"></option>
         </select>
     </label>
 
@@ -78,7 +83,6 @@
 </form>
 
 <script>
-    // Script optionnel mais recommandé pour calculer automatiquement le montant total
     const effectifInput = document.getElementById('effectif');
     const prixUnitaireInput = document.getElementById('prixUnitaire');
     const montantTotalInput = document.getElementById('montantTotal');
