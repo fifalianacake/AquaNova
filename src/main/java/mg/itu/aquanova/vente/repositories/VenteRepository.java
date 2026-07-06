@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import mg.itu.aquanova.vente.models.Vente;
 
@@ -17,7 +18,7 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
 
     @Query("SELECT v FROM Vente v WHERE " +
            "(:id IS NULL OR v.id = :id) AND " +
-           "(:client IS NULL OR LOWER(v.client) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
+           "(:client IS NULL OR LOWER(v.client.nom) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
            "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
            "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
            "(:debut IS NULL OR v.dateVente >= :debut) AND " +
@@ -33,6 +34,32 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
         @Param("fin") LocalDate fin,
         @Param("statutId") Long statutId
     );
+
+    @Query("SELECT v FROM Vente v WHERE " +
+           "(:id IS NULL OR v.id = :id) AND " +
+           "(:client IS NULL OR LOWER(v.client.nom) LIKE LOWER(CONCAT('%', :client, '%'))) AND " +
+           "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
+           "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
+           "(:debut IS NULL OR v.dateVente >= :debut) AND " +
+           "(:fin IS NULL OR v.dateVente <= :fin) AND " +
+           "(:statutId IS NULL OR v.statutVente.id = :statutId) AND " +
+           "(:montantMin IS NULL OR (v.poidsVendu * v.prixUnitaire) >= :montantMin) AND " +
+           "(:montantMax IS NULL OR (v.poidsVendu * v.prixUnitaire) <= :montantMax) " +
+           "ORDER BY v.dateVente DESC")
+    List<Vente> searchTransactions(
+        @Param("id") Long id,
+        @Param("client") String client,
+        @Param("recolteId") Long recolteId,
+        @Param("lotId") Long lotId,
+        @Param("debut") LocalDate debut,
+        @Param("fin") LocalDate fin,
+        @Param("statutId") Long statutId,
+        @Param("montantMin") Double montantMin,
+        @Param("montantMax") Double montantMax
+    );
+
+    @Query("SELECT v FROM Vente v WHERE v.client.id = :clientId ORDER BY v.dateVente DESC")
+    List<Vente> findByClientId(@Param("clientId") Long clientId);
      // CA total (montantTotal = poidsVendu * prixUnitaire)
     @Query("SELECT COALESCE(SUM(v.poidsVendu * v.prixUnitaire), 0) FROM Vente v " +
            "WHERE v.statutVente.libelle IN ('VALIDEE', 'PAYEE') " +
