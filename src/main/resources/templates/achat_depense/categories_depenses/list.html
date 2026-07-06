@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Catégories de Dépenses</title>
+</head>
+<body>
+
+    <h1>Liste des Catégories de Dépenses</h1>
+
+    <a th:href="@{/categories-depenses/new}">Ajouter une nouvelle catégorie</a>
+    <br/><br/>
+
+    <div th:if="${error}" style="color: red;">
+        <p th:text="${error}"></p>
+    </div>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Code</th>
+                <th>Libellé</th>
+                <th>Description</th>
+                <th>Type de Catégorie</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="cat : ${categories}">
+                <td th:text="${cat.id}">1</td>
+                <td th:text="${cat.code}">ACHAT_ALEVINS</td>
+                <td th:text="${cat.libelle}">Achat d'alevins</td>
+                <td th:text="${cat.description}">Description...</td>
+                <td th:text="${cat.typeCategorie}">ACHAT</td>
+                <td>
+                    <a th:href="@{/categories-depenses/{id}/edit(id=${cat.id})}">Modifier</a>
+                    
+                    <span> | </span>
+                    
+                    <form th:action="@{/categories-depenses/{id}/delete(id=${cat.id})}" method="POST" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">
+                            Supprimer
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(categories)}">
+                <td colspan="6">Aucune catégorie enregistrée.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

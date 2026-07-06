@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import mg.itu.aquanova.vente.models.Vente;
 
+@Repository
 public interface VenteRepository extends JpaRepository<Vente, Long> {
 
     @Query("SELECT v FROM Vente v WHERE v.recolte.id = :recolteId AND v.statutVente.code <> mg.itu.aquanova.vente.models.StatutVenteEnum.ANNULEE")

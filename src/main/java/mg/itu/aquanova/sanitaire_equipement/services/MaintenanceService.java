@@ -3,7 +3,6 @@ package mg.itu.aquanova.sanitaire_equipement.services;
 import mg.itu.aquanova.sanitaire_equipement.models.Maintenance;
 import mg.itu.aquanova.sanitaire_equipement.models.StatutEquipement;
 import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenanceEnum;
-import mg.itu.aquanova.sanitaire_equipement.models.Equipement;
 import mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum;
 import mg.itu.aquanova.sanitaire_equipement.repositories.MaintenanceRepository;
 
@@ -17,7 +16,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -165,7 +163,6 @@ public class MaintenanceService {
                     existing.setObservation(updatedMaintenance.getObservation());
                     
                     Maintenance saved = repository.save(existing);
-                    updateStatutEquipement(saved, StatutEquipement.DISPONIBLE);
                     return saved;
                 })
                 .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
@@ -176,8 +173,7 @@ public class MaintenanceService {
         Maintenance maintenance = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
         
-        repository.deleteById(id);
-        updateStatutEquipement(maintenance, StatutEquipement.DISPONIBLE);
+        repository.deleteById(maintenance.getId());
     }
 
     public List<Maintenance> getByEquipement(Long idEquipement) {
@@ -197,24 +193,20 @@ public class MaintenanceService {
         return repository.findById(id)
                 .map(maintenance -> {
                     maintenance.setStatutIntervention(StatutInterventionEnum.TERMINEE);
-                    maintenance.setDateResolution(LocalDate.now());
                     if (observation != null) maintenance.setObservation(observation);
                     if (coutFinal != null) maintenance.setCout(coutFinal);
-                    
+
+                    updateStatutEquipement(maintenance, StatutEquipement.DISPONIBLE);
+                    updateDerniereMaintenanceEquipement(maintenance, LocalDate.now());
+
                     Maintenance saved = repository.save(maintenance);
-                    
-                    updateDerniereMaintenanceEquipement(saved.getEquipement(), saved.getDateResolution());
-                    updateStatutEquipement(saved, StatutEquipement.DISPONIBLE);
-                    
                     return saved;
                 })
                 .orElseThrow(() -> new RuntimeException("Impossible de clôturer : Intervention introuvable (ID: " + id + ")"));
     }
 
-    public void updateDerniereMaintenanceEquipement(Equipement equipement, LocalDate dateResolution) {
-        if (equipement != null) {
-            System.out.println("Mise à jour de la date de dernière maintenance pour l'équipement " + equipement.getId());
-        }
+    public void updateDerniereMaintenanceEquipement(Maintenance maintenance, LocalDate dateResolution) {
+        maintenance.setDateResolution(dateResolution);
     }
 
     public void updateStatutEquipement(Maintenance maintenance, StatutEquipement statut) {

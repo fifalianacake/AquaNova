@@ -7,7 +7,6 @@ public class RecolteForm {
     private Long typeRecolteId;
     private LocalDate dateRecolte;
     private Integer effectifRecolte;
-    private Double poidsTotal;
 
     public Long getLotId() {
         return lotId;
@@ -41,11 +40,4 @@ public class RecolteForm {
         this.effectifRecolte = effectifRecolte;
     }
 
-    public Double getPoidsTotal() {
-        return poidsTotal;
-    }
-
-    public void setPoidsTotal(Double poidsTotal) {
-        this.poidsTotal = poidsTotal;
-    }
 }

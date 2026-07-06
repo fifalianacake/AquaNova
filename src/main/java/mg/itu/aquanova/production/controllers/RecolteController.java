@@ -65,8 +65,7 @@ public class RecolteController {
                     form.getLotId(),
                     form.getTypeRecolteId(),
                     form.getDateRecolte(),
-                    form.getEffectifRecolte(),
-                    form.getPoidsTotal());
+                    form.getEffectifRecolte());
             return "redirect:/recoltes";
         } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
             model.addAttribute("error", ex.getMessage());

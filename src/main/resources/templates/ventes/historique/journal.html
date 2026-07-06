@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Journal d'Audit</title>
+</head>
+<body>
+
+    <h2>Journal d'Événement Commercial</h2>
+    <p>Identifiant d'archive système : <span th:text="'TX-VENTE-' + ${vente.id}"></span></p>
+
+    <ul>
+        <li><strong>Montant Facturé Constaté : </strong> <span th:text="${vente.montantTotal} + ' Ar'"></span></li>
+        <li><strong>Date de l'opération : </strong> <span th:text="${#temporals.format(vente.dateVente, 'dd MMMM yyyy')}"></span></li>
+        <li><strong>Statut de la transaction : </strong> <span th:text="${vente.statutVente.libelle}"></span></li>
+        <li><strong>Client acheteur : </strong> <span th:text="${vente.client}"></span></li>
+        <li><strong>Récolte rattachée : </strong> <span th:text="'Récolte #' + ${vente.recolte.id}"></span></li>
+        <li><strong>Poids total vendu : </strong> <span th:text="${vente.poidsVendu} + ' kg'"></span></li>
+        <li><strong>Prix Unitaire appliqué : </strong> <span th:text="${vente.prixUnitaire} + ' Ar / kg'"></span></li>
+        <li><strong>Observations / Notes d'audit : </strong> <span th:text="${vente.observation != null && !vente.observation.isEmpty()} ? ${vente.observation} : 'Aucune note particulière renseignée.'"></span></li>
+    </ul>
+
+    <a th:href="@{/ventes/historique}">← Retour à l'historique global</a>
+
+</body>
+</html>

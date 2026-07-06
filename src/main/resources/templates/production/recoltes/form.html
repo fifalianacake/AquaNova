@@ -16,7 +16,7 @@
                 <option value="">--</option>
                 <option th:each="lot : ${lots}"
                         th:value="${lot.id}"
-                        th:text="${lot.code + ' - effectif actuel: ' + lot.effectifActuel}"></option>
+                        th:text="${lot.code + ' - effectif actuel: ' + lot.effectifActuel + ' - poids moyen actuel: ' + lot.poidsMoyenActuel}"></option>
             </select>
         </label>
     </div>
@@ -35,9 +35,6 @@
     </div>
     <div>
         <label>Effectif récolté: <input type="number" th:field="*{effectifRecolte}" min="1"></label>
-    </div>
-    <div>
-        <label>Poids total: <input type="number" th:field="*{poidsTotal}" min="0.01" step="0.01"></label>
     </div>
     <div>
         <button type="submit">Enregistrer</button>
