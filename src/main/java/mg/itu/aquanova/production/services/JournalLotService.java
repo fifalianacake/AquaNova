@@ -60,5 +60,4 @@ public class JournalLotService {
                 dateDebut,
                 dateFin);
     }
-    public void supprimer(Long id) { journalLotRepository.deleteById(id); }
 }
