@@ -22,9 +22,11 @@ import java.util.stream.Stream;
 public class MaintenanceService {
 
     private final MaintenanceRepository repository;
+    private final EquipementService equipementService;
 
-    public MaintenanceService(MaintenanceRepository repository) {
+    public MaintenanceService(MaintenanceRepository repository, EquipementService equipementService) {
         this.repository = repository;
+        this.equipementService = equipementService;
     }
 
     private void validerMaintenance(Maintenance maintenance) {
@@ -59,7 +61,7 @@ public class MaintenanceService {
 
     public Maintenance findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Maintenance introuvable avec l'id : " + id));
     }
 
     public Page<Maintenance> lister(MaintenanceFilter filter, Pageable pageable) {
@@ -132,17 +134,22 @@ public class MaintenanceService {
         if (maintenance.getStatutIntervention() == null) {
             maintenance.setStatutIntervention(StatutInterventionEnum.OUVERTE);
         }
-        
+
         validerMaintenance(maintenance);
 
-        if(maintenance.getCategorieMaintenance().getLibelle() == CategorieMaintenanceEnum.PANNE) {
-            updateStatutEquipement(maintenance, StatutEquipement.EN_PANNE);
-        } else {
-            updateStatutEquipement(maintenance, StatutEquipement.EN_MAINTENANCE);
+        if (maintenance.getStatutIntervention() == StatutInterventionEnum.TERMINEE) {
+            throw new IllegalArgumentException(
+                    "Une intervention ne peut pas être créée déjà clôturée : déclarez-la puis utilisez "
+                            + "l'action de clôture, qui seule met correctement à jour l'équipement.");
         }
 
+        StatutEquipement statutPendantIntervention = maintenance.getCategorieMaintenance().getLibelle() == CategorieMaintenanceEnum.PANNE
+                ? StatutEquipement.EN_PANNE
+                : StatutEquipement.EN_MAINTENANCE;
+        equipementService.updateStatut(maintenance.getEquipement().getId(), statutPendantIntervention);
+
         Maintenance savedMaintenance = repository.save(maintenance);
-        
+
         return savedMaintenance;
     }
 
@@ -150,30 +157,30 @@ public class MaintenanceService {
     public Maintenance update(Long id, Maintenance updatedMaintenance) {
         validerMaintenance(updatedMaintenance);
 
-        return repository.findById(id)
-                .map(existing -> {
-                    existing.setEquipement(updatedMaintenance.getEquipement());
-                    existing.setUtilisateur(updatedMaintenance.getUtilisateur());
-                    existing.setCategorieMaintenance(updatedMaintenance.getCategorieMaintenance());
-                    existing.setDateMaintenance(updatedMaintenance.getDateMaintenance());
-                    existing.setDescription(updatedMaintenance.getDescription());
-                    existing.setCout(updatedMaintenance.getCout());
-                    existing.setStatutIntervention(updatedMaintenance.getStatutIntervention());
-                    existing.setDateResolution(updatedMaintenance.getDateResolution());
-                    existing.setObservation(updatedMaintenance.getObservation());
-                    
-                    Maintenance saved = repository.save(existing);
-                    return saved;
-                })
-                .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
-    }
+        Maintenance existing = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Maintenance introuvable avec l'id : " + id));
 
-    @Transactional
-    public void delete(Long id) {
-        Maintenance maintenance = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Maintenance introuvable avec l'id : " + id));
-        
-        repository.deleteById(maintenance.getId());
+        if (existing.getStatutIntervention() == StatutInterventionEnum.TERMINEE) {
+            throw new IllegalStateException(
+                    "Cette intervention est clôturée : elle ne peut plus être modifiée.");
+        }
+
+        if (updatedMaintenance.getStatutIntervention() == StatutInterventionEnum.TERMINEE) {
+            throw new IllegalStateException(
+                    "Utilisez l'action de clôture pour terminer une intervention : elle seule remet "
+                            + "correctement à jour le statut et la date de dernière maintenance de l'équipement.");
+        }
+
+        existing.setEquipement(updatedMaintenance.getEquipement());
+        existing.setUtilisateur(updatedMaintenance.getUtilisateur());
+        existing.setCategorieMaintenance(updatedMaintenance.getCategorieMaintenance());
+        existing.setDateMaintenance(updatedMaintenance.getDateMaintenance());
+        existing.setDescription(updatedMaintenance.getDescription());
+        existing.setCout(updatedMaintenance.getCout());
+        existing.setStatutIntervention(updatedMaintenance.getStatutIntervention());
+        existing.setObservation(updatedMaintenance.getObservation());
+
+        return repository.save(existing);
     }
 
     public List<Maintenance> getByEquipement(Long idEquipement) {
@@ -190,28 +197,30 @@ public class MaintenanceService {
             throw new IllegalArgumentException("Le coût final ne peut pas être négatif.");
         }
 
-        return repository.findById(id)
-                .map(maintenance -> {
-                    maintenance.setStatutIntervention(StatutInterventionEnum.TERMINEE);
-                    if (observation != null) maintenance.setObservation(observation);
-                    if (coutFinal != null) maintenance.setCout(coutFinal);
+        Maintenance maintenance = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Impossible de clôturer : Intervention introuvable (ID: " + id + ")"));
 
-                    updateStatutEquipement(maintenance, StatutEquipement.DISPONIBLE);
-                    updateDerniereMaintenanceEquipement(maintenance, LocalDate.now());
-
-                    Maintenance saved = repository.save(maintenance);
-                    return saved;
-                })
-                .orElseThrow(() -> new RuntimeException("Impossible de clôturer : Intervention introuvable (ID: " + id + ")"));
-    }
-
-    public void updateDerniereMaintenanceEquipement(Maintenance maintenance, LocalDate dateResolution) {
-        maintenance.setDateResolution(dateResolution);
-    }
-
-    public void updateStatutEquipement(Maintenance maintenance, StatutEquipement statut) {
-        if (maintenance.getEquipement() != null) {
-            maintenance.getEquipement().setStatut(statut);
+        if (maintenance.getStatutIntervention() == StatutInterventionEnum.TERMINEE) {
+            throw new IllegalStateException("Cette intervention est déjà clôturée.");
         }
+
+        LocalDate dateResolution = LocalDate.now();
+
+        maintenance.setStatutIntervention(StatutInterventionEnum.TERMINEE);
+        maintenance.setDateResolution(dateResolution);
+        if (observation != null) maintenance.setObservation(observation);
+        if (coutFinal != null) maintenance.setCout(coutFinal);
+
+        Long equipementId = maintenance.getEquipement().getId();
+        // Un équipement affecté à un bassin retourne en service ; un équipement
+        // général (non affecté) redevient simplement disponible.
+        StatutEquipement statutApresCloture = maintenance.getEquipement().getBassin() != null
+                ? StatutEquipement.EN_SERVICE
+                : StatutEquipement.DISPONIBLE;
+        equipementService.updateStatut(equipementId, statutApresCloture);
+        equipementService.updateDerniereMaintenance(equipementId, dateResolution);
+
+        return repository.save(maintenance);
     }
 }

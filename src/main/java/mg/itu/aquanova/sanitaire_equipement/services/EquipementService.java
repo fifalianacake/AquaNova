@@ -1,5 +1,6 @@
 package mg.itu.aquanova.sanitaire_equipement.services;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -94,6 +95,16 @@ public class EquipementService {
         Equipement equipement = trouverParId(id);
 
         equipement.setStatut(nouveauStatut);
+
+        repository.save(equipement);
+    }
+
+    @Transactional
+    public void updateDerniereMaintenance(Long id, LocalDate date) {
+
+        Equipement equipement = trouverParId(id);
+
+        equipement.setDerniereMaintenance(date);
 
         repository.save(equipement);
     }

@@ -11,7 +11,9 @@
     </p>
 
     <h1>Intervention ID #<span th:text="${maintenance.id}">12</span></h1>
-    
+
+    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
+
     <ul>
         <li><strong>Statut actuel :</strong> <span th:text="${maintenance.statutIntervention}">OUVERTE</span></li>
         <li><strong>Équipement concerné (ID) :</strong> <span th:text="${maintenance.equipement != null ? maintenance.equipement.id : 'Non spécifié'}">-</span></li>
@@ -27,7 +29,11 @@
     <h3>Observations / Rapport final</h3>
     <p th:text="${#strings.isEmpty(maintenance.observation) ? 'Aucune observation pour le moment.' : maintenance.observation}"></p>
 
-    <div th:if="${maintenance.statutIntervention == T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).OUVERTE}">
+    <p th:if="${maintenance.statutIntervention != T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).TERMINEE}">
+        <a th:href="@{/maintenances/{id}/edit(id=${maintenance.id})}">Modifier cette intervention</a>
+    </p>
+
+    <div th:if="${maintenance.statutIntervention != T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).TERMINEE}">
         <hr>
         <h2>Clôturer l'intervention</h2>
         <form th:action="@{/maintenances/{id}/cloturer(id=${maintenance.id})}" method="post">

@@ -12,7 +12,8 @@
 
     <h1 th:text="${maintenance.id == null} ? 'Déclarer une intervention / Panne' : 'Modifier l\'intervention'">Saisie Intervention</h1>
     
-    <form th:action="@{/maintenances/save}" th:object="${maintenance}" method="post">
+    <form th:action="${maintenance.id} == null ? @{/maintenances/save} : @{/maintenances/update/{id}(id=${maintenance.id})}"
+          th:object="${maintenance}" method="post">
         <input type="hidden" th:field="*{id}">
 
         <p>
@@ -53,14 +54,10 @@
         <p>
             <label>Statut Intervention * :</label><br>
             <select th:field="*{statutIntervention}" required>
-                <option th:each="statut : ${T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).values()}"
-                        th:value="${statut}" th:text="${statut}"></option>
+                <option value="OUVERTE">OUVERTE</option>
+                <option value="EN_COURS">EN_COURS</option>
             </select>
-        </p>
-
-        <p>
-            <label>Date de Résolution :</label><br>
-            <input type="date" th:field="*{dateResolution}">
+            <br><small>La clôture (TERMINEE) se fait uniquement via l'action "Clôturer" sur la fiche de l'intervention.</small>
         </p>
 
         <p>

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import mg.itu.aquanova.sanitaire_equipement.models.Maintenance;
+import mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum;
 import mg.itu.aquanova.sanitaire_equipement.services.MaintenanceService;
 import mg.itu.aquanova.sanitaire_equipement.services.CategorieMaintenanceService;
 import mg.itu.aquanova.sanitaire_equipement.services.EquipementService;
@@ -84,12 +85,26 @@ public class MaintenanceController {
         return "sanitaire_equipement/maintenance/detail";
     }
 
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable("id") Long id, Model model) {
+        Maintenance maintenance = maintenanceService.findById(id);
+
+        // Une intervention clôturée est une entrée d'historique figée : rien à modifier.
+        if (maintenance.getStatutIntervention() == StatutInterventionEnum.TERMINEE) {
+            return "redirect:/maintenances/" + id;
+        }
+
+        model.addAttribute("maintenance", maintenance);
+        addFormAttributes(model);
+        return "sanitaire_equipement/maintenance/form";
+    }
+
     @PostMapping("/update/{id}")
     public String updateMaintenance(@PathVariable("id") Long id, @ModelAttribute("maintenance") Maintenance maintenance, Model model) {
         try {
             maintenanceService.update(id, maintenance);
             return "redirect:/maintenances/" + id;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             model.addAttribute("maintenance", maintenance);
             model.addAttribute("errorMessage", e.getMessage());
             addFormAttributes(model);
@@ -101,16 +116,17 @@ public class MaintenanceController {
     public String cloturerIntervention(
             @PathVariable("id") Long id,
             @RequestParam(value = "observation", required = false) String observation,
-            @RequestParam(value = "coutFinal", required = false) BigDecimal coutFinal) {
-        
-        maintenanceService.cloturerIntervention(id, observation, coutFinal);
-        return "redirect:/maintenances/" + id;
-    }
+            @RequestParam(value = "coutFinal", required = false) BigDecimal coutFinal,
+            Model model) {
 
-    @GetMapping("/delete/{id}")
-    public String deleteMaintenance(@PathVariable("id") Long id) {
-        maintenanceService.delete(id);
-        return "redirect:/maintenances";
+        try {
+            maintenanceService.cloturerIntervention(id, observation, coutFinal);
+            return "redirect:/maintenances/" + id;
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("maintenance", maintenanceService.findById(id));
+            model.addAttribute("errorMessage", e.getMessage());
+            return "sanitaire_equipement/maintenance/detail";
+        }
     }
 
     // @GetMapping("/equipement/{idEquipement}")
