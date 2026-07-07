@@ -57,8 +57,7 @@ public class PeseeService {
         pesee.setObservation(observation);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
-        lotRepository.save(lot);
+        recalculerPoidsMoyenActuel(lot);
 
         journalLotService.inscrireEvenement(
                 lot,
@@ -96,8 +95,7 @@ public class PeseeService {
         pesee.setPoidsMoyen(poidsMoyen);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
-        lotRepository.save(lot);
+        recalculerPoidsMoyenActuel(lot);
 
         return saved;
     }
@@ -105,10 +103,11 @@ public class PeseeService {
     // DELETE
     @Transactional
     public void supprimerPesee(Long id) {
-        if (!peseeRepository.existsById(id)) {
-            throw new IllegalArgumentException("Impossible de supprimer : Pesée introuvable.");
-        }
-        peseeRepository.deleteById(id);
+        Pese pesee = peseeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Impossible de supprimer : Pesée introuvable."));
+        LotModels lot = pesee.getLot();
+        peseeRepository.delete(pesee);
+        recalculerPoidsMoyenActuel(lot);
     }
 
 
@@ -157,6 +156,20 @@ public Double getDernierPoidsMoyen(Long idLot) {
         if (poidsTotal == null || poidsTotal.signum() <= 0) {
             throw new IllegalArgumentException("Le poids total de l'échantillon doit être supérieur à 0.");
         }
+    }
+
+    private void recalculerPoidsMoyenActuel(LotModels lot) {
+        if (lot == null || lot.getId() == null) {
+            return;
+        }
+
+        List<Pese> historique = peseeRepository.findByLotIdOrderByDatePeseeDesc(lot.getId());
+        Double poidsActuel = historique.isEmpty()
+                ? lot.getPoidsMoyenInitial()
+                : historique.get(0).getPoidsMoyen().doubleValue();
+
+        lot.setPoidsMoyenActuel(poidsActuel);
+        lotRepository.save(lot);
     }
 
     private Double round3(Double value) {

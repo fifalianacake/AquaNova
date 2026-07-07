@@ -109,10 +109,6 @@ public class MortaliteService {
         return saved;
     }
 
-    public void delete(Integer id) {
-        repo.deleteById(id);
-    }
-
     public Integer getTotalMortsByLot(Long lotId) {
         validerIdLot(lotId);
         return repo.sumNbMortsByLotId(lotId);

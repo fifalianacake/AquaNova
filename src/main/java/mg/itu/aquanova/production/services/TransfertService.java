@@ -116,10 +116,6 @@ public class TransfertService {
         return transfertSauvegarde;
     }
 
-    public void deleteTransfert(Long id) {
-        transfertRepository.deleteById(id);
-    }
-
     public TransfertModels updateTransfert(Long id, TransfertModels updatedTransfert) {
         throw new UnsupportedOperationException("La modification d'un transfert déjà appliqué n'est pas supportée.");
     }

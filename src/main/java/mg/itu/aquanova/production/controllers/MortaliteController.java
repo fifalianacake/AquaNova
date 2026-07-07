@@ -77,13 +77,6 @@ public class MortaliteController {
         }
     }
 
-    // 5. Supprimer une mortalité
-    @GetMapping("/supprimer/{id}")
-    public String supprimerMortalite(@PathVariable Integer id) {
-        mortaliteService.delete(id);
-        return "redirect:/production/mortalites";
-    }
-
     private void addFormLists(Model model) {
         model.addAttribute("lots", lotService.listerTous());
     }

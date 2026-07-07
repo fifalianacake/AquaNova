@@ -69,27 +69,6 @@ public class TransfertController {
         }
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteTransfert(@PathVariable("id") Long id) {
-        transfertService.deleteTransfert(id);
-        return "redirect:/transferts";
-    }
-
-    @GetMapping("/edit/{id}")
-    public String showEditTransfertForm(@PathVariable("id") Long id, Model model) {
-        TransfertModels transfert = transfertService.getTransfertById(id);
-        if (transfert != null) {
-            model.addAttribute("transfert", transfert);
-            
-            model.addAttribute("bassins", bassinService.getAllBassins());
-            model.addAttribute("lots", lotService.listerTous());
-            
-            return "production/transferts/form";
-        } else {
-            return "redirect:/transferts";
-        }
-    }
-
     private void addFormLists(Model model) {
         model.addAttribute("bassins", bassinService.getAllBassins());
         model.addAttribute("lots", lotService.listerTous());
