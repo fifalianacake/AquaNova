@@ -45,7 +45,7 @@ public class TransfertController {
         return "production/transferts/form";
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public String saveTransfert(@ModelAttribute("transfert") TransfertModels transfert, Model model) {
         try {
             transfertService.saveTransfert(transfert);

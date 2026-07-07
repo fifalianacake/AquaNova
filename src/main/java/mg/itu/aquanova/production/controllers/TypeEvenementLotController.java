@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("production/types-evenements")
+@RequestMapping("/types-evenements-lot")
 public class TypeEvenementLotController {
     private final TypeEvenementLotService service;
 
@@ -30,7 +30,7 @@ public class TypeEvenementLotController {
     @PostMapping
     public String create(@ModelAttribute("type") TypeEvenementLot type) {
         service.creer(type);
-        return "redirect:/production/types-evenements";
+        return "redirect:/types-evenements-lot";
     }
 
     @GetMapping("/{id}")
@@ -49,12 +49,12 @@ public class TypeEvenementLotController {
     @PostMapping("/{id}")
     public String update(@PathVariable Long id, @ModelAttribute("type") TypeEvenementLot type) {
         service.modifier(id, type);
-        return "redirect:/production/types-evenements";
+        return "redirect:/types-evenements-lot";
     }
 
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         service.supprimer(id);
-        return "redirect:/production/types-evenements";
+        return "redirect:/types-evenements-lot";
     }
 }

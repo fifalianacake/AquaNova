@@ -22,7 +22,8 @@
 <div>
     <a th:href="@{/lots}">Back to list</a>
     <a th:href="@{/lots/{id}/journal(id=${lot.id})}">Journal</a>
-    <a th:href="@{/production/mortalites/lot/{id}(id=${lot.id})}">Mortalités</a>
+    <a th:href="@{/lots/{id}/pesees(id=${lot.id})}">Pesées</a>
+    <a th:href="@{/lots/{id}/mortalites(id=${lot.id})}">Mortalités</a>
     <a th:href="@{/production/previsions-recoltes(lotId=${lot.id})}">Prévision récolte</a>
     <a th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
     <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Passer ce lot au statut ANNULE ?')">Delete</a>

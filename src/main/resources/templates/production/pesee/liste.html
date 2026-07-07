@@ -11,7 +11,7 @@
     <h1>Historique des pesées - Lot N° <span th:text="${idLot}"></span></h1>
 
     <p>
-        <a th:href="@{'/production/pesee/ajouter/' + ${idLot}}">Enregistrer une nouvelle pesée</a>
+        <a th:href="@{'/lots/' + ${idLot} + '/pesees/new'}">Enregistrer une nouvelle pesée</a>
     </p>
 
     <table border="1">
@@ -33,9 +33,9 @@
                 <td th:text="${p.poidsMoyen}"></td>
                 <td th:text="${p.observation}"></td>
                 <td>
-                    <a th:href="@{'/production/pesee/modifier/' + ${p.id}}">Modifier</a>
+                    <a th:href="@{'/pesees/' + ${p.id} + '/edit'}">Modifier</a>
                     |
-                    <a th:href="@{'/production/pesee/supprimer/' + ${p.id}}"
+                    <a th:href="@{'/pesees/' + ${p.id} + '/delete'}"
                         onclick="return confirm('Supprimer cette pesée ?');">Supprimer</a>
                 </td>
             </tr>

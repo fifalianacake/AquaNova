@@ -15,7 +15,7 @@
     <a th:href="@{/lots}">Retour à la liste des lots</a>
 </p>
 
-<form method="get" th:action="@{/journaux}">
+<form method="get" th:action="@{/journaux-lots}">
     <div>
         <label>Lot:
             <select name="lotId">
@@ -46,7 +46,7 @@
         </label>
 
         <button type="submit">Filtrer</button>
-        <a th:href="@{/journaux}">Réinitialiser</a>
+        <a th:href="@{/journaux-lots}">Réinitialiser</a>
     </div>
 </form>
 

@@ -8,8 +8,8 @@
 <h1>Types d'événements de lot</h1>
 
 <div>
-    <a th:href="@{/production/types-evenements/new}">Créer un type d'événement</a>
-    <a th:href="@{/journaux}">Retour aux journaux</a>
+    <a th:href="@{/types-evenements-lot/new}">Créer un type d'événement</a>
+    <a th:href="@{/journaux-lots}">Retour aux journaux</a>
 </div>
 
 <table>
@@ -27,9 +27,9 @@
         <td th:text="${type.code}"></td>
         <td th:text="${type.libelle}"></td>
         <td>
-            <a th:href="@{/production/types-evenements/{id}(id=${type.id})}">Voir</a>
-            <a th:href="@{/production/types-evenements/{id}/edit(id=${type.id})}">Modifier</a>
-            <a th:href="@{/production/types-evenements/{id}/delete(id=${type.id})}"
+            <a th:href="@{/types-evenements-lot/{id}(id=${type.id})}">Voir</a>
+            <a th:href="@{/types-evenements-lot/{id}/edit(id=${type.id})}">Modifier</a>
+            <a th:href="@{/types-evenements-lot/{id}/delete(id=${type.id})}"
                onclick="return confirm('Supprimer ce type d’événement ?')">Supprimer</a>
         </td>
     </tr>

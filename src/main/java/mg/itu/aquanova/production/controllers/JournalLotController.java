@@ -30,7 +30,7 @@ public class JournalLotController {
         return "production/journaux/lot";
     }
 
-    @GetMapping("/journaux")
+    @GetMapping("/journaux-lots")
     public String listeJournaux(
             @RequestParam(required = false) Long lotId,
             @RequestParam(required = false) TypeEvenementLot.LibelleEvenement typeEvenement,
