@@ -10,6 +10,8 @@
 
     <h1>Liste des Rôles</h1>
 
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
     <a th:href="@{/roles/new}"> Ajouter un nouveau rôle</a>
     <br><br>
 
