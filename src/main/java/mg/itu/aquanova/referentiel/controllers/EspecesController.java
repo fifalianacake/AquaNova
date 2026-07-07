@@ -30,9 +30,15 @@ public class EspecesController {
     }
 
     @PostMapping
-    public String save(@ModelAttribute EspecesModels e) {
-        service.save(e);
-        return "redirect:/especes";
+    public String save(@ModelAttribute EspecesModels e, Model model) {
+        try {
+            service.save(e);
+            return "redirect:/especes";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("espece", e);
+            model.addAttribute("error", ex.getMessage());
+            return "especes/form";
+        }
     }
     @GetMapping("/{id}")
     public String edit(@PathVariable Integer id, Model model) {

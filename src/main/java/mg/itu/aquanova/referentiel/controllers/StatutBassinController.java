@@ -58,11 +58,19 @@ public class StatutBassinController {
     @PostMapping("/{id}")
     public String update(
             @PathVariable Long id,
-            @ModelAttribute StatutBassin statut) {
+            @ModelAttribute StatutBassin statut,
+            Model model) {
 
-        service.update(id, statut);
-
-        return "redirect:/statuts-bassins";
+        try {
+            service.update(id, statut);
+            return "redirect:/statuts-bassins";
+        } catch (IllegalArgumentException e) {
+            statut.setId(id);
+            model.addAttribute("statut", statut);
+            model.addAttribute("libelles", LibelleStatutBassin.values());
+            model.addAttribute("error", e.getMessage());
+            return "referentiel/statuts-bassins/form";
+        }
     }
 
     @GetMapping("/{id}/delete")

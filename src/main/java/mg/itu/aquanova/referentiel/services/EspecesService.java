@@ -24,6 +24,13 @@ public class EspecesService {
     }
 
     public EspecesModels save(EspecesModels e) {
+        if (e.getNom() == null || e.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom de l'espèce est obligatoire.");
+        }
+        if (e.getPoidsCibleMoyen() != null && e.getPoidsCibleMoyen().signum() <= 0) {
+            throw new IllegalArgumentException("Le poids cible moyen doit être strictement positif.");
+        }
+        e.setNom(e.getNom().trim());
         return repo.save(e);
     }
 

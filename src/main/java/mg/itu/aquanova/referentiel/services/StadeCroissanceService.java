@@ -25,6 +25,14 @@ public class StadeCroissanceService {
     }
 
     public StadeCroissanceModels save(StadeCroissanceModels stade) {
+        if (stade.getNom() == null || stade.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom du stade de croissance est obligatoire.");
+        }
+        if (stade.getPoidsMin() != null && stade.getPoidsMax() != null
+                && stade.getPoidsMin().compareTo(stade.getPoidsMax()) >= 0) {
+            throw new IllegalArgumentException("Le poids minimum doit être strictement inférieur au poids maximum.");
+        }
+        stade.setNom(stade.getNom().trim());
         return repo.save(stade);
     }
 

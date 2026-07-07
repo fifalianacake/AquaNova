@@ -1,22 +1,21 @@
 <h2>Form Stade Croissance</h2>
 
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
 <form action="/stade-croissance" method="post" th:object="${stade}">
     <input type="hidden" th:field="*{id}" />
 
-```
-Nom :
-<input type="text" th:field="*{nom}" />
-<br/>
+    Nom :
+    <input type="text" th:field="*{nom}" />
+    <br/>
 
-Poids Min :
-<input type="number" step="0.01" th:field="*{poidsMin}" />
-<br/>
+    Poids Min :
+    <input type="number" step="0.01" th:field="*{poidsMin}" />
+    <br/>
 
-Poids Max :
-<input type="number" step="0.01" th:field="*{poidsMax}" />
-<br/>
+    Poids Max :
+    <input type="number" step="0.01" th:field="*{poidsMax}" />
+    <br/>
 
-<button type="submit">Save</button>
-```
-
+    <button type="submit">Save</button>
 </form>
