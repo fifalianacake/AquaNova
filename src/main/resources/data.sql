@@ -1,4 +1,20 @@
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = 'alerte'
+          AND column_name = 'message'
+          AND data_type = 'bytea'
+    ) THEN
+        ALTER TABLE alerte
+        ALTER COLUMN message TYPE text
+        USING convert_from(message, 'UTF8');
+    END IF;
+END $$;@@
+
 -- Insertion des categories de dépenses 
+/*
 INSERT INTO categorie_depense (code, libelle, description, type_categorie)
 VALUES 
 ('ACHAT_ALEVINS', 'Achat d''alevins', 'Dépenses liées à l''acquisition de jeunes poissons pour l''élevage.', 'ACHAT'),
@@ -17,4 +33,5 @@ VALUES
 
 ('AUTRE', 'Autre', 'Toutes autres dépenses ne rentrant pas dans les catégories prédéfinies.', 'MIXTE')
 
-ON CONFLICT (code) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;@@
+*/

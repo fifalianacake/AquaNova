@@ -34,7 +34,7 @@ public class Alerte {
     @JoinColumn(name = "id_statut_alerte", nullable = false)
     private StatutAlerte statutAlerte;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String message;
 
     @Column(name = "entite_type")
