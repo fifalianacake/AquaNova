@@ -84,6 +84,20 @@ public class DistributionService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Aliment introuvable avec l'ID : " + distributionDTO.getIdAliment()));
 
+        if (isUpdate) {
+            mouvementStockService.findByDistributionId(distribution.getId())
+                    .ifPresent(mouvement -> mouvementStockService.deleteLinkedToDistribution(mouvement.getId()));
+        }
+
+        double stockDisponible = mouvementStockService.getStockDisponibleADate(
+                aliment.getId(), distributionDTO.getDateDistribution());
+        if (stockDisponible < distributionDTO.getQuantite().doubleValue()) {
+            throw new IllegalStateException(
+                    "Stock insuffisant pour " + aliment.getNom() + " à la date "
+                            + distributionDTO.getDateDistribution() + " : disponible "
+                            + stockDisponible + " kg, demandé " + distributionDTO.getQuantite() + " kg.");
+        }
+
         distribution.setDateDistribution(distributionDTO.getDateDistribution());
         distribution.setLot(lot);
         distribution.setAliment(aliment);
@@ -94,11 +108,6 @@ public class DistributionService {
         distribution.setRationTheorique(rationTheorique);
 
         distribution = distributionRepository.save(distribution);
-
-        if (isUpdate) {
-            mouvementStockService.findByDistributionId(distribution.getId())
-                    .ifPresent(mouvement -> mouvementStockService.deleteLinkedToDistribution(mouvement.getId()));
-        }
 
         MouvementStock mouvementStock = createMouvementStock(distribution);
         mouvementStockService.create(mouvementStock);

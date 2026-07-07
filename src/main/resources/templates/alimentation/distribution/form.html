@@ -11,6 +11,8 @@
 
     <h1 th:text="${distribution.id != null} ? 'Modifier la distribution' : 'Créer une nouvelle distribution'"></h1>
 
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
     <form th:action="@{/alimentation/distribution/save}" th:object="${distribution}" method="post">
 
         <input type="hidden" th:field="*{id}" />

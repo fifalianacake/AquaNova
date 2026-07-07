@@ -48,9 +48,17 @@ public class DistributionController {
     }
 
     @PostMapping("/save")
-    public String saveDistribution(@ModelAttribute DistributionDTO distributionDTO) {
-        distributionService.saveDistribution(distributionDTO);
-        return "redirect:/alimentation/distribution";
+    public String saveDistribution(@ModelAttribute DistributionDTO distributionDTO, Model model) {
+        try {
+            distributionService.saveDistribution(distributionDTO);
+            return "redirect:/alimentation/distribution";
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("distribution", distributionDTO);
+            model.addAttribute("lots", lotService.listerTous());
+            model.addAttribute("aliments", alimentService.findAll());
+            return "alimentation/distribution/form";
+        }
     }
 
     @GetMapping("/edit/{id}")
