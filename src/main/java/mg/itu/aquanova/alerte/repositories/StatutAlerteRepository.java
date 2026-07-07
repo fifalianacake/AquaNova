@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import mg.itu.aquanova.alerte.models.TypeAlerte;
+import mg.itu.aquanova.alerte.models.StatutAlerte;
 
 @Repository
-public interface TypeAlerteRepository extends JpaRepository<TypeAlerte, Long> {
-    Optional<TypeAlerte> findByCode(String code);
+public interface StatutAlerteRepository extends JpaRepository<StatutAlerte, Long> {
+    Optional<StatutAlerte> findByCode(String code);
 }

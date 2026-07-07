@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Détail Alerte – AquaNova</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f7fa;
+               padding: 30px; color: #333; }
+        .card {
+            background: #fff; border-radius: 8px; padding: 30px;
+            max-width: 700px; margin: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        h1 { font-size: 20px; margin-bottom: 25px; color: #d32f2f; }
+        .row { display: flex; margin-bottom: 15px; }
+        .row .lbl {
+            width: 200px; font-size: 13px; color: #888; font-weight: bold;
+        }
+        .row .val { font-size: 14px; color: #333; }
+        .badge {
+            display: inline-block; padding: 3px 10px;
+            border-radius: 12px; font-size: 12px; font-weight: bold;
+        }
+        .badge-CRITIQUE { background: #ffebee; color: #c62828; }
+        .badge-MAJEURE  { background: #fff3e0; color: #e65100; }
+        .badge-MINEURE  { background: #e8f5e9; color: #2e7d32; }
+        .message-box {
+            background: #f9f9f9; border-left: 4px solid #d32f2f;
+            padding: 12px 16px; border-radius: 4px;
+            font-size: 14px; margin: 15px 0;
+        }
+        .actions { margin-top: 25px; display: flex; gap: 10px; }
+        .btn-retour {
+            padding: 9px 20px; background: #eee; color: #333;
+            border: 1px solid #ccc; border-radius: 5px;
+            text-decoration: none; font-size: 14px;
+        }
+        hr { border: none; border-top: 1px solid #eee; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>⚠ Détail de l'alerte #<span th:text="${alerte.id}"></span></h1>
+
+    <div class="row">
+        <div class="lbl">Module source</div>
+        <div class="val" th:text="${alerte.moduleSource}"></div>
+    </div>
+    <div class="row">
+        <div class="lbl">Type d'alerte</div>
+        <div class="val" th:text="${alerte.typeAlerte}"></div>
+    </div>
+    <div class="row">
+        <div class="lbl">Criticité</div>
+        <div class="val">
+            <span class="badge"
+                  th:classappend="'badge-' + ${alerte.niveauCriticiteCode}"
+                  th:text="${alerte.niveauCriticite}">
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="lbl">Statut</div>
+        <div class="val" th:text="${alerte.statutAlerte}"></div>
+    </div>
+    <div class="row">
+        <div class="lbl">Entité concernée</div>
+        <div class="val"
+             th:text="${alerte.entiteType} + ' #' + ${alerte.entiteId}">
+        </div>
+    </div>
+    <div class="row">
+        <div class="lbl">Date de création</div>
+        <div class="val"
+             th:text="${#temporals.format(alerte.dateCreation, 'dd/MM/yyyy HH:mm')}">
+        </div>
+    </div>
+    <div class="row" th:if="${alerte.dateResolution != null}">
+        <div class="lbl">Date de résolution</div>
+        <div class="val"
+             th:text="${#temporals.format(alerte.dateResolution, 'dd/MM/yyyy HH:mm')}">
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="message-box" th:text="${alerte.message}"></div>
+
+    <div class="row" th:if="${alerte.commentaireResolution != null}">
+        <div class="lbl">Commentaire résolution</div>
+        <div class="val" th:text="${alerte.commentaireResolution}"></div>
+    </div>
+
+    <div class="actions">
+        <a href="/alertes" class="btn-retour">← Retour à la liste</a>
+    </div>
+</div>
+
+</body>
+</html>
