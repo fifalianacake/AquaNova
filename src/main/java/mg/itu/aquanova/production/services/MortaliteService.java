@@ -195,8 +195,10 @@ public class MortaliteService {
     }
 
     private void verifierLotNonCloture(LotModels lot) {
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une mortalité sur un lot clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une mortalité sur un lot clôturé ou annulé.");
         }
     }
 

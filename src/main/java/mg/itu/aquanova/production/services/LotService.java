@@ -95,6 +95,10 @@ public class LotService {
                 stream = stream.filter(l -> l.getEffectifActuel() != null && l.getEffectifActuel() <= filter.getEffectifMax());
             }
         }
+
+        if (filter == null || filter.getStatutId() == null) {
+            stream = stream.filter(l -> l.getStatutLot() == null || l.getStatutLot().getLibelle() != StatutLotEnum.ANNULE);
+        }
         
         List<LotModels> resultatFiltre = stream.toList();
 
@@ -130,6 +134,8 @@ public class LotService {
     public LotModels modifier(Long id, LotModels lot) {
         validerLot(lot, id);
         LotModels exist = trouverParId(id);
+        boolean etaitActif = estActif(exist.getStatutLot());
+        Bassin ancienBassin = exist.getBassin();
         exist.setCode(lot.getCode());
         exist.setEspece(lot.getEspece());
         exist.setBassin(lot.getBassin());
@@ -141,12 +147,26 @@ public class LotService {
         exist.setPoidsMoyenInitial(lot.getPoidsMoyenInitial());
         exist.setPoidsMoyenActuel(lot.getPoidsMoyenActuel());
         exist.setObservation(lot.getObservation());
+
+        if (etaitActif && !estActif(exist.getStatutLot())) {
+            marquerBassinLibre(ancienBassin);
+        }
         return repository.save(exist);
     }
 
     public void supprimer(Long id) {
-        LotModels l = trouverParId(id);
-        repository.delete(l);
+        LotModels lot = trouverParId(id);
+        StatutLotModels statutAnnule = statutLotRepository.findByLibelle(StatutLotEnum.ANNULE)
+                .orElseThrow(() -> new EntityNotFoundException("Statut de lot ANNULE introuvable."));
+
+        boolean etaitActif = estActif(lot.getStatutLot());
+        lot.setStatutLot(statutAnnule);
+
+        if (etaitActif) {
+            marquerBassinLibre(lot.getBassin());
+        }
+
+        repository.save(lot);
     }
 
     public void validerLot(LotModels lot, Long idLotIgnore) {
@@ -179,7 +199,9 @@ public class LotService {
     }
 
     private boolean estActif(StatutLotModels statut) {
-        return statut != null && statut.getLibelle() != StatutLotEnum.CLOTURE;
+        return statut != null
+                && statut.getLibelle() != StatutLotEnum.CLOTURE
+                && statut.getLibelle() != StatutLotEnum.ANNULE;
     }
 
     private void initialiserValeursActuelles(LotModels lot) {
@@ -197,10 +219,24 @@ public class LotService {
         lot.setBassin(bassinsRepository.save(bassin));
     }
 
+    private void marquerBassinLibre(Bassin bassinLot) {
+        if (bassinLot == null || bassinLot.getId() == null) {
+            return;
+        }
+
+        Bassin bassin = bassinsRepository.findById(bassinLot.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Bassin introuvable: " + bassinLot.getId()));
+        StatutBassin statutLibre = statutBassinRepository.findByLibelle(LibelleStatutBassin.LIBRE)
+                .orElseThrow(() -> new EntityNotFoundException("Statut de bassin LIBRE introuvable."));
+
+        bassin.setStatut(statutLibre);
+        bassinsRepository.save(bassin);
+    }
+
     private void verifierBassinDisponible(Long bassinId, Long idLotIgnore) {
-        List<LotModels> lotsActifsDuBassin = repository.findByBassinIdAndStatutLotLibelleNot(
+        List<LotModels> lotsActifsDuBassin = repository.findByBassinIdAndStatutLotLibelleNotIn(
                 bassinId,
-                StatutLotEnum.CLOTURE);
+                List.of(StatutLotEnum.CLOTURE, StatutLotEnum.ANNULE));
 
         boolean occupeParUnAutreLot = lotsActifsDuBassin.stream()
                 .anyMatch(lot -> idLotIgnore == null || !idLotIgnore.equals(lot.getId()));

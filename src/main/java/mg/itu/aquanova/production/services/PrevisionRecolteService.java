@@ -147,7 +147,9 @@ public class PrevisionRecolteService {
     }
 
     private boolean estLotActif(LotModels lot) {
-        return lot.getStatutLot() == null || lot.getStatutLot().getLibelle() != StatutLotEnum.CLOTURE;
+        return lot.getStatutLot() == null
+                || (lot.getStatutLot().getLibelle() != StatutLotEnum.CLOTURE
+                        && lot.getStatutLot().getLibelle() != StatutLotEnum.ANNULE);
     }
 
     private boolean correspondAuxFiltres(LotModels lot, PrevisionRecolteFilter filter) {

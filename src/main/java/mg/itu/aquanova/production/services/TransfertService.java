@@ -149,8 +149,10 @@ public class TransfertService {
     }
 
     private void verifierLotSource(LotModels lotSource, Bassin bassinSource, TransfertModels transfert) {
-        if (lotSource.getStatutLot() != null && lotSource.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible de transférer un lot clôturé.");
+        if (lotSource.getStatutLot() != null
+                && (lotSource.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lotSource.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible de transférer un lot clôturé ou annulé.");
         }
         if (lotSource.getBassin() == null || !lotSource.getBassin().getId().equals(bassinSource.getId())) {
             throw new IllegalArgumentException("Le bassin source ne correspond pas au bassin actuel du lot source.");
@@ -178,7 +180,9 @@ public class TransfertService {
 
     private void verifierBassinDestinationLibre(Bassin bassinDestination) {
         boolean destinationOccupee = lotRepository
-                .findByBassinIdAndStatutLotLibelleNot(bassinDestination.getId(), StatutLotEnum.CLOTURE)
+                .findByBassinIdAndStatutLotLibelleNotIn(
+                        bassinDestination.getId(),
+                        List.of(StatutLotEnum.CLOTURE, StatutLotEnum.ANNULE))
                 .stream()
                 .anyMatch(lot -> lot.getEffectifActuel() != null && lot.getEffectifActuel() > 0);
 
@@ -209,7 +213,9 @@ public class TransfertService {
     }
 
     private StatutLotModels statutActifParDefaut(LotModels lotSource) {
-        if (lotSource.getStatutLot() != null && lotSource.getStatutLot().getLibelle() != StatutLotEnum.CLOTURE) {
+        if (lotSource.getStatutLot() != null
+                && lotSource.getStatutLot().getLibelle() != StatutLotEnum.CLOTURE
+                && lotSource.getStatutLot().getLibelle() != StatutLotEnum.ANNULE) {
             return lotSource.getStatutLot();
         }
         return statutLotRepository.findByLibelle(StatutLotEnum.EN_CROISSANCE)

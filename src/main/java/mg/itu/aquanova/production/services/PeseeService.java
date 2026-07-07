@@ -131,8 +131,10 @@ public Double getDernierPoidsMoyen(Long idLot) {
         LotModels lot = lotRepository.findById(idLot)
                 .orElseThrow(() -> new EntityNotFoundException("Lot introuvable: " + idLot));
 
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une pesée sur un lot clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une pesée sur un lot clôturé ou annulé.");
         }
         if (lot.getDateMiseEnCharge() != null && datePesee.isBefore(lot.getDateMiseEnCharge())) {
             throw new IllegalArgumentException("La date de pesée ne peut pas être antérieure à la date de mise en charge du lot.");

@@ -84,7 +84,7 @@
         <td>
             <a th:href="@{'/lots/' + ${lot.id}}">View</a>
             <a th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
-            <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
+            <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Passer ce lot au statut ANNULE ?')">Delete</a>
         </td>
     </tr>
     </tbody>
