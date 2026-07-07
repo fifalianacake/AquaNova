@@ -1,5 +1,6 @@
 package mg.itu.aquanova.alimentation.services;
 
+import mg.itu.aquanova.admin.service.ParametreSystemeService;
 import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.alimentation.models.PrevisionResult;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
@@ -14,18 +15,19 @@ import java.util.List;
 @Service
 public class PrevisionService {
 
-    private static final int PERIODE_ANALYSE_JOURS = 30;
-
     private final AlimentRepository alimentRepository;
     private final DistributionRepository distributionRepository;
     private final StockService stockService;
+    private final ParametreSystemeService parametreSystemeService;
 
     public PrevisionService(AlimentRepository alimentRepository,
                             DistributionRepository distributionRepository,
-                            StockService stockService) {
+                            StockService stockService,
+                            ParametreSystemeService parametreSystemeService) {
         this.alimentRepository = alimentRepository;
         this.distributionRepository = distributionRepository;
         this.stockService = stockService;
+        this.parametreSystemeService = parametreSystemeService;
     }
 
     public Double calculateConsumption(Long alimentId, LocalDate dateDebut, LocalDate dateFin) {
@@ -80,10 +82,11 @@ public class PrevisionService {
             throw new IllegalArgumentException("La date de référence est obligatoire");
         }
 
-        int horizon = (horizonJours == null || horizonJours <= 0) ? PERIODE_ANALYSE_JOURS : horizonJours;
+        int periodeAnalyse = getPeriodeAnalyseJours();
+        int horizon = (horizonJours == null || horizonJours <= 0) ? getHorizonPrevisionJours() : horizonJours;
 
         
-        LocalDate dateDebutAnalyse = dateReference.minusDays(PERIODE_ANALYSE_JOURS - 1);
+        LocalDate dateDebutAnalyse = dateReference.minusDays(periodeAnalyse - 1L);
 
         List<Aliment> aliments = this.alimentRepository.findAll();
         List<PrevisionResult> results = new ArrayList<>();
@@ -122,7 +125,7 @@ public class PrevisionService {
     }
 
     public List<PrevisionResult> getAllPrevisions(LocalDate dateReference) {
-        return this.getPrevisions(null, dateReference, PERIODE_ANALYSE_JOURS);
+        return this.getPrevisions(null, dateReference, null);
     }
 
     public List<Aliment> getAlimentsForFilter() {
@@ -145,5 +148,17 @@ public class PrevisionService {
 
     private Double round2(Double value) {
         return Math.round(value * 100.0) / 100.0;
+    }
+
+    public int getPeriodeAnalyseJours() {
+        return Math.max(
+                1,
+                parametreSystemeService.getInteger(ParametreSystemeService.PERIODE_ANALYSE_CONSO_JOURS, 30));
+    }
+
+    public int getHorizonPrevisionJours() {
+        return Math.max(
+                1,
+                parametreSystemeService.getInteger(ParametreSystemeService.HORIZON_PREVISION_STOCK_JOURS, 30));
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import mg.itu.aquanova.admin.service.ParametreSystemeService;
 import mg.itu.aquanova.production.dto.PrevisionRecolteResult;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.Pese;
@@ -16,14 +17,18 @@ import mg.itu.aquanova.production.repositories.PeseRepository;
 @Service
 public class PrevisionRecolteService {
     private static final Double ZERO = 0.0;
-    private static final Double SEUIL_PROCHE_RECOLTE = 0.90;
 
     private final LotRepository lotRepository;
     private final PeseRepository peseRepository;
+    private final ParametreSystemeService parametreSystemeService;
 
-    public PrevisionRecolteService(LotRepository lotRepository, PeseRepository peseRepository) {
+    public PrevisionRecolteService(
+            LotRepository lotRepository,
+            PeseRepository peseRepository,
+            ParametreSystemeService parametreSystemeService) {
         this.lotRepository = lotRepository;
         this.peseRepository = peseRepository;
+        this.parametreSystemeService = parametreSystemeService;
     }
 
     public Double calculerCroissanceMoyenne(Long lotId) {
@@ -34,7 +39,7 @@ public class PrevisionRecolteService {
 
     public Double calculerCroissanceMoyenne(LotModels lot) {
         List<Pese> pesees = peseRepository.findByLotIdOrderByDatePeseeAsc(lot.getId());
-        if (pesees.size() < 2) {
+        if (pesees.size() < getNombreMinPeseesPrevision()) {
             return null;
         }
 
@@ -138,7 +143,7 @@ public class PrevisionRecolteService {
     }
 
     private boolean estProcheDuPoidsCible(Double poidsMoyenActuel, Double poidsCible) {
-        return poidsMoyenActuel >= poidsCible * SEUIL_PROCHE_RECOLTE;
+        return poidsMoyenActuel >= poidsCible * getSeuilProcheRecolte();
     }
 
     private boolean estLotActif(LotModels lot) {
@@ -175,5 +180,15 @@ public class PrevisionRecolteService {
 
     private Double round3(Double value) {
         return Math.round(value * 1000.0) / 1000.0;
+    }
+
+    private Double getSeuilProcheRecolte() {
+        return parametreSystemeService.getDouble(ParametreSystemeService.SEUIL_PROCHE_RECOLTE_RATIO, 0.90);
+    }
+
+    private Integer getNombreMinPeseesPrevision() {
+        return Math.max(
+                2,
+                parametreSystemeService.getInteger(ParametreSystemeService.NB_MIN_PESEES_PREVISION_RECOLTE, 2));
     }
 }
