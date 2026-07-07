@@ -5,4 +5,8 @@ import java.util.Optional;
 
 public interface TypeEvenementLotRepository extends JpaRepository<TypeEvenementLot, Long> {
     Optional<TypeEvenementLot> findByLibelle(TypeEvenementLot.LibelleEvenement libelle);
+
+    boolean existsByLibelle(TypeEvenementLot.LibelleEvenement libelle);
+
+    boolean existsByCode(String code);
 }

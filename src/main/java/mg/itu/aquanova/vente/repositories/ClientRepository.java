@@ -12,14 +12,14 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     @Query("SELECT c FROM Client c WHERE " +
            "(:id IS NULL OR c.id = :id) AND " +
-           "(:nom IS NULL OR LOWER(c.nom) LIKE LOWER(CONCAT('%', :nom, '%'))) AND " +
+           "(:nomPattern IS NULL OR LOWER(c.nom) LIKE :nomPattern) AND " +
            "(:typeId IS NULL OR c.typeClient.id = :typeId) AND " +
-           "(:contact IS NULL OR c.contact LIKE CONCAT('%', :contact, '%')) AND " +
+           "(:contactPattern IS NULL OR LOWER(c.contact) LIKE :contactPattern) AND " +
            "(:actif IS NULL OR c.actif = :actif)")
     List<Client> filtrerClients(
             @Param("id") Long id,
-            @Param("nom") String nom,
+            @Param("nomPattern") String nomPattern,
             @Param("typeId") Long typeId,
-            @Param("contact") String contact,
+            @Param("contactPattern") String contactPattern,
             @Param("actif") Boolean actif);
 }

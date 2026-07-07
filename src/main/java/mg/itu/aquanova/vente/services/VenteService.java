@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class VenteService {
@@ -138,7 +139,7 @@ public class VenteService {
 
         return repository.searchTransactions(
                 filters.getId(),
-                filters.getClient(),
+                likePattern(filters.getClient()),
                 filters.getIdRecolte(),
                 filters.getIdLot(),
                 filters.getDateDebut(),
@@ -167,5 +168,12 @@ public class VenteService {
 
     public List<Vente> getByClient(Long id) {
         return repository.findByClientId(id);
+    }
+
+    private String likePattern(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return "%" + value.trim().toLowerCase(Locale.ROOT) + "%";
     }
 }
