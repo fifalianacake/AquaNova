@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Prévisions Financières</title>
+</head>
+
+<body>
+
+    <h2>Calcul des Prévisions Financières par Période</h2>
+
+    <form th:action="@{/finance/previsions}" method="get">
+        <div>
+            <label for="dateDebut">Date de début :</label>
+            <input type="date" id="dateDebut" name="dateDebut" th:value="${dateDebut}" required />
+
+            <label for="dateFin">Date de fin :</label>
+            <input type="date" id="dateFin" name="dateFin" th:value="${dateFin}" required />
+
+            <button type="submit">Générer les prévisions</button>
+        </div>
+    </form>
+
+    <br />
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Code Lot</th>
+                <th>Espèce</th>
+                <th>Biomasse Prévue</th>
+                <th>Prix Moyen Vente</th>
+                <th>CA Prévisionnel</th>
+                <th>Coût Prévisionnel</th>
+                <th>Profit Prévisionnel</th>
+                <th>Marge Prévisionnelle</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(previsions)}">
+                <td colspan="9" style="text-align: center;">Aucune prévision financière disponible pour cette période
+                </td>
+            </tr>
+
+            <tr th:each="p : ${previsions}">
+                <td th:text="${p.codeLot}"></td>
+                <td th:text="${p.espece}"></td>
+                <td th:text="${#numbers.formatDecimal(p.biomassePrevue, 1, 2)}"></td>
+                <td th:text="${#numbers.formatDecimal(p.prixMoyenVenteKg, 1, 2)}"></td>
+                <td th:text="${#numbers.formatDecimal(p.caPrevisionnel, 1, 2)}"></td>
+                <td th:text="${#numbers.formatDecimal(p.coutPrevisionnel, 1, 2)}"></td>
+                <td th:text="${#numbers.formatDecimal(p.profitPrevisionnel, 1, 2)}"></td>
+                <td th:text="${#numbers.formatDecimal(p.margePrevisionnelle, 1, 2)}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>

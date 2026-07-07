@@ -27,4 +27,8 @@ public interface DistributionRepository extends JpaRepository<Distribution, Long
             @Param("dateFin") LocalDate dateFin);
 
     List<Distribution> findByLotId(Long lotId);
+
+    @Query("SELECT COALESCE(SUM(d.quantite * d.aliment.prixUnitaire), 0) " +
+           "FROM Distribution d WHERE d.lot.id = :lotId")
+    Double findTotalCoutAlimentByLotId(@Param("lotId") Long lotId);
 }
