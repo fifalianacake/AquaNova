@@ -54,46 +54,24 @@ public class DistributionService {
                 .orElseThrow(() -> new IllegalArgumentException("Distribution introuvable avec l'ID : " + id));
     }
 
+    @Transactional
     public void deleteDistribution(Long id) {
-        distributionRepository.deleteById(id);
+        Distribution distribution = getDistributionById(id);
+
+        mouvementStockService.findByDistributionId(distribution.getId())
+                .ifPresent(mouvement -> mouvementStockService.deleteLinkedToDistribution(mouvement.getId()));
+
+        distributionRepository.delete(distribution);
     }
 
     @Transactional
-    public void saveOrUpdateDistribution(DistributionDTO distributionDTO) {
-        validateDistributionDTO(distributionDTO);
-        Distribution distribution = new Distribution();
-
-        if (distributionDTO.getId() != null) {
-            distribution = getDistributionById(distributionDTO.getId());
-        }
-
-        LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
-
-        if (distributionDTO.getIdAliment() == null)
-            throw new IllegalArgumentException("ID de l'aliment est requis");
-
-        Aliment aliment = alimentRepository.findById(distributionDTO.getIdAliment())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Aliment introuvable avec l'ID : " + distributionDTO.getIdAliment()));
-
-        distribution.setDateDistribution(distributionDTO.getDateDistribution());
-        distribution.setLot(lot);
-        distribution.setAliment(aliment);
-        distribution.setQuantite(distributionDTO.getQuantite());
-
-        BigDecimal rationTheorique = CalculRationTheoriqueCible(distributionDTO);
-
-        distribution.setRationTheorique(rationTheorique);
-
-        distributionRepository.save(distribution);
-    }
-
     public Distribution saveDistribution(DistributionDTO distributionDTO) {
         validateDistributionDTO(distributionDTO);
 
-        Distribution distribution = new Distribution();
+        boolean isUpdate = distributionDTO.getId() != null;
+        Distribution distribution = isUpdate
+                ? getDistributionById(distributionDTO.getId())
+                : new Distribution();
 
         LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -115,14 +93,17 @@ public class DistributionService {
 
         distribution.setRationTheorique(rationTheorique);
 
-        distributionRepository.save(distribution);
+        distribution = distributionRepository.save(distribution);
+
+        if (isUpdate) {
+            mouvementStockService.findByDistributionId(distribution.getId())
+                    .ifPresent(mouvement -> mouvementStockService.deleteLinkedToDistribution(mouvement.getId()));
+        }
 
         MouvementStock mouvementStock = createMouvementStock(distribution);
-
         mouvementStockService.create(mouvementStock);
 
         return distribution;
-
     }
 
     private MouvementStock createMouvementStock(Distribution distribution) {
@@ -132,6 +113,7 @@ public class DistributionService {
         mouvementStock.setTypeMouvement(TypeMouvement.SORTIE);
         mouvementStock.setQuantite(distribution.getQuantite().doubleValue());
         mouvementStock.setCommentaire("Distribution aliment dans le lot #" + distribution.getLot().getId());
+        mouvementStock.setDistribution(distribution);
         return mouvementStock;
     }
 

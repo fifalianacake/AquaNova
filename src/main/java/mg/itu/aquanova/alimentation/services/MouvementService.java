@@ -123,6 +123,13 @@ public class MouvementService {
         validate(m);
         validateUpdate(m);
 
+        MouvementStock existing = findById(m.getId());
+        if (existing.getDistribution() != null) {
+            throw new IllegalStateException(
+                    "Ce mouvement provient de la distribution #" + existing.getDistribution().getId()
+                            + " : modifiez cette distribution plutôt que le mouvement directement.");
+        }
+
         List<MouvementStock> all = repo.findByAlimentId(m.getAliment().getId());
 
         // replace the edited movement in memory
@@ -167,13 +174,28 @@ public class MouvementService {
 
         MouvementStock toDelete = findById(id);
 
+        if (toDelete.getDistribution() != null) {
+            throw new IllegalStateException(
+                    "Ce mouvement provient de la distribution #" + toDelete.getDistribution().getId()
+                            + " : supprimez cette distribution plutôt que le mouvement directement.");
+        }
+
+        deleteInternal(toDelete);
+    }
+
+    public void deleteLinkedToDistribution(Long id) {
+        deleteInternal(findById(id));
+    }
+
+    private void deleteInternal(MouvementStock toDelete) {
+
         List<MouvementStock> all = repo.findByAlimentId(toDelete.getAliment().getId());
 
-        all.removeIf(m -> m.getId().equals(id));
+        all.removeIf(m -> m.getId().equals(toDelete.getId()));
 
         validateTimelineList(all);
 
-        repo.deleteById(id);
+        repo.deleteById(toDelete.getId());
     }
 
     public List<MouvementStock> search(Long id,
@@ -262,5 +284,9 @@ public class MouvementService {
     public MouvementStock findById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mouvement introuvable"));
+    }
+
+    public java.util.Optional<MouvementStock> findByDistributionId(Long distributionId) {
+        return repo.findByDistributionId(distributionId);
     }
 }
