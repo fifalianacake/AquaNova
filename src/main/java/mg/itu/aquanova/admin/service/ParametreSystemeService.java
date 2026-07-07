@@ -84,12 +84,18 @@ public class ParametreSystemeService {
         if (valeur == null) {
             return valeurParDefaut;
         }
-        return Boolean.parseBoolean(valeur);
+        if ("true".equalsIgnoreCase(valeur.trim())) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(valeur.trim())) {
+            return false;
+        }
+        return valeurParDefaut;
     }
 
     public ParametreSysteme create(ParametreSysteme parametre) {
         if (repository.existsByCode(parametre.getCode())) {
-            throw new RuntimeException("Ce code de paramètre existe déjà");
+            throw new IllegalArgumentException("Ce code de paramètre existe déjà");
         }
 
         return repository.save(parametre);
@@ -97,6 +103,16 @@ public class ParametreSystemeService {
 
     public ParametreSysteme update(Long id, ParametreSysteme data) {
         ParametreSysteme parametre = findById(id);
+
+        if (parametre == null) {
+            throw new IllegalArgumentException("Ce paramètre est introuvable (ID : " + id + ")");
+        }
+
+        repository.findByCode(data.getCode())
+                .filter(autre -> !autre.getId().equals(id))
+                .ifPresent(autre -> {
+                    throw new IllegalArgumentException("Ce code de paramètre est déjà utilisé par un autre paramètre");
+                });
 
         parametre.setCode(data.getCode());
         parametre.setLibelle(data.getLibelle());
@@ -111,7 +127,7 @@ public class ParametreSystemeService {
         ParametreSysteme parametre = findById(id);
 
         if (parametre == null) {
-            throw new RuntimeException("Ce code n'existe pas");
+            throw new IllegalArgumentException("Ce paramètre n'existe pas");
         }
 
         repository.delete(parametre);
@@ -121,7 +137,7 @@ public class ParametreSystemeService {
         ParametreSysteme parametre = findByCode(code);
 
         if (parametre == null) {
-            throw new RuntimeException("Ce paramètre n'existe pas");
+            throw new IllegalArgumentException("Ce paramètre n'existe pas");
         }
 
         repository.delete(parametre);
