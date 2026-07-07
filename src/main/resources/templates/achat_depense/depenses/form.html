@@ -1,60 +1,216 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title th:text="${depense.id == null ? 'Nouvelle dépense' : 'Modifier dépense'}">Dépense</title>
+
+    ```
     <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        form { max-width: 720px; }
-        label { display: block; margin: 12px 0; }
-        input, select, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-        .error { color: #b00020; margin: 12px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f9fc;
+            margin: 0;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .error {
+            color: #b00020;
+            margin-bottom: 12px;
+        }
+
+        .readonly {
+            background: #f1f3f5;
+        }
     </style>
+    ```
+
 </head>
+
 <body>
-<h1 th:text="${depense.id == null ? 'Nouvelle dépense' : 'Modifier dépense'}">Dépense</h1>
+    <div class="container">
 
-<div class="error" th:if="${error}" th:text="${error}"></div>
+        <h1 th:text="${depense.id == null ? 'Nouvelle dépense' : 'Modifier dépense'}"></h1>
 
-<form method="post" th:object="${depense}"
-      th:action="${depense.id == null} ? @{/depenses} : @{/depenses/{id}(id=${depense.id})}">
+        <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <label>Date *
-        <input type="date" th:field="*{dateDepense}" required />
-    </label>
+        <form method="post" th:object="${depense}"
+            th:action="${depense.id == null} ? @{/depenses} : @{/depenses/{id}(id=${depense.id})}">
 
-    <label>Catégorie *
-        <select th:field="*{categorieDepense.id}" required>
-            <option value="">-- Choisir --</option>
-            <option th:each="c : ${categoriesDepense}"
-                    th:value="${c.id}"
-                    th:text="${c.code + ' - ' + c.libelle}"></option>
-        </select>
-    </label>
+            ```
+            <div class="grid">
+                <div>
+                    <label>Date *</label>
+                    <input type="date" th:field="*{dateDepense}" required />
+                </div>
 
-    <label>Libellé *
-        <input type="text" th:field="*{libelle}" required />
-    </label>
+                <div>
+                    <label>Catégorie *</label>
+                    <select th:field="*{categorieDepense.id}" required>
+                        <option value="">-- Choisir --</option>
+                        <option th:each="c : ${categoriesDepense}" th:value="${c.id}"
+                            th:text="${c.code + ' - ' + c.libelle}">
+                        </option>
+                    </select>
+                </div>
 
-    <label>Montant *
-        <input type="number" step="0.01" min="0" th:field="*{montant}" required />
-    </label>
+                <div class="full">
+                    <label>Libellé *</label>
+                    <input type="text" th:field="*{libelle}" required />
+                </div>
 
-    <label>Mode paiement
-        <input type="text" th:field="*{modePaiement}" placeholder="Espèces, mobile money, virement..." />
-    </label>
+                <div class="full">
+                    <label>Montant total</label>
+                    <input type="number" step="0.01" th:field="*{montant}" readonly class="readonly"
+                        id="totalMontant" />
+                </div>
+            </div>
 
-    <label>Référence
-        <input type="text" th:field="*{reference}" />
-    </label>
+            <fieldset>
+                <legend>Lignes de paiement</legend>
 
-    <label>Observation
-        <textarea th:field="*{observation}" rows="4"></textarea>
-    </label>
+                <div id="paiementsContainer">
+                    <div th:each="paiement, stat : *{paiements}" class="paiement-line">
 
-    <button type="submit">Enregistrer</button>
-    <a th:href="@{/depenses}">Annuler</a>
-</form>
+                        <div>
+                            <label>Mode *</label>
+                            <select th:field="*{paiements[__${stat.index}__].modePaiement}" required>
+                                <option value="">-- Choisir --</option>
+                                <option th:each="mode : ${T(mg.itu.aquanova.achat.models.ModePaiementEnum).values()}"
+                                    th:value="${mode}" th:text="${mode.libelle}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Montant *</label>
+                            <input type="number" step="0.01" min="0" th:field="*{paiements[__${stat.index}__].montant}"
+                                class="montant-input" required />
+                        </div>
+
+                        <div>
+                            <label>Référence</label>
+                            <input type="text" th:field="*{paiements[__${stat.index}__].reference}" />
+                        </div>
+
+                        <div>
+                            <label>Observation</label>
+                            <input type="text" th:field="*{paiements[__${stat.index}__].observation}" />
+                        </div>
+
+                        <div>
+                            <button type="button" class="btn btn-danger" onclick="removeLine(this)">✕</button>
+                        </div>
+
+                        <input type="hidden" th:field="*{paiements[__${stat.index}__].id}" />
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="addPaymentLine()">
+                    + Ajouter une ligne
+                </button>
+            </fieldset>
+
+            <div class="full">
+                <label>Observation</label>
+                <textarea th:field="*{observation}" rows="3"></textarea>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a th:href="@{/depenses}" class="btn btn-secondary">Annuler</a>
+            </div>
+            ```
+
+        </form>
+    </div>
+
+    <script>
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('.montant-input').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalMontant').value = total.toFixed(2);
+        }
+
+        document.addEventListener('input', function (e) {
+            if (e.target.classList.contains('montant-input')) {
+                updateTotal();
+            }
+        });
+
+        function addPaymentLine() {
+            const container = document.getElementById('paiementsContainer');
+            const index = container.children.length;
+
+            const div = document.createElement('div');
+            div.className = 'paiement-line';
+
+            div.innerHTML = `
+            <div>
+                <label>Mode *</label>
+                <select name="paiements[${index}].modePaiement" required>
+                    <option value="">-- Choisir --</option>
+                    <option value="ESPECES">Espèces</option>
+                    <option value="MOBILE_MONEY">Mobile money</option>
+                    <option value="VIREMENT">Virement</option>
+                    <option value="CHEQUE">Chèque</option>
+                    <option value="AUTRE">Autre</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Montant *</label>
+                <input type="number" step="0.01" min="0" 
+                       name="paiements[${index}].montant"
+                       class="montant-input" required />
+            </div>
+
+            <div>
+                <label>Référence</label>
+                <input type="text" name="paiements[${index}].reference" />
+            </div>
+
+            <div>
+                <label>Observation</label>
+                <input type="text" name="paiements[${index}].observation" />
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-danger" onclick="removeLine(this)">✕</button>
+            </div>
+
+            <input type="hidden" name="paiements[${index}].id" />
+        `;
+
+            container.appendChild(div);
+        }
+
+        function removeLine(button) {
+            button.closest('.paiement-line').remove();
+            updateTotal();
+        }
+    </script>
 
 </body>
+
 </html>

@@ -144,5 +144,8 @@ public class DepenseController {
         if (depense.getCategorieDepense() == null) {
             depense.setCategorieDepense(new CategorieDepense());
         }
+        if (depense.getPaiements() == null || depense.getPaiements().isEmpty()) {
+            depense.addPaiement(new mg.itu.aquanova.achat.models.DepensePaiement());
+        }
     }
 }

@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.JoinType;
 import mg.itu.aquanova.achat.dto.DepenseFilter;
 import mg.itu.aquanova.achat.models.CategorieDepense;
 import mg.itu.aquanova.achat.models.Depense;
+import mg.itu.aquanova.achat.models.DepensePaiement;
 import mg.itu.aquanova.achat.repositories.CategorieDepenseRepository;
 import mg.itu.aquanova.achat.repositories.DepenseRepository;
 
@@ -46,8 +48,16 @@ public class DepenseService {
 
     @Transactional
     public Depense enregistrer(Depense depense) {
+        if (depense == null) {
+            throw new IllegalArgumentException("La dépense est obligatoire.");
+        }
+        if (depense.getPaiements() != null && !depense.getPaiements().isEmpty()) {
+            depense.reglerTotalPaiements();
+        }
+
         valider(depense);
         normaliser(depense);
+        normaliserPaiements(depense);
         return depenseRepository.save(depense);
     }
 
@@ -61,17 +71,17 @@ public class DepenseService {
 
     public BigDecimal calculerTotalFiltre(DepenseFilter filter) {
         return listerPourExport(filter).stream()
-                .map(Depense::getMontant)
+                .map(depense -> depense.getMontant())
                 .filter(montant -> montant != null)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
     }
 
     public byte[] exporterPdf(DepenseFilter filter) {
         List<Depense> depenses = listerPourExport(filter);
         BigDecimal total = depenses.stream()
-                .map(Depense::getMontant)
+                .map(depense -> depense.getMontant())
                 .filter(montant -> montant != null)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         StringBuilder contenu = new StringBuilder();
         contenu.append("DEPENSES DIVERSES\n");
@@ -117,7 +127,8 @@ public class DepenseService {
                 predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("montant"), filter.getMontantMax()));
             }
             if (filter.getModePaiement() != null && !filter.getModePaiement().isBlank()) {
-                predicates = cb.and(predicates, cb.like(cb.lower(root.get("modePaiement")), "%" + filter.getModePaiement().trim().toLowerCase() + "%"));
+                var paiements = root.join("paiements", JoinType.LEFT);
+                predicates = cb.and(predicates, cb.like(cb.lower(paiements.get("modePaiement").as(String.class)), "%" + filter.getModePaiement().trim().toLowerCase() + "%"));
             }
 
             return predicates;
@@ -137,8 +148,28 @@ public class DepenseService {
         if (depense.getLibelle() == null || depense.getLibelle().isBlank()) {
             throw new IllegalArgumentException("Le libellé est obligatoire.");
         }
-        if (depense.getMontant() == null || depense.getMontant().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Le montant doit être supérieur ou égal à zéro.");
+
+        if (depense.getPaiements() == null || depense.getPaiements().isEmpty()) {
+            if (depense.getMontant() == null || depense.getMontant().compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("Le montant doit être supérieur ou égal à zéro.");
+            }
+        } else {
+            boolean anyPayment = false;
+            for (DepensePaiement paiement : depense.getPaiements()) {
+                if (paiement == null) {
+                    continue;
+                }
+                if (paiement.getModePaiement() == null) {
+                    throw new IllegalArgumentException("Le mode de paiement de chaque ligne est obligatoire.");
+                }
+                if (paiement.getMontant() == null || paiement.getMontant().compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new IllegalArgumentException("Le montant de chaque ligne de paiement doit être supérieur à zéro.");
+                }
+                anyPayment = true;
+            }
+            if (!anyPayment) {
+                throw new IllegalArgumentException("Au moins une ligne de paiement valide est requise.");
+            }
         }
     }
 
@@ -148,9 +179,33 @@ public class DepenseService {
 
         depense.setCategorieDepense(categorie);
         depense.setLibelle(depense.getLibelle().trim());
-        depense.setModePaiement(blankToNull(depense.getModePaiement()));
         depense.setReference(blankToNull(depense.getReference()));
         depense.setObservation(blankToNull(depense.getObservation()));
+
+        if (depense.getPaiements() != null && !depense.getPaiements().isEmpty()) {
+            depense.setModePaiement(null);
+        } else {
+            depense.setModePaiement(blankToNull(depense.getModePaiement()));
+        }
+    }
+
+    private void normaliserPaiements(Depense depense) {
+        if (depense.getPaiements() == null) {
+            return;
+        }
+        depense.getPaiements().removeIf(paiement -> paiement == null || montantVide(paiement));
+        for (DepensePaiement paiement : depense.getPaiements()) {
+            paiement.setDepense(depense);
+            paiement.setReference(blankToNull(paiement.getReference()));
+            paiement.setObservation(blankToNull(paiement.getObservation()));
+        }
+    }
+
+    private boolean montantVide(DepensePaiement paiement) {
+        return paiement.getModePaiement() == null
+                && (paiement.getMontant() == null || paiement.getMontant().compareTo(BigDecimal.ZERO) == 0)
+                && (paiement.getReference() == null || paiement.getReference().isBlank())
+                && (paiement.getObservation() == null || paiement.getObservation().isBlank());
     }
 
     private String blankToNull(String value) {
