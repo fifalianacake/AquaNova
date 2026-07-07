@@ -8,4 +8,6 @@ public interface TypeAlimentRepository
                 extends JpaRepository<TypeAlimentModels, Integer> {
 
         TypeAlimentModels findById(int id);
+
+        boolean existsByNomIgnoreCase(String nom);
 }

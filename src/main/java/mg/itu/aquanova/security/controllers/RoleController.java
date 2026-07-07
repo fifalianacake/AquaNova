@@ -42,9 +42,15 @@ public class RoleController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteRole(@PathVariable("id") Long id) {
-        roleService.deleteRole(id);
-        return "redirect:/roles";
+    public String deleteRole(@PathVariable("id") Long id, Model model) {
+        try {
+            roleService.deleteRole(id);
+            return "redirect:/roles";
+        } catch (IllegalStateException e) {
+            model.addAttribute("roles", roleService.getAllRoles());
+            model.addAttribute("error", e.getMessage());
+            return "security/roles/list";
+        }
     }
 
 }

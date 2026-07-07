@@ -12,7 +12,7 @@
     <section>
         <div th:if="${erreur}" th:text="${erreur}"></div>
 
-        <form th:action="${typeTraitement.id == null} ? @{/types-traitements-eau} : @{/types-traitements-eau/edit/{id}(id=${typeTraitement.id})}"
+        <form th:action="${typeTraitement.id == null} ? @{/types-traitements-eau} : @{/types-traitements-eau/{id}(id=${typeTraitement.id})}"
               th:object="${typeTraitement}"
               method="post">
             <label for="libelle">Libellé *</label>

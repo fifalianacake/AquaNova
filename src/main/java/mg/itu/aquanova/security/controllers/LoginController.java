@@ -1,6 +1,7 @@
 package mg.itu.aquanova.security.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,9 @@ public class LoginController {
     @Autowired
     private UserRoleService userRoleService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/login")
     public String loginPage() {
         return "security/login";
@@ -38,12 +42,17 @@ public class LoginController {
             return "security/login";
         }
 
-        if (!user.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             model.addAttribute("error", "Mot de passe incorrect");
             return "security/login";
         }
 
         UserRoleModels userRole = userRoleService.getUserRoleByUserId(user.getId());
+
+        if (userRole == null) {
+            model.addAttribute("error", "Aucun rôle n'est assigné à cet utilisateur. Contactez un administrateur.");
+            return "security/login";
+        }
 
         session.setAttribute("user", user);
         session.setAttribute("role", userRole.getRole().getName());

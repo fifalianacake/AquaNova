@@ -1,5 +1,7 @@
 <h2>Form Espece</h2>
 
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
 <form action="/especes" method="post" th:object="${espece}">
     <input type="hidden" th:field="*{id}" />
 

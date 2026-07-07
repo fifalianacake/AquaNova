@@ -35,14 +35,9 @@ public class MouvementService {
         return repo.save(m);
     }
 
-    private void checkFIFOAvailability(MouvementStock m) {
-
-        LocalDate date = m.getDateMouvement();
-        Long alimentId = m.getAliment().getId();
-
-        Double stockAtDate = repo.findByAlimentId(alimentId)
+    public Double getStockDisponibleADate(Long alimentId, LocalDate date) {
+        return repo.findByAlimentId(alimentId)
                 .stream()
-                // ONLY movements before or equal to the date
                 .filter(x -> !x.getDateMouvement().isAfter(date))
                 .mapToDouble(x -> {
                     if (x.getTypeMouvement() == TypeMouvement.ENTREE)
@@ -51,48 +46,6 @@ public class MouvementService {
                         return -x.getQuantite();
                 })
                 .sum();
-
-        if (stockAtDate < m.getQuantite()) {
-            throw new RuntimeException(
-                    "Stock insuffisant à la date " + date +
-                            " | Disponible: " + stockAtDate +
-                            " | Demandé: " + m.getQuantite());
-        }
-    }
-
-    private void applyFIFO(MouvementStock m) {
-
-        Double remaining = m.getQuantite();
-
-        List<MouvementStock> entries = repo
-                .findByAlimentId(m.getAliment().getId())
-                .stream()
-                .filter(x -> x.getTypeMouvement() == TypeMouvement.ENTREE)
-                .sorted(Comparator.comparing(MouvementStock::getDateMouvement))
-                .toList();
-
-        for (MouvementStock entry : entries) {
-
-            if (remaining <= 0)
-                break;
-
-            Double available = entry.getQuantite();
-
-            if (available <= 0)
-                continue;
-
-            Double taken = Math.min(available, remaining);
-
-            // simulate consumption
-            entry.setQuantite(available - taken);
-            repo.save(entry);
-
-            remaining -= taken;
-        }
-
-        if (remaining > 0) {
-            throw new RuntimeException("Stock insuffisant, reste: " + remaining);
-        }
     }
 
     private void validateTimelineList(List<MouvementStock> list) {
@@ -123,6 +76,13 @@ public class MouvementService {
         validate(m);
         validateUpdate(m);
 
+        MouvementStock existing = findById(m.getId());
+        if (existing.getDistribution() != null) {
+            throw new IllegalStateException(
+                    "Ce mouvement provient de la distribution #" + existing.getDistribution().getId()
+                            + " : modifiez cette distribution plutôt que le mouvement directement.");
+        }
+
         List<MouvementStock> all = repo.findByAlimentId(m.getAliment().getId());
 
         // replace the edited movement in memory
@@ -138,42 +98,32 @@ public class MouvementService {
         return repo.save(m);
     }
 
-    private void checkStockAtDateExcludingSelf(MouvementStock m) {
-
-        LocalDate date = m.getDateMouvement();
-        Long alimentId = m.getAliment().getId();
-
-        Double stockAtDate = repo.findByAlimentId(alimentId)
-                .stream()
-                .filter(x -> !x.getId().equals(m.getId()))
-                .filter(x -> !x.getDateMouvement().isAfter(date))
-                .mapToDouble(x -> {
-                    if (x.getTypeMouvement() == TypeMouvement.ENTREE)
-                        return x.getQuantite();
-                    else
-                        return -x.getQuantite();
-                })
-                .sum();
-
-        if (stockAtDate < m.getQuantite()) {
-            throw new RuntimeException(
-                    "Stock insuffisant à la date " + date +
-                            " | Disponible: " + stockAtDate +
-                            " | Demandé: " + m.getQuantite());
-        }
-    }
-
     public void delete(Long id) {
 
         MouvementStock toDelete = findById(id);
 
+        if (toDelete.getDistribution() != null) {
+            throw new IllegalStateException(
+                    "Ce mouvement provient de la distribution #" + toDelete.getDistribution().getId()
+                            + " : supprimez cette distribution plutôt que le mouvement directement.");
+        }
+
+        deleteInternal(toDelete);
+    }
+
+    public void deleteLinkedToDistribution(Long id) {
+        deleteInternal(findById(id));
+    }
+
+    private void deleteInternal(MouvementStock toDelete) {
+
         List<MouvementStock> all = repo.findByAlimentId(toDelete.getAliment().getId());
 
-        all.removeIf(m -> m.getId().equals(id));
+        all.removeIf(m -> m.getId().equals(toDelete.getId()));
 
         validateTimelineList(all);
 
-        repo.deleteById(id);
+        repo.deleteById(toDelete.getId());
     }
 
     public List<MouvementStock> search(Long id,
@@ -262,5 +212,9 @@ public class MouvementService {
     public MouvementStock findById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mouvement introuvable"));
+    }
+
+    public java.util.Optional<MouvementStock> findByDistributionId(Long distributionId) {
+        return repo.findByDistributionId(distributionId);
     }
 }

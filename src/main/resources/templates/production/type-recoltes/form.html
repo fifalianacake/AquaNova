@@ -7,7 +7,7 @@
 <body>
 <h1 th:text="${type.id} == null ? 'Créer un type de récolte' : 'Modifier le type #' + ${type.id}"></h1>
 
-<form th:action="${type.id} == null ? @{/type-recoltes} : @{/type-recoltes/{id}(id=${type.id})}"
+<form th:action="${type.id} == null ? @{/types-recoltes} : @{/types-recoltes/{id}(id=${type.id})}"
       th:object="${type}"
       method="post">
     <div>
@@ -27,7 +27,7 @@
     </div>
     <div>
         <button type="submit">Enregistrer</button>
-        <a th:href="@{/type-recoltes}">Annuler</a>
+        <a th:href="@{/types-recoltes}">Annuler</a>
     </div>
 </form>
 </body>

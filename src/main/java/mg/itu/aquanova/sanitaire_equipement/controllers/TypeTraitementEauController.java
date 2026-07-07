@@ -41,7 +41,7 @@ public class TypeTraitementEauController {
         return "sanitaire_equipement/types-traitements-eau/formulaire";
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/{id}/edit")
     public String afficherFormulaireModification(@PathVariable Long id, Model model, HttpSession session) {
         if (session.getAttribute("user") == null) {
             return "redirect:/login";
@@ -80,7 +80,7 @@ public class TypeTraitementEauController {
         }
     }
 
-    @PostMapping("/edit/{id}")
+    @PostMapping("/{id}")
     public String modifier(
             @PathVariable Long id,
             @ModelAttribute("typeTraitement") TypeTraitementEau typeTraitement,
@@ -101,7 +101,7 @@ public class TypeTraitementEauController {
         }
     }
 
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     public String supprimer(@PathVariable Long id, HttpSession session) {
         if (session.getAttribute("user") == null) {
             return "redirect:/login";

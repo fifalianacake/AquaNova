@@ -27,6 +27,10 @@ public class MouvementStock {
 
     private String commentaire;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_distribution", nullable = true)
+    private Distribution distribution;
+
     public MouvementStock() {
     }
 
@@ -77,5 +81,13 @@ public class MouvementStock {
 
     public void setCommentaire(String commentaire) {
         this.commentaire = commentaire;
+    }
+
+    public Distribution getDistribution() {
+        return distribution;
+    }
+
+    public void setDistribution(Distribution distribution) {
+        this.distribution = distribution;
     }
 }

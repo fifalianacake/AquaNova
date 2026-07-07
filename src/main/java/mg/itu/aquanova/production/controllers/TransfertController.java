@@ -45,7 +45,7 @@ public class TransfertController {
         return "production/transferts/form";
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public String saveTransfert(@ModelAttribute("transfert") TransfertModels transfert, Model model) {
         try {
             transfertService.saveTransfert(transfert);
@@ -64,27 +64,6 @@ public class TransfertController {
         if (transfert != null) {
             model.addAttribute("transfert", transfert);
             return "production/transferts/details";
-        } else {
-            return "redirect:/transferts";
-        }
-    }
-
-    @GetMapping("/delete/{id}")
-    public String deleteTransfert(@PathVariable("id") Long id) {
-        transfertService.deleteTransfert(id);
-        return "redirect:/transferts";
-    }
-
-    @GetMapping("/edit/{id}")
-    public String showEditTransfertForm(@PathVariable("id") Long id, Model model) {
-        TransfertModels transfert = transfertService.getTransfertById(id);
-        if (transfert != null) {
-            model.addAttribute("transfert", transfert);
-            
-            model.addAttribute("bassins", bassinService.getAllBassins());
-            model.addAttribute("lots", lotService.listerTous());
-            
-            return "production/transferts/form";
         } else {
             return "redirect:/transferts";
         }

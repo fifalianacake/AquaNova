@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/type-recoltes")
+@RequestMapping("/types-recoltes")
 public class TypeRecolteController {
 
     private final TypeRecolteService service;
@@ -37,7 +37,7 @@ public class TypeRecolteController {
     @PostMapping
     public String create(@ModelAttribute("type") TypeRecoltes type) {
         service.saveTypeRecoltes(type);
-        return "redirect:/type-recoltes";
+        return "redirect:/types-recoltes";
     }
 
     @GetMapping("/{id}")
@@ -56,13 +56,13 @@ public class TypeRecolteController {
     @PostMapping("/{id}")
     public String update(@PathVariable Long id, @ModelAttribute("type") TypeRecoltes type) {
         service.updateTypeRecoltes(id, type);
-        return "redirect:/type-recoltes";
+        return "redirect:/types-recoltes";
     }
 
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         service.deleteTypeRecoltes(id);
-        return "redirect:/type-recoltes";
+        return "redirect:/types-recoltes";
     }
 
     private void addLibelles(Model model) {

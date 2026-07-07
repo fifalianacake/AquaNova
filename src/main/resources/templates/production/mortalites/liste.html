@@ -12,8 +12,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 th:text="${titre != null ? titre : 'Suivi des Mortalités'}">Suivi des Mortalités</h2>
         <div>
-            <a th:if="${lot != null}" th:href="@{/production/mortalites/nouveau/lot/{id}(id=${lot.id})}" class="btn btn-primary">Ajouter une Mortalité</a>
-            <a th:if="${lot == null}" th:href="@{/production/mortalites/nouveau}" class="btn btn-primary">Ajouter une Mortalité</a>
+            <a th:if="${lot != null}" th:href="@{/lots/{id}/mortalites/new(id=${lot.id})}" class="btn btn-primary">Ajouter une Mortalité</a>
+            <a th:if="${lot == null}" th:href="@{/mortalites/new}" class="btn btn-primary">Ajouter une Mortalité</a>
             <a th:if="${lot != null}" th:href="@{/lots/{id}(id=${lot.id})}" class="btn btn-secondary">Retour au lot</a>
         </div>
     </div>
@@ -37,10 +37,8 @@
                 <td th:text="${m.nbMorts}">5</td>
                 <td th:text="${m.cause != null ? m.cause : '-'}">Maladie</td>
                 <td>
-                    <a th:href="@{/production/mortalites/modifier/{id}(id=${m.id})}"
+                    <a th:href="@{/mortalites/{id}/edit(id=${m.id})}"
                         class="btn btn-sm btn-warning">Modifier</a>
-                    <a th:href="@{/production/mortalites/supprimer/{id}(id=${m.id})}" class="btn btn-sm btn-danger"
-                        onclick="return confirm('Voulez-vous supprimer cette entrée de mortalité ?')">Supprimer</a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(mortalites)}">

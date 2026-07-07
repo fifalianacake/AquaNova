@@ -30,9 +30,15 @@ public class TypeAlimentController {
     }
 
     @PostMapping
-    public String save(@ModelAttribute TypeAlimentModels type) {
-        service.save(type);
-        return "redirect:/type-aliment";
+    public String save(@ModelAttribute TypeAlimentModels type, Model model) {
+        try {
+            service.save(type);
+            return "redirect:/type-aliment";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("type", type);
+            model.addAttribute("error", e.getMessage());
+            return "type-aliment/form";
+        }
     }
 
     @GetMapping("/{id}")

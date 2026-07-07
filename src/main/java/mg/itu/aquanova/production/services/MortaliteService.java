@@ -109,10 +109,6 @@ public class MortaliteService {
         return saved;
     }
 
-    public void delete(Integer id) {
-        repo.deleteById(id);
-    }
-
     public Integer getTotalMortsByLot(Long lotId) {
         validerIdLot(lotId);
         return repo.sumNbMortsByLotId(lotId);
@@ -195,8 +191,10 @@ public class MortaliteService {
     }
 
     private void verifierLotNonCloture(LotModels lot) {
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une mortalité sur un lot clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une mortalité sur un lot clôturé ou annulé.");
         }
     }
 

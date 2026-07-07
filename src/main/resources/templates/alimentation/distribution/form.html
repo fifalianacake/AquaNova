@@ -11,9 +11,10 @@
 
     <h1 th:text="${distribution.id != null} ? 'Modifier la distribution' : 'Créer une nouvelle distribution'"></h1>
 
-    <form th:action="@{/alimentation/distribution/save}" th:object="${distribution}" method="post">
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
-        <input type="hidden" th:field="*{id}" />
+    <form th:action="${distribution.id} == null ? @{/distributions} : @{'/distributions/' + ${distribution.id}}"
+          th:object="${distribution}" method="post">
 
         <div>
             <label for="dateDistribution">Date de distribution :</label>
@@ -57,7 +58,7 @@
         <br />
 
         <button type="submit">Enregistrer</button>
-        <a th:href="@{/alimentation/distribution}">Annuler</a>
+        <a th:href="@{/distributions}">Annuler</a>
     </form>
 
 </body>

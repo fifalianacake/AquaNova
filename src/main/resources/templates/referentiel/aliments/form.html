@@ -8,6 +8,8 @@
 
     <h2 th:text="${aliment.id == null} ? 'Créer un aliment' : 'Modifier l\'aliment'">Formulaire</h2>
 
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
     <form th:action="@{/aliments}" th:object="${aliment}" method="post">
         
         <input type="hidden" th:field="*{id}" />

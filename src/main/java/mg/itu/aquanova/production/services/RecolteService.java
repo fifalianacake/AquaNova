@@ -143,8 +143,10 @@ public class RecolteService {
         if (effectifRecolte == null || effectifRecolte <= 0) {
             throw new IllegalArgumentException("L'effectif récolté doit être strictement positif.");
         }
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot déjà clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot clôturé ou annulé.");
         }
         if (lot.getEffectifActuel() == null || lot.getEffectifActuel() <= 0) {
             throw new IllegalStateException("Ce lot ne contient plus d'individus récoltables.");

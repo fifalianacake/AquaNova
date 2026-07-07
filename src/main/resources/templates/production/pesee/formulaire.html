@@ -12,8 +12,7 @@
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
-    <form th:action="@{/production/pesee/enregistrer}" method="post">
-        <input type="hidden" name="idLot" th:value="${idLot}">
+    <form th:action="@{'/lots/' + ${idLot} + '/pesees'}" method="post">
 
         <div>
             <label>Date de pesée :</label>
@@ -34,7 +33,7 @@
         
         <p>
             <button type="submit">Enregistrer</button>
-            <a th:href="@{'/production/pesee/liste/' + ${idLot}}">Annuler</a>
+            <a th:href="@{'/lots/' + ${idLot} + '/pesees'}">Annuler</a>
         </p>
     </form>
 </body>

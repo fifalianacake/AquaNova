@@ -10,5 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface StatutVenteRepository extends JpaRepository<StatutVente, Long> {
 
     StatutVente findByCode(StatutVenteEnum code);
+
+    boolean existsByCode(StatutVenteEnum code);
     
 }

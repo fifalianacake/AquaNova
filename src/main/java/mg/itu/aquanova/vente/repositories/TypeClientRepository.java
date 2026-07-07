@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TypeClientRepository extends JpaRepository<TypeClient, Long> {
     TypeClient findByCode(TypeClientEnum code);
+
+    boolean existsByCode(TypeClientEnum code);
 }

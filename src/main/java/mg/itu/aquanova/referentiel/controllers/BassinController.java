@@ -48,9 +48,17 @@ public class BassinController {
 
     // 4. Traiter l'enregistrement (Ajout ou Modification)
     @PostMapping("/enregistrer")
-    public String enregistrerBassin(@ModelAttribute("bassin") Bassin bassin) {
-        bassinService.saveBassin(bassin);
-        return "redirect:/referentiel/bassins";
+    public String enregistrerBassin(@ModelAttribute("bassin") Bassin bassin, Model model) {
+        try {
+            bassinService.saveBassin(bassin);
+            return "redirect:/referentiel/bassins";
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("bassin", bassin);
+            model.addAttribute("types", bassinService.getAllTypes());
+            model.addAttribute("statuts", statutBassinService.findAll());
+            return "referentiel/bassins/saisie";
+        }
     }
 
     // 5. Supprimer un bassin

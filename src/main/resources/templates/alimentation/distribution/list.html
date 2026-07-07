@@ -8,7 +8,7 @@
 
     <h2>Liste des Distributions d'Alimentation</h2>
     
-    <a th:href="@{/alimentation/distribution/new}">Nouvelle Distribution</a>
+    <a th:href="@{/distributions/new}">Nouvelle Distribution</a>
     <br/><br/>
 
     <table border="1">
@@ -34,9 +34,9 @@
                 <td th:text="${dist.rationTheorique + ' kg'}">0.00 kg</td>
                 <td th:text="${dist.quantite + ' kg'}">0.00 kg</td>
                 <td>
-                    <a th:href="@{/alimentation/distribution/edit/{id}(id=${dist.id})}">Modifier</a>
-                    | 
-                    <a th:href="@{/alimentation/distribution/delete/{id}(id=${dist.id})}" 
+                    <a th:href="@{/distributions/{id}/edit(id=${dist.id})}">Modifier</a>
+                    |
+                    <a th:href="@{/distributions/{id}/delete(id=${dist.id})}"
                        onclick="return confirm('Supprimer ?')">Supprimer</a>
                 </td>
             </tr>
