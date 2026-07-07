@@ -3,7 +3,7 @@
 <body>
     <h1>Types d'équipements</h1>
 
-    <form th:action="@{/types-equipements/save}" th:object="${typeEquipement}" method="post">
+    <form th:action="@{/types-equipements}" th:object="${typeEquipement}" method="post">
         <label>Libellé :</label>
         <input type="text" th:field="*{libelle}" required>
 

@@ -60,7 +60,7 @@ public class MaintenanceController {
         return "sanitaire_equipement/maintenance/form";
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public String saveMaintenance(@ModelAttribute("maintenance") Maintenance maintenance, Model model) {
         try {
             maintenanceService.create(maintenance);
@@ -99,7 +99,7 @@ public class MaintenanceController {
         return "sanitaire_equipement/maintenance/form";
     }
 
-    @PostMapping("/update/{id}")
+    @PostMapping("/{id}")
     public String updateMaintenance(@PathVariable("id") Long id, @ModelAttribute("maintenance") Maintenance maintenance, Model model) {
         try {
             maintenanceService.update(id, maintenance);

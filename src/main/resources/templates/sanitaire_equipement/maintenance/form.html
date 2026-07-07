@@ -12,7 +12,7 @@
 
     <h1 th:text="${maintenance.id == null} ? 'Déclarer une intervention / Panne' : 'Modifier l\'intervention'">Saisie Intervention</h1>
     
-    <form th:action="${maintenance.id} == null ? @{/maintenances/save} : @{/maintenances/update/{id}(id=${maintenance.id})}"
+    <form th:action="${maintenance.id} == null ? @{/maintenances} : @{/maintenances/{id}(id=${maintenance.id})}"
           th:object="${maintenance}" method="post">
         <input type="hidden" th:field="*{id}">
 

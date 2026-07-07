@@ -25,8 +25,8 @@
 
         <div>
             <a th:href="@{/types-traitements-eau}">Retour</a>
-            <a th:href="@{/types-traitements-eau/edit/{id}(id=${typeTraitement.id})}">Modifier</a>
-            <form th:action="@{/types-traitements-eau/delete/{id}(id=${typeTraitement.id})}"
+            <a th:href="@{/types-traitements-eau/{id}/edit(id=${typeTraitement.id})}">Modifier</a>
+            <form th:action="@{/types-traitements-eau/{id}/delete(id=${typeTraitement.id})}"
                   method="post"
                   onsubmit="return confirm('Supprimer ce type de traitement ?')">
                 <button type="submit">Supprimer</button>

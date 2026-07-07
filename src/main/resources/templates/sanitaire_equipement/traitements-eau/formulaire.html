@@ -13,7 +13,7 @@
         
         <div th:if="${erreur}" th:text="${erreur}"></div>
 
-        <form th:action="${traitement.id} == null ? @{/traitements-eau} : @{'/traitements-eau/edit/' + ${traitement.id}}"
+        <form th:action="${traitement.id} == null ? @{/traitements-eau} : @{'/traitements-eau/' + ${traitement.id}}"
               th:object="${traitement}"
               method="post">
             <div>

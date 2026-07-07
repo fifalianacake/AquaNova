@@ -5,7 +5,7 @@
 
     <h2>Nouveau relevé d'eau</h2>
 
-    <form method="post" th:action="${releve.id} == null ? @{/releves-eau} : @{'/releves-eau/edit/' + ${releve.id}}"
+    <form method="post" th:action="${releve.id} == null ? @{/releves-eau} : @{'/releves-eau/' + ${releve.id}}"
         th:object="${releve}">
 
         <p>

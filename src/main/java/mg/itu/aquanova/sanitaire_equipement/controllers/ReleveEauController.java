@@ -107,7 +107,7 @@ public class ReleveEauController {
         return "sanitaire_equipement/releves/detail";
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id,
             Model model,
             HttpSession session) {
@@ -125,7 +125,7 @@ public class ReleveEauController {
         return "sanitaire_equipement/releves/form";
     }
 
-    @PostMapping("/edit/{id}")
+    @PostMapping("/{id}")
     public String update(@PathVariable Long id,
             @ModelAttribute ReleveEau releve,
             HttpSession session) {
@@ -147,7 +147,7 @@ public class ReleveEauController {
         return "redirect:/releves-eau";
     }
 
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, HttpSession session) {
         if (session.getAttribute("user") == null)
             return "redirect:/login";

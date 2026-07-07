@@ -113,13 +113,13 @@
 
             |
 
-            <a th:href="@{/equipements/edit/{id}(id=${e.id})}">
+            <a th:href="@{/equipements/{id}/edit(id=${e.id})}">
                 Modifier
             </a>
 
             |
 
-            <form th:action="@{/equipements/delete/{id}(id=${e.id})}"
+            <form th:action="@{/equipements/{id}/delete(id=${e.id})}"
                   method="post"
                   style="display:inline;">
 
