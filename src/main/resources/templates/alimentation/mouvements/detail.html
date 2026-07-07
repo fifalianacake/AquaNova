@@ -13,8 +13,8 @@
     <p>Commentaire : <span th:text="${mouvement.commentaire}"></span></p>
 
     <a href="/stocks/mouvements">Retour</a>
-    <a th:href="@{'/stocks/mouvements/edit/' + ${mouvement.id}}">Modifier</a>
-    <form th:action="@{'/stocks/mouvements/delete/' + ${mouvement.id}}" method="post">
+    <a th:href="@{'/stocks/mouvements/' + ${mouvement.id} + '/edit'}">Modifier</a>
+    <form th:action="@{'/stocks/mouvements/' + ${mouvement.id} + '/delete'}" method="post">
         <button type="submit">Supprimer</button>
     </form>
 

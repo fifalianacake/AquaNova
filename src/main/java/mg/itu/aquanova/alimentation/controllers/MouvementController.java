@@ -72,7 +72,7 @@ public class MouvementController {
         }
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/{id}/edit")
     public String edit(@PathVariable Long id,
             Model model) {
 
@@ -82,7 +82,7 @@ public class MouvementController {
         return "alimentation/mouvements/form";
     }
 
-    @PostMapping("/edit/{id}")
+    @PostMapping("/{id}")
     public String update(@PathVariable Long id,
             @ModelAttribute MouvementStock mouvement,
             Model model) {
@@ -103,7 +103,7 @@ public class MouvementController {
         }
     }
 
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id,
             Model model) {
 

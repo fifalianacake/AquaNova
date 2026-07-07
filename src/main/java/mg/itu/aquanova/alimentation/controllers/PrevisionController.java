@@ -61,9 +61,4 @@ public class PrevisionController {
             return "alimentation/prevision/list";
         }
     }
-
-    @GetMapping("/alimentation/prevision")
-    public String redirectToPrevision() {
-        return "redirect:/prevision";
-    }
 }
