@@ -129,14 +129,38 @@ public class VenteController {
     }
 
     @PostMapping("/{id}/valider")
-    public String valider(@PathVariable Long id) {
-        service.validerVente(id);
-        return "redirect:/ventes/" + id;
+    public String valider(@PathVariable Long id, Model model) {
+        try {
+            service.validerVente(id);
+            return "redirect:/ventes/" + id;
+        } catch (RuntimeException e) {
+            model.addAttribute("vente", service.trouverParId(id));
+            model.addAttribute("erreur", e.getMessage());
+            return "ventes/fiche";
+        }
+    }
+
+    @PostMapping("/{id}/payer")
+    public String payer(@PathVariable Long id, Model model) {
+        try {
+            service.marquerPayee(id);
+            return "redirect:/ventes/" + id;
+        } catch (RuntimeException e) {
+            model.addAttribute("vente", service.trouverParId(id));
+            model.addAttribute("erreur", e.getMessage());
+            return "ventes/fiche";
+        }
     }
 
     @PostMapping("/{id}/annuler")
-    public String annuler(@PathVariable Long id) {
-        service.annulerVente(id);
-        return "redirect:/ventes/" + id;
+    public String annuler(@PathVariable Long id, Model model) {
+        try {
+            service.annulerVente(id);
+            return "redirect:/ventes/" + id;
+        } catch (RuntimeException e) {
+            model.addAttribute("vente", service.trouverParId(id));
+            model.addAttribute("erreur", e.getMessage());
+            return "ventes/fiche";
+        }
     }
 }

@@ -94,9 +94,10 @@ public class VenteService {
     @Transactional
     public Vente update(Vente vente) {
         Vente ancienne = repository.findById(vente.getId()).orElseThrow();
-        if (ancienne.getStatutVente().getCode() == StatutVenteEnum.VALIDEE
-                || ancienne.getStatutVente().getCode() == StatutVenteEnum.PAYEE) {
-            throw new RuntimeException("Impossible de modifier une vente validée.");
+        if (ancienne.getStatutVente().getCode() != StatutVenteEnum.CREEE) {
+            throw new IllegalStateException(
+                    "Seule une vente au statut CREEE peut être modifiée (statut actuel : "
+                            + ancienne.getStatutVente().getCode() + ").");
         }
 
         // Empêche toute modification de la récolte / du statut via champs cachés
@@ -134,13 +135,37 @@ public class VenteService {
     @Transactional
     public void validerVente(Long id) {
         Vente v = repository.findById(id).orElseThrow();
+        if (v.getStatutVente().getCode() != StatutVenteEnum.CREEE) {
+            throw new IllegalStateException(
+                    "Seule une vente au statut CREEE peut être validée (statut actuel : "
+                            + v.getStatutVente().getCode() + ").");
+        }
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.VALIDEE));
+        repository.save(v);
+    }
+
+    @Transactional
+    public void marquerPayee(Long id) {
+        Vente v = repository.findById(id).orElseThrow();
+        if (v.getStatutVente().getCode() != StatutVenteEnum.VALIDEE) {
+            throw new IllegalStateException(
+                    "Seule une vente validée peut être marquée comme payée (statut actuel : "
+                            + v.getStatutVente().getCode() + ").");
+        }
+        v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.PAYEE));
         repository.save(v);
     }
 
     @Transactional
     public void annulerVente(Long id) {
         Vente v = repository.findById(id).orElseThrow();
+        StatutVenteEnum statutActuel = v.getStatutVente().getCode();
+        if (statutActuel == StatutVenteEnum.ANNULEE) {
+            throw new IllegalStateException("Cette vente est déjà annulée.");
+        }
+        if (statutActuel == StatutVenteEnum.PAYEE) {
+            throw new IllegalStateException("Impossible d'annuler une vente déjà payée.");
+        }
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.ANNULEE));
         Vente sauvegardee = repository.save(v);
         rafraichirStatutRecolte(sauvegardee.getRecolte().getId());
