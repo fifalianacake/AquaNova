@@ -4,6 +4,7 @@ import mg.itu.aquanova.vente.dto.TransactionFilterDTO;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
 import mg.itu.aquanova.vente.services.ClientService;
+import mg.itu.aquanova.vente.services.TypeClientService;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
 import mg.itu.aquanova.production.services.RecolteService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,13 +22,15 @@ public class VenteController {
     private final StatutVenteRepository statutRepository;
     private final RecolteService recolteService; // Ajouté ici
     private final ClientService clientService;
+    private final TypeClientService typeClientService;
 
     public VenteController(VenteService service, StatutVenteRepository statutRepository,
-            RecolteService recolteService, ClientService clientService) {
+            RecolteService recolteService, ClientService clientService, TypeClientService typeClientService) {
         this.service = service;
         this.statutRepository = statutRepository;
         this.recolteService = recolteService;
         this.clientService = clientService;
+        this.typeClientService = typeClientService;
     }
 
     @GetMapping
@@ -76,6 +79,7 @@ public class VenteController {
         model.addAttribute("vente", v);
         model.addAttribute("recoltes", recolteService.getAllRecoltes()); // Utilise le getAllRecoltes() de Tommy
         model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
+        model.addAttribute("typesClient", typeClientService.listerTout());
         return "ventes/formulaire";
     }
 
@@ -99,6 +103,7 @@ public class VenteController {
         } catch (RuntimeException e) {
             model.addAttribute("erreur", e.getMessage());
             model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
+        model.addAttribute("typesClient", typeClientService.listerTout());
 
             if (vente.getId() == null) {
                 model.addAttribute("recoltes", recolteService.getAllRecoltes());
@@ -119,6 +124,7 @@ public class VenteController {
     public String afficherFormulaireModification(@PathVariable Long id, Model model) {
         model.addAttribute("vente", service.trouverParId(id));
         model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
+        model.addAttribute("typesClient", typeClientService.listerTout());
         return "ventes/edit";
     }
 
