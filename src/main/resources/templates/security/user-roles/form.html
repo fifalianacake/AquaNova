@@ -12,7 +12,7 @@
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
-    <form th:action="@{/user-roles/save}" th:object="${userRole}" method="post">
+    <form th:action="@{/user-roles}" th:object="${userRole}" method="post">
 
         <input type="hidden" th:field="*{id}" />
 

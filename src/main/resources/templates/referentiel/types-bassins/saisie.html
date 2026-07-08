@@ -11,7 +11,7 @@
 
     <h2 class="mb-4" th:text="${typeBassin.id == null ? 'Nouveau Type de Bassin' : 'Modifier le Type'}">Saisie Type</h2>
 
-    <form th:action="@{/referentiel/types-bassins/enregistrer}" th:object="${typeBassin}" method="post"
+    <form th:action="@{/types-bassins}" th:object="${typeBassin}" method="post"
         class="col-md-6">
         <input type="hidden" th:field="*{id}" />
 
@@ -23,7 +23,7 @@
 
         <button type="submit" class="btn btn-success"
             th:text="${typeBassin.id == null ? 'Créer' : 'Enregistrer'}">Enregistrer</button>
-        <a th:href="@{/referentiel/types-bassins}" class="btn btn-secondary">Annuler</a>
+        <a th:href="@{/types-bassins}" class="btn btn-secondary">Annuler</a>
     </form>
 
 </body>

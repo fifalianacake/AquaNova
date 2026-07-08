@@ -35,7 +35,7 @@ public class UserController {
         return "security/users/form"; 
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public String saveUser(@ModelAttribute("user") User user, Model model) {
         try {
             userService.saveUser(user);
@@ -47,7 +47,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String deleteUser(@PathVariable("id") Long id, Model model) {
         try {
             userService.deleteUser(id);

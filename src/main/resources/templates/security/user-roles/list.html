@@ -28,7 +28,7 @@
                 <td th:text="${ur.user.email}">user@exemple.com</td>
                 <td th:text="${ur.role.name}">ROLE_USER</td>
                 <td>
-                    <a th:href="@{/user-roles/delete/{id}(id=${ur.id})}"
+                    <a th:href="@{/user-roles/{id}/delete(id=${ur.id})}"
                         onclick="return confirm('Retirer ce rôle à l\'utilisateur ?');">
                         Retirer le rôle
                     </a>

@@ -47,7 +47,7 @@ public class StadeCroissanceController {
         return "stade-croissance/form";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String delete(@PathVariable Integer id) {
         service.delete(id);
         return "redirect:/stade-croissance";
