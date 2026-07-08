@@ -39,7 +39,7 @@
                 <td>
                     <a th:href="@{/aliments/{id}(id=${aliment.id})}">Voir</a> | 
                     <a th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier</a> | 
-                    <a th:href="@{/aliments/delete/{id}(id=${aliment.id})}" 
+                    <a th:href="@{/aliments/{id}/delete(id=${aliment.id})}"
                        th:onclick="return confirm('Supprimer cet aliment ?');">Supprimer</a>
                 </td>
             </tr>

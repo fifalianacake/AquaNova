@@ -66,7 +66,7 @@ public class AlimentController {
         return "referentiel/aliments/form";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         service.delete(id);
         return "redirect:/aliments";

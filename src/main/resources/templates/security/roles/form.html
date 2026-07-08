@@ -8,7 +8,7 @@
 
     <h1>Formulaire d'ajout de rôle</h1>
 
-    <form th:action="@{/roles/save}" th:object="${role}" method="post">
+    <form th:action="@{/roles}" th:object="${role}" method="post">
         
         <input type="hidden" th:field="*{id}" />
 

@@ -43,7 +43,7 @@ public class UserRoleController {
         return "security/user-roles/form";
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public String saveUserRole(@ModelAttribute("userRole") UserRoleModels userRole, Model model) {
         try {
             userRoleService.saveUserRole(userRole);
@@ -57,7 +57,7 @@ public class UserRoleController {
         }
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String deleteUserRole(@PathVariable("id") Long id) {
         userRoleService.deleteUserRole(id);
         return "redirect:/user-roles";

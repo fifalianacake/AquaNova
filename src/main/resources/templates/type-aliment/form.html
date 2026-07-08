@@ -2,7 +2,7 @@
 
 <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
-<form action="/type-aliment" method="post" th:object="${type}">
+<form action="/types-aliments" method="post" th:object="${type}">
     <input type="hidden" th:field="*{id}" />
 
     Nom :

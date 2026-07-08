@@ -28,7 +28,7 @@
                 <td th:text="${role.id}">1</td>
                 <td th:text="${role.name}">ROLE_ADMIN</td>
                 <td>
-                    <a th:href="@{/roles/delete/{id}(id=${role.id})}"
+                    <a th:href="@{/roles/{id}/delete(id=${role.id})}"
                         onclick="return confirm('Êtes-vous sur de vouloir supprimer ce rôle ?');">
                         Supprimer
                     </a>

@@ -5,4 +5,6 @@ import mg.itu.aquanova.referentiel.models.StadeCroissanceModels;
 
 public interface StadeCroissanceRepository
         extends JpaRepository<StadeCroissanceModels, Integer> {
+
+    boolean existsByNomIgnoreCase(String nom);
 }

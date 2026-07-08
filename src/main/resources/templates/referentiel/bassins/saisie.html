@@ -13,7 +13,7 @@
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
-    <form th:action="@{/referentiel/bassins/enregistrer}" th:object="${bassin}" method="post" class="col-md-6">
+    <form th:action="@{/bassins}" th:object="${bassin}" method="post" class="col-md-6">
         <input type="hidden" th:field="*{id}" />
 
         <div class="mb-3">
@@ -48,7 +48,7 @@
 
         <button type="submit" class="btn btn-success"
             th:text="${bassin.id == null ? 'Créer' : 'Enregistrer'}">Enregistrer</button>
-        <a th:href="@{/referentiel/bassins}" class="btn btn-secondary">Annuler</a>
+        <a th:href="@{/bassins}" class="btn btn-secondary">Annuler</a>
     </form>
 
 </body>

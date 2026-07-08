@@ -10,7 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/referentiel/bassins")
+@RequestMapping("/bassins")
 public class BassinController {
 
     private final BassinService bassinService;
@@ -29,7 +29,7 @@ public class BassinController {
     }
 
     // 2. Afficher le formulaire d'ajout d'un nouveau bassin
-    @GetMapping("/nouveau")
+    @GetMapping("/new")
     public String formulaireModification(Model model) {
         model.addAttribute("bassin", new Bassin());
         model.addAttribute("types", bassinService.getAllTypes());
@@ -38,7 +38,7 @@ public class BassinController {
     }
 
     // 3. Afficher le formulaire de modification d'un bassin existant
-    @GetMapping("/modifier/{id}")
+    @GetMapping("/{id}/edit")
     public String formulaireModification(@PathVariable Long id, Model model) {
         model.addAttribute("bassin", bassinService.getBassinById(id));
         model.addAttribute("types", bassinService.getAllTypes());
@@ -47,11 +47,11 @@ public class BassinController {
     }
 
     // 4. Traiter l'enregistrement (Ajout ou Modification)
-    @PostMapping("/enregistrer")
+    @PostMapping
     public String enregistrerBassin(@ModelAttribute("bassin") Bassin bassin, Model model) {
         try {
             bassinService.saveBassin(bassin);
-            return "redirect:/referentiel/bassins";
+            return "redirect:/bassins";
         } catch (IllegalArgumentException | IllegalStateException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("bassin", bassin);
@@ -62,9 +62,9 @@ public class BassinController {
     }
 
     // 5. Supprimer un bassin
-    @GetMapping("/supprimer/{id}")
+    @GetMapping("/{id}/delete")
     public String supprimerBassin(@PathVariable Long id) {
         bassinService.deleteBassin(id);
-        return "redirect:/referentiel/bassins";
+        return "redirect:/bassins";
     }
 }
