@@ -20,15 +20,19 @@ import mg.itu.aquanova.achat.dto.AchatAlevinFilter;
 import mg.itu.aquanova.achat.dto.AchatAlevinForm;
 import mg.itu.aquanova.achat.dto.AchatIntrantFilter;
 import mg.itu.aquanova.achat.dto.AchatIntrantForm;
+import mg.itu.aquanova.achat.dto.AchatProvendeForm;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.StatutAchat;
 import mg.itu.aquanova.achat.services.AchatAlevinService;
 import mg.itu.aquanova.achat.services.AchatIntrantService;
+import mg.itu.aquanova.achat.services.AchatProvendeService;
 import mg.itu.aquanova.achat.services.AchatService;
 import mg.itu.aquanova.achat.services.CategorieDepenseService;
 import mg.itu.aquanova.achat.services.FournisseurService;
 import mg.itu.aquanova.achat.services.IntrantService;
 import mg.itu.aquanova.referentiel.services.EspecesService;
+import mg.itu.aquanova.referentiel.services.AlimentService;
+import java.util.Collections;
 
 @Controller
 public class AchatController {
@@ -38,26 +42,32 @@ public class AchatController {
     private final AchatService achatService;
     private final AchatIntrantService achatIntrantService;
     private final AchatAlevinService achatAlevinService;
+    private final AchatProvendeService achatProvendeService;
     private final FournisseurService fournisseurService;
     private final CategorieDepenseService categorieDepenseService;
     private final IntrantService intrantService;
     private final EspecesService especesService;
+    private final AlimentService alimentService;
 
     public AchatController(
             AchatService achatService,
             AchatIntrantService achatIntrantService,
             AchatAlevinService achatAlevinService,
+            AchatProvendeService achatProvendeService,
             FournisseurService fournisseurService,
             CategorieDepenseService categorieDepenseService,
             IntrantService intrantService,
-            EspecesService especesService) {
+            EspecesService especesService,
+            AlimentService alimentService) {
         this.achatService = achatService;
         this.achatIntrantService = achatIntrantService;
         this.achatAlevinService = achatAlevinService;
+        this.achatProvendeService = achatProvendeService;
         this.fournisseurService = fournisseurService;
         this.categorieDepenseService = categorieDepenseService;
         this.intrantService = intrantService;
         this.especesService = especesService;
+        this.alimentService = alimentService;
     }
 
     @GetMapping("/achats")
@@ -138,8 +148,13 @@ public class AchatController {
     @PostMapping("/achats/{id}/valider")
     public String valider(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            achatIntrantService.validerAchat(id);
-            redirectAttributes.addFlashAttribute("success", "Achat validé et stock intrant alimenté.");
+            Achat achat = achatIntrantService.trouverParId(id);
+            if (achat.getCategorieDepense() != null && "ACHAT_PROVENDE".equalsIgnoreCase(achat.getCategorieDepense().getCode())) {
+                achatProvendeService.validerAchat(id);
+            } else {
+                achatIntrantService.validerAchat(id);
+            }
+            redirectAttributes.addFlashAttribute("success", "Achat validé et stock alimenté.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
@@ -149,7 +164,12 @@ public class AchatController {
     @PostMapping("/achats/{id}/annuler")
     public String annuler(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            achatIntrantService.annulerAchat(id);
+            Achat achat = achatIntrantService.trouverParId(id);
+            if (achat.getCategorieDepense() != null && "ACHAT_PROVENDE".equalsIgnoreCase(achat.getCategorieDepense().getCode())) {
+                achatProvendeService.annulerAchat(id);
+            } else {
+                achatIntrantService.annulerAchat(id);
+            }
             redirectAttributes.addFlashAttribute("success", "Achat annulé.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -175,6 +195,38 @@ public class AchatController {
         model.addAttribute("fournisseurs", fournisseurService.listerActifs());
         model.addAttribute("categoriesDepense", categorieDepenseService.trouverParCode("ACHAT_ALEVINS"));
         model.addAttribute("especes", especesService.findAll());
+    }
+
+    @GetMapping("/achats/provende/new")
+    public String formulaireAchatProvende(Model model) {
+        model.addAttribute("achatProvendeForm", new AchatProvendeForm());
+        addFormProvendeAttributes(model);
+        return "achat_depense/achats/form-provende";
+    }
+
+    @PostMapping("/achats/provende")
+    public String creerAchatProvende(
+            @ModelAttribute("achatProvendeForm") AchatProvendeForm form,
+            Model model) {
+        try {
+            var achat = achatProvendeService.createAchatProvende(form);
+            return "redirect:/achats/" + achat.getId();
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("achatProvendeForm", form);
+            addFormProvendeAttributes(model);
+            return "achat_depense/achats/form-provende";
+        }
+    }
+
+    private void addFormProvendeAttributes(Model model) {
+        model.addAttribute("fournisseurs", fournisseurService.listerActifs());
+        try {
+            model.addAttribute("categoriesDepense", Collections.singletonList(categorieDepenseService.trouverParCode("ACHAT_PROVENDE")));
+        } catch (Exception e) {
+            model.addAttribute("categoriesDepense", categorieDepenseService.listerTous());
+        }
+        model.addAttribute("aliments", alimentService.findAll());
     }
 
 }
