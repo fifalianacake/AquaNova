@@ -42,13 +42,15 @@ public class RentabiliteLotService {
         if(listRecoltes.size() != 0) {
             for(Recoltes recolte : listRecoltes) {
                 Optional<Vente> venteOptional = venteRepository.findByRecolte(recolte);
-                if(!venteOptional.isPresent()) {
-                    throw new EntityNotFoundException("Aucun Vente associe a cette Recolte");
+
+                if (venteOptional.isEmpty()) {
+                    continue; 
                 }
-                Vente vente = venteOptional.orElse(null);
+                Vente vente = venteOptional.get();
 
                 if(vente.getStatutVente().getCode().equals(StatutVenteEnum.PAYEE)) {
-                    chiffreAffaire = chiffreAffaire.add(BigDecimal.valueOf(vente.getPoidsVendu() * vente.getPrixUnitaire()));
+                    BigDecimal montantVente = BigDecimal.valueOf(vente.getMontantTotal());
+                    chiffreAffaire = chiffreAffaire.add(montantVente);
                 }
                 
             }
@@ -56,5 +58,32 @@ public class RentabiliteLotService {
 
         return chiffreAffaire;
     }
+
+    // public BigDecimal calculerProfitLot(Long idLot) {
+    //     BigDecimal profit = BigDecimal.ZERO;
+    //     BigDecimal chiffreAffaire = calculerChiffreAffairesLot(idLot);
+
+
+    //     return profit;
+    // }
+
+    // public BigDecimal calculerMargeBeneficiaire(Long idLot) {
+    //     BigDecimal marge = BigDecimal.ZERO;
+
+
+    //     return marge;
+    // }
+
+    // public BigDecimal calculerRentabilite(Long idLot) {
+    //     BigDecimal rentabilite = BigDecimal.ZERO;
+
+
+    //     return rentabilite;
+    // }
+
+    // public String getStatutRentabilite(Long idLot) {
+
+    //     return "";
+    // }
 
 }
