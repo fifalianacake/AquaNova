@@ -48,7 +48,7 @@ public class VenteService {
 
     @Transactional
     public Vente create(Vente vente) {
-        if (vente.getClient() == null || vente.getClient().getNom() == null || vente.getClient().getNom().trim().isEmpty()) {
+        if (vente.getClient() == null || vente.getClient().getId() == null) {
             throw new RuntimeException("Client obligatoire");
         }
         if (vente.getRecolte() == null)
@@ -92,7 +92,7 @@ public class VenteService {
         vente.setRecolte(ancienne.getRecolte());
         vente.setStatutVente(ancienne.getStatutVente());
 
-        if (vente.getClient() == null || vente.getClient().getNom().trim().isEmpty())
+        if (vente.getClient() == null || vente.getClient().getId() == null)
             throw new RuntimeException("Client obligatoire");
         if (vente.getDateVente() == null)
             throw new RuntimeException("Date obligatoire");

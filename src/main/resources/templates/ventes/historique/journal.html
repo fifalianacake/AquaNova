@@ -13,7 +13,7 @@
         <li><strong>Montant Facturé Constaté : </strong> <span th:text="${vente.montantTotal} + ' Ar'"></span></li>
         <li><strong>Date de l'opération : </strong> <span th:text="${#temporals.format(vente.dateVente, 'dd MMMM yyyy')}"></span></li>
         <li><strong>Statut de la transaction : </strong> <span th:text="${vente.statutVente.libelle}"></span></li>
-        <li><strong>Client acheteur : </strong> <span th:text="${vente.client}"></span></li>
+        <li><strong>Client acheteur : </strong> <span th:text="${vente.client != null ? vente.client.nom : '-'}"></span></li>
         <li><strong>Récolte rattachée : </strong> <span th:text="'Récolte #' + ${vente.recolte.id}"></span></li>
         <li><strong>Poids total vendu : </strong> <span th:text="${vente.poidsVendu} + ' kg'"></span></li>
         <li><strong>Prix Unitaire appliqué : </strong> <span th:text="${vente.prixUnitaire} + ' Ar / kg'"></span></li>

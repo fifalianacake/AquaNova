@@ -3,6 +3,7 @@ package mg.itu.aquanova.vente.controllers;
 import mg.itu.aquanova.vente.dto.TransactionFilterDTO;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
+import mg.itu.aquanova.vente.services.ClientService;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
 import mg.itu.aquanova.production.services.RecolteService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,12 +20,14 @@ public class VenteController {
     private final VenteService service;
     private final StatutVenteRepository statutRepository;
     private final RecolteService recolteService; // Ajouté ici
+    private final ClientService clientService;
 
     public VenteController(VenteService service, StatutVenteRepository statutRepository,
-            RecolteService recolteService) {
+            RecolteService recolteService, ClientService clientService) {
         this.service = service;
         this.statutRepository = statutRepository;
         this.recolteService = recolteService;
+        this.clientService = clientService;
     }
 
     @GetMapping
@@ -72,6 +75,7 @@ public class VenteController {
 
         model.addAttribute("vente", v);
         model.addAttribute("recoltes", recolteService.getAllRecoltes()); // Utilise le getAllRecoltes() de Tommy
+        model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
         return "ventes/formulaire";
     }
 
@@ -80,6 +84,9 @@ public class VenteController {
         try {
             if (vente.getRecolte() != null && vente.getRecolte().getId() != null) {
                 vente.setRecolte(recolteService.getRecolteById(vente.getRecolte().getId()));
+            }
+            if (vente.getClient() != null && vente.getClient().getId() != null) {
+                vente.setClient(clientService.trouverParId(vente.getClient().getId()));
             }
 
             if (vente.getId() == null) {
@@ -91,6 +98,7 @@ public class VenteController {
             return "redirect:/ventes";
         } catch (RuntimeException e) {
             model.addAttribute("erreur", e.getMessage());
+            model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
 
             if (vente.getId() == null) {
                 model.addAttribute("recoltes", recolteService.getAllRecoltes());
@@ -110,6 +118,7 @@ public class VenteController {
     @GetMapping("/{id}/edit")
     public String afficherFormulaireModification(@PathVariable Long id, Model model) {
         model.addAttribute("vente", service.trouverParId(id));
+        model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
         return "ventes/edit";
     }
 
