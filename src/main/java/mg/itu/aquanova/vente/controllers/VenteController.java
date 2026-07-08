@@ -77,7 +77,7 @@ public class VenteController {
         v.setDateVente(LocalDate.now());
 
         model.addAttribute("vente", v);
-        model.addAttribute("recoltes", recolteService.getAllRecoltes()); // Utilise le getAllRecoltes() de Tommy
+        model.addAttribute("recoltes", recolteService.getRecoltesDisponibles()); // Utilise le getAllRecoltes() de Tommy
         model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
         model.addAttribute("typesClient", typeClientService.listerTout());
         return "ventes/formulaire";
@@ -106,7 +106,7 @@ public class VenteController {
         model.addAttribute("typesClient", typeClientService.listerTout());
 
             if (vente.getId() == null) {
-                model.addAttribute("recoltes", recolteService.getAllRecoltes());
+                model.addAttribute("recoltes", recolteService.getRecoltesDisponibles());
                 return "ventes/formulaire";
             }
 

@@ -71,7 +71,6 @@ public class ReferenceDataSeeder implements CommandLineRunner {
 
     private static final Map<StatutLotEnum, String> STATUT_LOT_DESCRIPTIONS = Map.of(
             StatutLotEnum.EN_CROISSANCE, "Lot en croissance",
-            StatutLotEnum.RECOLTE_PARTIELLE, "Lot partiellement recolte",
             StatutLotEnum.CLOTURE, "Lot cloture",
             StatutLotEnum.ANNULE, "Lot annule");
 

@@ -7,6 +7,7 @@ import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.repositories.VenteRepository;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
 import mg.itu.aquanova.production.models.Recoltes; // Modifié ici
+import mg.itu.aquanova.production.services.RecolteService;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -18,10 +19,19 @@ public class VenteService {
 
     private final VenteRepository repository;
     private final StatutVenteRepository statutRepository;
+    private final RecolteService recolteService;
 
-    public VenteService(VenteRepository repository, StatutVenteRepository statutRepository) {
+    public VenteService(VenteRepository repository, StatutVenteRepository statutRepository,
+            RecolteService recolteService) {
         this.repository = repository;
         this.statutRepository = statutRepository;
+        this.recolteService = recolteService;
+    }
+
+    private void rafraichirStatutRecolte(Long recolteId) {
+        Recoltes recolteAJour = recolteService.getRecolteById(recolteId);
+        Double dispoApres = calculerPoidsDisponibleRecolte(recolteAJour, null);
+        recolteService.mettreAJourStatutDisponibilite(recolteId, dispoApres);
     }
 
     public Double calculerPoidsDisponibleRecolte(Recoltes recolte, Long exceptionVenteId) {
@@ -76,6 +86,7 @@ public class VenteService {
         vente.setStatutVente(statutCree);
 
         Vente sauvee = repository.save(vente);
+        rafraichirStatutRecolte(sauvee.getRecolte().getId());
         System.out.println("JOURNAL_VENTE: Création de la vente #" + sauvee.getId());
         return sauvee;
     }
@@ -115,7 +126,9 @@ public class VenteService {
             }
         }
 
-        return repository.save(vente);
+        Vente sauvegardee = repository.save(vente);
+        rafraichirStatutRecolte(sauvegardee.getRecolte().getId());
+        return sauvegardee;
     }
 
     @Transactional
@@ -129,7 +142,8 @@ public class VenteService {
     public void annulerVente(Long id) {
         Vente v = repository.findById(id).orElseThrow();
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.ANNULEE));
-        repository.save(v);
+        Vente sauvegardee = repository.save(v);
+        rafraichirStatutRecolte(sauvegardee.getRecolte().getId());
     }
 
     public List<Vente> search(TransactionFilterDTO filters) {
