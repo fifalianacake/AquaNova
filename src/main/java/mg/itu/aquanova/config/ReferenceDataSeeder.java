@@ -1,5 +1,6 @@
 package mg.itu.aquanova.config;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.Map;
 
@@ -16,9 +17,11 @@ import mg.itu.aquanova.production.repositories.StatutLotRepository;
 import mg.itu.aquanova.production.repositories.TypeEvenementLotRepository;
 import mg.itu.aquanova.production.repositories.TypeRecoltesRepository;
 import mg.itu.aquanova.referentiel.models.LibelleStatutBassin;
+import mg.itu.aquanova.referentiel.models.StadeCroissanceModels;
 import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.models.TypeAlimentModels;
 import mg.itu.aquanova.referentiel.models.TypeBassin;
+import mg.itu.aquanova.referentiel.repositories.StadeCroissanceRepository;
 import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
 import mg.itu.aquanova.referentiel.repositories.TypeAlimentRepository;
 import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
@@ -53,6 +56,17 @@ public class ReferenceDataSeeder implements CommandLineRunner {
             "FINITION",
             "GENITEUR",
             "NATUREL"
+    };
+
+    private record StadeSeed(String nom, String poidsMin, String poidsMax) {
+    }
+
+    private static final StadeSeed[] STADES_CROISSANCE = {
+            new StadeSeed("ALEVIN", "0", "5"),
+            new StadeSeed("JUVENILE", "5", "50"),
+            new StadeSeed("GROSSISSEMENT", "50", "300"),
+            new StadeSeed("FINITION", "300", "600"),
+            new StadeSeed("ADULTE", "600", null)
     };
 
     private static final Map<StatutLotEnum, String> STATUT_LOT_DESCRIPTIONS = Map.of(
@@ -94,6 +108,7 @@ public class ReferenceDataSeeder implements CommandLineRunner {
     private final StatutVenteRepository statutVenteRepository;
     private final TypeClientRepository typeClientRepository;
     private final CategorieMaintenanceRepository categorieMaintenanceRepository;
+    private final StadeCroissanceRepository stadeCroissanceRepository;
 
     public ReferenceDataSeeder(
             RoleRepository roleRepository,
@@ -105,7 +120,8 @@ public class ReferenceDataSeeder implements CommandLineRunner {
             TypeEvenementLotRepository typeEvenementLotRepository,
             StatutVenteRepository statutVenteRepository,
             TypeClientRepository typeClientRepository,
-            CategorieMaintenanceRepository categorieMaintenanceRepository) {
+            CategorieMaintenanceRepository categorieMaintenanceRepository,
+            StadeCroissanceRepository stadeCroissanceRepository) {
         this.roleRepository = roleRepository;
         this.typeBassinRepository = typeBassinRepository;
         this.typeAlimentRepository = typeAlimentRepository;
@@ -116,6 +132,7 @@ public class ReferenceDataSeeder implements CommandLineRunner {
         this.statutVenteRepository = statutVenteRepository;
         this.typeClientRepository = typeClientRepository;
         this.categorieMaintenanceRepository = categorieMaintenanceRepository;
+        this.stadeCroissanceRepository = stadeCroissanceRepository;
     }
 
     @Override
@@ -131,6 +148,7 @@ public class ReferenceDataSeeder implements CommandLineRunner {
         seedStatutsVente();
         seedTypesClient();
         seedCategoriesMaintenance();
+        seedStadesCroissance();
     }
 
     private void seedRoles() {
@@ -234,6 +252,18 @@ public class ReferenceDataSeeder implements CommandLineRunner {
                 categorie.setLibelle(libelle);
                 categorie.setDescription(CATEGORIE_MAINTENANCE_DESCRIPTIONS.getOrDefault(libelle, defaultLabel(libelle)));
                 categorieMaintenanceRepository.save(categorie);
+            }
+        }
+    }
+
+    private void seedStadesCroissance() {
+        for (StadeSeed stade : STADES_CROISSANCE) {
+            if (!stadeCroissanceRepository.existsByNomIgnoreCase(stade.nom())) {
+                StadeCroissanceModels modele = new StadeCroissanceModels();
+                modele.setNom(stade.nom());
+                modele.setPoidsMin(stade.poidsMin() != null ? new BigDecimal(stade.poidsMin()) : null);
+                modele.setPoidsMax(stade.poidsMax() != null ? new BigDecimal(stade.poidsMax()) : null);
+                stadeCroissanceRepository.save(modele);
             }
         }
     }
