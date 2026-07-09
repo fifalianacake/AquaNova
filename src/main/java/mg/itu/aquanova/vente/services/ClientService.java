@@ -34,6 +34,9 @@ public class ClientService {
         if (client.getNom() == null || client.getNom().trim().isEmpty()) {
             throw new IllegalArgumentException("Le nom du client est obligatoire.");
         }
+        if (client.getTypeClient() == null || client.getTypeClient().getId() == null) {
+            throw new IllegalArgumentException("Le type de client est obligatoire.");
+        }
         if (client.getEmail() != null && !client.getEmail().isEmpty() && !client.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             throw new IllegalArgumentException("L'adresse email n'est pas valide.");
         }

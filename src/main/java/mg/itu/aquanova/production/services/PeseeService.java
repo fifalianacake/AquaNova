@@ -7,6 +7,7 @@ import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.repositories.PeseRepository;
+import mg.itu.aquanova.referentiel.repositories.StadeCroissanceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +22,14 @@ public class PeseeService {
     private final PeseRepository peseeRepository;
     private final LotRepository lotRepository;
     private final JournalLotService journalLotService;
+    private final StadeCroissanceRepository stadeCroissanceRepository;
 
-    public PeseeService(PeseRepository peseeRepository, LotRepository lotRepository, JournalLotService journalLotService) {
+    public PeseeService(PeseRepository peseeRepository, LotRepository lotRepository, JournalLotService journalLotService,
+            StadeCroissanceRepository stadeCroissanceRepository) {
         this.peseeRepository = peseeRepository;
         this.lotRepository = lotRepository;
         this.journalLotService = journalLotService;
+        this.stadeCroissanceRepository = stadeCroissanceRepository;
     }
 
     public List<Pese> listerToutesLesPesees() {
@@ -169,6 +173,15 @@ public Double getDernierPoidsMoyen(Long idLot) {
                 : historique.get(0).getPoidsMoyen().doubleValue();
 
         lot.setPoidsMoyenActuel(poidsActuel);
+
+        if (poidsActuel != null) {
+            BigDecimal poidsDecimal = BigDecimal.valueOf(poidsActuel);
+            stadeCroissanceRepository.findAll().stream()
+                    .filter(stade -> stade.correspondAuPoids(poidsDecimal))
+                    .findFirst()
+                    .ifPresent(lot::setStadeCroissance);
+        }
+
         lotRepository.save(lot);
     }
 

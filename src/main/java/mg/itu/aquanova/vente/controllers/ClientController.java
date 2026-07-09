@@ -1,11 +1,17 @@
 package mg.itu.aquanova.vente.controllers;
 
 import mg.itu.aquanova.vente.models.Client;
+import mg.itu.aquanova.vente.models.TypeClient;
 import mg.itu.aquanova.vente.services.ClientService;
 import mg.itu.aquanova.vente.services.TypeClientService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/clients")
@@ -49,6 +55,40 @@ public class ClientController {
             model.addAttribute("erreur", e.getMessage());
             model.addAttribute("types", typeClientService.listerTout());
             return "clients/formulaire";
+        }
+    }
+
+    // Création rapide depuis la modale du formulaire de vente (appelée en AJAX,
+    // ne doit jamais rediriger : renvoie du JSON dans tous les cas).
+    @PostMapping("/api")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> creerRapide(
+            @RequestParam String nom,
+            @RequestParam Long typeClientId,
+            @RequestParam(required = false) String contact,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String adresse) {
+
+        try {
+            Client client = new Client();
+            client.setNom(nom);
+            TypeClient type = new TypeClient();
+            type.setId(typeClientId);
+            client.setTypeClient(type);
+            client.setContact(contact);
+            client.setEmail(email);
+            client.setAdresse(adresse);
+
+            Client sauvegarde = clientService.enregistrer(client);
+
+            Map<String, Object> corps = new LinkedHashMap<>();
+            corps.put("id", sauvegarde.getId());
+            corps.put("nom", sauvegarde.getNom());
+            return ResponseEntity.ok(corps);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> erreur = new LinkedHashMap<>();
+            erreur.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erreur);
         }
     }
 

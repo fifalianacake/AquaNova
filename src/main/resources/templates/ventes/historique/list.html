@@ -76,7 +76,7 @@
             </tr>
             <tr th:each="v : ${transactions}">
                 <td th:text="${#temporals.format(v.dateVente, 'dd/MM/yyyy')}"></td>
-                <td th:text="${v.client}"></td>
+                <td th:text="${v.client != null ? v.client.nom : '-'}"></td>
                 <td th:text="'# ' + ${v.recolte.id}"></td>
                 <td th:text="${v.recolte.lot != null} ? 'Lot #' + ${v.recolte.lot.id} : '-'"></td>
                 <td>VENTE</td>

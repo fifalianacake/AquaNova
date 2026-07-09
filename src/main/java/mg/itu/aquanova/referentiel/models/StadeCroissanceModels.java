@@ -54,4 +54,13 @@ public class StadeCroissanceModels {
     public void setPoidsMax(BigDecimal poidsMax) {
         this.poidsMax = poidsMax;
     }
+
+    public boolean correspondAuPoids(BigDecimal poids) {
+        if (poids == null) {
+            return false;
+        }
+        boolean auDessusMin = poidsMin == null || poids.compareTo(poidsMin) >= 0;
+        boolean sousLeMax = poidsMax == null || poids.compareTo(poidsMax) < 0;
+        return auDessusMin && sousLeMax;
+    }
 }

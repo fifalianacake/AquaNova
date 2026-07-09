@@ -31,6 +31,10 @@ public class Recoltes {
     @Column(name = "poids_moyen", nullable = false)
     private Double poidsMoyen;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut", nullable = false, length = 20)
+    private StatutRecolteEnum statut = StatutRecolteEnum.DISPONIBLE;
+
     public Recoltes() {
     }
     public Recoltes(Long id, LotModels lot, TypeRecoltes typeRecolte, LocalDate dateRecolte, int effectifRecolte,
@@ -86,5 +90,11 @@ public class Recoltes {
     }
     public Double getPoidsMoyen() {
         return poidsMoyen;
+    }
+    public StatutRecolteEnum getStatut() {
+        return statut;
+    }
+    public void setStatut(StatutRecolteEnum statut) {
+        this.statut = statut;
     }
 }
