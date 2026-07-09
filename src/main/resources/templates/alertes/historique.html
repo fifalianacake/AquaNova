@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Historique des alertes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        h1 { margin-bottom: 4px; }
+        .sub { color: #666; margin-bottom: 18px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background: #f5f5f5; }
+        .toolbar, .filters, .pagination { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
+        .filters label { display: flex; flex-direction: column; font-size: 13px; gap: 2px; }
+        .filters select, .filters input { padding: 4px 6px; }
+        .btn { display: inline-block; padding: 6px 14px; text-decoration: none; border-radius: 4px; font-size: 13px; cursor: pointer; border: none; }
+        .btn-primary { background: #156581; color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid #156581; color: #156581; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+    </style>
+</head>
+<body>
+
+<h1>Historique des alertes</h1>
+<p class="sub">Alertes résolues ou ignorées — consultation et analyse uniquement.</p>
+
+<!-- ── Filtres ── -->
+<form method="get" th:action="@{/alertes/historique}" class="filters">
+    <input type="hidden" name="page" value="0" />
+
+    <label>Module
+        <select name="moduleSource">
+            <option value="">Tous</option>
+            <option th:each="m : ${moduleSources}"
+                    th:value="${m}"
+                    th:text="${m}"
+                    th:selected="${filter.moduleSource == m}"></option>
+        </select>
+    </label>
+
+    <label>Type alerte
+        <select name="typeAlerte">
+            <option value="">Tous</option>
+            <option th:each="t : ${typesAlerte}"
+                    th:value="${t}"
+                    th:text="${t}"
+                    th:selected="${filter.typeAlerte == t}"></option>
+        </select>
+    </label>
+
+    <label>Criticité
+        <select name="niveauCriticite">
+            <option value="">Tous</option>
+            <option th:each="n : ${niveauxCriticite}"
+                    th:value="${n}"
+                    th:text="${n}"
+                    th:selected="${filter.niveauCriticite == n}"></option>
+        </select>
+    </label>
+
+    <label>Statut
+        <select name="statut">
+            <option value="">Tous</option>
+            <option th:each="s : ${statutsAlerte}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${filter.statut == s}"></option>
+        </select>
+    </label>
+
+    <label>Date début
+        <input type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+    </label>
+
+    <label>Date fin
+        <input type="date" name="dateFin" th:value="${filter.dateFin}" />
+    </label>
+
+    <label>Lot
+        <select name="lotId">
+            <option value="">Tous</option>
+            <option th:each="l : ${lots}"
+                    th:value="${l.id}"
+                    th:text="${l.code}"
+                    th:selected="${filter.lotId == l.id}"></option>
+        </select>
+    </label>
+
+    <label>Bassin
+        <select name="bassinId">
+            <option value="">Tous</option>
+            <option th:each="b : ${bassins}"
+                    th:value="${b.id}"
+                    th:text="${b.reference}"
+                    th:selected="${filter.bassinId == b.id}"></option>
+        </select>
+    </label>
+
+    <label>Lignes/page
+        <select name="size" onchange="this.form.submit()">
+            <option th:each="s : ${pageSizes}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${alertes.size == s}"></option>
+        </select>
+    </label>
+
+    <button type="submit" class="btn btn-primary">Filtrer</button>
+    <a th:href="@{/alertes/historique}" class="btn btn-outline">Réinitialiser</a>
+</form>
+
+<!-- ── Export PDF ── -->
+<div class="toolbar">
+    <a th:href="@{/alertes/historique/export/pdf(
+            moduleSource=${filter.moduleSource},
+            typeAlerte=${filter.typeAlerte},
+            niveauCriticite=${filter.niveauCriticite},
+            statut=${filter.statut},
+            dateDebut=${filter.dateDebut},
+            dateFin=${filter.dateFin},
+            lotId=${filter.lotId},
+            bassinId=${filter.bassinId})}"
+       class="btn btn-outline">
+        📄 Exporter en PDF
+    </a>
+</div>
+
+<!-- ── Tableau ── -->
+<table>
+    <thead>
+    <tr>
+        <th>Date création</th>
+        <th>Date résolution</th>
+        <th>Module</th>
+        <th>Type</th>
+        <th>Criticité</th>
+        <th>Statut</th>
+        <th>Message</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="a : ${alertes.content}">
+        <td th:text="${#temporals.format(a.dateCreation, 'dd/MM/yyyy HH:mm')}"></td>
+        <td th:text="${a.dateResolution != null ? #temporals.format(a.dateResolution, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+        <td th:text="${a.moduleSource}"></td>
+        <td th:text="${a.typeAlerte}"></td>
+        <td>
+            <span class="badge"
+                  th:text="${a.niveauCriticite}"
+                  th:classappend="${a.niveauCriticite.name() == 'CRITIQUE' ? 'badge-danger' : (a.niveauCriticite.name() == 'AVERTISSEMENT' ? 'badge-warning' : 'badge-info')}">
+            </span>
+        </td>
+        <td>
+            <span class="badge"
+                  th:text="${a.statut}"
+                  th:classappend="${a.statut.name() == 'RESOLUE' ? 'badge-success' : (a.statut.name() == 'IGNOREE' ? 'badge-secondary' : 'badge-info')}">
+            </span>
+        </td>
+        <td th:text="${a.message}"></td>
+    </tr>
+    <tr th:if="${alertes.empty}">
+        <td colspan="7" style="text-align:center;">Aucune alerte trouvée pour ces critères.</td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- ── Pagination ── -->
+<div class="pagination" th:if="${alertes.totalPages > 0}">
+    <a th:if="${alertes.hasPrevious()}"
+       th:href="@{/alertes/historique(
+               page=${alertes.number - 1}, size=${alertes.size},
+               moduleSource=${filter.moduleSource}, typeAlerte=${filter.typeAlerte},
+               niveauCriticite=${filter.niveauCriticite}, statut=${filter.statut},
+               dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin},
+               lotId=${filter.lotId}, bassinId=${filter.bassinId})}">
+        &laquo; Précédent
+    </a>
+    <span th:unless="${alertes.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
+
+    <span th:text="'Page ' + ${alertes.number + 1} + ' sur ' + ${alertes.totalPages} + ' — ' + ${alertes.totalElements} + ' alerte(s)'"></span>
+
+    <a th:if="${alertes.hasNext()}"
+       th:href="@{/alertes/historique(
+               page=${alertes.number + 1}, size=${alertes.size},
+               moduleSource=${filter.moduleSource}, typeAlerte=${filter.typeAlerte},
+               niveauCriticite=${filter.niveauCriticite}, statut=${filter.statut},
+               dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin},
+               lotId=${filter.lotId}, bassinId=${filter.bassinId})}">
+        Suivant &raquo;
+    </a>
+    <span th:unless="${alertes.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+</div>
+
+</body>
+</html>

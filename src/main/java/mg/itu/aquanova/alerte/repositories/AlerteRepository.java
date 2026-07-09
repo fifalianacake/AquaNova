@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import mg.itu.aquanova.alerte.models.Alerte;
 
-public interface AlerteRepository extends JpaRepository<Alerte,Long>{
+public interface AlerteRepository extends JpaRepository<Alerte,Long> JpaSpecificationExecutor<Alerte> {
 
     List<Alerte> findByModuleSource(String moduleSource);
 
