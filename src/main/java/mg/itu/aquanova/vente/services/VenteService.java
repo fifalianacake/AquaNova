@@ -61,14 +61,17 @@ public class VenteService {
         if (vente.getClient() == null || vente.getClient().getId() == null) {
             throw new RuntimeException("Client obligatoire");
         }
+        if (!Boolean.TRUE.equals(vente.getClient().getActif())) {
+            throw new RuntimeException("Ce client est désactivé : impossible de lui associer une nouvelle vente.");
+        }
         if (vente.getRecolte() == null)
             throw new RuntimeException("Récolte obligatoire");
         if (vente.getDateVente() == null)
             throw new RuntimeException("Date obligatoire");
-        if (vente.getPoidsVendu() == null || vente.getPoidsVendu() <= 0)
-            throw new RuntimeException("Poids vendu doit être > 0");
         if (vente.getPrixUnitaire() == null || vente.getPrixUnitaire() <= 0)
             throw new RuntimeException("Prix unitaire doit être > 0");
+
+        resoudrePoidsEtEffectif(vente);
 
         Double dispoPoids = calculerPoidsDisponibleRecolte(vente.getRecolte(), null);
         if (vente.getPoidsVendu() > dispoPoids) {
@@ -87,8 +90,50 @@ public class VenteService {
 
         Vente sauvee = repository.save(vente);
         rafraichirStatutRecolte(sauvee.getRecolte().getId());
-        System.out.println("JOURNAL_VENTE: Création de la vente #" + sauvee.getId());
         return sauvee;
+    }
+
+    /**
+     * Résout le couple poids/effectif vendu à partir d'un seul des deux champs (saisie exclusive
+     * imposée par le formulaire) : l'autre est déduit via le poids moyen individuel de la récolte.
+     * Rejette explicitement le cas où les deux seraient renseignés en même temps.
+     */
+    private void resoudrePoidsEtEffectif(Vente vente) {
+        boolean poidsRenseigne = vente.getPoidsVendu() != null;
+        boolean effectifRenseigne = vente.getEffectifVendu() != null;
+
+        if (poidsRenseigne && effectifRenseigne) {
+            throw new RuntimeException(
+                    "Choisissez soit le poids vendu, soit l'effectif vendu : les deux ne peuvent pas être renseignés en même temps.");
+        }
+        if (!poidsRenseigne && !effectifRenseigne) {
+            throw new RuntimeException("Le poids vendu ou l'effectif vendu est obligatoire.");
+        }
+        if (effectifRenseigne && vente.getEffectifVendu() <= 0) {
+            throw new RuntimeException("Effectif vendu doit être > 0");
+        }
+        if (poidsRenseigne && vente.getPoidsVendu() <= 0) {
+            throw new RuntimeException("Poids vendu doit être > 0");
+        }
+
+        Double poidsMoyen = vente.getRecolte() != null ? vente.getRecolte().getPoidsMoyen() : null;
+        if (poidsMoyen == null || poidsMoyen <= 0) {
+            if (effectifRenseigne) {
+                throw new RuntimeException(
+                        "Le poids moyen individuel de la récolte est inconnu : impossible de déduire le poids à partir de l'effectif. Renseignez directement le poids vendu.");
+            }
+            return;
+        }
+
+        if (effectifRenseigne) {
+            vente.setPoidsVendu(arrondir2(vente.getEffectifVendu() * poidsMoyen));
+        } else {
+            vente.setEffectifVendu((int) Math.round(vente.getPoidsVendu() / poidsMoyen));
+        }
+    }
+
+    private Double arrondir2(Double valeur) {
+        return Math.round(valeur * 100.0) / 100.0;
     }
 
     @Transactional
@@ -106,14 +151,19 @@ public class VenteService {
 
         if (vente.getClient() == null || vente.getClient().getId() == null)
             throw new RuntimeException("Client obligatoire");
+
+        boolean clientInchange = ancienne.getClient() != null
+                && ancienne.getClient().getId().equals(vente.getClient().getId());
+        if (!clientInchange && !Boolean.TRUE.equals(vente.getClient().getActif())) {
+            throw new RuntimeException("Ce client est désactivé : impossible de lui associer cette vente.");
+        }
+
         if (vente.getDateVente() == null)
             throw new RuntimeException("Date obligatoire");
-        if (vente.getPoidsVendu() == null || vente.getPoidsVendu() <= 0)
-            throw new RuntimeException("Poids vendu doit être > 0");
         if (vente.getPrixUnitaire() == null || vente.getPrixUnitaire() <= 0)
             throw new RuntimeException("Prix unitaire doit être > 0");
-        if (vente.getEffectifVendu() != null && vente.getEffectifVendu() <= 0)
-            throw new RuntimeException("Effectif vendu doit être > 0");
+
+        resoudrePoidsEtEffectif(vente);
 
         Double dispoPoids = calculerPoidsDisponibleRecolte(vente.getRecolte(), vente.getId());
         if (vente.getPoidsVendu() > dispoPoids) {

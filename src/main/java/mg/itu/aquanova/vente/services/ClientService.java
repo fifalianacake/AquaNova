@@ -25,6 +25,21 @@ public class ClientService {
         return clientRepository.filtrerClients(id, likePattern(nom), typeId, likePattern(contact), actif);
     }
 
+    /**
+     * Clients actifs, utilisables pour une nouvelle sélection (ex: liste déroulante de vente).
+     * Si {@code clientActuel} est désactivé, il est tout de même inclus pour ne pas le faire
+     * disparaître d'un formulaire d'édition qui le référence déjà.
+     */
+    public List<Client> listerActifsPour(Client clientActuel) {
+        List<Client> actifs = new java.util.ArrayList<>(rechercher(null, null, null, null, true));
+        if (clientActuel != null && clientActuel.getId() != null
+                && !Boolean.TRUE.equals(clientActuel.getActif())
+                && actifs.stream().noneMatch(c -> c.getId().equals(clientActuel.getId()))) {
+            actifs.add(clientActuel);
+        }
+        return actifs;
+    }
+
     public Client trouverParId(Long id) {
         return clientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client introuvable"));
     }

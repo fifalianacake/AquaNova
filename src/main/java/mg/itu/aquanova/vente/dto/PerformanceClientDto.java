@@ -2,7 +2,7 @@ package mg.itu.aquanova.vente.dto;
 
 public class PerformanceClientDto {
 
-    private String clientNom;       // String car client est un String dans Vente
+    private String clientNom;
     private Long nombreVentes;
     private Double volumeAchete;
     private Double chiffreAffaires;

@@ -78,7 +78,7 @@ public class VenteController {
 
         model.addAttribute("vente", v);
         model.addAttribute("recoltes", recolteService.getRecoltesDisponibles()); // Utilise le getAllRecoltes() de Tommy
-        model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
+        model.addAttribute("clients", clientService.listerActifsPour(null));
         model.addAttribute("typesClient", typeClientService.listerTout());
         return "ventes/formulaire";
     }
@@ -102,8 +102,8 @@ public class VenteController {
             return "redirect:/ventes";
         } catch (RuntimeException e) {
             model.addAttribute("erreur", e.getMessage());
-            model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
-        model.addAttribute("typesClient", typeClientService.listerTout());
+            model.addAttribute("clients", clientService.listerActifsPour(vente.getClient()));
+            model.addAttribute("typesClient", typeClientService.listerTout());
 
             if (vente.getId() == null) {
                 model.addAttribute("recoltes", recolteService.getRecoltesDisponibles());
@@ -122,8 +122,9 @@ public class VenteController {
 
     @GetMapping("/{id}/edit")
     public String afficherFormulaireModification(@PathVariable Long id, Model model) {
-        model.addAttribute("vente", service.trouverParId(id));
-        model.addAttribute("clients", clientService.rechercher(null, null, null, null, null));
+        Vente vente = service.trouverParId(id);
+        model.addAttribute("vente", vente);
+        model.addAttribute("clients", clientService.listerActifsPour(vente.getClient()));
         model.addAttribute("typesClient", typeClientService.listerTout());
         return "ventes/edit";
     }

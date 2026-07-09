@@ -69,7 +69,10 @@ public class RecolteService {
 
         validerRecolte(lot, typeRecolte, dateRecolte, effectifRecolte);
 
-        Double poidsMoyen = lot.getPoidsMoyenActuel();
+        // lot.getPoidsMoyenActuel() est exprimé en grammes (convention utilisée dans tout le reste
+        // du code, cf. finance.PrevisionFinanciereService et alimentation.DistributionService) ;
+        // Recoltes.poidsMoyen/poidsTotal sont eux exprimés en kg (affichés tels quels dans les vues).
+        Double poidsMoyen = lot.getPoidsMoyenActuel() / 1000.0;
         Double poidsTotal = calculerPoidsTotalRecolte(lot, effectifRecolte);
         int nouvelEffectif = lot.getEffectifActuel() - effectifRecolte;
 
@@ -168,7 +171,7 @@ public class RecolteService {
     }
 
     private Double calculerPoidsTotalRecolte(LotModels lot, Integer effectifRecolte) {
-        return lot.getPoidsMoyenActuel() * effectifRecolte;
+        return (lot.getPoidsMoyenActuel() / 1000.0) * effectifRecolte;
     }
 
     private void appliquerStatutsApresRecolte(LotModels lot, int nouvelEffectif) {

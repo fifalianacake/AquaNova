@@ -40,15 +40,6 @@ public class HistoriqueVenteService {
         return searchTransactions(filters);
     }
 
-    public List<Vente> getVentesAnnulee(){
-        StatutVente statutAnnulee = statutVenteRepository.findByCode(mg.itu.aquanova.vente.models.StatutVenteEnum.ANNULEE);
-        TransactionFilterDTO filters = new TransactionFilterDTO();
-        if(statutAnnulee != null){
-            filters.setStatutId(statutAnnulee.getId());
-        }
-        return searchTransactions(filters);
-    }
-
     public List<StatutVente> getAllStatuts() {
         return statutVenteRepository.findAll();
     }

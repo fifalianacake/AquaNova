@@ -41,19 +41,25 @@ public class HistoriqueExportController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dateDebut,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dateFin,
             @RequestParam(required = false) Long clientId,
-            @RequestParam(required = false) String statut,
+            @RequestParam(required = false) Long statutId,
             @RequestParam(required = false) String clientNom) {
 
-        
+
         List<Vente> ventes = venteService.search(
-                null,          
-                clientNom,      
-                null,          
-                null,           
-                dateDebut,      
-                dateFin,        
-                null            
+                null,
+                clientNom,
+                null,
+                null,
+                dateDebut,
+                dateFin,
+                statutId
         );
+
+        if (clientId != null) {
+            ventes = ventes.stream()
+                    .filter(v -> v.getClient() != null && clientId.equals(v.getClient().getId()))
+                    .toList();
+        }
 
         // Construire les lignes
         List<List<String>> lignes = new ArrayList<>();
@@ -96,7 +102,7 @@ public class HistoriqueExportController {
             .filtre("Date fin", dateFin != null ? dateFin.toString() : null)
             .filtre("Client ID", clientId)
             .filtre("Client", clientNom)
-            .filtre("Statut", statut)
+            .filtre("Statut", statutId)
             .colonnes(List.of("N°", "Date", "Client", "Lot", "Poids (kg)", 
                     "Prix Unitaire", "Montant (MGA)", "Statut"))
             .lignes(lignes)
