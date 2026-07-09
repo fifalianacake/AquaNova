@@ -1,37 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Fiche Vente</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
-        .fiche-container { background: white; max-width: 600px; margin: 50px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .info-label { font-weight: bold; color: #555; }
-        .info-value { color: #111; }
-        .badge { padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; text-transform: uppercase; }
-        .badge-creee { background-color: #ffeeba; color: #856404; }
-        .badge-validee { background-color: #cce5ff; color: #004085; }
-        .badge-payee { background-color: #d4edda; color: #155724; }
-        .badge-annulee { background-color: #f8d7da; color: #721c24; }
-        .btn-box { display: flex; gap: 10px; margin-top: 30px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: bold; color: white; display: inline-block; }
-        .btn-secondary { background-color: #6c757d; }
-        .btn-warning { background-color: #ffc107; color: #212529; }
-        .btn-success { background-color: #28a745; }
-        .btn-danger { background-color: #dc3545; }
-        .btn-right { margin-left: auto; }
-    </style>
 </head>
 <body>
+<main>
 
     <div class="fiche-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #343a40; padding-bottom: 10px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d9e4ec; padding-bottom: 10px; margin-bottom: 15px;">
             <h2>Fiche de Vente #<span th:text="${vente.id}"></span></h2>
             <span th:class="'badge badge-' + ${#strings.toLowerCase(vente.statutVente.code)}" th:text="${vente.statutVente.libelle}"></span>
         </div>
 
-        <div class="error" th:if="${erreur}" th:text="${erreur}" style="color: red; background: #fce8e6; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;"></div>
+        <div class="error" th:if="${erreur}" th:text="${erreur}"></div>
 
         <div class="info-row">
             <div class="info-label">Date de vente</div>
@@ -63,7 +44,7 @@
         </div>
         <div class="info-row" style="background-color: #f1f3f5; padding: 12px 8px; border-radius: 4px; margin-top: 10px;">
             <div class="info-label" style="font-size: 1.05em; color: #000;">Montant Total Facturé</div>
-            <div class="info-value" th:text="${vente.montantTotal + ' Ar'}" style="font-weight: bold; color: #28a745; font-size: 1.1em;"></div>
+            <div class="info-value" th:text="${vente.montantTotal + ' Ar'}" style="font-weight: bold; color: #2176ae; font-size: 1.1em;"></div>
         </div>
         <div class="info-row">
             <div class="info-label">Observations</div>
@@ -74,16 +55,16 @@
             <a th:href="@{/ventes}" class="btn btn-secondary">Retour</a>
             
             <th:block th:if="${vente.statutVente.code.name() == 'CREEE'}">
-                <a th:href="@{/ventes/{id}/edit(id=${vente.id})}" class="btn btn-warning">Modifier</a>
+                <a th:href="@{/ventes/{id}/edit(id=${vente.id})}" class="btn btn-outline-primary">Modifier</a>
 
                 <form th:action="@{/ventes/{id}/valider(id=${vente.id})}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-success">Valider la vente</button>
+                    <button type="submit" class="btn btn-primary">Valider la vente</button>
                 </form>
             </th:block>
 
             <form th:if="${vente.statutVente.code.name() == 'VALIDEE'}"
                   th:action="@{/ventes/{id}/payer(id=${vente.id})}" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-success">Marquer comme payée</button>
+                <button type="submit" class="btn btn-primary">Marquer comme payée</button>
             </form>
 
             <form th:if="${vente.statutVente.code.name() != 'ANNULEE' && vente.statutVente.code.name() != 'PAYEE'}"
@@ -96,6 +77,6 @@
                th:href="@{/ventes/{id}/export-pdf(id=${vente.id})}" class="btn btn-primary btn-right">Facture PDF</a>
         </div>
     </div>
-
+</main>
 </body>
 </html>

@@ -1,62 +1,61 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Historique Commercial</title>
 </head>
 <body>
-
+<main>
     <h2>Historique Global des Transactions Commerciales</h2>
 
     <form th:action="@{/ventes/historique}" th:object="${filters}" method="get">
         <div>
-            <label>Client</label>
-            <input type="text" th:field="*{client}"/>
+            <label class="form-label">Client</label>
+            <input class="form-control" type="text" th:field="*{client}"/>
         </div>
         <div>
-            <label>Bassin / Lot</label>
-            <select th:field="*{idLot}">
+            <label class="form-label">Bassin / Lot</label>
+            <select class="form-select" th:field="*{idLot}">
                 <option value="">-- Tous les lots --</option>
                 <option th:each="l : ${lots}" th:value="${l.id}" th:text="'Lot #' + ${l.id}"></option>
             </select>
         </div>
         <div>
-            <label>Récolte d'origine</label>
-            <select th:field="*{idRecolte}">
+            <label class="form-label">Récolte d'origine</label>
+            <select class="form-select" th:field="*{idRecolte}">
                 <option value="">-- Toutes les récoltes --</option>
                 <option th:each="r : ${recoltes}" th:value="${r.id}" th:text="'Récolte #' + ${r.id}"></option>
             </select>
         </div>
         <div>
-            <label>Statut de la Vente</label>
-            <select th:field="*{statutId}">
+            <label class="form-label">Statut de la Vente</label>
+            <select class="form-select" th:field="*{statutId}">
                 <option value="">-- Tous les statuts --</option>
                 <option th:each="s : ${statuts}" th:value="${s.id}" th:text="${s.libelle}"></option>
             </select>
         </div>
         <div>
-            <label>Date Début</label>
-            <input type="date" th:field="*{dateDebut}"/>
+            <label class="form-label">Date Début</label>
+            <input class="form-control" type="date" th:field="*{dateDebut}"/>
         </div>
         <div>
-            <label>Date Fin</label>
-            <input type="date" th:field="*{dateFin}"/>
+            <label class="form-label">Date Fin</label>
+            <input class="form-control" type="date" th:field="*{dateFin}"/>
         </div>
         <div>
-            <label>Montant Min</label>
-            <input type="number" step="0.01" th:field="*{montantMin}"/>
+            <label class="form-label">Montant Min</label>
+            <input class="form-control" type="number" step="0.01" th:field="*{montantMin}"/>
         </div>
         <div>
-            <label>Montant Max</label>
-            <input type="number" step="0.01" th:field="*{montantMax}"/>
+            <label class="form-label">Montant Max</label>
+            <input class="form-control" type="number" step="0.01" th:field="*{montantMax}"/>
         </div>
         <div>
             <a th:href="@{/ventes/historique}">Réinitialiser</a>
-            <button type="submit">Appliquer les filtres</button>
+            <button class="btn btn-primary" type="submit">Appliquer les filtres</button>
         </div>
     </form>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>Date</th>
@@ -84,11 +83,11 @@
                 <td th:text="${v.montantTotal} + ' Ar'"></td>
                 <td th:text="${v.statutVente.libelle}"></td>
                 <td>
-                    <a th:href="@{/ventes/{id}/journal(id=${v.id})}">Voir Journal</a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/ventes/{id}/journal(id=${v.id})}">Voir Journal</a>
                 </td>
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
 </html>

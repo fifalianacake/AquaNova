@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-
 <body>
+<main>
     <h1>Details du paramètre système</h1>
 
     <div th:if="${parametre != null}">
@@ -24,10 +21,10 @@
     </div>
 
     <p>
-        <a th:href="@{/parametres-systeme}">Retour à la liste</a>
+        <a class="btn btn-secondary" th:href="@{/parametres-systeme}">Retour à la liste</a>
         |
-        <a th:if="${parametre != null}" th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
+        <a class="btn btn-sm btn-outline-primary" th:if="${parametre != null}" th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
     </p>
+</main>
 </body>
-
 </html>

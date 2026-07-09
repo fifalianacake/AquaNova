@@ -1,23 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Stock intrant</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 16px; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background: #f5f5f5; }
-        .filters, .pagination, .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
-        .stock { padding: 12px; border: 1px solid #ddd; background: #f8f8f8; display: inline-block; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1>Fiche stock intrant</h1>
 
 <div class="toolbar">
     <a th:href="@{/intrants}">Catalogue intrants</a>
-    <a th:href="@{/intrants/{id}(id=${intrant.id})}">Fiche intrant</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{/intrants/{id}(id=${intrant.id})}">Fiche intrant</a>
     <a th:href="@{/achats/intrants/new}">Nouvel achat d'intrants</a>
 </div>
 
@@ -27,12 +20,12 @@
 <form method="get" th:action="@{/intrants/{intrantId}/stock(intrantId=${intrant.id})}" class="filters">
     <input type="hidden" name="page" value="0" />
 
-    <label>ID mouvement
-        <input type="number" name="id" th:value="${filter.id}" />
+    <label class="form-label">ID mouvement
+        <input class="form-control" type="number" name="id" th:value="${filter.id}" />
     </label>
 
-    <label>Type
-        <select name="typeMouvement">
+    <label class="form-label">Type
+        <select class="form-select" name="typeMouvement">
             <option value="">Tous</option>
             <option th:each="type : ${typesMouvement}"
                     th:value="${type}"
@@ -41,16 +34,16 @@
         </select>
     </label>
 
-    <label>Date début
-        <input type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+    <label class="form-label">Date début
+        <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
     </label>
 
-    <label>Date fin
-        <input type="date" name="dateFin" th:value="${filter.dateFin}" />
+    <label class="form-label">Date fin
+        <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
     </label>
 
-    <label>Lignes/page
-        <select name="size" onchange="this.form.submit()">
+    <label class="form-label">Lignes/page
+        <select class="form-select" name="size" onchange="this.form.submit()">
             <option th:each="s : ${pageSizes}"
                     th:value="${s}"
                     th:text="${s}"
@@ -58,11 +51,11 @@
         </select>
     </label>
 
-    <button type="submit">Filtrer</button>
+    <button class="btn btn-primary" type="submit">Filtrer</button>
     <a th:href="@{/intrants/{intrantId}/stock(intrantId=${intrant.id})}">Réinitialiser</a>
 </form>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>ID</th>
@@ -94,7 +87,7 @@
 </table>
 
 <div class="pagination" th:if="${mouvements.totalPages > 0}">
-    <a th:if="${mouvements.hasPrevious()}"
+    <a class="btn btn-secondary" th:if="${mouvements.hasPrevious()}"
        th:href="@{/intrants/{intrantId}/stock(intrantId=${intrant.id}, page=${mouvements.number - 1}, size=${mouvements.size}, id=${filter.id}, typeMouvement=${filter.typeMouvement}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
     <span th:unless="${mouvements.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
 
@@ -104,6 +97,6 @@
        th:href="@{/intrants/{intrantId}/stock(intrantId=${intrant.id}, page=${mouvements.number + 1}, size=${mouvements.size}, id=${filter.id}, typeMouvement=${filter.typeMouvement}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
     <span th:unless="${mouvements.hasNext()}" style="color:#999;">Suivant &raquo;</span>
 </div>
-
+</main>
 </body>
 </html>

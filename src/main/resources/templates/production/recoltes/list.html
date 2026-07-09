@@ -1,25 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Liste des récoltes</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1>Liste des récoltes</h1>
 
 <p>
-    <a th:href="@{/recoltes/new}">Créer une récolte</a>
+    <a class="btn btn-primary" th:href="@{/recoltes/new}">Créer une récolte</a>
     <a th:href="@{/types-recoltes}">Gérer les types de récolte</a>
 </p>
 
 <form method="get" th:action="@{/recoltes}">
     <div>
-        <label>Lot:
-            <select name="lotId">
+        <label class="form-label">Lot:
+            <select class="form-select" name="lotId">
                 <option value="">--</option>
                 <option th:each="lot : ${lots}"
                         th:value="${lot.id}"
@@ -27,8 +24,8 @@
                         th:selected="${param.lotId} == ${lot.id}"></option>
             </select>
         </label>
-        <label>Type:
-            <select name="typeRecolteId">
+        <label class="form-label">Type:
+            <select class="form-select" name="typeRecolteId">
                 <option value="">--</option>
                 <option th:each="type : ${typesRecolte}"
                         th:value="${type.id}"
@@ -36,14 +33,14 @@
                         th:selected="${param.typeRecolteId} == ${type.id}"></option>
             </select>
         </label>
-        <label>Du: <input type="date" name="dateFrom" th:value="${param.dateFrom}"></label>
-        <label>Au: <input type="date" name="dateTo" th:value="${param.dateTo}"></label>
-        <button type="submit">Filtrer</button>
+        <label class="form-label">Du: <input class="form-control" type="date" name="dateFrom" th:value="${param.dateFrom}"></label>
+        <label class="form-label">Au: <input class="form-control" type="date" name="dateTo" th:value="${param.dateTo}"></label>
+        <button class="btn btn-primary" type="submit">Filtrer</button>
         <a th:href="@{/recoltes}">Réinitialiser</a>
     </div>
 </form>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>ID</th>
@@ -68,11 +65,11 @@
         <td th:text="${recolte.poidsMoyen}"></td>
         <td th:text="${recolte.statut}"></td>
         <td>
-            <a th:href="@{/recoltes/{id}(id=${recolte.id})}">Voir</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/recoltes/{id}(id=${recolte.id})}">Voir</a>
         </td>
     </tr>
     </tbody>
 </table>
-
+</main>
 </body>
 </html>

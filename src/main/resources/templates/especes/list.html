@@ -1,8 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Liste des espèces</title>
+</head>
+<body>
+<main>
 <h2>Liste des espèces</h2>
 
-<a href="/especes/new">Ajouter</a>
+<a class="btn btn-primary" href="/especes/new">Ajouter</a>
 
-<table border="1">
+<table class="table table-hover align-middle">
     <tr>
         <th>ID</th>
         <th>Nom</th>
@@ -17,8 +24,11 @@
         <td th:text="${e.poidsCibleMoyen}"></td>
         <td th:text="${e.image}"></td>
         <td>
-            <a th:href="@{/especes/{id}(id=${e.id})}">Edit</a>
-            <a th:href="@{/especes/{id}/delete(id=${e.id})}">Delete</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/especes/{id}(id=${e.id})}">Edit</a>
+            <a class="btn btn-sm btn-outline-danger" th:href="@{/especes/{id}/delete(id=${e.id})}">Delete</a>
         </td>
     </tr>
 </table>
+</main>
+</body>
+</html>

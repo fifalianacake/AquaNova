@@ -1,8 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Liste des Types d'Aliments</title>
+</head>
+<body>
+<main>
 <h2>Liste des Types d'Aliments</h2>
 
-<a href="/types-aliments/new">Ajouter</a>
+<a class="btn btn-primary" href="/types-aliments/new">Ajouter</a>
 
-<table border="1">
+<table class="table table-hover align-middle">
     <tr>
         <th>ID</th>
         <th>Nom</th>
@@ -14,14 +21,17 @@
     <td th:text="${t.nom}"></td>
 
     <td>
-        <a th:href="@{/types-aliments/{id}(id=${t.id})}">
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/types-aliments/{id}(id=${t.id})}">
             Edit
         </a>
 
-        <a th:href="@{/types-aliments/{id}/delete(id=${t.id})}">
+        <a class="btn btn-sm btn-outline-danger" th:href="@{/types-aliments/{id}/delete(id=${t.id})}">
             Delete
         </a>
     </td>
 </tr>
 
 </table>
+</main>
+</body>
+</html>

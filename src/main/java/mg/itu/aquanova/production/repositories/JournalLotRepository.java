@@ -18,8 +18,8 @@ public interface JournalLotRepository extends JpaRepository<JournalLot, Long> {
             select j from JournalLot j
             where (:lotId is null or j.lot.id = :lotId)
               and (:typeEvenement is null or j.typeEvenement.libelle = :typeEvenement)
-              and (:dateDebut is null or j.dateEvenement >= :dateDebut)
-              and (:dateFin is null or j.dateEvenement <= :dateFin)
+              and (cast(:dateDebut as timestamp) is null or j.dateEvenement >= :dateDebut)
+              and (cast(:dateFin as timestamp) is null or j.dateEvenement <= :dateFin)
             order by j.dateEvenement asc
             """)
     List<JournalLot> rechercher(

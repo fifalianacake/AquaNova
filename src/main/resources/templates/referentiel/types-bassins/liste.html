@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Référentiel - Types de Bassins</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-
-<body class="container mt-5">
-
+<body>
+<main>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Types de Bassins</h2>
         <div>
@@ -31,14 +27,13 @@
                 <td th:text="${t.libelle}">Happa</td>
                 <td>
                     <a th:href="@{/types-bassins/{id}/edit(id=${t.id})}"
-                        class="btn btn-sm btn-warning">Modifier</a>
+                        class="btn btn-sm btn-outline-primary">Modifier</a>
                     <a th:href="@{/types-bassins/{id}/delete(id=${t.id})}" class="btn btn-sm btn-danger"
                         onclick="return confirm('Supprimer ce type ?')">Supprimer</a>
                 </td>
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
-
 </html>

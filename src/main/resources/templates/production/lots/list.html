@@ -1,63 +1,60 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Liste des lots</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1>Liste des lots</h1>
 
 <div>
-    <a th:href="@{/lots/new}">Créer un nouveau lot</a>
+    <a class="btn btn-primary" th:href="@{/lots/new}">Créer un nouveau lot</a>
     <a th:href="@{/production/previsions-recoltes}">Prévision récoltes</a>
 </div>
 
 <form method="get" th:action="@{/lots}">
     <div>
-        <label>Id: <input type="number" name="id" th:value="${param.id}"></label>
-        <label>Code: <input type="text" name="code" th:value="${param.code}"></label>
-        <label>Espece:
-            <select name="especeId">
+        <label class="form-label">Id: <input class="form-control" type="number" name="id" th:value="${param.id}"></label>
+        <label class="form-label">Code: <input class="form-control" type="text" name="code" th:value="${param.code}"></label>
+        <label class="form-label">Espece:
+            <select class="form-select" name="especeId">
                 <option value="">--</option>
                 <option th:each="e : ${especes}" th:value="${e.id}" th:text="${e.nom}" th:selected="${param.especeId} == ${e.id}"></option>
             </select>
         </label>
-        <label>Bassin:
-            <select name="bassinId">
+        <label class="form-label">Bassin:
+            <select class="form-select" name="bassinId">
                 <option value="">--</option>
                 <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}" th:selected="${param.bassinId} == ${b.id}"></option>
             </select>
         </label>
-        <label>Stade:
-            <select name="stadeId">
+        <label class="form-label">Stade:
+            <select class="form-select" name="stadeId">
                 <option value="">--</option>
                 <option th:each="s : ${stades}" th:value="${s.id}" th:text="${s.nom}" th:selected="${param.stadeId} == ${s.id}"></option>
             </select>
         </label>
-        <label>Statut:
-            <select name="statutId">
+        <label class="form-label">Statut:
+            <select class="form-select" name="statutId">
                 <option value="">--</option>
                 <option th:each="st : ${statuts}" th:value="${st.id}" th:text="${st.libelle}" th:selected="${param.statutId} == ${st.id}"></option>
             </select>
         </label>
     </div>
     <div>
-        <label>Date from: <input type="date" name="dateFrom" th:value="${param.dateFrom}"></label>
-        <label>Date to: <input type="date" name="dateTo" th:value="${param.dateTo}"></label>
-        <label>Effectif min: <input type="number" name="effectifMin" th:value="${param.effectifMin}"></label>
-        <label>Effectif max: <input type="number" name="effectifMax" th:value="${param.effectifMax}"></label>
+        <label class="form-label">Date from: <input class="form-control" type="date" name="dateFrom" th:value="${param.dateFrom}"></label>
+        <label class="form-label">Date to: <input class="form-control" type="date" name="dateTo" th:value="${param.dateTo}"></label>
+        <label class="form-label">Effectif min: <input class="form-control" type="number" name="effectifMin" th:value="${param.effectifMin}"></label>
+        <label class="form-label">Effectif max: <input class="form-control" type="number" name="effectifMax" th:value="${param.effectifMax}"></label>
     </div>
     <div>
-        <button type="submit">Search</button>
+        <button class="btn btn-primary" type="submit">Search</button>
         <a th:href="@{/lots}">Reset</a>
     </div>
 </form>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>ID</th>
@@ -83,8 +80,8 @@
         <td th:text="${lot.effectifActuel}"></td>
         <td>
             <a th:href="@{'/lots/' + ${lot.id}}">View</a>
-            <a th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
-            <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Passer ce lot au statut ANNULE ?')">Delete</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
+            <a class="btn btn-sm btn-outline-danger" th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Passer ce lot au statut ANNULE ?')">Delete</a>
         </td>
     </tr>
     </tbody>
@@ -93,7 +90,7 @@
 <div th:if="${totalPages > 0}" style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
     
     <span th:if="${hasPrevious}">
-        <a th:href="@{/lots(page=${currentPage - 1}, 
+        <a class="btn btn-secondary" th:href="@{/lots(page=${currentPage - 1}, 
                             id=${lotFilter.id}, 
                             code=${lotFilter.code}, 
                             especeId=${lotFilter.especeId}, 
@@ -125,6 +122,6 @@
     <span th:unless="${hasNext}" style="color: #999;">Suivant &raquo;</span>
 
 </div>
-
+</main>
 </body>
 </html>

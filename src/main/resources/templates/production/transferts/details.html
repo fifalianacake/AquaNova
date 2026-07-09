@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Details du transfert</title>
 </head>
-
 <body>
+<main>
     <h1>Détails du transfert</h1>
     <div>
         <p><strong>ID:</strong> <span th:text="${transfert.id}"></span></p>
@@ -20,8 +17,8 @@
         <p><strong>Bassin destination:</strong> <span th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></span></p>
     </div>
     <div>
-        <a th:href="@{/transferts}">Retour à la liste</a>
+        <a class="btn btn-secondary" th:href="@{/transferts}">Retour à la liste</a>
     </div>
+</main>
 </body>
-
 </html>

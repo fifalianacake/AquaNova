@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova</title>
+</head>
 <body>
+<main>
     <div th:if="${error}" style="color:red;">
         <p th:text="${error}"></p>
     </div>
@@ -15,22 +18,22 @@
             <legend>Filtres</legend>
 
             <div>
-                <label>ID du mouvement</label><br>
-                <input type="number" name="id" placeholder="Ex : 12" th:value="${param.id}">
+                <label class="form-label">ID du mouvement</label><br>
+                <input class="form-control" type="number" name="id" placeholder="Ex : 12" th:value="${param.id}">
             </div>
 
             <br>
 
             <div>
-                <label>Aliment</label><br>
-                <input type="text" name="aliment" placeholder="Nom de l'aliment" th:value="${param.aliment}">
+                <label class="form-label">Aliment</label><br>
+                <input class="form-control" type="text" name="aliment" placeholder="Nom de l'aliment" th:value="${param.aliment}">
             </div>
 
             <br>
 
             <div>
-                <label>Type</label><br>
-                <select name="type">
+                <label class="form-label">Type</label><br>
+                <select class="form-select" name="type">
                     <option value="">Tous</option>
                     <option value="ENTREE" th:selected="${param.type == 'ENTREE'}">
                         Entrée
@@ -47,20 +50,20 @@
             <br>
 
             <div>
-                <label>Date de début</label><br>
-                <input type="date" name="start" th:value="${param.start}">
+                <label class="form-label">Date de début</label><br>
+                <input class="form-control" type="date" name="start" th:value="${param.start}">
             </div>
 
             <br>
 
             <div>
-                <label>Date de fin</label><br>
-                <input type="date" name="end" th:value="${param.end}">
+                <label class="form-label">Date de fin</label><br>
+                <input class="form-control" type="date" name="end" th:value="${param.end}">
             </div>
 
             <br>
 
-            <button type="submit">Filtrer</button>
+            <button class="btn btn-primary" type="submit">Filtrer</button>
             <a th:href="@{/stocks/mouvements}">Réinitialiser</a>
 
         </fieldset>
@@ -68,7 +71,7 @@
     </form>
 
     <!-- TABLE -->
-    <table border="1">
+    <table class="table table-hover align-middle">
         <tr>
             <th>ID</th>
             <th>Date</th>
@@ -85,7 +88,7 @@
             <td th:text="${m.typeMouvement}"></td>
             <td th:text="${m.quantite}"></td>
             <td>
-                <a th:href="@{'/stocks/mouvements/' + ${m.id}}">Voir</a>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{'/stocks/mouvements/' + ${m.id}}">Voir</a>
             </td>
         </tr>
     </table>
@@ -95,8 +98,7 @@
         Page navigation handled in controller if needed
     </div>
 
-    <a href="/stocks/mouvements/new">Nouveau mouvement</a>
-
+    <a class="btn btn-primary" href="/stocks/mouvements/new">Nouveau mouvement</a>
+</main>
 </body>
-
 </html>

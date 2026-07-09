@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Fiche Traitement</title>
 </head>
 <body>
-
+<main>
     <div>
         <h2>Fiche de Traitement d'Eau #<span th:text="${traitement.id}"></span></h2>
         
@@ -35,13 +34,13 @@
         </div>
 
         <div>
-            <a th:href="@{/traitements-eau}">Retour</a>
-            <a th:href="@{/traitements-eau/{id}/edit(id=${traitement.id})}">Modifier</a>
+            <a class="btn btn-secondary" th:href="@{/traitements-eau}">Retour</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/traitements-eau/{id}/edit(id=${traitement.id})}">Modifier</a>
             <form th:action="@{/traitements-eau/{id}/delete(id=${traitement.id})}" method="post" onsubmit="return confirm('Voulez-vous vraiment effacer ce traitement ?')">
-                <button type="submit">Supprimer</button>
+                <button class="btn btn-danger" type="submit">Supprimer</button>
             </form>
         </div>
     </div>
-
+</main>
 </body>
 </html>

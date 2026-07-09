@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Détails Statut Lot</title>
 </head>
 <body>
+<main>
 <h1>Détails statut lot <span th:text="${statut.id}"></span></h1>
 <div>
     <p><strong>Libelle:</strong> <span th:text="${statut.libelle}"></span></p>
@@ -12,8 +12,9 @@
 </div>
 <div>
     <a th:href="@{/statut-lots}">Back to list</a>
-    <a th:href="@{'/statut-lots/' + ${statut.id} + '/edit'}">Edit</a>
-    <a th:href="@{'/statut-lots/' + ${statut.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{'/statut-lots/' + ${statut.id} + '/edit'}">Edit</a>
+    <a class="btn btn-sm btn-outline-danger" th:href="@{'/statut-lots/' + ${statut.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
 </div>
+</main>
 </body>
 </html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Type de traitement eau</title>
 </head>
 <body>
+<main>
     <h2 th:text="${typeTraitement.id != null} ? 'Modifier un type de traitement' : 'Nouveau type de traitement'">
         Nouveau type de traitement
     </h2>
@@ -15,20 +15,21 @@
         <form th:action="${typeTraitement.id == null} ? @{/types-traitements-eau} : @{/types-traitements-eau/{id}(id=${typeTraitement.id})}"
               th:object="${typeTraitement}"
               method="post">
-            <label for="libelle">Libellé *</label>
-            <input id="libelle" type="text" th:field="*{libelle}" required>
+            <label class="form-label" for="libelle">Libellé *</label>
+            <input class="form-control" id="libelle" type="text" th:field="*{libelle}" required>
 
-            <label for="description">Description</label>
-            <textarea id="description" th:field="*{description}" rows="5"></textarea>
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control" id="description" th:field="*{description}" rows="5"></textarea>
 
             <div>
-                <button type="submit"
+                <button class="btn btn-primary" type="submit"
                         th:text="${typeTraitement.id != null} ? 'Modifier' : 'Créer'">
                     Créer
                 </button>
-                <a th:href="@{/types-traitements-eau}">Retour</a>
+                <a class="btn btn-secondary" th:href="@{/types-traitements-eau}">Retour</a>
             </div>
         </form>
     </section>
+</main>
 </body>
 </html>

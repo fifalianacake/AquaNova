@@ -1,19 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Affectations des Rôles</title>
 </head>
-
 <body>
-
+<main>
     <h1>Liste des Rôles par Utilisateur</h1>
 
     <a th:href="@{/user-roles/new}">Affecter un rôle à un utilisateur</a>
     <br><br>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -41,8 +38,7 @@
     </table>
 
     <br>
-    <a th:href="@{/users}">Retour à la liste des utilisateurs</a>
-
+    <a class="btn btn-secondary" th:href="@{/users}">Retour à la liste des utilisateurs</a>
+</main>
 </body>
-
 </html>

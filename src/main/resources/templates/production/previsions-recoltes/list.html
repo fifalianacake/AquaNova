@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Prévisions de récolte</title>
 </head>
 <body>
-
+<main>
 <h1>Prévisions de récolte</h1>
 
 <p>
@@ -14,8 +13,8 @@
 
 <form method="get" th:action="@{/production/previsions-recoltes}">
     <div>
-        <label for="lotId">Lot :</label>
-        <select id="lotId" name="lotId">
+        <label class="form-label" for="lotId">Lot :</label>
+        <select class="form-select" id="lotId" name="lotId">
             <option value="">Tous les lots</option>
             <option th:each="lot : ${lots}"
                     th:value="${lot.id}"
@@ -26,8 +25,8 @@
     </div>
 
     <div>
-        <label for="especeId">Espèce :</label>
-        <select id="especeId" name="especeId">
+        <label class="form-label" for="especeId">Espèce :</label>
+        <select class="form-select" id="especeId" name="especeId">
             <option value="">Toutes les espèces</option>
             <option th:each="espece : ${especes}"
                     th:value="${espece.id}"
@@ -38,8 +37,8 @@
     </div>
 
     <div>
-        <label for="bassinId">Bassin :</label>
-        <select id="bassinId" name="bassinId">
+        <label class="form-label" for="bassinId">Bassin :</label>
+        <select class="form-select" id="bassinId" name="bassinId">
             <option value="">Tous les bassins</option>
             <option th:each="bassin : ${bassins}"
                     th:value="${bassin.id}"
@@ -50,16 +49,16 @@
     </div>
 
     <div>
-        <label for="dateDebut">Récolte estimée du :</label>
-        <input type="date" id="dateDebut" name="dateDebut" th:value="${filter.dateDebut}">
+        <label class="form-label" for="dateDebut">Récolte estimée du :</label>
+        <input class="form-control" type="date" id="dateDebut" name="dateDebut" th:value="${filter.dateDebut}">
     </div>
 
     <div>
-        <label for="dateFin">Au :</label>
-        <input type="date" id="dateFin" name="dateFin" th:value="${filter.dateFin}">
+        <label class="form-label" for="dateFin">Au :</label>
+        <input class="form-control" type="date" id="dateFin" name="dateFin" th:value="${filter.dateFin}">
     </div>
 
-    <button type="submit">Filtrer</button>
+    <button class="btn btn-primary" type="submit">Filtrer</button>
     <a th:href="@{/production/previsions-recoltes}">Réinitialiser</a>
 </form>
 
@@ -67,7 +66,7 @@
 
 <h2>Lots proches de la récolte</h2>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>Lot</th>
@@ -102,7 +101,7 @@
     <span th:text="${previsions != null ? #lists.size(previsions) : 0}">0</span>
 </p>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>Lot</th>
@@ -143,6 +142,6 @@
     </tr>
     </tbody>
 </table>
-
+</main>
 </body>
 </html>

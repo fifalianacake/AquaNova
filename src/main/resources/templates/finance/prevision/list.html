@@ -1,24 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Prévisions Financières</title>
 </head>
-
 <body>
-
+<main>
     <h2>Calcul des Prévisions Financières par Période</h2>
 
     <form th:action="@{/finance/previsions}" method="get">
         <div>
-            <label for="dateDebut">Date de début :</label>
-            <input type="date" id="dateDebut" name="dateDebut" th:value="${dateDebut}" required />
+            <label class="form-label" for="dateDebut">Date de début :</label>
+            <input class="form-control" type="date" id="dateDebut" name="dateDebut" th:value="${dateDebut}" required />
 
-            <label for="dateFin">Date de fin :</label>
-            <input type="date" id="dateFin" name="dateFin" th:value="${dateFin}" required />
+            <label class="form-label" for="dateFin">Date de fin :</label>
+            <input class="form-control" type="date" id="dateFin" name="dateFin" th:value="${dateFin}" required />
 
-            <button type="submit">Générer les prévisions</button>
+            <button class="btn btn-primary" type="submit">Générer les prévisions</button>
         </div>
     </form>
 
@@ -26,7 +23,7 @@
 
     <p th:if="${erreur}" th:text="${erreur}" style="color: red; font-weight: bold;"></p>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>Code Lot</th>
@@ -57,7 +54,6 @@
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
-
 </html>

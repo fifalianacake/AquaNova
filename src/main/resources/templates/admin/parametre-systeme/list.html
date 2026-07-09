@@ -1,22 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des paramètres système</title>
 </head>
-
 <body>
+<main>
     <h1>Liste des paramètres système</h1>
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
     <p>
-        <a th:href="@{/parametres-systeme/new}">Creer un nouveau paramètre</a>
+        <a class="btn btn-primary" th:href="@{/parametres-systeme/new}">Creer un nouveau paramètre</a>
     </p>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -37,16 +34,16 @@
                 <td th:text="${parametre.typeValeur}"></td>
                 <td th:text="${parametre.description}"></td>
                 <td>
-                    <a th:href="@{'/parametres-systeme/' + ${parametre.id}}">Details</a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/parametres-systeme/' + ${parametre.id}}">Details</a>
                     |
-                    <a th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
                     |
-                    <a th:href="@{'/parametres-systeme/' + ${parametre.id} + '/delete'}"
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{'/parametres-systeme/' + ${parametre.id} + '/delete'}"
                         onclick="return confirm('Supprimer ce paramètre ?');">Supprimer</a>
                 </td>
             </tr>
         </tbody>
     </table>
+</main>
 </body>
-
 </html>

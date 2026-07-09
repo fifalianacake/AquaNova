@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Statut Bassin Form</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-<body class="container mt-5">
-
+<body>
+<main>
 <h2 class="mb-4" th:text="${statut.id == null ? 'New Statut Bassin' : 'Edit Statut Bassin'}">
     Statut Bassin Form
 </h2>
@@ -32,9 +30,9 @@
         </select>
     </div>
 
-    <button type="submit" class="btn btn-success">Save</button>
+    <button type="submit" class="btn btn-primary">Save</button>
     <a th:href="@{/statuts-bassins}" class="btn btn-secondary">Cancel</a>
 </form>
-
+</main>
 </body>
 </html>

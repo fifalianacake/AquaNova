@@ -1,20 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des transferts</title>
 </head>
-
 <body>
+<main>
     <h1>Liste des transferts</h1>
 
     <p>
-        <a th:href="@{/transferts/new}">Creer un nouveau transfert</a>
+        <a class="btn btn-primary" th:href="@{/transferts/new}">Creer un nouveau transfert</a>
     </p>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -39,12 +36,11 @@
                 <td th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></td>
                 <td th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></td>
                 <td>
-                    <a th:href="@{'/transferts/' + ${transfert.id}}">Voir</a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/transferts/' + ${transfert.id}}">Voir</a>
                 </td>
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
-
 </html>

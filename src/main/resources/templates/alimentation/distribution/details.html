@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détails de la Distribution</title>
 </head>
-
 <body>
-
+<main>
     <h1>Fiche de Distribution de nourriture</h1>
 
     <div>
@@ -29,11 +25,10 @@
     <hr />
 
     <div>
-        <a th:href="@{/distributions/{id}/edit(id=${distribution.id})}">Modifier cette fiche</a>
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/distributions/{id}/edit(id=${distribution.id})}">Modifier cette fiche</a>
         |
-        <a th:href="@{/distributions}">Retour à la liste</a>
+        <a class="btn btn-secondary" th:href="@{/distributions}">Retour à la liste</a>
     </div>
-
+</main>
 </body>
-
 </html>

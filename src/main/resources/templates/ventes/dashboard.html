@@ -1,80 +1,110 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard ventes</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>AquaNova - Dashboard ventes</title>
 </head>
 <body>
-    <header>
-        <h1>Dashboard ventes</h1>
-        <nav>
-            <a th:href="@{/ventes}">Liste des ventes</a>
-            <a th:href="@{/ventes/new}">Nouvelle vente</a>
-        </nav>
-    </header>
+<main>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0">Dashboard ventes</h2>
+        <div>
+            <a th:href="@{/ventes}" class="btn btn-outline-primary btn-sm">Liste des ventes</a>
+            <a th:href="@{/ventes/new}" class="btn btn-primary btn-sm">Nouvelle vente</a>
+        </div>
+    </div>
 
-    <main>
-        <section>
-            <h2>Filtres</h2>
-            <form th:action="@{/ventes/dashboard}" method="get">
-                <div>
-                    <label for="debut">Date début</label>
-                    <input id="debut" type="date" name="debut" th:value="${debut}">
-                </div>
-                <div>
-                    <label for="fin">Date fin</label>
-                    <input id="fin" type="date" name="fin" th:value="${fin}">
-                </div>
-                <button type="submit">Afficher</button>
-            </form>
-        </section>
+    <form th:action="@{/ventes/dashboard}" method="get" class="card card-body flex-row align-items-end gap-3 mb-4" style="flex-wrap: wrap;">
+        <div>
+            <label class="form-label" for="debut">Date début</label>
+            <input class="form-control" id="debut" type="date" name="debut" th:value="${debut}">
+        </div>
+        <div>
+            <label class="form-label" for="fin">Date fin</label>
+            <input class="form-control" id="fin" type="date" name="fin" th:value="${fin}">
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Afficher</button>
+        </div>
+    </form>
 
-        <section>
-            <h2>Statistiques</h2>
-            <div>
-                <article>
-                    <h3>Chiffre d'affaires</h3>
-                    <p th:text="${stats.chiffreAffaires != null ? stats.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</p>
-                </article>
-                <article>
-                    <h3>Volume écoulé</h3>
-                    <p th:text="${stats.volumeEcoule != null ? stats.volumeEcoule + ' kg' : '0 kg'}">0 kg</p>
-                </article>
-                <article>
-                    <h3>Nombre de ventes</h3>
-                    <p th:text="${stats.nombreVentes != null ? stats.nombreVentes : 0}">0</p>
-                </article>
-                <article>
-                    <h3>Prix moyen par kg</h3>
-                    <p th:text="${stats.prixMoyenKg != null ? stats.prixMoyenKg + ' Ar/kg' : '0 Ar/kg'}">0 Ar/kg</p>
-                </article>
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-secondary small">Chiffre d'affaires</div>
+                    <div class="fs-4 fw-bold text-primary"
+                         th:text="${stats.chiffreAffaires != null ? stats.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</div>
+                </div>
             </div>
-        </section>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-secondary small">Volume écoulé</div>
+                    <div class="fs-4 fw-bold text-primary"
+                         th:text="${stats.volumeEcoule != null ? stats.volumeEcoule + ' kg' : '0 kg'}">0 kg</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-secondary small">Nombre de ventes</div>
+                    <div class="fs-4 fw-bold text-primary"
+                         th:text="${stats.nombreVentes != null ? stats.nombreVentes : 0}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-secondary small">Prix moyen par kg</div>
+                    <div class="fs-4 fw-bold text-primary"
+                         th:text="${stats.prixMoyenKg != null ? stats.prixMoyenKg + ' Ar/kg' : '0 Ar/kg'}">0 Ar/kg</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <section>
-            <h2>Graphiques</h2>
-            <article>
-                <h3>Chiffre d'affaires par jour</h3>
-                <canvas id="caParJourChart"></canvas>
-            </article>
-            <article>
-                <h3>Volume vendu par lot</h3>
-                <canvas id="volumeParLotChart"></canvas>
-            </article>
-            <article>
-                <h3>Chiffre d'affaires par client</h3>
-                <canvas id="caClientChart"></canvas>
-            </article>
-            <article>
-                <h3>Top 5 clients par CA</h3>
-                <canvas id="top5Chart"></canvas>
-            </article>
-        </section>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Chiffre d'affaires par jour</h3>
+                    <canvas id="caParJourChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Volume vendu par lot</h3>
+                    <canvas id="volumeParLotChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Chiffre d'affaires par client</h3>
+                    <canvas id="caClientChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Top 5 clients par CA</h3>
+                    <canvas id="top5Chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <section>
-            <h2>Top clients</h2>
-            <table>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="h6">Top clients</h3>
+            <table class="table table-hover mb-0">
                 <thead>
                     <tr>
                         <th>Client</th>
@@ -95,11 +125,13 @@
                     </tr>
                 </tbody>
             </table>
-        </section>
+        </div>
+    </div>
 
-        <section>
-            <h2>Volumes par lot et récolte</h2>
-            <table>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="h6">Volumes par lot et récolte</h3>
+            <table class="table table-hover mb-0">
                 <thead>
                     <tr>
                         <th>Lot</th>
@@ -122,9 +154,10 @@
                     </tr>
                 </tbody>
             </table>
-        </section>
-    </main>
+        </div>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script th:inline="javascript">
         const caParJourLabels = JSON.parse(/*[[${caParJourLabels}]]*/ '[]');
         const caParJourValues = JSON.parse(/*[[${caParJourValues}]]*/ '[]');
@@ -136,14 +169,14 @@
         const top5Values = JSON.parse(/*[[${top5Values}]]*/ '[]');
 
         const chartColors = [
-            '#2563eb',
-            '#16a34a',
-            '#f59e0b',
-            '#dc2626',
-            '#7c3aed',
-            '#0891b2',
-            '#db2777',
-            '#65a30d'
+            '#2176ae',
+            '#4da3cf',
+            '#12344d',
+            '#7fc0e0',
+            '#1a628f',
+            '#a8d4ea',
+            '#5b8ba8',
+            '#2f8fc4'
         ];
 
         new Chart(document.getElementById('caParJourChart'), {
@@ -153,8 +186,8 @@
                 datasets: [{
                     label: "Chiffre d'affaires",
                     data: caParJourValues,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                    borderColor: '#2176ae',
+                    backgroundColor: 'rgba(33, 118, 174, 0.15)',
                     fill: true,
                     tension: 0.3
                 }]
@@ -214,7 +247,7 @@
                 datasets: [{
                     label: "Chiffre d'affaires",
                     data: top5Values,
-                    backgroundColor: '#16a34a'
+                    backgroundColor: '#2176ae'
                 }]
             },
             options: {
@@ -231,5 +264,6 @@
             }
         });
     </script>
+</main>
 </body>
 </html>

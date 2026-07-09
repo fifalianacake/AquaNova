@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Achats d'intrants et d'alevins</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 16px; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background: #f5f5f5; }
-        .toolbar, .filters, .pagination { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1>Historique des achats d'intrants</h1>
 
 <div class="toolbar">
@@ -22,12 +16,12 @@
 <form method="get" th:action="@{/achats}" class="filters">
     <input type="hidden" name="page" value="0" />
 
-    <label>ID
-        <input type="number" name="id" th:value="${filter.id}" />
+    <label class="form-label">ID
+        <input class="form-control" type="number" name="id" th:value="${filter.id}" />
     </label>
 
-    <label>Fournisseur
-        <select name="fournisseurId">
+    <label class="form-label">Fournisseur
+        <select class="form-select" name="fournisseurId">
             <option value="">Tous</option>
             <option th:each="f : ${fournisseurs}"
                     th:value="${f.id}"
@@ -36,8 +30,8 @@
         </select>
     </label>
 
-    <label>Catégorie
-        <select name="categorieDepenseId">
+    <label class="form-label">Catégorie
+        <select class="form-select" name="categorieDepenseId">
             <option value="">Toutes</option>
             <option th:each="c : ${categoriesDepense}"
                     th:value="${c.id}"
@@ -46,8 +40,8 @@
         </select>
     </label>
 
-    <label>Intrant
-        <select name="intrantId">
+    <label class="form-label">Intrant
+        <select class="form-select" name="intrantId">
             <option value="">Tous</option>
             <option th:each="i : ${intrants}"
                     th:value="${i.id}"
@@ -56,8 +50,8 @@
         </select>
     </label>
 
-    <label>Statut
-        <select name="statutAchat">
+    <label class="form-label">Statut
+        <select class="form-select" name="statutAchat">
             <option value="">Tous</option>
             <option th:each="s : ${statutsAchat}"
                     th:value="${s}"
@@ -66,28 +60,28 @@
         </select>
     </label>
 
-    <label>Date début
-        <input type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+    <label class="form-label">Date début
+        <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
     </label>
 
-    <label>Date fin
-        <input type="date" name="dateFin" th:value="${filter.dateFin}" />
+    <label class="form-label">Date fin
+        <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
     </label>
 
-    <label>Montant min
-        <input type="number" step="0.01" min="0" name="montantMin" th:value="${filter.montantMin}" />
+    <label class="form-label">Montant min
+        <input class="form-control" type="number" step="0.01" min="0" name="montantMin" th:value="${filter.montantMin}" />
     </label>
 
-    <label>Montant max
-        <input type="number" step="0.01" min="0" name="montantMax" th:value="${filter.montantMax}" />
+    <label class="form-label">Montant max
+        <input class="form-control" type="number" step="0.01" min="0" name="montantMax" th:value="${filter.montantMax}" />
     </label>
 
-    <label>Référence facture
-        <input type="text" name="referenceFacture" th:value="${filter.referenceFacture}" />
+    <label class="form-label">Référence facture
+        <input class="form-control" type="text" name="referenceFacture" th:value="${filter.referenceFacture}" />
     </label>
 
-    <label>Lignes/page
-        <select name="size" onchange="this.form.submit()">
+    <label class="form-label">Lignes/page
+        <select class="form-select" name="size" onchange="this.form.submit()">
             <option th:each="s : ${pageSizes}"
                     th:value="${s}"
                     th:text="${s}"
@@ -95,11 +89,11 @@
         </select>
     </label>
 
-    <button type="submit">Filtrer</button>
+    <button class="btn btn-primary" type="submit">Filtrer</button>
     <a th:href="@{/achats}">Réinitialiser</a>
 </form>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>ID</th>
@@ -123,7 +117,7 @@
         <td th:text="${!#lists.isEmpty(achat.lignes) ? achat.lignes[0].quantite + ' ' + achat.lignes[0].unite : '-'}"></td>
         <td th:text="${achat.montantTotal}"></td>
         <td th:text="${achat.statutAchat}"></td>
-        <td><a th:href="@{/achats/{id}(id=${achat.id})}">Fiche</a></td>
+        <td><a class="btn btn-sm btn-outline-primary" th:href="@{/achats/{id}(id=${achat.id})}">Fiche</a></td>
     </tr>
     <tr th:if="${achats.empty}">
         <td colspan="9">Aucun achat d'intrants trouvé.</td>
@@ -132,7 +126,7 @@
 </table>
 
 <div class="pagination" th:if="${achats.totalPages > 0}">
-    <a th:if="${achats.hasPrevious()}"
+    <a class="btn btn-secondary" th:if="${achats.hasPrevious()}"
        th:href="@{/achats(page=${achats.number - 1}, size=${achats.size}, id=${filter.id}, fournisseurId=${filter.fournisseurId}, categorieDepenseId=${filter.categorieDepenseId}, intrantId=${filter.intrantId}, statutAchat=${filter.statutAchat}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax}, referenceFacture=${filter.referenceFacture})}">&laquo; Précédent</a>
     <span th:unless="${achats.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
 
@@ -155,12 +149,12 @@
 <form method="get" th:action="@{/achats}" class="filters">
     <input type="hidden" name="page" value="0" />
 
-    <label>ID
-        <input type="number" name="id" th:value="${filterAlevin.id}" />
+    <label class="form-label">ID
+        <input class="form-control" type="number" name="id" th:value="${filterAlevin.id}" />
     </label>
 
-    <label>Fournisseur
-        <select name="fournisseurId">
+    <label class="form-label">Fournisseur
+        <select class="form-select" name="fournisseurId">
             <option value="">Tous</option>
             <option th:each="f : ${fournisseurs}"
                     th:value="${f.id}"
@@ -169,8 +163,8 @@
         </select>
     </label>
 
-    <label>Catégorie
-        <select name="categorieDepenseId">
+    <label class="form-label">Catégorie
+        <select class="form-select" name="categorieDepenseId">
             <option value="">Toutes</option>
             <option th:each="c : ${categoriesDepense}"
                     th:value="${c.id}"
@@ -179,8 +173,8 @@
         </select>
     </label>
 
-    <label>Espèce
-        <select name="especeId">
+    <label class="form-label">Espèce
+        <select class="form-select" name="especeId">
             <option value="">Toutes</option>
             <option th:each="e : ${especes}"
                     th:value="${e.id}"
@@ -189,8 +183,8 @@
         </select>
     </label>
 
-    <label>Statut
-        <select name="statutAchat">
+    <label class="form-label">Statut
+        <select class="form-select" name="statutAchat">
             <option value="">Tous</option>
             <option th:each="s : ${statutsAchat}"
                     th:value="${s}"
@@ -199,28 +193,28 @@
         </select>
     </label>
 
-    <label>Date début
-        <input type="date" name="dateDebut" th:value="${filterAlevin.dateDebut}" />
+    <label class="form-label">Date début
+        <input class="form-control" type="date" name="dateDebut" th:value="${filterAlevin.dateDebut}" />
     </label>
 
-    <label>Date fin
-        <input type="date" name="dateFin" th:value="${filterAlevin.dateFin}" />
+    <label class="form-label">Date fin
+        <input class="form-control" type="date" name="dateFin" th:value="${filterAlevin.dateFin}" />
     </label>
 
-    <label>Montant min
-        <input type="number" step="0.01" min="0" name="montantMin" th:value="${filterAlevin.montantMin}" />
+    <label class="form-label">Montant min
+        <input class="form-control" type="number" step="0.01" min="0" name="montantMin" th:value="${filterAlevin.montantMin}" />
     </label>
 
-    <label>Montant max
-        <input type="number" step="0.01" min="0" name="montantMax" th:value="${filterAlevin.montantMax}" />
+    <label class="form-label">Montant max
+        <input class="form-control" type="number" step="0.01" min="0" name="montantMax" th:value="${filterAlevin.montantMax}" />
     </label>
 
-    <label>Référence facture
-        <input type="text" name="referenceFacture" th:value="${filterAlevin.referenceFacture}" />
+    <label class="form-label">Référence facture
+        <input class="form-control" type="text" name="referenceFacture" th:value="${filterAlevin.referenceFacture}" />
     </label>
 
-    <label>Lignes/page
-        <select name="size" onchange="this.form.submit()">
+    <label class="form-label">Lignes/page
+        <select class="form-select" name="size" onchange="this.form.submit()">
             <option th:each="s : ${pageSizes}"
                     th:value="${s}"
                     th:text="${s}"
@@ -228,11 +222,11 @@
         </select>
     </label>
 
-    <button type="submit">Filtrer</button>
+    <button class="btn btn-primary" type="submit">Filtrer</button>
     <a th:href="@{/achats}">Réinitialiser</a>
 </form>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>ID</th>
@@ -256,7 +250,7 @@
         <td th:text="${!#lists.isEmpty(achatAlevin.lignes) ? achatAlevin.lignes[0].quantite + ' ' + achatAlevin.lignes[0].unite : '-'}"></td>
         <td th:text="${achatAlevin.montantTotal}"></td>
         <td th:text="${achatAlevin.statutAchat}"></td>
-        <td><a th:href="@{/achats/alevins/{id}(id=${achatAlevin.id})}">Fiche</a></td>
+        <td><a class="btn btn-sm btn-outline-primary" th:href="@{/achats/alevins/{id}(id=${achatAlevin.id})}">Fiche</a></td>
     </tr>
     <tr th:if="${achatsAlevin.empty}">
         <td colspan="9">Aucun achat d'alevins trouvé.</td>
@@ -265,7 +259,7 @@
 </table>
 
 <div class="pagination" th:if="${achatsAlevin.totalPages > 0}">
-    <a th:if="${achatsAlevin.hasPrevious()}"
+    <a class="btn btn-secondary" th:if="${achatsAlevin.hasPrevious()}"
        th:href="@{/achats(page=${achatsAlevin.number - 1}, size=${achatsAlevin.size}, id=${filterAlevin.id}, fournisseurId=${filterAlevin.fournisseurId}, categorieDepenseId=${filterAlevin.categorieDepenseId}, especeId=${filterAlevin.especeId}, statutAchat=${filterAlevin.statutAchat}, dateDebut=${filterAlevin.dateDebut}, dateFin=${filterAlevin.dateFin}, montantMin=${filterAlevin.montantMin}, montantMax=${filterAlevin.montantMax}, referenceFacture=${filterAlevin.referenceFacture})}">&laquo; Précédent</a>
     <span th:unless="${achatsAlevin.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
 
@@ -275,6 +269,6 @@
        th:href="@{/achats(page=${achatsAlevin.number + 1}, size=${achatsAlevin.size}, id=${filterAlevin.id}, fournisseurId=${filterAlevin.fournisseurId}, categorieDepenseId=${filterAlevin.categorieDepenseId}, especeId=${filterAlevin.especeId}, statutAchat=${filterAlevin.statutAchat}, dateDebut=${filterAlevin.dateDebut}, dateFin=${filterAlevin.dateFin}, montantMin=${filterAlevin.montantMin}, montantMax=${filterAlevin.montantMax}, referenceFacture=${filterAlevin.referenceFacture})}">Suivant &raquo;</a>
     <span th:unless="${achatsAlevin.hasNext()}" style="color:#999;">Suivant &raquo;</span>
 </div>
-
+</main>
 </body>
 </html>

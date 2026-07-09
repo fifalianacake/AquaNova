@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Statut Bassin Details</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-<body class="container mt-5">
-
+<body>
+<main>
 <h2 class="mb-4">Statut Bassin Details</h2>
 
 <table class="table table-bordered">
@@ -20,8 +18,8 @@
     </tr>
 </table>
 
-<a th:href="@{/statuts-bassins/{id}/edit(id=${statut.id})}" class="btn btn-warning">Edit</a>
+<a th:href="@{/statuts-bassins/{id}/edit(id=${statut.id})}" class="btn btn-outline-primary">Edit</a>
 <a th:href="@{/statuts-bassins}" class="btn btn-secondary">Back</a>
-
+</main>
 </body>
 </html>

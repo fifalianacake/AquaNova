@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Détail récolte</title>
 </head>
 <body>
+<main>
 <h1>Détail de la récolte</h1>
 
 <p>ID: <span th:text="${recolte.id}"></span></p>
@@ -17,8 +17,8 @@
 <p>Statut: <span th:text="${recolte.statut}"></span></p>
 
 <p>
-    <a th:href="@{/recoltes}">Retour à la liste</a>
+    <a class="btn btn-secondary" th:href="@{/recoltes}">Retour à la liste</a>
 </p>
-
+</main>
 </body>
 </html>

@@ -1,14 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Journal du lot</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1>Journal du lot <span th:text="${lot.code}"></span></h1>
 
 <p>
@@ -20,11 +17,11 @@
 </p>
 
 <p>
-    <a th:href="@{/lots/{id}(id=${lot.id})}">Retour au lot</a>
-    <a th:href="@{/lots}">Retour à la liste des lots</a>
+    <a class="btn btn-secondary" th:href="@{/lots/{id}(id=${lot.id})}">Retour au lot</a>
+    <a class="btn btn-secondary" th:href="@{/lots}">Retour à la liste des lots</a>
 </p>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>Date</th>
@@ -43,5 +40,6 @@
     </tr>
     </tbody>
 </table>
+</main>
 </body>
 </html>

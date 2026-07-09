@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova</title>
+</head>
 <body>
-
+<main>
     <h2>Détail du relevé</h2>
 
     <p>
@@ -53,19 +55,18 @@
 
     <hr>
 
-    <a href="/releves-eau">
+    <a class="btn btn-secondary" href="/releves-eau">
         Retour
     </a>
 
-    <a th:href="@{'/releves-eau/' + ${releve.id} + '/edit'}">
+    <a class="btn btn-sm btn-outline-primary" th:href="@{'/releves-eau/' + ${releve.id} + '/edit'}">
         Modifier
     </a>
 
     <form th:action="@{'/releves-eau/' + ${releve.id} + '/delete'}" method="post" style="display:inline;"
         onsubmit="return confirm('Supprimer ce relevé ?');">
-        <button type="submit">Supprimer</button>
+        <button class="btn btn-danger" type="submit">Supprimer</button>
     </form>
-
+</main>
 </body>
-
 </html>

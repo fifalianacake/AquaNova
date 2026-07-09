@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Accueil</title>
+</head>
+<body>
+<main>
+    <h2>Bienvenue sur AquaNova</h2>
+    <p class="text-secondary">Plateforme de gestion de pisciculture : production, alimentation, suivi sanitaire, achats, ventes et finance.</p>
+
+    <div class="row g-3 mt-2">
+        <div class="col-sm-6 col-lg-3">
+            <a th:href="@{/lots}" class="card text-decoration-none h-100">
+                <div class="card-body">
+                    <i class="bi bi-droplet-half fs-3 text-primary"></i>
+                    <h5 class="card-title mt-2">Production</h5>
+                    <p class="card-text text-secondary small">Lots, récoltes, pesées, transferts et mortalités.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <a th:href="@{/distributions}" class="card text-decoration-none h-100">
+                <div class="card-body">
+                    <i class="bi bi-basket2 fs-3 text-primary"></i>
+                    <h5 class="card-title mt-2">Alimentation</h5>
+                    <p class="card-text text-secondary small">Distributions, stocks d'aliments et prévisions.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <a th:href="@{/releves-eau}" class="card text-decoration-none h-100">
+                <div class="card-body">
+                    <i class="bi bi-heart-pulse fs-3 text-primary"></i>
+                    <h5 class="card-title mt-2">Sanitaire</h5>
+                    <p class="card-text text-secondary small">Qualité de l'eau, traitements et maintenances.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <a th:href="@{/ventes}" class="card text-decoration-none h-100">
+                <div class="card-body">
+                    <i class="bi bi-currency-exchange fs-3 text-primary"></i>
+                    <h5 class="card-title mt-2">Ventes</h5>
+                    <p class="card-text text-secondary small">Ventes, clients et tableau de bord commercial.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Nouvelle récolte</title>
 </head>
 <body>
+<main>
 <h1>Créer une récolte</h1>
 
 <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
 <form th:action="@{/recoltes}" method="post" th:object="${recolteForm}">
     <div>
-        <label>Lot:
-            <select th:field="*{lotId}">
+        <label class="form-label">Lot:
+            <select class="form-select" th:field="*{lotId}">
                 <option value="">--</option>
                 <option th:each="lot : ${lots}"
                         th:value="${lot.id}"
@@ -21,8 +21,8 @@
         </label>
     </div>
     <div>
-        <label>Type de récolte:
-            <select th:field="*{typeRecolteId}">
+        <label class="form-label">Type de récolte:
+            <select class="form-select" th:field="*{typeRecolteId}">
                 <option value="">--</option>
                 <option th:each="type : ${typesRecolte}"
                         th:value="${type.id}"
@@ -31,16 +31,16 @@
         </label>
     </div>
     <div>
-        <label>Date de récolte: <input type="date" th:field="*{dateRecolte}"></label>
+        <label class="form-label">Date de récolte: <input class="form-control" type="date" th:field="*{dateRecolte}"></label>
     </div>
     <div>
-        <label>Effectif récolté: <input type="number" th:field="*{effectifRecolte}" min="1"></label>
+        <label class="form-label">Effectif récolté: <input class="form-control" type="number" th:field="*{effectifRecolte}" min="1"></label>
     </div>
     <div>
-        <button type="submit">Enregistrer</button>
-        <a th:href="@{/recoltes}">Annuler</a>
+        <button class="btn btn-primary" type="submit">Enregistrer</button>
+        <a class="btn btn-secondary" th:href="@{/recoltes}">Annuler</a>
     </div>
 </form>
-
+</main>
 </body>
 </html>

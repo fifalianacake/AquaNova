@@ -1,39 +1,27 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Gestion des Ventes</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
-        .filter-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .filter-box input, .filter-box select { margin-right: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: bold; display: inline-block; }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-success { background-color: #28a745; color: white; float: right; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #343a40; color: white; }
-        tr:hover { background-color: #f1f1f1; cursor: pointer; }
-    </style>
 </head>
 <body>
+<main>
 
     <div>
-        <a th:href="@{/ventes/new}" class="btn btn-success">Saisir une vente</a>
+        <a th:href="@{/ventes/new}" class="btn btn-primary">Saisir une vente</a>
         <h2>Registre des Ventes Associées aux Récoltes</h2>
     </div>
 
     <div class="filter-box">
         <form th:action="@{/ventes}" method="get">
-            <input type="number" name="id" placeholder="ID Vente" th:value="${currentId}" style="width: 90px;">
-            <input type="text" name="client" placeholder="Nom Client" th:value="${currentClient}">
-            <input type="number" name="recolteId" placeholder="ID Récolte" th:value="${currentRecolteId}" style="width: 100px;">
-            <input type="number" name="lotId" placeholder="ID Lot d'origine" th:value="${currentLotId}" style="width: 130px;">
-            <input type="date" name="debut" th:value="${currentDebut}">
-            <input type="date" name="fin" th:value="${currentFin}">
-            <input type="number" name="montantMin" step="0.01" placeholder="Montant min" th:value="${currentMontantMin}" style="width: 120px;">
-            <input type="number" name="montantMax" step="0.01" placeholder="Montant max" th:value="${currentMontantMax}" style="width: 120px;">
-            <select name="statutId">
+            <input class="form-control" type="number" name="id" placeholder="ID Vente" th:value="${currentId}" style="width: 90px;">
+            <input class="form-control" type="text" name="client" placeholder="Nom Client" th:value="${currentClient}">
+            <input class="form-control" type="number" name="recolteId" placeholder="ID Récolte" th:value="${currentRecolteId}" style="width: 100px;">
+            <input class="form-control" type="number" name="lotId" placeholder="ID Lot d'origine" th:value="${currentLotId}" style="width: 130px;">
+            <input class="form-control" type="date" name="debut" th:value="${currentDebut}">
+            <input class="form-control" type="date" name="fin" th:value="${currentFin}">
+            <input class="form-control" type="number" name="montantMin" step="0.01" placeholder="Montant min" th:value="${currentMontantMin}" style="width: 120px;">
+            <input class="form-control" type="number" name="montantMax" step="0.01" placeholder="Montant max" th:value="${currentMontantMax}" style="width: 120px;">
+            <select class="form-select" name="statutId">
                 <option value="">-- Statut --</option>
                 <option th:each="s : ${statuts}" th:value="${s.id}" th:text="${s.libelle}" th:selected="${s.id == currentStatutId}"></option>
             </select>
@@ -41,7 +29,7 @@
         </form>
     </div>
 
-    <table>
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -64,7 +52,7 @@
                 <td th:text="${v.recolte.lot != null ? 'Lot #' + v.recolte.lot.id : 'N/A'}"></td>
                 <td th:text="${v.poidsVendu + ' kg'}"></td>
                 <td th:text="${v.prixUnitaire + ' Ar'}"></td>
-                <td th:text="${v.montantTotal + ' Ar'}" style="font-weight: bold; color: #0056b3;"></td>
+                <td th:text="${v.montantTotal + ' Ar'}" style="font-weight: bold; color: #1a628f;"></td>
                 <td th:text="${v.statutVente.libelle}"></td>
             </tr>
             <tr th:if="${#lists.isEmpty(ventes)}">
@@ -72,6 +60,6 @@
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
 </html>

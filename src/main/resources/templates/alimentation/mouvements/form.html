@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - form</title>
+</head>
+<body>
+<main>
 <div th:if="${error}" style="color:red;">
     <p th:text="${error}"></p>
 </div>
@@ -5,27 +12,30 @@
     th:action="${mouvement.id} == null ? @{/stocks/mouvements} : @{'/stocks/mouvements/' + ${mouvement.id}}"
     th:object="${mouvement}">
 
-    <label>Date</label>
-    <input type="date" th:field="*{dateMouvement}" required />
+    <label class="form-label">Date</label>
+    <input class="form-control" type="date" th:field="*{dateMouvement}" required />
 
-    <label>Aliment</label>
-    <select th:field="*{aliment.id}">
+    <label class="form-label">Aliment</label>
+    <select class="form-select" th:field="*{aliment.id}">
         <option th:each="a : ${aliments}" th:value="${a.id}" th:text="${a.nom}">
         </option>
     </select>
 
-    <label>Type</label>
-    <select th:field="*{typeMouvement}">
+    <label class="form-label">Type</label>
+    <select class="form-select" th:field="*{typeMouvement}">
         <option value="ENTREE">ENTREE</option>
         <option value="SORTIE">SORTIE</option>
         <option value="PERTE">PERTE</option>
     </select>
 
-    <label>Quantité</label>
-    <input type="number" step="0.01" th:field="*{quantite}" required />
+    <label class="form-label">Quantité</label>
+    <input class="form-control" type="number" step="0.01" th:field="*{quantite}" required />
 
-    <label>Commentaire</label>
-    <input type="text" th:field="*{commentaire}" />
+    <label class="form-label">Commentaire</label>
+    <input class="form-control" type="text" th:field="*{commentaire}" />
 
-    <button type="submit">Enregistrer</button>
+    <button class="btn btn-primary" type="submit">Enregistrer</button>
 </form>
+</main>
+</body>
+</html>

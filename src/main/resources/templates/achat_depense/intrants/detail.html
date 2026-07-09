@@ -1,15 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Fiche intrant</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        .actions { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
-        dt { font-weight: bold; margin-top: 10px; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1 th:text="${intrant.nom}">Intrant</h1>
 
 <dl>
@@ -23,13 +19,13 @@
 </dl>
 
 <div class="actions">
-    <a th:href="@{/intrants}">Retour liste</a>
-    <a th:href="@{/intrants/{id}/edit(id=${intrant.id})}">Modifier</a>
-    <a th:href="@{/intrants/{id}/stock(id=${intrant.id})}">Fiche stock</a>
+    <a class="btn btn-secondary" th:href="@{/intrants}">Retour liste</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{/intrants/{id}/edit(id=${intrant.id})}">Modifier</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{/intrants/{id}/stock(id=${intrant.id})}">Fiche stock</a>
     <form method="post" th:action="@{/intrants/{id}/delete(id=${intrant.id})}" onsubmit="return confirm('Supprimer ou désactiver cet intrant ?')">
-        <button type="submit">Supprimer / Désactiver</button>
+        <button class="btn btn-danger" type="submit">Supprimer / Désactiver</button>
     </form>
 </div>
-
+</main>
 </body>
 </html>

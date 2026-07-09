@@ -1,15 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Fiche dépense</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0; }
-        dt { font-weight: bold; margin-top: 8px; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1 th:text="${'Dépense #' + depense.id}">Fiche dépense</h1>
 
 <dl>
@@ -23,13 +19,13 @@
 </dl>
 
 <div class="actions">
-    <a th:href="@{/depenses}">Retour liste</a>
-    <a th:href="@{/depenses/{id}/edit(id=${depense.id})}">Modifier</a>
+    <a class="btn btn-secondary" th:href="@{/depenses}">Retour liste</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{/depenses/{id}/edit(id=${depense.id})}">Modifier</a>
     <form method="post" th:action="@{/depenses/{id}/delete(id=${depense.id})}"
           onsubmit="return confirm('Supprimer cette dépense ?')">
-        <button type="submit">Supprimer</button>
+        <button class="btn btn-danger" type="submit">Supprimer</button>
     </form>
 </div>
-
+</main>
 </body>
 </html>

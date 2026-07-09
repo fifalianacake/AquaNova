@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Référentiel - Saisie Type Bassin</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-
-<body class="container mt-5">
-
+<body>
+<main>
     <h2 class="mb-4" th:text="${typeBassin.id == null ? 'Nouveau Type de Bassin' : 'Modifier le Type'}">Saisie Type</h2>
 
     <form th:action="@{/types-bassins}" th:object="${typeBassin}" method="post"
@@ -21,11 +17,10 @@
                 placeholder="Ex: Bassin Terre, Happa" />
         </div>
 
-        <button type="submit" class="btn btn-success"
+        <button type="submit" class="btn btn-primary"
             th:text="${typeBassin.id == null ? 'Créer' : 'Enregistrer'}">Enregistrer</button>
         <a th:href="@{/types-bassins}" class="btn btn-secondary">Annuler</a>
     </form>
-
+</main>
 </body>
-
 </html>

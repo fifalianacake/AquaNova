@@ -1,27 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Liste des Aliments</title>
 </head>
 <body>
-
+<main>
     <h2>Gestion des Aliments</h2>
 
     <p>
-        <a th:href="@{/aliments/new}">+ Créer un nouvel aliment</a>
+        <a class="btn btn-primary" th:href="@{/aliments/new}">+ Créer un nouvel aliment</a>
     </p>
 
     <form th:action="@{/aliments}" method="get">
-        <label for="search">Rechercher par nom :</label>
-        <input type="text" id="search" name="q" th:value="${q}" placeholder="Nom de l'aliment..." />
-        <button type="submit">Rechercher</button>
-        <a th:if="${q != null}" th:href="@{/aliments}">Annuler la recherche</a>
+        <label class="form-label" for="search">Rechercher par nom :</label>
+        <input class="form-control" type="text" id="search" name="q" th:value="${q}" placeholder="Nom de l'aliment..." />
+        <button class="btn btn-primary" type="submit">Rechercher</button>
+        <a class="btn btn-secondary" th:if="${q != null}" th:href="@{/aliments}">Annuler la recherche</a>
     </form>
 
     <br/>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -37,14 +36,14 @@
                 <td th:text="${aliment.id}">1</td>
                 <td th:text="${aliment.nom}">Exemple Aliment</td>
                 <td>
-                    <a th:href="@{/aliments/{id}(id=${aliment.id})}">Voir</a> | 
-                    <a th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier</a> | 
-                    <a th:href="@{/aliments/{id}/delete(id=${aliment.id})}"
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}(id=${aliment.id})}">Voir</a> | 
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier</a> | 
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/aliments/{id}/delete(id=${aliment.id})}"
                        th:onclick="return confirm('Supprimer cet aliment ?');">Supprimer</a>
                 </td>
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
 </html>

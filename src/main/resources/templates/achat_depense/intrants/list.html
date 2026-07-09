@@ -1,39 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Catalogue des intrants</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 16px; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background: #f5f5f5; }
-        .toolbar, .filters, .pagination { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
-        .badge { padding: 2px 6px; border: 1px solid #ddd; border-radius: 4px; }
-    </style>
 </head>
 <body>
+<main>
+
 <h1>Catalogue des intrants</h1>
 
 <div class="toolbar">
     <a th:href="@{/intrants/new}">Nouvel intrant</a>
     <a th:href="@{/achats/intrants/new}">Nouvel achat d'intrants</a>
-    <a th:href="@{/achats}">Historique achats intrants</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{/achats}">Historique achats intrants</a>
 </div>
 
 <form method="get" th:action="@{/intrants}" class="filters">
     <input type="hidden" name="page" value="0" />
 
-    <label>ID
-        <input type="number" name="id" th:value="${filter.id}" />
+    <label class="form-label">ID
+        <input class="form-control" type="number" name="id" th:value="${filter.id}" />
     </label>
 
-    <label>Nom
-        <input type="text" name="nom" th:value="${filter.nom}" placeholder="Sel, chaux, désinfectant..." />
+    <label class="form-label">Nom
+        <input class="form-control" type="text" name="nom" th:value="${filter.nom}" placeholder="Sel, chaux, désinfectant..." />
     </label>
 
-    <label>Catégorie
-        <select name="categorieIntrant">
+    <label class="form-label">Catégorie
+        <select class="form-select" name="categorieIntrant">
             <option value="">Toutes</option>
             <option th:each="cat : ${categoriesIntrant}"
                     th:value="${cat}"
@@ -42,20 +35,20 @@
         </select>
     </label>
 
-    <label>Unité
-        <input type="text" name="unite" th:value="${filter.unite}" placeholder="kg, L, unité" />
+    <label class="form-label">Unité
+        <input class="form-control" type="text" name="unite" th:value="${filter.unite}" placeholder="kg, L, unité" />
     </label>
 
-    <label>Actif
-        <select name="actif">
+    <label class="form-label">Actif
+        <select class="form-select" name="actif">
             <option value="">Tous</option>
             <option value="true" th:selected="${filter.actif == true}">Actifs</option>
             <option value="false" th:selected="${filter.actif == false}">Inactifs</option>
         </select>
     </label>
 
-    <label>Lignes/page
-        <select name="size" onchange="this.form.submit()">
+    <label class="form-label">Lignes/page
+        <select class="form-select" name="size" onchange="this.form.submit()">
             <option th:each="s : ${pageSizes}"
                     th:value="${s}"
                     th:text="${s}"
@@ -63,11 +56,11 @@
         </select>
     </label>
 
-    <button type="submit">Filtrer</button>
+    <button class="btn btn-primary" type="submit">Filtrer</button>
     <a th:href="@{/intrants}">Réinitialiser</a>
 </form>
 
-<table>
+<table class="table table-hover align-middle">
     <thead>
     <tr>
         <th>ID</th>
@@ -88,9 +81,9 @@
         <td th:text="${intrant.prixReference}"></td>
         <td><span class="badge" th:text="${intrant.actif ? 'Oui' : 'Non'}"></span></td>
         <td>
-            <a th:href="@{/intrants/{id}(id=${intrant.id})}">Fiche</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/intrants/{id}(id=${intrant.id})}">Fiche</a>
             <a th:href="@{/intrants/{id}/stock(id=${intrant.id})}">Stock</a>
-            <a th:href="@{/intrants/{id}/edit(id=${intrant.id})}">Modifier</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/intrants/{id}/edit(id=${intrant.id})}">Modifier</a>
         </td>
     </tr>
     <tr th:if="${intrants.empty}">
@@ -100,7 +93,7 @@
 </table>
 
 <div class="pagination" th:if="${intrants.totalPages > 0}">
-    <a th:if="${intrants.hasPrevious()}"
+    <a class="btn btn-secondary" th:if="${intrants.hasPrevious()}"
        th:href="@{/intrants(page=${intrants.number - 1}, size=${intrants.size}, id=${filter.id}, nom=${filter.nom}, categorieIntrant=${filter.categorieIntrant}, unite=${filter.unite}, actif=${filter.actif})}">&laquo; Précédent</a>
     <span th:unless="${intrants.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
 
@@ -110,6 +103,6 @@
        th:href="@{/intrants(page=${intrants.number + 1}, size=${intrants.size}, id=${filter.id}, nom=${filter.nom}, categorieIntrant=${filter.categorieIntrant}, unite=${filter.unite}, actif=${filter.actif})}">Suivant &raquo;</a>
     <span th:unless="${intrants.hasNext()}" style="color:#999;">Suivant &raquo;</span>
 </div>
-
+</main>
 </body>
 </html>

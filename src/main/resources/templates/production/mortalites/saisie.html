@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Production - Saisie Mortalité</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-
-<body class="container mt-5">
-
+<body>
+<main>
     <h2 class="mb-4" th:text="${mortalite.id == null ? 'Nouvelle Mortalité' : 'Modifier la Mortalité'}">Saisie Mortalité</h2>
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
@@ -39,11 +35,10 @@
             <textarea id="cause" th:field="*{cause}" class="form-control" rows="3"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-success"
+        <button type="submit" class="btn btn-primary"
             th:text="${mortalite.id == null ? 'Créer' : 'Enregistrer'}">Enregistrer</button>
         <a th:href="@{/mortalites}" class="btn btn-secondary">Annuler</a>
     </form>
-
+</main>
 </body>
-
 </html>

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${aliment.id == null} ? 'Nouveau Aliment' : 'Modifier l\'Aliment'">Formulaire</title>
+    <title>Formulaire</title>
 </head>
 <body>
-
+<main>
     <h2 th:text="${aliment.id == null} ? 'Créer un aliment' : 'Modifier l\'aliment'">Formulaire</h2>
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
@@ -15,16 +14,16 @@
         <input type="hidden" th:field="*{id}" />
 
         <p>
-            <label for="nom">Nom de l'aliment :</label><br/>
-            <input type="text" id="nom" th:field="*{nom}" required />
+            <label class="form-label" for="nom">Nom de l'aliment :</label><br/>
+            <input class="form-control" type="text" id="nom" th:field="*{nom}" required />
         </p>
 
         <p>
-            <button type="submit" th:text="${aliment.id == null} ? 'Créer' : 'Enregistrer les modifications'">Enregistrer</button>
-            <a th:href="@{/aliments}">Annuler</a>
+            <button class="btn btn-primary" type="submit" th:text="${aliment.id == null} ? 'Créer' : 'Enregistrer les modifications'">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/aliments}">Annuler</a>
         </p>
         
     </form>
-
+</main>
 </body>
 </html>

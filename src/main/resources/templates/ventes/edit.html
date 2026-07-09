@@ -1,28 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Modifier la Vente</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
-        .form-container { background: white; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .form-group .readonly-value { padding: 8px 0; color: #555; }
-        .btn-box { display: flex; justify-content: space-between; margin-top: 20px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; font-weight: bold; }
-        .btn-primary { background-color: #28a745; color: white; }
-        .btn-secondary { background-color: #6c757d; color: white; }
-        .error { color: red; background: #fce8e6; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; }
-        .client-row { display: flex; gap: 8px; align-items: flex-start; }
-        .client-row select { flex: 1; }
-        .btn-link { white-space: nowrap; background-color: #17a2b8; color: white; padding: 8px 12px; }
-        dialog#modalNouveauClient { border: none; border-radius: 8px; padding: 20px; max-width: 420px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-        dialog#modalNouveauClient::backdrop { background: rgba(0,0,0,0.4); }
-    </style>
 </head>
 <body>
+<main>
 
     <div class="form-container">
         <h2>Modifier la Vente #<span th:text="${vente.id}"></span></h2>
@@ -35,14 +17,14 @@
             <input type="hidden" th:field="*{recolte.id}" />
 
             <div class="form-group">
-                <label>Récolte d'origine</label>
+                <label class="form-label">Récolte d'origine</label>
                 <div class="readonly-value" th:text="'Récolte N° ' + ${vente.recolte.id} + ' [Poids total: ' + ${vente.recolte.poidsTotal} + 'kg]'"></div>
             </div>
 
             <div class="form-group">
-                <label>Client *</label>
+                <label class="form-label">Client *</label>
                 <div class="client-row">
-                    <select th:field="*{client.id}" id="clientSelect" required>
+                    <select class="form-select" th:field="*{client.id}" id="clientSelect" required>
                         <option value="">-- Sélectionner le client --</option>
                         <option th:each="c : ${clients}" th:value="${c.id}" th:text="${c.nom}"></option>
                     </select>
@@ -51,28 +33,28 @@
             </div>
 
             <div class="form-group">
-                <label>Date de la vente *</label>
-                <input type="date" th:field="*{dateVente}" required>
+                <label class="form-label">Date de la vente *</label>
+                <input class="form-control" type="date" th:field="*{dateVente}" required>
             </div>
 
             <div class="form-group">
-                <label>Poids vendu (kg) *</label>
-                <input type="number" step="0.01" th:field="*{poidsVendu}" min="0.01" placeholder="0.00" required>
+                <label class="form-label">Poids vendu (kg) *</label>
+                <input class="form-control" type="number" step="0.01" th:field="*{poidsVendu}" min="0.01" placeholder="0.00" required>
             </div>
 
             <div class="form-group">
-                <label>Prix unitaire (Ar) *</label>
-                <input type="number" step="0.01" th:field="*{prixUnitaire}" min="0.01" placeholder="0.00" required>
+                <label class="form-label">Prix unitaire (Ar) *</label>
+                <input class="form-control" type="number" step="0.01" th:field="*{prixUnitaire}" min="0.01" placeholder="0.00" required>
             </div>
 
             <div class="form-group">
-                <label>Effectif vendu (Optionnel)</label>
-                <input type="number" th:field="*{effectifVendu}" min="1" placeholder="Nombre de pièces">
+                <label class="form-label">Effectif vendu (Optionnel)</label>
+                <input class="form-control" type="number" th:field="*{effectifVendu}" min="1" placeholder="Nombre de pièces">
             </div>
 
             <div class="form-group">
-                <label>Observation</label>
-                <textarea th:field="*{observation}" rows="3" placeholder="Notes complémentaires..."></textarea>
+                <label class="form-label">Observation</label>
+                <textarea class="form-control" th:field="*{observation}" rows="3" placeholder="Notes complémentaires..."></textarea>
             </div>
 
             <div class="btn-box">
@@ -87,31 +69,31 @@
         <div id="modalClientErreur" class="error" style="display:none;"></div>
 
         <div class="form-group">
-            <label>Nom / Raison sociale *</label>
-            <input type="text" id="modalClientNom" placeholder="Nom du client">
+            <label class="form-label">Nom / Raison sociale *</label>
+            <input class="form-control" type="text" id="modalClientNom" placeholder="Nom du client">
         </div>
 
         <div class="form-group">
-            <label>Type de client *</label>
-            <select id="modalClientType">
+            <label class="form-label">Type de client *</label>
+            <select class="form-select" id="modalClientType">
                 <option value="">-- Choisir un type --</option>
                 <option th:each="t : ${typesClient}" th:value="${t.id}" th:text="${t.libelle}"></option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>Contact téléphonique</label>
-            <input type="text" id="modalClientContact" placeholder="Optionnel">
+            <label class="form-label">Contact téléphonique</label>
+            <input class="form-control" type="text" id="modalClientContact" placeholder="Optionnel">
         </div>
 
         <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="modalClientEmail" placeholder="Optionnel">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" id="modalClientEmail" placeholder="Optionnel">
         </div>
 
         <div class="form-group">
-            <label>Adresse</label>
-            <input type="text" id="modalClientAdresse" placeholder="Optionnel">
+            <label class="form-label">Adresse</label>
+            <input class="form-control" type="text" id="modalClientAdresse" placeholder="Optionnel">
         </div>
 
         <div class="btn-box">
@@ -190,6 +172,6 @@
         }
         /*]]>*/
     </script>
-
+</main>
 </body>
 </html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Détail type d'événement</title>
 </head>
 <body>
+<main>
 <h1>Détail type d'événement</h1>
 
 <p><strong>ID:</strong> <span th:text="${type.id}"></span></p>
@@ -12,8 +12,9 @@
 <p><strong>Libellé:</strong> <span th:text="${type.libelle}"></span></p>
 
 <div>
-    <a th:href="@{/types-evenements-lot/{id}/edit(id=${type.id})}">Modifier</a>
-    <a th:href="@{/types-evenements-lot}">Retour</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-evenements-lot/{id}/edit(id=${type.id})}">Modifier</a>
+    <a class="btn btn-secondary" th:href="@{/types-evenements-lot}">Retour</a>
 </div>
+</main>
 </body>
 </html>

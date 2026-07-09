@@ -1,37 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova</title>
+</head>
 <body>
-
+<main>
     <h2>Relevés de qualité de l'eau</h2>
 
     <form method="get" action="/releves-eau">
 
-        <input type="text" name="bassin" placeholder="Bassin ref" />
+        <input class="form-control" type="text" name="bassin" placeholder="Bassin ref" />
 
-        <input type="date" name="start" />
-        <input type="date" name="end" />
+        <input class="form-control" type="date" name="start" />
+        <input class="form-control" type="date" name="end" />
 
-        <input type="number" step="0.1" name="minTemp" placeholder="Temp min" />
-        <input type="number" step="0.1" name="maxTemp" placeholder="Temp max" />
+        <input class="form-control" type="number" step="0.1" name="minTemp" placeholder="Temp min" />
+        <input class="form-control" type="number" step="0.1" name="maxTemp" placeholder="Temp max" />
 
-        <input type="number" step="0.1" name="minPh" placeholder="pH min" />
-        <input type="number" step="0.1" name="maxPh" placeholder="pH max" />
+        <input class="form-control" type="number" step="0.1" name="minPh" placeholder="pH min" />
+        <input class="form-control" type="number" step="0.1" name="maxPh" placeholder="pH max" />
 
-        <input type="number" step="0.1" name="minOxy" placeholder="O2 min" />
-        <input type="number" step="0.1" name="maxOxy" placeholder="O2 max" />
+        <input class="form-control" type="number" step="0.1" name="minOxy" placeholder="O2 min" />
+        <input class="form-control" type="number" step="0.1" name="maxOxy" placeholder="O2 max" />
 
-        <button>Filter</button>
+        <button class="btn btn-primary">Filter</button>
         <a href="/releves-eau">Reset</a>
     </form>
 
     <br>
 
-    <a href="/releves-eau/new">Nouveau relevé</a>
+    <a class="btn btn-primary" href="/releves-eau/new">Nouveau relevé</a>
 
     <br><br>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
 
         <tr>
             <th>ID</th>
@@ -67,13 +69,13 @@
 
             <td>
 
-                <a th:href="@{'/releves-eau/' + ${r.id}}">Voir</a>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{'/releves-eau/' + ${r.id}}">Voir</a>
 
-                <a th:href="@{'/releves-eau/' + ${r.id} + '/edit'}">Modifier</a>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{'/releves-eau/' + ${r.id} + '/edit'}">Modifier</a>
 
                 <form th:action="@{'/releves-eau/' + ${r.id} + '/delete'}" method="post"
                     onsubmit="return confirm('Supprimer ce relevé ?');">
-                    <button type="submit">Supprimer</button>
+                    <button class="btn btn-danger" type="submit">Supprimer</button>
                 </form>
 
             </td>
@@ -81,7 +83,6 @@
         </tr>
 
     </table>
-
+</main>
 </body>
-
 </html>

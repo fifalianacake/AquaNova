@@ -1,21 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Liste des Rôles</title>
 </head>
-
 <body>
-
+<main>
     <h1>Liste des Rôles</h1>
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
 
-    <a th:href="@{/roles/new}"> Ajouter un nouveau rôle</a>
+    <a class="btn btn-primary" th:href="@{/roles/new}"> Ajouter un nouveau rôle</a>
     <br><br>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -28,7 +25,7 @@
                 <td th:text="${role.id}">1</td>
                 <td th:text="${role.name}">ROLE_ADMIN</td>
                 <td>
-                    <a th:href="@{/roles/{id}/delete(id=${role.id})}"
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/roles/{id}/delete(id=${role.id})}"
                         onclick="return confirm('Êtes-vous sur de vouloir supprimer ce rôle ?');">
                         Supprimer
                     </a>
@@ -41,8 +38,7 @@
     </table>
 
     <br>
-    <a th:href="@{/users}">Retour à la liste des utilisateurs</a>
-
+    <a class="btn btn-secondary" th:href="@{/users}">Retour à la liste des utilisateurs</a>
+</main>
 </body>
-
 </html>

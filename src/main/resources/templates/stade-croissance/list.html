@@ -1,8 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Liste des Stades de Croissance</title>
+</head>
+<body>
+<main>
 <h2>Liste des Stades de Croissance</h2>
 
-<a href="/stade-croissance/new">Ajouter</a>
+<a class="btn btn-primary" href="/stade-croissance/new">Ajouter</a>
 
-<table border="1">
+<table class="table table-hover align-middle">
     <tr>
         <th>ID</th>
         <th>Nom</th>
@@ -18,14 +25,17 @@
     <td th:text="${s.poidsMax}"></td>
 
     <td>
-        <a th:href="@{/stade-croissance/{id}(id=${s.id})}">
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/stade-croissance/{id}(id=${s.id})}">
             Edit
         </a>
 
-        <a th:href="@{/stade-croissance/{id}/delete(id=${s.id})}">
+        <a class="btn btn-sm btn-outline-danger" th:href="@{/stade-croissance/{id}/delete(id=${s.id})}">
             Delete
         </a>
     </td>
 </tr>
 
 </table>
+</main>
+</body>
+</html>

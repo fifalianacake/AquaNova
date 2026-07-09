@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Saisie Traitement</title>
 </head>
 <body>
-
+<main>
     <div>
         <h2 th:text="${traitement.id != null} ? 'Modification du traitement eau' : 'Saisie du traitement eau'">
             Saisie de Traitement de l'Eau
@@ -17,8 +16,8 @@
               th:object="${traitement}"
               method="post">
             <div>
-                <label>Bassin *</label>
-                <select th:field="*{bassin.id}" required>
+                <label class="form-label">Bassin *</label>
+                <select class="form-select" th:field="*{bassin.id}" required>
                     <option value="">-- Choisir un bassin --</option>
                     <option th:each="b : ${bassins}"
                             th:value="${b.id}"
@@ -27,37 +26,37 @@
             </div>
 
             <div>
-                <label>Type de traitement *</label>
-                <select th:field="*{typeTraitementEau.id}" required>
+                <label class="form-label">Type de traitement *</label>
+                <select class="form-select" th:field="*{typeTraitementEau.id}" required>
                     <option value="">-- Sélectionner un type --</option>
                     <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
                 </select>
             </div>
 
             <div>
-                <label>Date du traitement *</label>
-                <input type="date" th:field="*{dateTraitement}" required>
+                <label class="form-label">Date du traitement *</label>
+                <input class="form-control" type="date" th:field="*{dateTraitement}" required>
             </div>
 
             <div>
-                <label>Détails techniques *</label>
-                <textarea th:field="*{detail}" rows="3" required></textarea>
+                <label class="form-label">Détails techniques *</label>
+                <textarea class="form-control" th:field="*{detail}" rows="3" required></textarea>
             </div>
 
             <div>
-                <label>Observations complémentaires</label>
-                <textarea th:field="*{observation}" rows="2"></textarea>
+                <label class="form-label">Observations complémentaires</label>
+                <textarea class="form-control" th:field="*{observation}" rows="2"></textarea>
             </div>
 
             <div>
-                <a th:href="@{/traitements-eau}">Retour</a>
-                <button type="submit"
+                <a class="btn btn-secondary" th:href="@{/traitements-eau}">Retour</a>
+                <button class="btn btn-primary" type="submit"
                         th:text="${traitement.id != null} ? 'Modifier' : 'Enregistrer'">
                     Enregistrer
                 </button>
             </div>
         </form>
     </div>
-
+</main>
 </body>
 </html>

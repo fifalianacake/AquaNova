@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Form Type Aliment</title>
+</head>
+<body>
+<main>
 <h2>Form Type Aliment</h2>
 
 <p th:if="${error}" th:text="${error}" style="color: red;"></p>
@@ -6,8 +13,11 @@
     <input type="hidden" th:field="*{id}" />
 
     Nom :
-    <input type="text" th:field="*{nom}" />
+    <input class="form-control" type="text" th:field="*{nom}" />
     <br/>
 
-    <button type="submit">Save</button>
+    <button class="btn btn-primary" type="submit">Save</button>
 </form>
+</main>
+</body>
+</html>

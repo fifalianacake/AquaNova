@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Référentiel - Liste des Bassins</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-
-<body class="container mt-5">
-
+<body>
+<main>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Référentiel des Bassins / Happas</h2>
         <div>
@@ -42,7 +38,7 @@
                 </td>
                 <td>
                     <a th:href="@{/bassins/{id}/edit(id=${b.id})}"
-                        class="btn btn-sm btn-warning">Modifier</a>
+                        class="btn btn-sm btn-outline-primary">Modifier</a>
                     <a th:href="@{/bassins/{id}/delete(id=${b.id})}" class="btn btn-sm btn-danger"
                         onclick="return confirm('Voulez-vous supprimer ce bassin ?')">Supprimer</a>
                 </td>
@@ -52,7 +48,6 @@
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
-
 </html>

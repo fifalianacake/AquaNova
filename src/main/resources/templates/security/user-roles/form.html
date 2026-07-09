@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Affecter un Rôle</title>
 </head>
-
 <body>
-
+<main>
     <h1>Affecter un rôle à un utilisateur</h1>
 
     <p th:if="${error}" th:text="${error}" style="color: red;"></p>
@@ -16,27 +13,26 @@
 
         <input type="hidden" th:field="*{id}" />
 
-        <label for="user">Choisir l'utilisateur :</label>
-        <select id="user" th:field="*{user.id}" required>
+        <label class="form-label" for="user">Choisir l'utilisateur :</label>
+        <select class="form-select" id="user" th:field="*{user.id}" required>
             <option value="">-- Selectionner un utilisateur --</option>
             <option th:each="u : ${users}" th:value="${u.id}"
                 th:text="${u.name} + ' ' + ${u.lastname} + ' (' + ${u.email} + ')'"></option>
         </select>
         <br><br>
 
-        <label for="role">Choisir le rôle :</label>
-        <select id="role" th:field="*{role.id}" required>
+        <label class="form-label" for="role">Choisir le rôle :</label>
+        <select class="form-select" id="role" th:field="*{role.id}" required>
             <option value="">-- Selectionner un rôle --</option>
             <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"></option>
         </select>
         <br><br>
 
-        <button type="submit">Lier le rôle</button>
+        <button class="btn btn-primary" type="submit">Lier le rôle</button>
     </form>
 
     <br>
-    <a th:href="@{/user-roles}">Annuler et retourner à la liste</a>
-
+    <a class="btn btn-secondary" th:href="@{/user-roles}">Annuler et retourner à la liste</a>
+</main>
 </body>
-
 </html>

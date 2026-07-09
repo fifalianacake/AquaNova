@@ -1,176 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Prévision des stocks de provende</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 24px;
-            color: #1f2937;
-            background: #f8fafc;
-        }
-
-        h1 {
-            margin-bottom: 4px;
-        }
-
-        .subtitle {
-            color: #64748b;
-            margin-bottom: 20px;
-        }
-
-        .actions {
-            margin-bottom: 16px;
-        }
-
-        .actions a {
-            margin-right: 12px;
-            text-decoration: none;
-            color: #2563eb;
-        }
-
-        .filter-card,
-        .summary-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .filter-row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            align-items: end;
-        }
-
-        label {
-            display: flex;
-            flex-direction: column;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        input,
-        select {
-            margin-top: 6px;
-            padding: 8px;
-            min-width: 180px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-        }
-
-        button {
-            padding: 9px 14px;
-            border: none;
-            border-radius: 6px;
-            background: #2563eb;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        .reset-link {
-            padding: 9px 14px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            color: #334155;
-            text-decoration: none;
-            background: white;
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-        }
-
-        .summary-grid {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .summary-item {
-            background: #f1f5f9;
-            padding: 12px;
-            border-radius: 6px;
-            min-width: 180px;
-        }
-
-        .summary-label {
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .summary-value {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 4px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th,
-        td {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background: #f1f5f9;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .badge-ok {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .empty {
-            text-align: center;
-            color: #64748b;
-            padding: 20px;
-        }
-    </style>
 </head>
-
 <body>
+<main>
 
     <h1>Prévision des stocks de provende</h1>
     <p class="subtitle">
@@ -189,9 +23,9 @@
         <form method="get" th:action="@{/prevision}">
             <div class="filter-row">
 
-                <label>
+                <label class="form-label">
                     Aliment
-                    <select name="alimentId">
+                    <select class="form-select" name="alimentId">
                         <option value="">-- Tous les aliments --</option>
                         <option th:each="aliment : ${aliments}" th:value="${aliment.id}" th:text="${aliment.nom}"
                             th:selected="${alimentId != null && alimentId == aliment.id}">
@@ -199,17 +33,17 @@
                     </select>
                 </label>
 
-                <label>
+                <label class="form-label">
                     Date de référence
-                    <input type="date" name="date" th:value="${dateReference}">
+                    <input class="form-control" type="date" name="date" th:value="${dateReference}">
                 </label>
 
-                <label>
+                <label class="form-label">
                     Horizon suggestion achat, en jours
-                    <input type="number" name="horizonJours" min="1" th:value="${horizonJours}">
+                    <input class="form-control" type="number" name="horizonJours" min="1" th:value="${horizonJours}">
                 </label>
 
-                <button type="submit">Calculer</button>
+                <button class="btn btn-primary" type="submit">Calculer</button>
                 <a class="reset-link" th:href="@{/prevision}">Réinitialiser</a>
 
             </div>
@@ -239,7 +73,7 @@
         </div>
     </div>
 
-    <table>
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>Aliment</th>
@@ -305,7 +139,6 @@
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
-
 </html>

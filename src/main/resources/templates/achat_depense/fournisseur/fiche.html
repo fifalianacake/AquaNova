@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Fiche Fournisseur</title>
 </head>
 <body>
-
+<main>
     <h1>Fiche Fournisseur</h1>
 
     <p>
-        <a th:href="@{/fournisseurs}">Retour à la liste</a> | 
-        <a th:href="@{/fournisseurs/{id}/edit(id=${fournisseur.id})}">Modifier ce fournisseur</a> |
-        <a th:href="@{/fournisseurs/{id}/export/pdf(id=${fournisseur.id})}" target="_blank">Exporter en PDF</a>
+        <a class="btn btn-secondary" th:href="@{/fournisseurs}">Retour à la liste</a> | 
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/fournisseurs/{id}/edit(id=${fournisseur.id})}">Modifier ce fournisseur</a> |
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/fournisseurs/{id}/export/pdf(id=${fournisseur.id})}" target="_blank">Exporter en PDF</a>
     </p>
 
     <h2>Informations Générales</h2>
@@ -28,7 +27,7 @@
     </ul>
 
     <h2>Historique des Achats</h2>
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>Référence Achat</th>
@@ -49,6 +48,6 @@
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
 </html>

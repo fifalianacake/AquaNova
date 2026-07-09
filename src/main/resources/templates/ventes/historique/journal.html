@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Journal d'Audit</title>
 </head>
 <body>
-
+<main>
     <h2>Journal d'Événement Commercial</h2>
     <p>Identifiant d'archive système : <span th:text="'TX-VENTE-' + ${vente.id}"></span></p>
 
@@ -20,7 +19,7 @@
         <li><strong>Observations / Notes d'audit : </strong> <span th:text="${vente.observation != null && !vente.observation.isEmpty()} ? ${vente.observation} : 'Aucune note particulière renseignée.'"></span></li>
     </ul>
 
-    <a th:href="@{/ventes/historique}">← Retour à l'historique global</a>
-
+    <a class="btn btn-secondary" th:href="@{/ventes/historique}">← Retour à l'historique global</a>
+</main>
 </body>
 </html>

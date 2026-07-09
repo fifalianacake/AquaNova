@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Fiche Maintenance</title>
 </head>
 <body>
-
+<main>
     <p>
-        <a th:href="@{/maintenances}">← Retour à la liste</a>
+        <a class="btn btn-secondary" th:href="@{/maintenances}">← Retour à la liste</a>
     </p>
 
     <h1>Intervention ID #<span th:text="${maintenance.id}">12</span></h1>
@@ -30,7 +29,7 @@
     <p th:text="${#strings.isEmpty(maintenance.observation) ? 'Aucune observation pour le moment.' : maintenance.observation}"></p>
 
     <p th:if="${maintenance.statutIntervention != T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).TERMINEE}">
-        <a th:href="@{/maintenances/{id}/edit(id=${maintenance.id})}">Modifier cette intervention</a>
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/maintenances/{id}/edit(id=${maintenance.id})}">Modifier cette intervention</a>
     </p>
 
     <div th:if="${maintenance.statutIntervention != T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).TERMINEE}">
@@ -38,16 +37,16 @@
         <h2>Clôturer l'intervention</h2>
         <form th:action="@{/maintenances/{id}/cloturer(id=${maintenance.id})}" method="post">
             <p>
-                <label>Observation finale (Rapport) * :</label><br>
-                <input type="text" name="observation" required size="50">
+                <label class="form-label">Observation finale (Rapport) * :</label><br>
+                <input class="form-control" type="text" name="observation" required size="50">
             </p>
             <p>
-                <label>Coût final (€) :</label><br>
-                <input type="number" step="0.01" min="0" name="coutFinal" th:value="${maintenance.cout}">
+                <label class="form-label">Coût final (€) :</label><br>
+                <input class="form-control" type="number" step="0.01" min="0" name="coutFinal" th:value="${maintenance.cout}">
             </p>
-            <button type="submit">Confirmer la clôture définitive</button>
+            <button class="btn btn-primary" type="submit">Confirmer la clôture définitive</button>
         </form>
     </div>
-
+</main>
 </body>
 </html>

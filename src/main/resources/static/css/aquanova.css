@@ -1,0 +1,465 @@
+/* ===================================================================
+   AquaNova — thème global
+   Palette bleue plate (sans gradient) :
+   - Primaire   : #2176ae
+   - Foncé      : #1a628f
+   - Sidebar    : #123a55
+   - Fond       : #f2f6f9
+   =================================================================== */
+
+:root {
+    --aq-primary: #2176ae;
+    --aq-primary-dark: #1a628f;
+    --aq-primary-soft: #e3eef6;
+    --aq-sidebar-bg: #123a55;
+    --aq-sidebar-hover: #1a4d6f;
+    --aq-body-bg: #f2f6f9;
+    --aq-border: #d9e4ec;
+    --aq-text: #21313e;
+    --bs-primary: #2176ae;
+    --bs-primary-rgb: 33, 118, 174;
+    --bs-link-color: #2176ae;
+    --bs-link-hover-color: #1a628f;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--aq-body-bg);
+    color: var(--aq-text);
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+}
+
+/* ── Structure générale ─────────────────────────────────────────── */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.app-main {
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-body {
+    padding: 1.5rem 2rem;
+    flex-grow: 1;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────── */
+
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background-color: var(--aq-sidebar-bg);
+    color: #cfe2ef;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: 1.1rem 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    background-color: #0e2f46;
+}
+
+.sidebar-brand:hover {
+    color: #ffffff;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: .5rem 0;
+}
+
+.sidebar-section-toggle {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    width: 100%;
+    padding: .6rem 1.25rem;
+    background: none;
+    border: none;
+    color: #cfe2ef;
+    font-size: .92rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.sidebar-section-toggle:hover {
+    background-color: var(--aq-sidebar-hover);
+    color: #ffffff;
+}
+
+.sidebar-section-toggle .chev {
+    margin-left: auto;
+    transition: transform .2s ease;
+    font-size: .75rem;
+}
+
+.sidebar-section-toggle.collapsed .chev {
+    transform: rotate(-90deg);
+}
+
+.sidebar-link {
+    display: block;
+    padding: .45rem 1.25rem .45rem 2.9rem;
+    color: #b4cddd;
+    font-size: .88rem;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    background-color: var(--aq-sidebar-hover);
+    color: #ffffff;
+}
+
+.sidebar-link.active {
+    background-color: var(--aq-primary);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.sidebar-footer {
+    border-top: 1px solid #1a4d6f;
+    padding: .4rem 0;
+}
+
+.sidebar-footer .sidebar-link {
+    padding-left: 1.25rem;
+}
+
+/* ── Topbar ─────────────────────────────────────────────────────── */
+
+.topbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--aq-border);
+    padding: .65rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topbar .user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: var(--aq-text);
+    font-size: .9rem;
+}
+
+.topbar .user-chip .bi {
+    color: var(--aq-primary);
+    font-size: 1.2rem;
+}
+
+/* ── Overrides Bootstrap (couleurs plates) ──────────────────────── */
+
+.btn-primary {
+    --bs-btn-bg: var(--aq-primary);
+    --bs-btn-border-color: var(--aq-primary);
+    --bs-btn-hover-bg: var(--aq-primary-dark);
+    --bs-btn-hover-border-color: var(--aq-primary-dark);
+    --bs-btn-active-bg: var(--aq-primary-dark);
+    --bs-btn-active-border-color: var(--aq-primary-dark);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--aq-primary);
+    --bs-btn-border-color: var(--aq-primary);
+    --bs-btn-hover-bg: var(--aq-primary);
+    --bs-btn-hover-border-color: var(--aq-primary);
+    --bs-btn-active-bg: var(--aq-primary-dark);
+    --bs-btn-active-border-color: var(--aq-primary-dark);
+}
+
+.table thead th {
+    background-color: var(--aq-primary-soft);
+    color: #17415e;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--aq-primary);
+    box-shadow: 0 0 0 .2rem rgba(33, 118, 174, .15);
+}
+
+.card {
+    border-color: var(--aq-border);
+}
+
+/* ── Habillage des pages "brutes" (sans classes Bootstrap) ──────── */
+
+.page-body h1, .page-body h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #17415e;
+    margin-bottom: 1rem;
+}
+
+.page-body h3, .page-body h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #17415e;
+}
+
+.page-body main > table,
+.page-body main table:not([class]) {
+    width: 100%;
+    background-color: #ffffff;
+    border-collapse: collapse;
+    border: 1px solid var(--aq-border);
+    margin-bottom: 1rem;
+}
+
+.page-body main table:not([class]) th,
+.page-body main table:not([class]) td {
+    padding: .55rem .75rem;
+    border: 1px solid var(--aq-border);
+    font-size: .92rem;
+}
+
+.page-body main table:not([class]) thead th,
+.page-body main table:not([class]) tr:first-child th {
+    background-color: var(--aq-primary-soft);
+    color: #17415e;
+    text-align: left;
+}
+
+.page-body main table:not([class]) tbody tr:hover {
+    background-color: #f6fafc;
+}
+
+.page-body main input:not([class]):not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.page-body main select:not([class]),
+.page-body main textarea:not([class]) {
+    display: inline-block;
+    padding: .42rem .65rem;
+    font-size: .92rem;
+    border: 1px solid #c4d4e0;
+    border-radius: .375rem;
+    background-color: #ffffff;
+    color: var(--aq-text);
+    margin-bottom: .35rem;
+    max-width: 100%;
+}
+
+.page-body main input:not([class]):focus,
+.page-body main select:not([class]):focus,
+.page-body main textarea:not([class]):focus {
+    outline: none;
+    border-color: var(--aq-primary);
+    box-shadow: 0 0 0 .2rem rgba(33, 118, 174, .15);
+}
+
+.page-body main label:not([class]) {
+    font-weight: 600;
+    font-size: .88rem;
+    margin-bottom: .2rem;
+}
+
+.page-body main button:not([class]),
+.page-body main input[type="submit"]:not([class]) {
+    display: inline-block;
+    padding: .45rem .95rem;
+    font-size: .92rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--aq-primary);
+    border: 1px solid var(--aq-primary);
+    border-radius: .375rem;
+}
+
+.page-body main button:not([class]):hover,
+.page-body main input[type="submit"]:not([class]):hover {
+    background-color: var(--aq-primary-dark);
+    border-color: var(--aq-primary-dark);
+}
+
+.page-body main a:not([class]) {
+    color: var(--aq-primary);
+    text-decoration: none;
+}
+
+.page-body main a:not([class]):hover {
+    color: var(--aq-primary-dark);
+    text-decoration: underline;
+}
+
+.page-body main form:not([class]) {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: .5rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    max-width: 100%;
+}
+
+.page-body main ul:not([class]) {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: .5rem;
+    padding: 1rem 1rem 1rem 2.2rem;
+}
+
+.page-body main ul:not([class]) li {
+    padding: .25rem 0;
+}
+
+/* ===================================================================
+   Classes partagées (anciennement définies page par page)
+   =================================================================== */
+
+/* Messages et textes d'état */
+.error {
+    color: #842029;
+    background-color: #f8d7da;
+    border: 1px solid #f1aeb5;
+    border-radius: .375rem;
+    padding: .6rem .9rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.success { color: #146c43; font-weight: 600; }
+.annule { color: #b02a37; font-weight: 600; }
+.hint, .sub, .subtitle { color: #64748b; font-size: .88rem; }
+.subtitle, .sub { margin-bottom: 1.1rem; }
+.empty { color: #64748b; text-align: center; padding: 1rem; }
+
+/* Barres d'outils, filtres, pagination */
+.toolbar, .filters, .pagination, .filter-row, .actions {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: .75rem 0;
+}
+
+.filter-row { align-items: flex-end; }
+
+.filters label, .filter-row label {
+    display: flex;
+    flex-direction: column;
+    font-size: .84rem;
+    font-weight: 600;
+    gap: .2rem;
+    margin-bottom: 0;
+}
+
+.actions a { color: var(--aq-primary); text-decoration: none; }
+.actions a:hover { color: var(--aq-primary-dark); text-decoration: underline; }
+
+/* Conteneurs type carte */
+.filter-box, .filter-card, .summary-card, .stock {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: .5rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.stock { display: inline-block; }
+
+.summary-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
+.summary-item { min-width: 150px; }
+.summary-label { color: #64748b; font-size: .82rem; }
+.summary-value { font-size: 1.25rem; font-weight: 700; color: var(--aq-primary-dark); margin-top: .15rem; }
+
+/* Formulaires "carte" centrés */
+.form-container {
+    background-color: #ffffff;
+    max-width: 560px;
+    margin: 1.5rem auto;
+    padding: 1.5rem;
+    border: 1px solid var(--aq-border);
+    border-radius: .5rem;
+}
+
+.fiche-container {
+    background-color: #ffffff;
+    max-width: 640px;
+    margin: 1.5rem auto;
+    padding: 1.75rem;
+    border: 1px solid var(--aq-border);
+    border-radius: .5rem;
+}
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: .3rem; font-weight: 600; font-size: .9rem; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: .45rem .65rem;
+    border: 1px solid #c4d4e0;
+    border-radius: .375rem;
+    box-sizing: border-box;
+}
+.form-group .readonly-value { padding: .45rem 0; color: #555; }
+.readonly-field, .readonly { background-color: #e9ecef; cursor: not-allowed; }
+
+/* Fiches détail */
+.info-row { display: flex; justify-content: space-between; padding: .7rem 0; border-bottom: 1px solid #eef3f7; }
+.info-label { font-weight: 600; color: #55606a; }
+.info-value { color: #111; }
+
+/* Boutons complémentaires */
+.btn-box { display: flex; gap: .6rem; margin-top: 1.25rem; }
+.btn-right { margin-left: auto; }
+.btn-link {
+    white-space: nowrap;
+    background-color: var(--aq-primary);
+    color: #ffffff;
+    padding: .45rem .75rem;
+    border: none;
+    border-radius: .375rem;
+    text-decoration: none;
+    font-weight: 600;
+}
+.btn-link:hover { background-color: var(--aq-primary-dark); color: #ffffff; }
+
+/* Badges de statut (pastels, sémantiques) */
+.badge { padding: .35rem .6rem; border-radius: .375rem; font-weight: 700; font-size: .78rem; }
+.badge-info { background-color: #d7e9f5; color: #17415e; }
+.badge-warning, .badge-creee { background-color: #fff3cd; color: #856404; }
+.badge-danger, .badge-annulee { background-color: #f8d7da; color: #721c24; }
+.badge-success, .badge-payee, .badge-ok { background-color: #d4edda; color: #155724; }
+.badge-secondary { background-color: #e2e3e5; color: #383d41; }
+.badge-validee { background-color: #cce5ff; color: #004085; }
+
+/* Boîte de dialogue (modal client, etc.) */
+dialog {
+    border: none;
+    border-radius: .5rem;
+    padding: 1.25rem;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .2);
+}
+dialog::backdrop { background: rgba(0, 0, 0, .4); }
+
+.client-row { display: flex; gap: .5rem; align-items: flex-start; }
+.client-row select { flex: 1; }
+
+/* Les formulaires d'action dans les tableaux ne doivent pas ressembler à des cartes */
+main table form:not([class]) {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline;
+}

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Détails Lot</title>
 </head>
 <body>
+<main>
 <h1>Détails du lot <span th:text="${lot.id}"></span></h1>
 <div>
     <p><strong>Code:</strong> <span th:text="${lot.code}"></span></p>
@@ -21,12 +21,13 @@
 </div>
 <div>
     <a th:href="@{/lots}">Back to list</a>
-    <a th:href="@{/lots/{id}/journal(id=${lot.id})}">Journal</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{/lots/{id}/journal(id=${lot.id})}">Journal</a>
     <a th:href="@{/lots/{id}/pesees(id=${lot.id})}">Pesées</a>
     <a th:href="@{/lots/{id}/mortalites(id=${lot.id})}">Mortalités</a>
     <a th:href="@{/production/previsions-recoltes(lotId=${lot.id})}">Prévision récolte</a>
-    <a th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
-    <a th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Passer ce lot au statut ANNULE ?')">Delete</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
+    <a class="btn btn-sm btn-outline-danger" th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Passer ce lot au statut ANNULE ?')">Delete</a>
 </div>
+</main>
 </body>
 </html>

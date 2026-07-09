@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Type de récolte</title>
 </head>
 <body>
+<main>
 <h1 th:text="${type.id} == null ? 'Créer un type de récolte' : 'Modifier le type #' + ${type.id}"></h1>
 
 <form th:action="${type.id} == null ? @{/types-recoltes} : @{/types-recoltes/{id}(id=${type.id})}"
       th:object="${type}"
       method="post">
     <div>
-        <label>Libellé:
-            <select th:field="*{libelle}" required>
+        <label class="form-label">Libellé:
+            <select class="form-select" th:field="*{libelle}" required>
                 <option value="">-- Choisir --</option>
                 <option th:each="libelle : ${libelles}"
                         th:value="${libelle}"
@@ -21,14 +21,15 @@
         </label>
     </div>
     <div>
-        <label>Description:
-            <textarea th:field="*{description}" required></textarea>
+        <label class="form-label">Description:
+            <textarea class="form-control" th:field="*{description}" required></textarea>
         </label>
     </div>
     <div>
-        <button type="submit">Enregistrer</button>
-        <a th:href="@{/types-recoltes}">Annuler</a>
+        <button class="btn btn-primary" type="submit">Enregistrer</button>
+        <a class="btn btn-secondary" th:href="@{/types-recoltes}">Annuler</a>
     </div>
 </form>
+</main>
 </body>
 </html>

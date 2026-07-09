@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Détails de l'Aliment</title>
 </head>
 <body>
-
+<main>
     <h2>Détails de l'Aliment</h2>
 
     <div th:if="${aliment != null}">
@@ -16,17 +15,17 @@
         </ul>
 
         <p>
-            <a th:href="@{/aliments}">Retour à la liste</a> | 
-            <a th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier cet aliment</a> | 
-            <a th:href="@{/aliments/{id}/delete(id=${aliment.id})}"
+            <a class="btn btn-secondary" th:href="@{/aliments}">Retour à la liste</a> | 
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier cet aliment</a> | 
+            <a class="btn btn-sm btn-outline-danger" th:href="@{/aliments/{id}/delete(id=${aliment.id})}"
                th:onclick="return confirm('Confirmer la suppression ?');">Supprimer</a>
         </p>
     </div>
 
     <div th:unless="${aliment != null}">
         <p>Aliment introuvable.</p>
-        <p><a th:href="@{/aliments}">Retour à la liste</a></p>
+        <p><a class="btn btn-secondary" th:href="@{/aliments}">Retour à la liste</a></p>
     </div>
-
+</main>
 </body>
 </html>

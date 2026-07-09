@@ -1,67 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Liste des Maintenances et Pannes</title>
 </head>
 <body>
-
+<main>
     <h1>Maintenances & Pannes</h1>
     
     <p>
-        <a th:href="@{/maintenances/new}">+ Nouvelle Intervention</a>
+        <a class="btn btn-primary" th:href="@{/maintenances/new}">+ Nouvelle Intervention</a>
     </p>
 
     <fieldset>
         <legend>Filtres de recherche</legend>
         <form th:action="@{/maintenances}" th:object="${filter}" method="get">
             <div>
-                <label>ID Intervention :</label>
-                <input type="number" th:field="*{id}">
+                <label class="form-label">ID Intervention :</label>
+                <input class="form-control" type="number" th:field="*{id}">
             </div>
             <div>
-                <label>ID Équipement :</label>
-                <input type="number" th:field="*{idEquipement}">
+                <label class="form-label">ID Équipement :</label>
+                <input class="form-control" type="number" th:field="*{idEquipement}">
             </div>
             <div>
-                <label>ID Utilisateur / Technicien :</label>
-                <input type="number" th:field="*{idUser}">
+                <label class="form-label">ID Utilisateur / Technicien :</label>
+                <input class="form-control" type="number" th:field="*{idUser}">
             </div>
             <div>
-                <label>ID Catégorie :</label>
-                <input type="number" th:field="*{idCategorieMaintenance}">
+                <label class="form-label">ID Catégorie :</label>
+                <input class="form-control" type="number" th:field="*{idCategorieMaintenance}">
             </div>
             <div>
-                <label>Statut Intervention :</label>
-                <select th:field="*{statutIntervention}">
+                <label class="form-label">Statut Intervention :</label>
+                <select class="form-select" th:field="*{statutIntervention}">
                     <option value="">Tous</option>
                     <option th:each="statut : ${T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).values()}"
                             th:value="${statut}" th:text="${statut}"></option>
                 </select>
             </div>
             <div>
-                <label>Coût exact :</label>
-                <input type="number" step="0.01" th:field="*{cout}">
+                <label class="form-label">Coût exact :</label>
+                <input class="form-control" type="number" step="0.01" th:field="*{cout}">
             </div>
             <div>
-                <label>Date Maintenance (Début) :</label>
-                <input type="date" th:field="*{debutDateMaintenance}">
+                <label class="form-label">Date Maintenance (Début) :</label>
+                <input class="form-control" type="date" th:field="*{debutDateMaintenance}">
             </div>
             <div>
-                <label>Date Maintenance (Fin) :</label>
-                <input type="date" th:field="*{finDateMaintenance}">
+                <label class="form-label">Date Maintenance (Fin) :</label>
+                <input class="form-control" type="date" th:field="*{finDateMaintenance}">
             </div>
             <div>
-                <label>Date Résolution (Début) :</label>
-                <input type="date" th:field="*{debutDateResolution}">
+                <label class="form-label">Date Résolution (Début) :</label>
+                <input class="form-control" type="date" th:field="*{debutDateResolution}">
             </div>
             <div>
-                <label>Date Résolution (Fin) :</label>
-                <input type="date" th:field="*{finDateResolution}">
+                <label class="form-label">Date Résolution (Fin) :</label>
+                <input class="form-control" type="date" th:field="*{finDateResolution}">
             </div>
             <br>
             <div>
-                <button type="submit">Filtrer</button>
+                <button class="btn btn-primary" type="submit">Filtrer</button>
                 <a th:href="@{/maintenances}">Réinitialiser</a>
             </div>
         </form>
@@ -69,7 +68,7 @@
 
     <br>
 
-    <table border="1">
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>ID</th>
@@ -92,7 +91,7 @@
                 <td th:text="${m.cout != null ? m.cout + ' €' : '0.00 €'}">150 €</td>
                 <td th:text="${m.dateResolution != null ? m.dateResolution : '-'}">-</td>
                 <td>
-                    <a th:href="@{/maintenances/{id}(id=${m.id})}">Détails</a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/maintenances/{id}(id=${m.id})}">Détails</a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(maintenances)}">
@@ -106,7 +105,7 @@
             Page <span th:text="${page.number + 1}">1</span> sur <span th:text="${page.totalPages}">5</span>
         </p>
         <div>
-            <a th:href="@{/maintenances(
+            <a class="btn btn-secondary" th:href="@{/maintenances(
                     page=${page.number - 1}, 
                     id=${filter.id}, 
                     idEquipement=${filter.idEquipement}, 
@@ -137,6 +136,6 @@
             th:if="${page.hasNext()}">Suivant</a>
         </div>
     </div>
-
+</main>
 </body>
 </html>

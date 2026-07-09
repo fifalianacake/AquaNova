@@ -1,37 +1,36 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Historique des Traitements</title>
 </head>
 <body>
-
+<main>
     <div>
-        <a th:href="@{/traitements-eau/new}">Saisir un traitement</a>
+        <a class="btn btn-primary" th:href="@{/traitements-eau/new}">Saisir un traitement</a>
         <h2>Traitements de l'Eau Appliqués</h2>
     </div>
 
     <div>
         <form th:action="@{/traitements-eau}" method="get">
-            <input type="number" name="id" placeholder="id" th:value="${currentId}">
-            <select name="bassinId">
+            <input class="form-control" type="number" name="id" placeholder="id" th:value="${currentId}">
+            <select class="form-select" name="bassinId">
                 <option value="">-- bassin --</option>
                 <option th:each="b : ${bassins}"
                         th:value="${b.id}"
                         th:text="${b.reference}"
                         th:selected="${b.id == currentBassinId}"></option>
             </select>
-            <select name="typeId">
+            <select class="form-select" name="typeId">
                 <option value="">-- type traitement --</option>
                 <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}" th:selected="${t.id == currentTypeId}"></option>
             </select>
-            <input type="date" name="debut" th:value="${currentDebut}">
-            <input type="date" name="fin" th:value="${currentFin}">
-            <button type="submit">Filtrer</button>
+            <input class="form-control" type="date" name="debut" th:value="${currentDebut}">
+            <input class="form-control" type="date" name="fin" th:value="${currentFin}">
+            <button class="btn btn-primary" type="submit">Filtrer</button>
         </form>
     </div>
 
-    <table>
+    <table class="table table-hover align-middle">
         <thead>
             <tr>
                 <th>id</th>
@@ -56,6 +55,6 @@
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
 </html>

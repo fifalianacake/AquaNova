@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Production - Liste des Mortalités</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-
-<body class="container mt-5">
-
+<body>
+<main>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 th:text="${titre != null ? titre : 'Suivi des Mortalités'}">Suivi des Mortalités</h2>
         <div>
@@ -38,7 +34,7 @@
                 <td th:text="${m.cause != null ? m.cause : '-'}">Maladie</td>
                 <td>
                     <a th:href="@{/mortalites/{id}/edit(id=${m.id})}"
-                        class="btn btn-sm btn-warning">Modifier</a>
+                        class="btn btn-sm btn-outline-primary">Modifier</a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(mortalites)}">
@@ -46,7 +42,6 @@
             </tr>
         </tbody>
     </table>
-
+</main>
 </body>
-
 </html>

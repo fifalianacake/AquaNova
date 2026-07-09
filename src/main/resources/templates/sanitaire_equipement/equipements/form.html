@@ -1,6 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova</title>
+</head>
 <body>
+<main>
     <h1 th:text="${equipement.id != null} ? 'Modification Équipement' : 'Saisie Équipement'">
         Saisie Équipement
     </h1>
@@ -8,27 +12,28 @@
     <form th:action="${equipement.id == null} ? @{/equipements} : @{/equipements/{id}(id=${equipement.id})}"
           th:object="${equipement}"
           method="post">
-        <label>Nom :</label> <input type="text" th:field="*{nom}" required /><br/>
+        <label class="form-label">Nom :</label> <input class="form-control" type="text" th:field="*{nom}" required /><br/>
         
-        <label>Type :</label>
-        <select th:field="*{typeEquipement.id}" required>
+        <label class="form-label">Type :</label>
+        <select class="form-select" th:field="*{typeEquipement.id}" required>
             <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
         </select><br/>
 
-        <label>Statut :</label>
-        <select th:field="*{statut}" required>
+        <label class="form-label">Statut :</label>
+        <select class="form-select" th:field="*{statut}" required>
             <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
         </select><br/>
 
-        <label>Date Installation :</label> <input type="date" th:field="*{dateInstallation}" required /><br/>
+        <label class="form-label">Date Installation :</label> <input class="form-control" type="date" th:field="*{dateInstallation}" required /><br/>
         
-        <label>Observation :</label> <textarea th:field="*{observation}"></textarea><br/>
+        <label class="form-label">Observation :</label> <textarea class="form-control" th:field="*{observation}"></textarea><br/>
         
-        <button type="submit" th:text="${equipement.id != null} ? 'Modifier' : 'Enregistrer'">
+        <button class="btn btn-primary" type="submit" th:text="${equipement.id != null} ? 'Modifier' : 'Enregistrer'">
             Enregistrer
         </button>
     </form>
 
-    <a th:href="@{/equipements}">Retour</a>
+    <a class="btn btn-secondary" th:href="@{/equipements}">Retour</a>
+</main>
 </body>
 </html>
