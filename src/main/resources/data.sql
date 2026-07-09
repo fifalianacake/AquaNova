@@ -54,3 +54,32 @@ VALUES
 ('NB_MIN_PESEES_PREVISION_RECOLTE', 'Nombre minimal de pesées pour prévision', '2', 'INTEGER',
  'Nombre minimal de pesées nécessaires pour estimer une date de récolte.')
 ON CONFLICT (code) DO NOTHING;
+
+-- Données de test : historique des alertes
+INSERT INTO alerte (module_source, type_alerte, niveau_criticite, statut, message, date_creation, date_resolution)
+VALUES
+('ALIMENTATION', 'STOCK_BAS', 'AVERTISSEMENT', 'RESOLUE',
+ 'Stock de provende en dessous du seuil minimal (100 kg).', '2026-06-01 08:30:00', '2026-06-02 14:00:00'),
+
+('PRODUCTION', 'MORTALITE_ELEVEE', 'CRITIQUE', 'RESOLUE',
+ 'Taux de mortalité anormalement élevé sur le lot LOT-001.', '2026-06-05 10:15:00', '2026-06-07 09:00:00'),
+
+('SANITAIRE', 'QUALITE_EAU', 'CRITIQUE', 'IGNOREE',
+ 'pH hors plage acceptable (4.2) dans le bassin BASSIN-A1.', '2026-06-10 06:00:00', '2026-06-10 18:00:00'),
+
+('EQUIPEMENT', 'MAINTENANCE', 'INFO', 'RESOLUE',
+ 'Maintenance préventive de la pompe P-03 effectuée.', '2026-06-15 11:00:00', '2026-06-15 16:30:00'),
+
+('PRODUCTION', 'RECOLTE_PROCHE', 'AVERTISSEMENT', 'RESOLUE',
+ 'Le lot LOT-002 atteint 92% du poids cible de récolte.', '2026-06-20 07:45:00', '2026-06-25 10:00:00'),
+
+('ALIMENTATION', 'PEREMPTION', 'CRITIQUE', 'IGNOREE',
+ 'Lot de provende PRV-2026-03 périmé depuis le 18/06.', '2026-06-18 09:00:00', '2026-06-19 08:00:00'),
+
+('SANITAIRE', 'SEUIL_DEPASSE', 'AVERTISSEMENT', 'RESOLUE',
+ 'Température eau à 32°C, seuil max dépassé (30°C).', '2026-06-22 14:20:00', '2026-06-22 17:00:00'),
+
+('PRODUCTION', 'AUTRE', 'INFO', 'RESOLUE',
+ 'Transfert du lot LOT-003 vers le bassin B-05 effectué.', '2026-06-28 13:00:00', '2026-06-28 13:30:00')
+
+ON CONFLICT DO NOTHING;
