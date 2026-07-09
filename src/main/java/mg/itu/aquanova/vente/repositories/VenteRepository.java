@@ -76,13 +76,19 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
             @Param("debut") LocalDate debut,
             @Param("fin") LocalDate fin);
 
-    // Prix moyen de vente au kg, pondéré par le poids vendu (CA total / volume total),
-    // toutes ventes valides confondues (VALIDEE/PAYEE), sur tout l'historique.
     @Query("SELECT CASE WHEN COALESCE(SUM(v.poidsVendu), 0) = 0 THEN 0.0 " +
            "ELSE SUM(v.poidsVendu * v.prixUnitaire) / SUM(v.poidsVendu) END " +
            "FROM Vente v " +
            "WHERE v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE)")
     Double estimerPrixMoyenVenteKg();
+
+    // Même calcul, restreint aux ventes des lots de l'espèce donnée (via vente -> recolte -> lot -> espece).
+    @Query("SELECT CASE WHEN COALESCE(SUM(v.poidsVendu), 0) = 0 THEN 0.0 " +
+           "ELSE SUM(v.poidsVendu * v.prixUnitaire) / SUM(v.poidsVendu) END " +
+           "FROM Vente v " +
+           "WHERE v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE) " +
+           "AND v.recolte.lot.espece.id = :especeId")
+    Double estimerPrixMoyenVenteKgParEspece(@Param("especeId") Integer especeId);
 
     // Nombre de ventes
     @Query("SELECT COUNT(v) FROM Vente v " +
@@ -117,7 +123,6 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
             
 
     // Répartition CA par client (v.client est une entité Client : on sélectionne
-    // explicitement son nom pour éviter de renvoyer l'entité elle-même)
     @Query("SELECT v.client.nom, " +
            "COALESCE(SUM(v.poidsVendu * v.prixUnitaire), 0) " +
            "FROM Vente v " +

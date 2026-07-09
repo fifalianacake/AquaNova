@@ -34,7 +34,12 @@ public class PrevisionFinanciereService {
         this.previsionRecolteService = previsionRecolteService;
     }
 
-    private Double estimerPrixMoyenVenteKg() {
+    private Double estimerPrixMoyenVenteKg(Integer especeId) {
+        Double prixEspece = especeId != null ? venteRepository.estimerPrixMoyenVenteKgParEspece(especeId) : null;
+        if (prixEspece != null && prixEspece > 0) {
+            return prixEspece;
+        }
+        // Repli : aucune vente encore enregistrée pour cette espèce, on utilise le prix moyen toutes espèces.
         return venteRepository.estimerPrixMoyenVenteKg();
     }
 
@@ -78,8 +83,6 @@ public class PrevisionFinanciereService {
 
         List<LotModels> listeLots = lotRepository.findAll();
 
-        Double prixMoyenVenteKg = estimerPrixMoyenVenteKg();
-
         for (LotModels lot : listeLots) {
 
             if (lot.getId() == null) {
@@ -93,6 +96,8 @@ public class PrevisionFinanciereService {
                 continue;
             }
 
+            Integer especeId = lot.getEspece() != null ? lot.getEspece().getId() : null;
+            Double prixMoyenVenteKg = estimerPrixMoyenVenteKg(especeId);
             Double biomassePrevue = estimerBiomasseVendable(lot);
             String espece = (lot.getEspece() != null && lot.getEspece().getNom() != null)
                     ? lot.getEspece().getNom() : "Inconnue";
