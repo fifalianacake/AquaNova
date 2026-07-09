@@ -31,4 +31,10 @@ public interface DistributionRepository extends JpaRepository<Distribution, Long
     @Query("SELECT COALESCE(SUM(d.quantite * d.aliment.prixUnitaire), 0) " +
            "FROM Distribution d WHERE d.lot.id = :lotId")
     Double findTotalCoutAlimentByLotId(@Param("lotId") Long lotId);
+
+    // Prix moyen pondéré (Ar/kg) de l'aliment consommé par un lot, sur tout son historique de distribution.
+    @Query("SELECT CASE WHEN COALESCE(SUM(d.quantite), 0) = 0 THEN 0.0 " +
+           "ELSE SUM(d.quantite * d.aliment.prixUnitaire) / SUM(d.quantite) END " +
+           "FROM Distribution d WHERE d.lot.id = :lotId")
+    Double findPrixMoyenAlimentByLotId(@Param("lotId") Long lotId);
 }

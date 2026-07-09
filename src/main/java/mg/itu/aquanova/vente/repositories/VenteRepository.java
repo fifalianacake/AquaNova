@@ -76,6 +76,14 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
             @Param("debut") LocalDate debut,
             @Param("fin") LocalDate fin);
 
+    // Prix moyen de vente au kg, pondéré par le poids vendu (CA total / volume total),
+    // toutes ventes valides confondues (VALIDEE/PAYEE), sur tout l'historique.
+    @Query("SELECT CASE WHEN COALESCE(SUM(v.poidsVendu), 0) = 0 THEN 0.0 " +
+           "ELSE SUM(v.poidsVendu * v.prixUnitaire) / SUM(v.poidsVendu) END " +
+           "FROM Vente v " +
+           "WHERE v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE)")
+    Double estimerPrixMoyenVenteKg();
+
     // Nombre de ventes
     @Query("SELECT COUNT(v) FROM Vente v " +
            "WHERE v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE) " +

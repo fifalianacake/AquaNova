@@ -144,10 +144,9 @@ public class DistributionService {
         }
     }
 
-    public Double calculGPQCible(DistributionDTO distributionDTO) {
-        LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
+    public Double calculGPQCible(Long idLot) {
+        LotModels lot = lotRepository.findById(idLot)
+                .orElseThrow(() -> new IllegalArgumentException("Lot introuvable avec l'ID : " + idLot));
 
         Double poidsMoyenActuel = lot.getPoidsMoyenActuel() != null ? lot.getPoidsMoyenActuel() : 0.0;
 
@@ -155,17 +154,17 @@ public class DistributionService {
                 ? lot.getEspece().getPoidsCibleMoyen().doubleValue()
                 : 0.0;
 
-        LocalDate dateRecolteEstimee = previsionRecolteService.estimerDateRecolte(lot.getId());
+        LocalDate dateRecolteEstimee = previsionRecolteService.estimerDateRecolte(idLot);
 
         if (dateRecolteEstimee == null) {
-            System.err.println("Date de récolte estimée introuvable pour le lot avec l'ID : " + lot.getId());
+            System.err.println("Date de récolte estimée introuvable pour le lot avec l'ID : " + idLot);
             return 1.0;
         }
 
         Integer jourRestant = (int) java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), dateRecolteEstimee);
 
         if (jourRestant <= 0) {
-            System.err.println("La date de récolte estimée est passée pour le lot avec l'ID : " + lot.getId());
+            System.err.println("La date de récolte estimée est passée pour le lot avec l'ID : " + idLot);
             return 0.2; // evite infini
         }
 
@@ -176,39 +175,42 @@ public class DistributionService {
         if (total <= 0) {
             System.err
                     .println("Le poids moyen actuel est supérieur ou égal au poids moyen cible pour le lot avec l'ID : "
-                            + lot.getId());
+                            + idLot);
             return 0.2; // evite infini
         }
 
         return total;
     }
 
-    public Double calculGainCible(DistributionDTO distributionDTO) {
-        LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
+    public Double calculGPQCible(DistributionDTO distributionDTO) {
+        return calculGPQCible(distributionDTO.getIdLot());
+    }
 
-        Double gainCible = 0.0;
+    public Double calculGainCible(Long idLot) {
+        LotModels lot = lotRepository.findById(idLot)
+                .orElseThrow(() -> new IllegalArgumentException("Lot introuvable avec l'ID : " + idLot));
 
-        Double gpqCible = calculGPQCible(distributionDTO);
+        Double gpqCible = calculGPQCible(idLot);
 
         Integer quantitePoisson = lot.getEffectifActuel() != null ? lot.getEffectifActuel() : 0;
 
-        gainCible = (gpqCible * quantitePoisson) / 1000.0;
-
-        return gainCible;
+        return (gpqCible * quantitePoisson) / 1000.0;
     }
 
-    public BigDecimal CalculRationTheoriqueCible(DistributionDTO distributionDTO) {
-        Double rationTheoriqueCible = 0.0;
+    public Double calculGainCible(DistributionDTO distributionDTO) {
+        return calculGainCible(distributionDTO.getIdLot());
+    }
 
-        Double gainCible = calculGainCible(distributionDTO);
+    public BigDecimal calculRationTheoriqueCible(Long idLot) {
+        Double gainCible = calculGainCible(idLot);
 
         Double ica = parametreSystemeService.getDouble(ParametreSystemeService.ICA_SYSTEME, 1.3);
 
-        rationTheoriqueCible = gainCible.doubleValue() * ica;
-        return BigDecimal.valueOf(rationTheoriqueCible);
+        return BigDecimal.valueOf(gainCible.doubleValue() * ica);
+    }
 
+    public BigDecimal CalculRationTheoriqueCible(DistributionDTO distributionDTO) {
+        return calculRationTheoriqueCible(distributionDTO.getIdLot());
     }
 
 }

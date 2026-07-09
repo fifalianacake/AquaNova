@@ -1,5 +1,6 @@
 package mg.itu.aquanova.finance.services;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
+import mg.itu.aquanova.alimentation.services.DistributionService;
 import mg.itu.aquanova.finance.dto.PrevisionFinanciereDTO;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.repositories.LotRepository;
@@ -19,13 +21,16 @@ public class PrevisionFinanciereService {
     private final LotRepository lotRepository;
     private final VenteRepository venteRepository;
     private final DistributionRepository distributionRepository;
+    private final DistributionService distributionService;
     private final PrevisionRecolteService previsionRecolteService;
 
     public PrevisionFinanciereService(LotRepository lotRepository, VenteRepository venteRepository,
-            DistributionRepository distributionRepository, PrevisionRecolteService previsionRecolteService) {
+            DistributionRepository distributionRepository, DistributionService distributionService,
+            PrevisionRecolteService previsionRecolteService) {
         this.lotRepository = lotRepository;
         this.venteRepository = venteRepository;
         this.distributionRepository = distributionRepository;
+        this.distributionService = distributionService;
         this.previsionRecolteService = previsionRecolteService;
     }
 
@@ -57,26 +62,28 @@ public class PrevisionFinanciereService {
         if (lotId == null) {
             return total;
         }
+
         LocalDate dateRecolteEstimee = previsionRecolteService.estimerDateRecolte(lotId);
         if (dateRecolteEstimee == null) {
             return total;
         }
 
-        LotModels lot = lotRepository.findById(lotId).orElse(null);
+        long joursRestants = ChronoUnit.DAYS.between(LocalDate.now(), dateRecolteEstimee);
+        if (joursRestants <= 0) {
+            return total;
+        }
 
-        Double coutActuelAliments = distributionRepository.findTotalCoutAlimentByLotId(lotId);
+        // Ration journalière théorique (kg/jour, pour tout le lot) basée sur l'ICA système
+        // et le gain de poids cible restant à atteindre avant la récolte (même formule que
+        // DistributionService, réutilisée ici pour projeter le coût sur les jours restants).
+        BigDecimal rationJournaliereKg = distributionService.calculRationTheoriqueCible(lotId);
+        Double prixMoyenAlimentKg = distributionRepository.findPrixMoyenAlimentByLotId(lotId);
 
-        Integer AgeActuel = (lot.getDateMiseEnCharge() != null)
-                ? (int) ChronoUnit.DAYS.between(lot.getDateMiseEnCharge(), LocalDate.now())
-                : 0;
+        if (rationJournaliereKg == null || prixMoyenAlimentKg == null) {
+            return total;
+        }
 
-        Integer joursRestants = (dateRecolteEstimee != null)
-                ? (int) ChronoUnit.DAYS.between(LocalDate.now(), dateRecolteEstimee)
-                : 0;
-
-        Double coutAlimentMoyenParJour = coutActuelAliments / (AgeActuel != 0 ? AgeActuel : 1);
-
-        total = coutActuelAliments + (coutAlimentMoyenParJour * joursRestants);
+        total = rationJournaliereKg.doubleValue() * prixMoyenAlimentKg * joursRestants;
 
         return total;
     }
