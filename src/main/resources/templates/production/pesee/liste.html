@@ -7,9 +7,33 @@
 <main>
     <h1>Historique des pesées - Lot N° <span th:text="${idLot}"></span></h1>
 
-    <p>
+    <div>
         <a class="btn btn-primary" th:href="@{'/lots/' + ${idLot} + '/pesees/new'}">Enregistrer une nouvelle pesée</a>
-    </p>
+    </div>
+
+    <form method="get" th:action="@{/lots/{idLot}/pesees(idLot=${idLot})}" class="filters">
+        <input type="hidden" name="page" value="0" />
+
+        <label class="form-label">Date début
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+        </label>
+
+        <label class="form-label">Date fin
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
+        </label>
+
+        <label class="form-label">Lignes/page
+            <select class="form-select" name="size" onchange="this.form.submit()">
+                <option th:each="s : ${pageSizes}"
+                        th:value="${s}"
+                        th:text="${s}"
+                        th:selected="${pesees.size == s}"></option>
+            </select>
+        </label>
+
+        <button class="btn btn-primary" type="submit">Filtrer</button>
+        <a th:href="@{/lots/{idLot}/pesees(idLot=${idLot})}">Réinitialiser</a>
+    </form>
 
     <table class="table table-hover align-middle">
         <thead>
@@ -23,7 +47,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="p : ${pesees}">
+            <tr th:each="p : ${pesees.content}">
                 <td th:text="${p.datePesee}"></td>
                 <td th:text="${p.nbEchantillon}"></td>
                 <td th:text="${p.poidsTotalEchantillon}"></td>
@@ -36,8 +60,23 @@
                         onclick="return confirm('Supprimer cette pesée ?');">Supprimer</a>
                 </td>
             </tr>
+            <tr th:if="${pesees.empty}">
+                <td colspan="6">Aucune pesée trouvée.</td>
+            </tr>
         </tbody>
     </table>
+
+    <div class="pagination" th:if="${pesees.totalPages > 0}">
+        <a class="btn btn-secondary" th:if="${pesees.hasPrevious()}"
+           th:href="@{/lots/{idLot}/pesees(idLot=${idLot}, page=${pesees.number - 1}, size=${pesees.size}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
+        <span th:unless="${pesees.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
+
+        <span th:text="'Page ' + ${pesees.number + 1} + ' sur ' + ${pesees.totalPages} + ' — ' + ${pesees.totalElements} + ' résultat(s)'"></span>
+
+        <a th:if="${pesees.hasNext()}"
+           th:href="@{/lots/{idLot}/pesees(idLot=${idLot}, page=${pesees.number + 1}, size=${pesees.size}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
+        <span th:unless="${pesees.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+    </div>
 </main>
 </body>
 </html>

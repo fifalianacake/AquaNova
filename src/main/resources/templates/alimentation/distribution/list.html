@@ -6,13 +6,62 @@
 <body>
 <main>
     <h2>Liste des Distributions d'Alimentation</h2>
-    
+
     <a class="btn btn-primary" th:href="@{/distributions/new}">Nouvelle Distribution</a>
     <br/><br/>
+
+    <form method="get" th:action="@{/distributions}" class="filters">
+        <input type="hidden" name="page" value="0" />
+
+        <label class="form-label">ID
+            <input class="form-control" type="number" name="id" th:value="${filter.id}" />
+        </label>
+
+        <label class="form-label">Lot
+            <select class="form-select" name="lotId">
+                <option value="">Tous</option>
+                <option th:each="l : ${lots}"
+                        th:value="${l.id}"
+                        th:text="${l.code}"
+                        th:selected="${filter.lotId == l.id}"></option>
+            </select>
+        </label>
+
+        <label class="form-label">Aliment
+            <select class="form-select" name="alimentId">
+                <option value="">Tous</option>
+                <option th:each="a : ${aliments}"
+                        th:value="${a.id}"
+                        th:text="${a.nom}"
+                        th:selected="${filter.alimentId == a.id}"></option>
+            </select>
+        </label>
+
+        <label class="form-label">Date début
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+        </label>
+
+        <label class="form-label">Date fin
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
+        </label>
+
+        <label class="form-label">Lignes/page
+            <select class="form-select" name="size" onchange="this.form.submit()">
+                <option th:each="s : ${pageSizes}"
+                        th:value="${s}"
+                        th:text="${s}"
+                        th:selected="${distributions.size == s}"></option>
+            </select>
+        </label>
+
+        <button class="btn btn-primary" type="submit">Filtrer</button>
+        <a th:href="@{/distributions}">Réinitialiser</a>
+    </form>
 
     <table class="table table-hover align-middle">
         <thead border="1">
             <tr>
+                <th>ID</th>
                 <th>Date</th>
                 <th>ID Lot</th>
                 <th>Aliment</th>
@@ -22,11 +71,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:if="${#lists.isEmpty(distributions)}">
-                <td>Aucune donnée disponible</td>
-            </tr>
-            
-            <tr th:each="dist : ${distributions}">
+            <tr th:each="dist : ${distributions.content}">
+                <td th:text="${dist.id}"></td>
                 <td th:text="${dist.dateDistribution}">01/01/2026 08:00</td>
                 <td th:text="${dist.lot.id}">1</td>
                 <td th:text="${dist.aliment.nom}">Granulé</td>
@@ -39,8 +85,23 @@
                        onclick="return confirm('Supprimer ?')">Supprimer</a>
                 </td>
             </tr>
+            <tr th:if="${distributions.empty}">
+                <td colspan="7">Aucune donnée trouvée.</td>
+            </tr>
         </tbody>
     </table>
+
+    <div class="pagination" th:if="${distributions.totalPages > 0}">
+        <a class="btn btn-secondary" th:if="${distributions.hasPrevious()}"
+           th:href="@{/distributions(page=${distributions.number - 1}, size=${distributions.size}, id=${filter.id}, lotId=${filter.lotId}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
+        <span th:unless="${distributions.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
+
+        <span th:text="'Page ' + ${distributions.number + 1} + ' sur ' + ${distributions.totalPages} + ' — ' + ${distributions.totalElements} + ' résultat(s)'"></span>
+
+        <a th:if="${distributions.hasNext()}"
+           th:href="@{/distributions(page=${distributions.number + 1}, size=${distributions.size}, id=${filter.id}, lotId=${filter.lotId}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
+        <span th:unless="${distributions.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+    </div>
 </main>
 </body>
 </html>

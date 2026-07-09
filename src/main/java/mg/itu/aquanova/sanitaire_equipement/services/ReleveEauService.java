@@ -1,13 +1,16 @@
 package mg.itu.aquanova.sanitaire_equipement.services;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import mg.itu.aquanova.admin.service.ParametreSystemeService;
+import mg.itu.aquanova.sanitaire_equipement.dto.ReleveEauFilter;
 import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
 import mg.itu.aquanova.sanitaire_equipement.repositories.ReleveEauRepository;
 
@@ -51,53 +54,53 @@ public class ReleveEauService {
     }
 
     // ==========================
-    // SEARCH
+    // LISTE / RECHERCHE
     // ==========================
 
-    public List<ReleveEau> search(Long id,
-            String bassin,
-            String start,
-            String end,
-            Double minTemp,
-            Double maxTemp,
-            Double minPh,
-            Double maxPh,
-            Double minOxy,
-            Double maxOxy) {
+    public Page<ReleveEau> lister(ReleveEauFilter filter, Pageable pageable) {
+        return repo.findAll(specification(filter), pageable);
+    }
 
-        LocalDate s = (start != null && !start.isBlank())
-                ? LocalDate.parse(start)
-                : null;
+    private Specification<ReleveEau> specification(ReleveEauFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
 
-        LocalDate e = (end != null && !end.isBlank())
-                ? LocalDate.parse(end)
-                : null;
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getBassinId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("bassin").get("id"), filter.getBassinId()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateReleve"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateReleve"), filter.getDateFin()));
+            }
+            if (filter.getTemperatureMin() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("temperature"), filter.getTemperatureMin()));
+            }
+            if (filter.getTemperatureMax() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("temperature"), filter.getTemperatureMax()));
+            }
+            if (filter.getPhMin() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("ph"), filter.getPhMin()));
+            }
+            if (filter.getPhMax() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("ph"), filter.getPhMax()));
+            }
+            if (filter.getOxygeneMin() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("oxygene"), filter.getOxygeneMin()));
+            }
+            if (filter.getOxygeneMax() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("oxygene"), filter.getOxygeneMax()));
+            }
 
-        return repo.findAll().stream()
-
-                .filter(r -> id == null || r.getId().equals(id))
-
-                .filter(r -> bassin == null
-                        || bassin.isBlank()
-                        || r.getBassin().getReference().toLowerCase()
-                                .contains(bassin.toLowerCase()))
-
-                .filter(r -> s == null || !r.getDateReleve().isBefore(s))
-                .filter(r -> e == null || !r.getDateReleve().isAfter(e))
-
-                // TEMP INTERVAL
-                .filter(r -> minTemp == null || r.getTemperature() >= minTemp)
-                .filter(r -> maxTemp == null || r.getTemperature() <= maxTemp)
-
-                // PH INTERVAL
-                .filter(r -> minPh == null || r.getPh() >= minPh)
-                .filter(r -> maxPh == null || r.getPh() <= maxPh)
-
-                // OXYGEN INTERVAL
-                .filter(r -> minOxy == null || r.getOxygene() >= minOxy)
-                .filter(r -> maxOxy == null || r.getOxygene() <= maxOxy)
-
-                .toList();
+            return predicates;
+        };
     }
 
     // ==========================

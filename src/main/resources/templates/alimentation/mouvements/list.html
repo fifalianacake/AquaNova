@@ -11,67 +11,56 @@
 
     <h2>Mouvements de stock</h2>
 
-    <!-- FILTERS -->
-    <form method="get" action="/stocks/mouvements">
+    <form method="get" th:action="@{/stocks/mouvements}" class="filters">
+        <input type="hidden" name="page" value="0" />
 
-        <fieldset>
-            <legend>Filtres</legend>
+        <label class="form-label">ID
+            <input class="form-control" type="number" name="id" th:value="${filter.id}" />
+        </label>
 
-            <div>
-                <label class="form-label">ID du mouvement</label><br>
-                <input class="form-control" type="number" name="id" placeholder="Ex : 12" th:value="${param.id}">
-            </div>
+        <label class="form-label">Type
+            <select class="form-select" name="type">
+                <option value="">Tous</option>
+                <option th:each="t : ${typesMouvement}"
+                        th:value="${t}"
+                        th:text="${t}"
+                        th:selected="${filter.type == t}"></option>
+            </select>
+        </label>
 
-            <br>
+        <label class="form-label">Aliment
+            <select class="form-select" name="alimentId">
+                <option value="">Tous</option>
+                <option th:each="a : ${aliments}"
+                        th:value="${a.id}"
+                        th:text="${a.nom}"
+                        th:selected="${filter.alimentId == a.id}"></option>
+            </select>
+        </label>
 
-            <div>
-                <label class="form-label">Aliment</label><br>
-                <input class="form-control" type="text" name="aliment" placeholder="Nom de l'aliment" th:value="${param.aliment}">
-            </div>
+        <label class="form-label">Date début
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+        </label>
 
-            <br>
+        <label class="form-label">Date fin
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
+        </label>
 
-            <div>
-                <label class="form-label">Type</label><br>
-                <select class="form-select" name="type">
-                    <option value="">Tous</option>
-                    <option value="ENTREE" th:selected="${param.type == 'ENTREE'}">
-                        Entrée
-                    </option>
-                    <option value="SORTIE" th:selected="${param.type == 'SORTIE'}">
-                        Sortie
-                    </option>
-                    <option value="PERTE" th:selected="${param.type == 'PERTE'}">
-                        Perte
-                    </option>
-                </select>
-            </div>
+        <label class="form-label">Lignes/page
+            <select class="form-select" name="size" onchange="this.form.submit()">
+                <option th:each="s : ${pageSizes}"
+                        th:value="${s}"
+                        th:text="${s}"
+                        th:selected="${mouvements.size == s}"></option>
+            </select>
+        </label>
 
-            <br>
-
-            <div>
-                <label class="form-label">Date de début</label><br>
-                <input class="form-control" type="date" name="start" th:value="${param.start}">
-            </div>
-
-            <br>
-
-            <div>
-                <label class="form-label">Date de fin</label><br>
-                <input class="form-control" type="date" name="end" th:value="${param.end}">
-            </div>
-
-            <br>
-
-            <button class="btn btn-primary" type="submit">Filtrer</button>
-            <a th:href="@{/stocks/mouvements}">Réinitialiser</a>
-
-        </fieldset>
-
+        <button class="btn btn-primary" type="submit">Filtrer</button>
+        <a th:href="@{/stocks/mouvements}">Réinitialiser</a>
     </form>
 
-    <!-- TABLE -->
     <table class="table table-hover align-middle">
+        <thead>
         <tr>
             <th>ID</th>
             <th>Date</th>
@@ -80,22 +69,34 @@
             <th>Quantité</th>
             <th>Action</th>
         </tr>
-
-        <tr th:each="m : ${mouvements}">
+        </thead>
+        <tbody>
+        <tr th:each="m : ${mouvements.content}">
             <td th:text="${m.id}"></td>
             <td th:text="${m.dateMouvement}"></td>
             <td th:text="${m.aliment.nom}"></td>
             <td th:text="${m.typeMouvement}"></td>
             <td th:text="${m.quantite}"></td>
             <td>
-                <a class="btn btn-sm btn-outline-primary" th:href="@{'/stocks/mouvements/' + ${m.id}}">Voir</a>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/stocks/mouvements/{id}(id=${m.id})}">Voir</a>
             </td>
         </tr>
+        <tr th:if="${mouvements.empty}">
+            <td colspan="6">Aucune donnée trouvée.</td>
+        </tr>
+        </tbody>
     </table>
 
-    <!-- PAGINATION (basic placeholder) -->
-    <div>
-        Page navigation handled in controller if needed
+    <div class="pagination" th:if="${mouvements.totalPages > 0}">
+        <a class="btn btn-secondary" th:if="${mouvements.hasPrevious()}"
+           th:href="@{/stocks/mouvements(page=${mouvements.number - 1}, size=${mouvements.size}, id=${filter.id}, type=${filter.type}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
+        <span th:unless="${mouvements.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
+
+        <span th:text="'Page ' + ${mouvements.number + 1} + ' sur ' + ${mouvements.totalPages} + ' — ' + ${mouvements.totalElements} + ' résultat(s)'"></span>
+
+        <a th:if="${mouvements.hasNext()}"
+           th:href="@{/stocks/mouvements(page=${mouvements.number + 1}, size=${mouvements.size}, id=${filter.id}, type=${filter.type}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
+        <span th:unless="${mouvements.hasNext()}" style="color:#999;">Suivant &raquo;</span>
     </div>
 
     <a class="btn btn-primary" href="/stocks/mouvements/new">Nouveau mouvement</a>

@@ -1,74 +1,64 @@
 package mg.itu.aquanova.vente.controllers;
 
+import java.util.List;
+
 import mg.itu.aquanova.vente.dto.TransactionFilterDTO;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
 import mg.itu.aquanova.vente.services.ClientService;
 import mg.itu.aquanova.vente.services.TypeClientService;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
+import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.production.services.RecolteService;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/ventes")
 public class VenteController {
 
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
+
     private final VenteService service;
     private final StatutVenteRepository statutRepository;
     private final RecolteService recolteService; // Ajouté ici
+    private final LotService lotService;
     private final ClientService clientService;
     private final TypeClientService typeClientService;
 
     public VenteController(VenteService service, StatutVenteRepository statutRepository,
-            RecolteService recolteService, ClientService clientService, TypeClientService typeClientService) {
+            RecolteService recolteService, LotService lotService, ClientService clientService,
+            TypeClientService typeClientService) {
         this.service = service;
         this.statutRepository = statutRepository;
         this.recolteService = recolteService;
+        this.lotService = lotService;
         this.clientService = clientService;
         this.typeClientService = typeClientService;
     }
 
     @GetMapping
     public String lister(
-            @RequestParam(required = false) Long id,
-            @RequestParam(required = false) String client,
-            @RequestParam(required = false) Long recolteId,
-            @RequestParam(required = false) Long lotId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin,
-            @RequestParam(required = false) Long statutId,
-            @RequestParam(required = false) BigDecimal montantMin,
-            @RequestParam(required = false) BigDecimal montantMax,
+            @ModelAttribute("filter") TransactionFilterDTO filter,
+            @PageableDefault(size = 10, sort = "dateVente") Pageable pageable,
             Model model) {
 
-        TransactionFilterDTO filters = new TransactionFilterDTO();
-        filters.setId(id);
-        filters.setClient(client);
-        filters.setIdRecolte(recolteId);
-        filters.setIdLot(lotId);
-        filters.setDateDebut(debut);
-        filters.setDateFin(fin);
-        filters.setStatutId(statutId);
-        filters.setMontantMin(montantMin);
-        filters.setMontantMax(montantMax);
-
-        model.addAttribute("ventes", service.search(filters));
+        model.addAttribute("ventes", service.lister(filter, pageable));
         model.addAttribute("statuts", statutRepository.findAll());
-        model.addAttribute("currentId", id);
-        model.addAttribute("currentClient", client);
-        model.addAttribute("currentRecolteId", recolteId);
-        model.addAttribute("currentLotId", lotId);
-        model.addAttribute("currentDebut", debut);
-        model.addAttribute("currentFin", fin);
-        model.addAttribute("currentStatutId", statutId);
-        model.addAttribute("currentMontantMin", montantMin);
-        model.addAttribute("currentMontantMax", montantMax);
+        model.addAttribute("recoltes", recolteService.getAllRecoltes());
+        model.addAttribute("lots", lotService.listerTous());
+        model.addAttribute("pageSizes", PAGE_SIZES);
         return "ventes/liste";
+    }
+
+    @GetMapping("/{id}/journal")
+    public String voirJournal(@PathVariable Long id, Model model) {
+        model.addAttribute("vente", service.trouverParId(id));
+        return "ventes/journal";
     }
 
     @GetMapping("/new")

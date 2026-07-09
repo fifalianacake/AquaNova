@@ -8,36 +8,53 @@
 
 <h1>Liste des récoltes</h1>
 
-<p>
+<div>
     <a class="btn btn-primary" th:href="@{/recoltes/new}">Créer une récolte</a>
     <a th:href="@{/types-recoltes}">Gérer les types de récolte</a>
-</p>
+</div>
 
-<form method="get" th:action="@{/recoltes}">
-    <div>
-        <label class="form-label">Lot:
-            <select class="form-select" name="lotId">
-                <option value="">--</option>
-                <option th:each="lot : ${lots}"
-                        th:value="${lot.id}"
-                        th:text="${lot.code}"
-                        th:selected="${param.lotId} == ${lot.id}"></option>
-            </select>
-        </label>
-        <label class="form-label">Type:
-            <select class="form-select" name="typeRecolteId">
-                <option value="">--</option>
-                <option th:each="type : ${typesRecolte}"
-                        th:value="${type.id}"
-                        th:text="${type.libelle}"
-                        th:selected="${param.typeRecolteId} == ${type.id}"></option>
-            </select>
-        </label>
-        <label class="form-label">Du: <input class="form-control" type="date" name="dateFrom" th:value="${param.dateFrom}"></label>
-        <label class="form-label">Au: <input class="form-control" type="date" name="dateTo" th:value="${param.dateTo}"></label>
-        <button class="btn btn-primary" type="submit">Filtrer</button>
-        <a th:href="@{/recoltes}">Réinitialiser</a>
-    </div>
+<form method="get" th:action="@{/recoltes}" class="filters">
+    <input type="hidden" name="page" value="0" />
+
+    <label class="form-label">Lot
+        <select class="form-select" name="lotId">
+            <option value="">--</option>
+            <option th:each="lot : ${lots}"
+                    th:value="${lot.id}"
+                    th:text="${lot.code}"
+                    th:selected="${filter.lotId == lot.id}"></option>
+        </select>
+    </label>
+
+    <label class="form-label">Type
+        <select class="form-select" name="typeRecolteId">
+            <option value="">--</option>
+            <option th:each="type : ${typesRecolte}"
+                    th:value="${type.id}"
+                    th:text="${type.libelle}"
+                    th:selected="${filter.typeRecolteId == type.id}"></option>
+        </select>
+    </label>
+
+    <label class="form-label">Date début
+        <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+    </label>
+
+    <label class="form-label">Date fin
+        <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
+    </label>
+
+    <label class="form-label">Lignes/page
+        <select class="form-select" name="size" onchange="this.form.submit()">
+            <option th:each="s : ${pageSizes}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${recoltes.size == s}"></option>
+        </select>
+    </label>
+
+    <button class="btn btn-primary" type="submit">Filtrer</button>
+    <a th:href="@{/recoltes}">Réinitialiser</a>
 </form>
 
 <table class="table table-hover align-middle">
@@ -55,7 +72,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="recolte : ${recoltes}">
+    <tr th:each="recolte : ${recoltes.content}">
         <td th:text="${recolte.id}"></td>
         <td th:text="${recolte.lot != null ? recolte.lot.code : ''}"></td>
         <td th:text="${recolte.typeRecolte != null ? recolte.typeRecolte.libelle : ''}"></td>
@@ -68,8 +85,23 @@
             <a class="btn btn-sm btn-outline-primary" th:href="@{/recoltes/{id}(id=${recolte.id})}">Voir</a>
         </td>
     </tr>
+    <tr th:if="${recoltes.empty}">
+        <td colspan="9">Aucune récolte trouvée.</td>
+    </tr>
     </tbody>
 </table>
+
+<div class="pagination" th:if="${recoltes.totalPages > 0}">
+    <a class="btn btn-secondary" th:if="${recoltes.hasPrevious()}"
+       th:href="@{/recoltes(page=${recoltes.number - 1}, size=${recoltes.size}, lotId=${filter.lotId}, typeRecolteId=${filter.typeRecolteId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
+    <span th:unless="${recoltes.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
+
+    <span th:text="'Page ' + ${recoltes.number + 1} + ' sur ' + ${recoltes.totalPages} + ' — ' + ${recoltes.totalElements} + ' résultat(s)'"></span>
+
+    <a th:if="${recoltes.hasNext()}"
+       th:href="@{/recoltes(page=${recoltes.number + 1}, size=${recoltes.size}, lotId=${filter.lotId}, typeRecolteId=${filter.typeRecolteId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
+    <span th:unless="${recoltes.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+</div>
 </main>
 </body>
 </html>

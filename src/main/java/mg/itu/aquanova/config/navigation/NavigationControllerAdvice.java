@@ -45,7 +45,8 @@ public class NavigationControllerAdvice {
                         new NavigationItemDTO("Maintenances", "/maintenances"))),
 
                 new NavigationItemDTO("Achats & Dépenses", "bi-cart3", List.of(
-                        new NavigationItemDTO("Achats", "/achats"),
+                        new NavigationItemDTO("Achats d'intrants", "/achats/intrants"),
+                        new NavigationItemDTO("Achats d'alevins", "/achats/alevins"),
                         new NavigationItemDTO("Dépenses", "/depenses"),
                         new NavigationItemDTO("Catégories de dépenses", "/categories-depenses"),
                         new NavigationItemDTO("Fournisseurs", "/fournisseurs"),
@@ -55,7 +56,6 @@ public class NavigationControllerAdvice {
                 new NavigationItemDTO("Ventes", "bi-currency-exchange", List.of(
                         new NavigationItemDTO("Ventes", "/ventes"),
                         new NavigationItemDTO("Clients", "/clients"),
-                        new NavigationItemDTO("Historique des ventes", "/ventes/historique"),
                         new NavigationItemDTO("Dashboard", "/ventes/dashboard"))),
 
                 new NavigationItemDTO("Finance", "bi-graph-up-arrow", List.of(

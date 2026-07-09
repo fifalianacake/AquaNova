@@ -1,6 +1,7 @@
 package mg.itu.aquanova.production.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.production.dto.RecolteFilter;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.Recoltes;
 import mg.itu.aquanova.production.models.StatutLotEnum;
@@ -16,12 +17,14 @@ import mg.itu.aquanova.production.repositories.TypeRecoltesRepository;
 import mg.itu.aquanova.referentiel.models.LibelleStatutBassin;
 import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class RecolteService {
@@ -111,28 +114,35 @@ public class RecolteService {
                 .orElseThrow(() -> new EntityNotFoundException("Récolte introuvable avec l'id : " + id));
     }
 
-    public List<Recoltes> rechercherRecoltes(
-            Long lotId,
-            Long typeRecolteId,
-            LocalDate dateFrom,
-            LocalDate dateTo) {
+    public Page<Recoltes> lister(RecolteFilter filter, Pageable pageable) {
+        return recoltesRepository.findAll(specification(filter), pageable);
+    }
 
-        Stream<Recoltes> stream = recoltesRepository.findAll().stream();
+    private Specification<Recoltes> specification(RecolteFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
 
-        if (lotId != null) {
-            stream = stream.filter(r -> r.getLot() != null && lotId.equals(r.getLot().getId()));
-        }
-        if (typeRecolteId != null) {
-            stream = stream.filter(r -> r.getTypeRecolte() != null && typeRecolteId.equals(r.getTypeRecolte().getId()));
-        }
-        if (dateFrom != null) {
-            stream = stream.filter(r -> r.getDateRecolte() != null && !r.getDateRecolte().isBefore(dateFrom));
-        }
-        if (dateTo != null) {
-            stream = stream.filter(r -> r.getDateRecolte() != null && !r.getDateRecolte().isAfter(dateTo));
-        }
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getLotId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("lot").get("id"), filter.getLotId()));
+            }
+            if (filter.getTypeRecolteId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("typeRecolte").get("id"), filter.getTypeRecolteId()));
+            }
+            if (filter.getStatut() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("statut"), filter.getStatut()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateRecolte"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateRecolte"), filter.getDateFin()));
+            }
 
-        return stream.toList();
+            return predicates;
+        };
     }
 
     private void validerRecolte(

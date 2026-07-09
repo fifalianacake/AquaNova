@@ -5,8 +5,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import mg.itu.aquanova.alimentation.dto.MouvementFilter;
 import mg.itu.aquanova.alimentation.models.*;
 import mg.itu.aquanova.alimentation.repositories.MouvementStockRepository;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
@@ -126,34 +130,35 @@ public class MouvementService {
         repo.deleteById(toDelete.getId());
     }
 
-    public List<MouvementStock> search(Long id,
-            String type,
-            String aliment,
-            String start,
-            String end) {
+    public Page<MouvementStock> lister(MouvementFilter filter, Pageable pageable) {
+        return repo.findAll(specification(filter), pageable);
+    }
 
-        TypeMouvement t = (type != null && !type.isBlank())
-                ? TypeMouvement.valueOf(type)
-                : null;
+    private Specification<MouvementStock> specification(MouvementFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
 
-        LocalDate s = (start != null && !start.isBlank())
-                ? LocalDate.parse(start)
-                : null;
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getType() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("typeMouvement"), filter.getType()));
+            }
+            if (filter.getAlimentId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("aliment").get("id"), filter.getAlimentId()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateMouvement"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateMouvement"), filter.getDateFin()));
+            }
 
-        LocalDate e = (end != null && !end.isBlank())
-                ? LocalDate.parse(end)
-                : null;
-
-        return repo.findAll().stream()
-                .filter(mv -> id == null || mv.getId().equals(id))
-                .filter(mv -> t == null || mv.getTypeMouvement() == t)
-                .filter(mv -> aliment == null
-                        || aliment.isBlank()
-                        || mv.getAliment().getNom().toLowerCase()
-                                .contains(aliment.toLowerCase()))
-                .filter(mv -> s == null || !mv.getDateMouvement().isBefore(s))
-                .filter(mv -> e == null || !mv.getDateMouvement().isAfter(e))
-                .toList();
+            return predicates;
+        };
     }
 
     public Double getStock(Long alimentId) {

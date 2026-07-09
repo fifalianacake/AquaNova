@@ -3,6 +3,9 @@ package mg.itu.aquanova.achat.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +28,34 @@ public class HistoriqueAchatDepenseService {
         this.depenseRepository = depenseRepository;
     }
 
-    public List<HistoriqueAchatDepenseDTO> rechercher(HistoriqueAchatDepenseFilter filter) {
+    /**
+     * Liste paginée de l'historique achats/dépenses.
+     *
+     * Particularité assumée : cet historique résulte d'une UNION en mémoire de deux types
+     * d'entités distinctes (Achat et Depense), chacune récupérée via sa propre Specification.
+     * Il n'existe pas de requête JPA unique capable de paginer nativement ce résultat combiné
+     * (pas d'entité commune, pas de vue SQL). On construit donc la liste complète triée par
+     * date décroissante, puis on la découpe manuellement selon le Pageable reçu avant de
+     * l'envelopper dans un PageImpl. C'est le seul endroit du module achat_depense où cette
+     * approche "in-memory" reste légitime (comme le faisaient Lots/Maintenance avant leur
+     * propre migration vers Pageable natif) : partout ailleurs, on pagine directement via
+     * JpaSpecificationExecutor.
+     */
+    public Page<HistoriqueAchatDepenseDTO> lister(HistoriqueAchatDepenseFilter filter, Pageable pageable) {
+        List<HistoriqueAchatDepenseDTO> tout = construireListeTriee(filter);
+
+        int total = tout.size();
+        int debut = (int) pageable.getOffset();
+        if (debut > total) {
+            debut = total;
+        }
+        int fin = Math.min(debut + pageable.getPageSize(), total);
+
+        List<HistoriqueAchatDepenseDTO> contenuPage = debut >= fin ? List.of() : tout.subList(debut, fin);
+        return new PageImpl<>(contenuPage, pageable, total);
+    }
+
+    private List<HistoriqueAchatDepenseDTO> construireListeTriee(HistoriqueAchatDepenseFilter filter) {
         List<HistoriqueAchatDepenseDTO> result = new ArrayList<>();
 
         if (filter == null || filter.getTypeOperation() == null || filter.getTypeOperation() == TypeOperation.ACHAT) {

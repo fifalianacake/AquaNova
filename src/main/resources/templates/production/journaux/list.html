@@ -8,43 +8,52 @@
 
 <h1>Journaux des lots</h1>
 
-<p>
+<div>
     <a class="btn btn-secondary" th:href="@{/lots}">Retour à la liste des lots</a>
-</p>
+</div>
 
-<form method="get" th:action="@{/journaux-lots}">
-    <div>
-        <label class="form-label">Lot:
-            <select class="form-select" name="lotId">
-                <option value="">-- Tous --</option>
-                <option th:each="lot : ${lots}"
-                        th:value="${lot.id}"
-                        th:text="${lot.code}"
-                        th:selected="${filter != null && filter.lotId != null && filter.lotId == lot.id}"></option>
-            </select>
-        </label>
+<form method="get" th:action="@{/journaux-lots}" class="filters">
+    <input type="hidden" name="page" value="0" />
 
-        <label class="form-label">Type:
-            <select class="form-select" name="typeEvenement">
-                <option value="">-- Tous --</option>
-                <option th:each="type : ${typesEvenement}"
-                        th:value="${type}"
-                        th:text="${type}"
-                        th:selected="${filter != null && filter.typeEvenement == type}"></option>
-            </select>
-        </label>
+    <label class="form-label">Lot
+        <select class="form-select" name="lotId">
+            <option value="">-- Tous --</option>
+            <option th:each="lot : ${lots}"
+                    th:value="${lot.id}"
+                    th:text="${lot.code}"
+                    th:selected="${filter.lotId != null && filter.lotId == lot.id}"></option>
+        </select>
+    </label>
 
-        <label class="form-label">Du:
-            <input class="form-control" type="date" name="dateDebut" th:value="${filter != null ? filter.dateDebut : null}">
-        </label>
+    <label class="form-label">Type
+        <select class="form-select" name="typeEvenement">
+            <option value="">-- Tous --</option>
+            <option th:each="type : ${typesEvenement}"
+                    th:value="${type}"
+                    th:text="${type}"
+                    th:selected="${filter.typeEvenement == type}"></option>
+        </select>
+    </label>
 
-        <label class="form-label">Au:
-            <input class="form-control" type="date" name="dateFin" th:value="${filter != null ? filter.dateFin : null}">
-        </label>
+    <label class="form-label">Date début
+        <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+    </label>
 
-        <button class="btn btn-primary" type="submit">Filtrer</button>
-        <a th:href="@{/journaux-lots}">Réinitialiser</a>
-    </div>
+    <label class="form-label">Date fin
+        <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
+    </label>
+
+    <label class="form-label">Lignes/page
+        <select class="form-select" name="size" onchange="this.form.submit()">
+            <option th:each="s : ${pageSizes}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${journaux.size == s}"></option>
+        </select>
+    </label>
+
+    <button class="btn btn-primary" type="submit">Filtrer</button>
+    <a th:href="@{/journaux-lots}">Réinitialiser</a>
 </form>
 
 <table class="table table-hover align-middle">
@@ -57,7 +66,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="journal : ${journaux}">
+    <tr th:each="journal : ${journaux.content}">
         <td th:text="${#temporals.format(journal.dateEvenement, 'dd/MM/yyyy HH:mm')}"></td>
         <td>
             <a th:if="${journal.lot != null}"
@@ -68,11 +77,23 @@
         <td th:text="${journal.typeEvenement != null ? journal.typeEvenement.libelle : '-'}"></td>
         <td th:text="${journal.description}"></td>
     </tr>
-    <tr th:if="${#lists.isEmpty(journaux)}">
+    <tr th:if="${journaux.empty}">
         <td colspan="4">Aucun événement enregistré.</td>
     </tr>
     </tbody>
 </table>
+
+<div class="pagination" th:if="${journaux.totalPages > 0}">
+    <a class="btn btn-secondary" th:if="${journaux.hasPrevious()}"
+       th:href="@{/journaux-lots(page=${journaux.number - 1}, size=${journaux.size}, lotId=${filter.lotId}, typeEvenement=${filter.typeEvenement}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
+    <span th:unless="${journaux.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
+
+    <span th:text="'Page ' + ${journaux.number + 1} + ' sur ' + ${journaux.totalPages} + ' — ' + ${journaux.totalElements} + ' résultat(s)'"></span>
+
+    <a th:if="${journaux.hasNext()}"
+       th:href="@{/journaux-lots(page=${journaux.number + 1}, size=${journaux.size}, lotId=${filter.lotId}, typeEvenement=${filter.typeEvenement}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
+    <span th:unless="${journaux.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+</div>
 </main>
 </body>
 </html>

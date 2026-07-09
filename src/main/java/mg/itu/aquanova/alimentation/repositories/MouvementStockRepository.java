@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import mg.itu.aquanova.alimentation.models.*;
 
-public interface MouvementStockRepository extends JpaRepository<MouvementStock, Long> {
+public interface MouvementStockRepository extends JpaRepository<MouvementStock, Long>, JpaSpecificationExecutor<MouvementStock> {
     List<MouvementStock> findByAlimentId(Long alimentId);
 
     Optional<MouvementStock> findByDistributionId(Long distributionId);

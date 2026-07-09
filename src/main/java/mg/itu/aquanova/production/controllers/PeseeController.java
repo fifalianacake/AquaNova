@@ -1,17 +1,23 @@
 package mg.itu.aquanova.production.controllers;
 
+import mg.itu.aquanova.production.dto.PeseeFilter;
 import mg.itu.aquanova.production.models.Pese;
 import mg.itu.aquanova.production.services.PeseeService;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 public class PeseeController {
+
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
 
     private final PeseeService peseeService;
 
@@ -22,10 +28,15 @@ public class PeseeController {
 
     //  l'HISTORIQUE (F6)
     @GetMapping("/lots/{idLot}/pesees")
-    public String listerPesees(@PathVariable Long idLot, Model model) {
+    public String listerPesees(
+            @PathVariable Long idLot,
+            @ModelAttribute("filter") PeseeFilter filter,
+            @PageableDefault(size = 10, sort = "datePesee") Pageable pageable,
+            Model model) {
 
-        model.addAttribute("pesees", this.peseeService.listerPeseesParLot(idLot));
+        model.addAttribute("pesees", this.peseeService.lister(idLot, filter, pageable));
         model.addAttribute("idLot", idLot);
+        model.addAttribute("pageSizes", PAGE_SIZES);
         return "production/pesee/liste";
     }
 

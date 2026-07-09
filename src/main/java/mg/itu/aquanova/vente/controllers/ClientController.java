@@ -1,9 +1,12 @@
 package mg.itu.aquanova.vente.controllers;
 
+import mg.itu.aquanova.vente.dto.ClientFilter;
 import mg.itu.aquanova.vente.models.Client;
 import mg.itu.aquanova.vente.models.TypeClient;
 import mg.itu.aquanova.vente.services.ClientService;
 import mg.itu.aquanova.vente.services.TypeClientService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,11 +14,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/clients")
 public class ClientController {
+
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
 
     private final ClientService clientService;
     private final TypeClientService typeClientService;
@@ -27,15 +33,13 @@ public class ClientController {
 
     @GetMapping
     public String lister(
-            @RequestParam(required = false) Long id,
-            @RequestParam(required = false) String nom,
-            @RequestParam(required = false) Long typeId,
-            @RequestParam(required = false) String contact,
-            @RequestParam(required = false) Boolean actif,
+            @ModelAttribute("filter") ClientFilter filter,
+            @PageableDefault(size = 10, sort = "nom") Pageable pageable,
             Model model) {
 
-        model.addAttribute("clients", clientService.rechercher(id, nom, typeId, contact, actif));
+        model.addAttribute("clients", clientService.lister(filter, pageable));
         model.addAttribute("types", typeClientService.listerTout());
+        model.addAttribute("pageSizes", PAGE_SIZES);
         return "clients/liste";
     }
 

@@ -6,28 +6,68 @@
 <body>
 <main>
 
-    <div>
+    <div class="toolbar">
         <a th:href="@{/ventes/new}" class="btn btn-primary">Saisir une vente</a>
-        <h2>Registre des Ventes Associées aux Récoltes</h2>
+        <h2 class="mb-0">Registre des Ventes</h2>
     </div>
 
-    <div class="filter-box">
-        <form th:action="@{/ventes}" method="get">
-            <input class="form-control" type="number" name="id" placeholder="ID Vente" th:value="${currentId}" style="width: 90px;">
-            <input class="form-control" type="text" name="client" placeholder="Nom Client" th:value="${currentClient}">
-            <input class="form-control" type="number" name="recolteId" placeholder="ID Récolte" th:value="${currentRecolteId}" style="width: 100px;">
-            <input class="form-control" type="number" name="lotId" placeholder="ID Lot d'origine" th:value="${currentLotId}" style="width: 130px;">
-            <input class="form-control" type="date" name="debut" th:value="${currentDebut}">
-            <input class="form-control" type="date" name="fin" th:value="${currentFin}">
-            <input class="form-control" type="number" name="montantMin" step="0.01" placeholder="Montant min" th:value="${currentMontantMin}" style="width: 120px;">
-            <input class="form-control" type="number" name="montantMax" step="0.01" placeholder="Montant max" th:value="${currentMontantMax}" style="width: 120px;">
-            <select class="form-select" name="statutId">
-                <option value="">-- Statut --</option>
-                <option th:each="s : ${statuts}" th:value="${s.id}" th:text="${s.libelle}" th:selected="${s.id == currentStatutId}"></option>
+    <form method="get" th:action="@{/ventes}" th:object="${filter}" class="filters">
+        <input type="hidden" name="page" value="0" />
+
+        <label class="form-label">ID
+            <input class="form-control" type="number" th:field="*{id}" />
+        </label>
+
+        <label class="form-label">Client
+            <input class="form-control" type="text" th:field="*{client}" placeholder="Nom du client" />
+        </label>
+
+        <label class="form-label">Récolte
+            <select class="form-select" th:field="*{idRecolte}">
+                <option value="">-- Toutes les récoltes --</option>
+                <option th:each="r : ${recoltes}" th:value="${r.id}" th:text="'Récolte #' + ${r.id}"></option>
             </select>
-            <button type="submit" class="btn btn-primary">Filtrer</button>
-        </form>
-    </div>
+        </label>
+
+        <label class="form-label">Lot d'origine
+            <select class="form-select" th:field="*{idLot}">
+                <option value="">-- Tous les lots --</option>
+                <option th:each="l : ${lots}" th:value="${l.id}" th:text="${l.code}"></option>
+            </select>
+        </label>
+
+        <label class="form-label">Date début
+            <input class="form-control" type="date" th:field="*{dateDebut}" />
+        </label>
+
+        <label class="form-label">Date fin
+            <input class="form-control" type="date" th:field="*{dateFin}" />
+        </label>
+
+        <label class="form-label">Montant min
+            <input class="form-control" type="number" step="0.01" min="0" th:field="*{montantMin}" />
+        </label>
+
+        <label class="form-label">Montant max
+            <input class="form-control" type="number" step="0.01" min="0" th:field="*{montantMax}" />
+        </label>
+
+        <label class="form-label">Statut
+            <select class="form-select" th:field="*{statutId}">
+                <option value="">-- Tous les statuts --</option>
+                <option th:each="s : ${statuts}" th:value="${s.id}" th:text="${s.libelle}"></option>
+            </select>
+        </label>
+
+        <label class="form-label">Lignes/page
+            <select class="form-select" name="size" onchange="this.form.submit()">
+                <option th:each="s : ${pageSizes}" th:value="${s}" th:text="${s}" th:selected="${ventes.size == s}"></option>
+            </select>
+        </label>
+
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        <a th:href="@{/ventes}">Réinitialiser</a>
+    </form>
 
     <table class="table table-hover align-middle">
         <thead>
@@ -44,7 +84,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="v : ${ventes}" th:onclick="|window.location.href='@{/ventes/}' + ${v.id}|">
+            <tr th:each="v : ${ventes.content}" th:onclick="|window.location.href='@{/ventes/}' + ${v.id}|" style="cursor:pointer;">
                 <td th:text="${v.id}"></td>
                 <td th:text="${v.dateVente}"></td>
                 <td th:text="${v.client != null ? v.client.nom : '-'}"></td>
@@ -55,11 +95,23 @@
                 <td th:text="${v.montantTotal + ' Ar'}" style="font-weight: bold; color: #1a628f;"></td>
                 <td th:text="${v.statutVente.libelle}"></td>
             </tr>
-            <tr th:if="${#lists.isEmpty(ventes)}">
-                <td colspan="9" style="text-align:center; color: #777; padding: 20px;">Aucune vente enregistrée.</td>
+            <tr th:if="${ventes.empty}">
+                <td colspan="9" style="text-align:center; color: #777; padding: 20px;">Aucune vente trouvée.</td>
             </tr>
         </tbody>
     </table>
+
+    <div class="pagination" th:if="${ventes.totalPages > 0}">
+        <a class="btn btn-secondary" th:if="${ventes.hasPrevious()}"
+           th:href="@{/ventes(page=${ventes.number - 1}, size=${ventes.size}, id=${filter.id}, client=${filter.client}, idRecolte=${filter.idRecolte}, idLot=${filter.idLot}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax}, statutId=${filter.statutId})}">&laquo; Précédent</a>
+        <span th:unless="${ventes.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
+
+        <span th:text="'Page ' + ${ventes.number + 1} + ' sur ' + ${ventes.totalPages} + ' — ' + ${ventes.totalElements} + ' vente(s)'"></span>
+
+        <a th:if="${ventes.hasNext()}"
+           th:href="@{/ventes(page=${ventes.number + 1}, size=${ventes.size}, id=${filter.id}, client=${filter.client}, idRecolte=${filter.idRecolte}, idLot=${filter.idLot}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax}, statutId=${filter.statutId})}">Suivant &raquo;</a>
+        <span th:unless="${ventes.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+    </div>
 </main>
 </body>
 </html>

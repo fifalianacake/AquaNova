@@ -1,11 +1,10 @@
-package mg.itu.aquanova.sanitaire_equipement.services;
+package mg.itu.aquanova.production.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class MaintenanceFilter {
+public class PeseeFilter {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateDebut;
@@ -13,10 +12,7 @@ public class MaintenanceFilter {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateFin;
 
-    private BigDecimal coutMin;
-    private BigDecimal coutMax;
-
-    public MaintenanceFilter() {
+    public PeseeFilter() {
     }
 
     public LocalDate getDateDebut() {
@@ -33,21 +29,5 @@ public class MaintenanceFilter {
 
     public void setDateFin(LocalDate dateFin) {
         this.dateFin = dateFin;
-    }
-
-    public BigDecimal getCoutMin() {
-        return coutMin;
-    }
-
-    public void setCoutMin(BigDecimal coutMin) {
-        this.coutMin = coutMin;
-    }
-
-    public BigDecimal getCoutMax() {
-        return coutMax;
-    }
-
-    public void setCoutMax(BigDecimal coutMax) {
-        this.coutMax = coutMax;
     }
 }

@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import mg.itu.aquanova.export_pdf.models.FichePdfData;
 import mg.itu.aquanova.export_pdf.models.ListePdfData;
 import mg.itu.aquanova.export_pdf.services.PdfExportService;
 import mg.itu.aquanova.export_pdf.models.PdfResponses;
+import mg.itu.aquanova.vente.dto.TransactionFilterDTO;
 import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
@@ -45,15 +45,13 @@ public class HistoriqueExportController {
             @RequestParam(required = false) String clientNom) {
 
 
-        List<Vente> ventes = venteService.search(
-                null,
-                clientNom,
-                null,
-                null,
-                dateDebut,
-                dateFin,
-                statutId
-        );
+        TransactionFilterDTO filter = new TransactionFilterDTO();
+        filter.setClient(clientNom);
+        filter.setDateDebut(dateDebut);
+        filter.setDateFin(dateFin);
+        filter.setStatutId(statutId);
+
+        List<Vente> ventes = venteService.listerPourExport(filter);
 
         if (clientId != null) {
             ventes = ventes.stream()

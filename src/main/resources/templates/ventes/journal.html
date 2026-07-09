@@ -19,7 +19,7 @@
         <li><strong>Observations / Notes d'audit : </strong> <span th:text="${vente.observation != null && !vente.observation.isEmpty()} ? ${vente.observation} : 'Aucune note particulière renseignée.'"></span></li>
     </ul>
 
-    <a class="btn btn-secondary" th:href="@{/ventes/historique}">← Retour à l'historique global</a>
+    <a class="btn btn-secondary" th:href="@{/ventes}">← Retour à la liste des ventes</a>
 </main>
 </body>
 </html>

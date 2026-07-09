@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,33 +12,10 @@ import org.springframework.stereotype.Repository;
 import mg.itu.aquanova.vente.models.Vente;
 
 @Repository
-public interface VenteRepository extends JpaRepository<Vente, Long> {
+public interface VenteRepository extends JpaRepository<Vente, Long>, JpaSpecificationExecutor<Vente> {
 
     @Query("SELECT v FROM Vente v WHERE v.recolte.id = :recolteId AND v.statutVente.code <> mg.itu.aquanova.vente.models.StatutVenteEnum.ANNULEE")
     List<Vente> findActiveVentesByRecolte(@Param("recolteId") Long recolteId);
-
-    @Query("SELECT v FROM Vente v WHERE " +
-           "(:id IS NULL OR v.id = :id) AND " +
-           "(:clientPattern IS NULL OR LOWER(v.client.nom) LIKE :clientPattern) AND " +
-           "(:recolteId IS NULL OR v.recolte.id = :recolteId) AND " +
-           "(:lotId IS NULL OR v.recolte.lot.id = :lotId) AND " +
-           "(:debut IS NULL OR v.dateVente >= :debut) AND " +
-           "(:fin IS NULL OR v.dateVente <= :fin) AND " +
-           "(:statutId IS NULL OR v.statutVente.id = :statutId) AND " +
-           "(:montantMin IS NULL OR (v.poidsVendu * v.prixUnitaire) >= :montantMin) AND " +
-           "(:montantMax IS NULL OR (v.poidsVendu * v.prixUnitaire) <= :montantMax) " +
-           "ORDER BY v.dateVente DESC")
-    List<Vente> searchTransactions(
-        @Param("id") Long id,
-        @Param("clientPattern") String clientPattern,
-        @Param("recolteId") Long recolteId,
-        @Param("lotId") Long lotId,
-        @Param("debut") LocalDate debut,
-        @Param("fin") LocalDate fin,
-        @Param("statutId") Long statutId,
-        @Param("montantMin") Double montantMin,
-        @Param("montantMax") Double montantMax
-    );
 
     @Query("SELECT v FROM Vente v WHERE v.client.id = :clientId ORDER BY v.dateVente DESC")
     List<Vente> findByClientId(@Param("clientId") Long clientId);

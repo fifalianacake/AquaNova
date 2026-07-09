@@ -7,16 +7,14 @@ import mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum;
 import mg.itu.aquanova.sanitaire_equipement.repositories.MaintenanceRepository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class MaintenanceService {
@@ -65,68 +63,31 @@ public class MaintenanceService {
     }
 
     public Page<Maintenance> lister(MaintenanceFilter filter, Pageable pageable) {
-        List<Maintenance> maintenances = repository.findAll();
-        Stream<Maintenance> stream = maintenances.stream();
+        return repository.findAll(specification(filter), pageable);
+    }
 
-        if (filter != null) {
-            if (filter.getId() != null) {
-                stream = stream.filter(m -> m.getId() != null && m.getId().equals(filter.getId()));
-            }
-            
-            if (filter.getIdEquipement() != null) {
-                stream = stream.filter(m -> m.getEquipement() != null && m.getEquipement().getId() != null && m.getEquipement().getId().equals(filter.getIdEquipement()));
-            }
-            
-            if (filter.getIdUser() != null) {
-                stream = stream.filter(m -> m.getUtilisateur() != null && m.getUtilisateur().getId() != null && m.getUtilisateur().getId().equals(filter.getIdUser()));
-            }
-            
-            if (filter.getIdCategorieMaintenance() != null) {
-                stream = stream.filter(m -> m.getCategorieMaintenance() != null && m.getCategorieMaintenance().getId() != null && m.getCategorieMaintenance().getId().equals(filter.getIdCategorieMaintenance()));
-            }
-            
-            if (filter.getDebutDateMaintenance() != null) {
-                LocalDate debutMaint = filter.getDebutDateMaintenance();
-                stream = stream.filter(m -> m.getDateMaintenance() != null && !m.getDateMaintenance().isBefore(debutMaint));
-            }
-            
-            if (filter.getFinDateMaintenance() != null) {
-                LocalDate finMaint = filter.getFinDateMaintenance();
-                stream = stream.filter(m -> m.getDateMaintenance() != null && !m.getDateMaintenance().isAfter(finMaint));
-            }
-            
-            if (filter.getCout() != null) {
-                stream = stream.filter(m -> m.getCout() != null && m.getCout().compareTo(filter.getCout()) == 0);
-            }
-            
-            if (filter.getStatutIntervention() != null) {
-                stream = stream.filter(m -> m.getStatutIntervention() == filter.getStatutIntervention());
-            }
-            
-            if (filter.getDebutDateResolution() != null) {
-                LocalDate debutRes = filter.getDebutDateResolution();
-                stream = stream.filter(m -> m.getDateResolution() != null && !m.getDateResolution().isBefore(debutRes));
-            }
-            
-            if (filter.getFinDateResolution() != null) {
-                LocalDate finRes = filter.getFinDateResolution();
-                stream = stream.filter(m -> m.getDateResolution() != null && !m.getDateResolution().isAfter(finRes));
-            }
-        }
-        
-        List<Maintenance> resultatFiltre = stream.toList();
+    private Specification<Maintenance> specification(MaintenanceFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
 
-        // Gestion manuelle de la pagination
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), resultatFiltre.size());
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateMaintenance"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateMaintenance"), filter.getDateFin()));
+            }
+            if (filter.getCoutMin() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("cout"), filter.getCoutMin()));
+            }
+            if (filter.getCoutMax() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("cout"), filter.getCoutMax()));
+            }
 
-        List<Maintenance> pageContenu = new ArrayList<>();
-        if (start <= resultatFiltre.size()) {
-            pageContenu = resultatFiltre.subList(start, end);
-        }
-
-        // Retour de la page Spring Data
-        return new PageImpl<>(pageContenu, pageable, resultatFiltre.size());
+            return predicates;
+        };
     }
 
     @Transactional

@@ -1,88 +1,132 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>AquaNova</title>
+    <title>Relevés de qualité de l'eau</title>
 </head>
 <body>
 <main>
-    <h2>Relevés de qualité de l'eau</h2>
 
-    <form method="get" action="/releves-eau">
+<h1>Relevés de qualité de l'eau</h1>
 
-        <input class="form-control" type="text" name="bassin" placeholder="Bassin ref" />
+<p><a class="btn btn-primary" th:href="@{/releves-eau/new}">Nouveau relevé</a></p>
 
-        <input class="form-control" type="date" name="start" />
-        <input class="form-control" type="date" name="end" />
+<form method="get" th:action="@{/releves-eau}" class="filters">
+    <input type="hidden" name="page" value="0" />
 
-        <input class="form-control" type="number" step="0.1" name="minTemp" placeholder="Temp min" />
-        <input class="form-control" type="number" step="0.1" name="maxTemp" placeholder="Temp max" />
+    <label class="form-label">Bassin
+        <select class="form-select" name="bassinId">
+            <option value="">Tous</option>
+            <option th:each="b : ${bassins}"
+                    th:value="${b.id}"
+                    th:text="${b.reference}"
+                    th:selected="${filter.bassinId == b.id}"></option>
+        </select>
+    </label>
 
-        <input class="form-control" type="number" step="0.1" name="minPh" placeholder="pH min" />
-        <input class="form-control" type="number" step="0.1" name="maxPh" placeholder="pH max" />
+    <label class="form-label">Date début
+        <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
+    </label>
 
-        <input class="form-control" type="number" step="0.1" name="minOxy" placeholder="O2 min" />
-        <input class="form-control" type="number" step="0.1" name="maxOxy" placeholder="O2 max" />
+    <label class="form-label">Date fin
+        <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
+    </label>
 
-        <button class="btn btn-primary">Filter</button>
-        <a href="/releves-eau">Reset</a>
-    </form>
+    <label class="form-label">Température min
+        <input class="form-control" type="number" step="0.1" name="temperatureMin" th:value="${filter.temperatureMin}" />
+    </label>
 
-    <br>
+    <label class="form-label">Température max
+        <input class="form-control" type="number" step="0.1" name="temperatureMax" th:value="${filter.temperatureMax}" />
+    </label>
 
-    <a class="btn btn-primary" href="/releves-eau/new">Nouveau relevé</a>
+    <label class="form-label">pH min
+        <input class="form-control" type="number" step="0.1" name="phMin" th:value="${filter.phMin}" />
+    </label>
 
-    <br><br>
+    <label class="form-label">pH max
+        <input class="form-control" type="number" step="0.1" name="phMax" th:value="${filter.phMax}" />
+    </label>
 
-    <table class="table table-hover align-middle">
+    <label class="form-label">Oxygène min
+        <input class="form-control" type="number" step="0.1" name="oxygeneMin" th:value="${filter.oxygeneMin}" />
+    </label>
 
-        <tr>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Bassin</th>
-            <th>Température</th>
-            <th>pH</th>
-            <th>Oxygène</th>
-            <th>Utilisateur</th>
-            <th>Alerte</th>
-            <th>Action</th>
-        </tr>
+    <label class="form-label">Oxygène max
+        <input class="form-control" type="number" step="0.1" name="oxygeneMax" th:value="${filter.oxygeneMax}" />
+    </label>
 
-        <tr th:each="r : ${releves}">
+    <label class="form-label">Lignes/page
+        <select class="form-select" name="size" onchange="this.form.submit()">
+            <option th:each="s : ${pageSizes}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${releves.size == s}"></option>
+        </select>
+    </label>
 
-            <td th:text="${r.id}"></td>
-            <td th:text="${r.dateReleve}"></td>
-            <td th:text="${r.bassin.reference}"></td>
-            <td th:text="${r.temperature}"></td>
-            <td th:text="${r.ph}"></td>
-            <td th:text="${r.oxygene}"></td>
-            <td th:text="${r.user.name + ' ' + r.user.lastname}"></td>
+    <button class="btn btn-primary" type="submit">Filtrer</button>
+    <a th:href="@{/releves-eau}">Réinitialiser</a>
+</form>
 
-            <td>
-                <span th:if="${r.temperature > 30
-                || r.temperature < 18
-                || r.ph > 8.5
-                || r.ph < 6.5
-                || r.oxygene < 5}" style="color:red;">
-                    ⚠
-                </span>
-            </td>
+<table class="table table-hover align-middle">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Bassin</th>
+        <th>Température</th>
+        <th>pH</th>
+        <th>Oxygène</th>
+        <th>Utilisateur</th>
+        <th>Alerte</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${releves.content}">
+        <td th:text="${r.id}"></td>
+        <td th:text="${r.dateReleve}"></td>
+        <td th:text="${r.bassin.reference}"></td>
+        <td th:text="${r.temperature}"></td>
+        <td th:text="${r.ph}"></td>
+        <td th:text="${r.oxygene}"></td>
+        <td th:text="${r.user.name + ' ' + r.user.lastname}"></td>
+        <td>
+            <span th:if="${r.temperature > 30
+            || r.temperature < 18
+            || r.ph > 8.5
+            || r.ph < 6.5
+            || r.oxygene < 5}" style="color:red;">
+                ⚠
+            </span>
+        </td>
+        <td>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/releves-eau/{id}(id=${r.id})}">Voir</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/releves-eau/{id}/edit(id=${r.id})}">Modifier</a>
+            <form th:action="@{/releves-eau/{id}/delete(id=${r.id})}" method="post"
+                  onsubmit="return confirm('Supprimer ce relevé ?');" style="display:inline;">
+                <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    <tr th:if="${releves.empty}">
+        <td colspan="9">Aucune donnée trouvée.</td>
+    </tr>
+    </tbody>
+</table>
 
-            <td>
+<div class="pagination" th:if="${releves.totalPages > 0}">
+    <a class="btn btn-secondary" th:if="${releves.hasPrevious()}"
+       th:href="@{/releves-eau(page=${releves.number - 1}, size=${releves.size}, bassinId=${filter.bassinId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, temperatureMin=${filter.temperatureMin}, temperatureMax=${filter.temperatureMax}, phMin=${filter.phMin}, phMax=${filter.phMax}, oxygeneMin=${filter.oxygeneMin}, oxygeneMax=${filter.oxygeneMax})}">&laquo; Précédent</a>
+    <span th:unless="${releves.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
 
-                <a class="btn btn-sm btn-outline-primary" th:href="@{'/releves-eau/' + ${r.id}}">Voir</a>
+    <span th:text="'Page ' + ${releves.number + 1} + ' sur ' + ${releves.totalPages} + ' — ' + ${releves.totalElements} + ' résultat(s)'"></span>
 
-                <a class="btn btn-sm btn-outline-primary" th:href="@{'/releves-eau/' + ${r.id} + '/edit'}">Modifier</a>
+    <a th:if="${releves.hasNext()}"
+       th:href="@{/releves-eau(page=${releves.number + 1}, size=${releves.size}, bassinId=${filter.bassinId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, temperatureMin=${filter.temperatureMin}, temperatureMax=${filter.temperatureMax}, phMin=${filter.phMin}, phMax=${filter.phMax}, oxygeneMin=${filter.oxygeneMin}, oxygeneMax=${filter.oxygeneMax})}">Suivant &raquo;</a>
+    <span th:unless="${releves.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+</div>
 
-                <form th:action="@{'/releves-eau/' + ${r.id} + '/delete'}" method="post"
-                    onsubmit="return confirm('Supprimer ce relevé ?');">
-                    <button class="btn btn-danger" type="submit">Supprimer</button>
-                </form>
-
-            </td>
-
-        </tr>
-
-    </table>
 </main>
 </body>
 </html>

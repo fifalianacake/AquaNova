@@ -1,7 +1,7 @@
 package mg.itu.aquanova.sanitaire_equipement.controllers;
 
 import java.math.BigDecimal;
-import org.springframework.data.domain.Page;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
@@ -24,6 +24,8 @@ import mg.itu.aquanova.sanitaire_equipement.services.MaintenanceFilter;
 @RequestMapping("/maintenances")
 public class MaintenanceController {
 
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
+
     private final MaintenanceService maintenanceService;
     private final EquipementService equipementService;
     private final CategorieMaintenanceService categorieMaintenanceService;
@@ -40,17 +42,13 @@ public class MaintenanceController {
 
     @GetMapping
     public String listMaintenances(
-            @ModelAttribute("filter") MaintenanceFilter filter, 
-            @PageableDefault(size = 10) Pageable pageable, 
+            @ModelAttribute("filter") MaintenanceFilter filter,
+            @PageableDefault(size = 10, sort = "dateMaintenance") Pageable pageable,
             Model model) {
-        
-        Page<Maintenance> pageMaintenances = maintenanceService.lister(filter, pageable);
-        
-        model.addAttribute("maintenances", pageMaintenances.getContent());
-        model.addAttribute("page", pageMaintenances);
-        
-        model.addAttribute("filter", filter); 
-        return "sanitaire_equipement/maintenance/list"; 
+
+        model.addAttribute("maintenances", maintenanceService.lister(filter, pageable));
+        addListAttributes(model);
+        return "sanitaire_equipement/maintenance/list";
     }
 
     @GetMapping("/new")
@@ -138,5 +136,9 @@ public class MaintenanceController {
     private void addFormAttributes(Model model) {
         model.addAttribute("equipements", equipementService.listerTout());
         model.addAttribute("categories", categorieMaintenanceService.getAll());
+    }
+
+    private void addListAttributes(Model model) {
+        model.addAttribute("pageSizes", PAGE_SIZES);
     }
 }

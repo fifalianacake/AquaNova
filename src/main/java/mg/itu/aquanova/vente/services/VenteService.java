@@ -8,9 +8,11 @@ import mg.itu.aquanova.vente.repositories.VenteRepository;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
 import mg.itu.aquanova.production.models.Recoltes; // Modifié ici
 import mg.itu.aquanova.production.services.RecolteService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -221,34 +223,51 @@ public class VenteService {
         rafraichirStatutRecolte(sauvegardee.getRecolte().getId());
     }
 
-    public List<Vente> search(TransactionFilterDTO filters) {
-        if (filters == null) {
-            filters = new TransactionFilterDTO();
-        }
-
-        return repository.searchTransactions(
-                filters.getId(),
-                likePattern(filters.getClient()),
-                filters.getIdRecolte(),
-                filters.getIdLot(),
-                filters.getDateDebut(),
-                filters.getDateFin(),
-                filters.getStatutId(),
-                filters.getMontantMin() != null ? filters.getMontantMin().doubleValue() : null,
-                filters.getMontantMax() != null ? filters.getMontantMax().doubleValue() : null);
+    public Page<Vente> lister(TransactionFilterDTO filter, Pageable pageable) {
+        return repository.findAll(specification(filter), pageable);
     }
 
-    public List<Vente> search(Long id, String client, Long recolteId, Long lotId, LocalDate debut, LocalDate fin,
-            Long statutId) {
-        TransactionFilterDTO filters = new TransactionFilterDTO();
-        filters.setId(id);
-        filters.setClient(client);
-        filters.setIdRecolte(recolteId);
-        filters.setIdLot(lotId);
-        filters.setDateDebut(debut);
-        filters.setDateFin(fin);
-        filters.setStatutId(statutId);
-        return search(filters);
+    public List<Vente> listerPourExport(TransactionFilterDTO filter) {
+        return repository.findAll(specification(filter), org.springframework.data.domain.Sort.by("dateVente").descending());
+    }
+
+    private Specification<Vente> specification(TransactionFilterDTO filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getClient() != null && !filter.getClient().isBlank()) {
+                predicates = cb.and(predicates, cb.like(cb.lower(root.get("client").get("nom")), likePattern(filter.getClient())));
+            }
+            if (filter.getIdRecolte() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("recolte").get("id"), filter.getIdRecolte()));
+            }
+            if (filter.getIdLot() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("recolte").get("lot").get("id"), filter.getIdLot()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateVente"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateVente"), filter.getDateFin()));
+            }
+            if (filter.getStatutId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("statutVente").get("id"), filter.getStatutId()));
+            }
+            if (filter.getMontantMin() != null) {
+                predicates = cb.and(predicates, cb.ge(cb.prod(root.get("poidsVendu"), root.get("prixUnitaire")), filter.getMontantMin()));
+            }
+            if (filter.getMontantMax() != null) {
+                predicates = cb.and(predicates, cb.le(cb.prod(root.get("poidsVendu"), root.get("prixUnitaire")), filter.getMontantMax()));
+            }
+
+            return predicates;
+        };
     }
 
     public Vente trouverParId(Long id) {

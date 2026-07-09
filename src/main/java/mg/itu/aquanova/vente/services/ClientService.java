@@ -1,10 +1,14 @@
 package mg.itu.aquanova.vente.services;
 
+import mg.itu.aquanova.vente.dto.ClientFilter;
 import mg.itu.aquanova.vente.models.Client;
 import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.repositories.ClientRepository;
 import mg.itu.aquanova.vente.repositories.VenteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -14,7 +18,7 @@ import java.util.Locale;
 public class ClientService {
 
     private final ClientRepository clientRepository;
-    private final VenteRepository venteRepository; 
+    private final VenteRepository venteRepository;
 
     public ClientService(ClientRepository clientRepository, VenteRepository venteRepository) {
         this.clientRepository = clientRepository;
@@ -23,6 +27,37 @@ public class ClientService {
 
     public List<Client> rechercher(Long id, String nom, Long typeId, String contact, Boolean actif) {
         return clientRepository.filtrerClients(id, likePattern(nom), typeId, likePattern(contact), actif);
+    }
+
+    public Page<Client> lister(ClientFilter filter, Pageable pageable) {
+        return clientRepository.findAll(specification(filter), pageable);
+    }
+
+    private Specification<Client> specification(ClientFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getNom() != null && !filter.getNom().isBlank()) {
+                predicates = cb.and(predicates, cb.like(cb.lower(root.get("nom")), likePattern(filter.getNom())));
+            }
+            if (filter.getTypeId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("typeClient").get("id"), filter.getTypeId()));
+            }
+            if (filter.getContact() != null && !filter.getContact().isBlank()) {
+                predicates = cb.and(predicates, cb.like(cb.lower(root.get("contact")), likePattern(filter.getContact())));
+            }
+            if (filter.getActif() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("actif"), filter.getActif()));
+            }
+
+            return predicates;
+        };
     }
 
     /**

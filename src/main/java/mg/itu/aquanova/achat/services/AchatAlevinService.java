@@ -109,7 +109,7 @@ public class AchatAlevinService {
                 predicates = cb.and(predicates, cb.equal(root.get("categorieDepense").get("id"), filter.getCategorieDepenseId()));
             }
             if (filter.getEspeceId() != null) {
-                predicates = cb.and(predicates, cb.equal(lignes.get("intrant").get("id"), filter.getEspeceId()));
+                predicates = cb.and(predicates, cb.equal(lignes.get("espece").get("id"), filter.getEspeceId()));
             }
             if (filter.getStatutAchat() != null) {
                 predicates = cb.and(predicates, cb.equal(root.get("statutAchat"), filter.getStatutAchat()));

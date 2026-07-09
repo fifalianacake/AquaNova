@@ -5,6 +5,9 @@ import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.repositories.JournalLotRepository;
 import mg.itu.aquanova.production.repositories.TypeEvenementLotRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -42,22 +45,34 @@ public class JournalLotService {
 
     public List<JournalLot> listerTous() { return journalLotRepository.findAllByOrderByDateEvenementAsc(); }
     public List<JournalLot> obtenirJournalParLot(Long lotId) { return journalLotRepository.findByLotIdOrderByDateEvenementAsc(lotId); }
-    public List<JournalLot> rechercher(JournalLotFilter filter) {
-        if (filter == null) {
-            return listerTous();
-        }
 
-        LocalDateTime dateDebut = filter.getDateDebut() != null
-                ? filter.getDateDebut().atStartOfDay()
-                : null;
-        LocalDateTime dateFin = filter.getDateFin() != null
-                ? filter.getDateFin().atTime(LocalTime.MAX)
-                : null;
+    public Page<JournalLot> lister(JournalLotFilter filter, Pageable pageable) {
+        return journalLotRepository.findAll(specification(filter), pageable);
+    }
 
-        return journalLotRepository.rechercher(
-                filter.getLotId(),
-                filter.getTypeEvenement(),
-                dateDebut,
-                dateFin);
+    private Specification<JournalLot> specification(JournalLotFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getLotId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("lot").get("id"), filter.getLotId()));
+            }
+            if (filter.getTypeEvenement() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("typeEvenement").get("libelle"), filter.getTypeEvenement()));
+            }
+            if (filter.getDateDebut() != null) {
+                LocalDateTime dateDebut = filter.getDateDebut().atStartOfDay();
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateEvenement"), dateDebut));
+            }
+            if (filter.getDateFin() != null) {
+                LocalDateTime dateFin = filter.getDateFin().atTime(LocalTime.MAX);
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateEvenement"), dateFin));
+            }
+
+            return predicates;
+        };
     }
 }

@@ -2,6 +2,7 @@ package mg.itu.aquanova.alimentation.services;
 
 import mg.itu.aquanova.admin.service.ParametreSystemeService;
 import mg.itu.aquanova.alimentation.dto.DistributionDTO;
+import mg.itu.aquanova.alimentation.dto.DistributionFilter;
 import mg.itu.aquanova.alimentation.models.Distribution;
 import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
 import mg.itu.aquanova.production.models.LotModels;
@@ -12,6 +13,9 @@ import mg.itu.aquanova.alimentation.models.MouvementStock;
 import mg.itu.aquanova.alimentation.models.TypeMouvement;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -47,6 +51,37 @@ public class DistributionService {
 
     public List<mg.itu.aquanova.alimentation.models.Distribution> getAllDistributions() {
         return distributionRepository.findAll();
+    }
+
+    public Page<Distribution> lister(DistributionFilter filter, Pageable pageable) {
+        return distributionRepository.findAll(specification(filter), pageable);
+    }
+
+    private Specification<Distribution> specification(DistributionFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getLotId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("lot").get("id"), filter.getLotId()));
+            }
+            if (filter.getAlimentId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("aliment").get("id"), filter.getAlimentId()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateDistribution"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateDistribution"), filter.getDateFin()));
+            }
+
+            return predicates;
+        };
     }
 
     public mg.itu.aquanova.alimentation.models.Distribution getDistributionById(Long id) {

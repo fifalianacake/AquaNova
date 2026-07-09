@@ -1,6 +1,7 @@
 package mg.itu.aquanova.production.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.production.dto.PeseeFilter;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.Pese;
 import mg.itu.aquanova.production.models.StatutLotEnum;
@@ -8,6 +9,9 @@ import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.repositories.PeseRepository;
 import mg.itu.aquanova.referentiel.repositories.StadeCroissanceRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +42,27 @@ public class PeseeService {
 
     public List<Pese> listerPeseesParLot(Long idLot) {
         return peseeRepository.findByLotIdOrderByDatePeseeDesc(idLot);
+    }
+
+    public Page<Pese> lister(Long idLot, PeseeFilter filter, Pageable pageable) {
+        return peseeRepository.findAll(specification(idLot, filter), pageable);
+    }
+
+    private Specification<Pese> specification(Long idLot, PeseeFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.equal(root.get("lot").get("id"), idLot);
+
+            if (filter != null) {
+                if (filter.getDateDebut() != null) {
+                    predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("datePesee"), filter.getDateDebut()));
+                }
+                if (filter.getDateFin() != null) {
+                    predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("datePesee"), filter.getDateFin()));
+                }
+            }
+
+            return predicates;
+        };
     }
 
     public Optional<Pese> trouverParId(Long id) {

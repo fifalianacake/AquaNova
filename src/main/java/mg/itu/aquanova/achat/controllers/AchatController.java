@@ -71,15 +71,28 @@ public class AchatController {
     }
 
     @GetMapping("/achats")
-    public String liste(
+    public String liste() {
+        return "redirect:/achats/intrants";
+    }
+
+    @GetMapping("/achats/intrants")
+    public String listeIntrants(
             @ModelAttribute("filter") AchatIntrantFilter filter,
-            @ModelAttribute("filterAlevin") AchatAlevinFilter filterAlevin,
             @PageableDefault(size = 10, sort = "dateAchat") Pageable pageable,
             Model model) {
         model.addAttribute("achats", achatIntrantService.listerAchatsIntrants(filter, pageable));
-        model.addAttribute("achatsAlevin", achatAlevinService.listerAchatsAlevin(filterAlevin, pageable));
-        addListAttributes(model);
-        return "achat_depense/achats/list";
+        addListIntrantAttributes(model);
+        return "achat_depense/achats/liste-intrants";
+    }
+
+    @GetMapping("/achats/alevins")
+    public String listeAlevins(
+            @ModelAttribute("filter") AchatAlevinFilter filter,
+            @PageableDefault(size = 10, sort = "dateAchat") Pageable pageable,
+            Model model) {
+        model.addAttribute("achats", achatAlevinService.listerAchatsAlevin(filter, pageable));
+        addListAlevinAttributes(model);
+        return "achat_depense/achats/liste-alevins";
     }
 
     @GetMapping("/achats/intrants/new")
@@ -177,10 +190,18 @@ public class AchatController {
         return "redirect:/achats/" + id;
     }
 
-    private void addListAttributes(Model model) {
+    private void addListIntrantAttributes(Model model) {
         model.addAttribute("fournisseurs", fournisseurService.listerTous());
         model.addAttribute("categoriesDepense", categorieDepenseService.listerCategoriesAchatIntrants());
         model.addAttribute("intrants", intrantService.listerTous());
+        model.addAttribute("statutsAchat", StatutAchat.values());
+        model.addAttribute("pageSizes", PAGE_SIZES);
+    }
+
+    private void addListAlevinAttributes(Model model) {
+        model.addAttribute("fournisseurs", fournisseurService.listerTous());
+        model.addAttribute("categoriesDepense", categorieDepenseService.trouverParCode("ACHAT_ALEVINS"));
+        model.addAttribute("especes", especesService.findAll());
         model.addAttribute("statutsAchat", StatutAchat.values());
         model.addAttribute("pageSizes", PAGE_SIZES);
     }
