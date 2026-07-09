@@ -72,6 +72,16 @@ public class AlerteController {
         return PdfResponses.attachment(pdf, "historique-alertes.pdf");
     }
 
+    /**
+     * Page HTML : détail d'une alerte, avec formulaire de changement de statut.
+     */
+    @GetMapping("/{id}")
+    public String detail(@PathVariable Long id, Model model) {
+        model.addAttribute("alerte", alerteService.getById(id));
+        model.addAttribute("statuts", StatutAlerte.values());
+        return "alertes/detail";
+    }
+
     // ── Attributs de formulaire pour les filtres ──
 
     private void addFilterAttributes(Model model) {

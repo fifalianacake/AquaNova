@@ -21,6 +21,9 @@ public class ParametreSystemeService {
     public static final String OXYGENE_MIN_MG_L = "OXYGENE_MIN_MG_L";
     public static final String SEUIL_PROCHE_RECOLTE_RATIO = "SEUIL_PROCHE_RECOLTE_RATIO";
     public static final String NB_MIN_PESEES_PREVISION_RECOLTE = "NB_MIN_PESEES_PREVISION_RECOLTE";
+    public static final String TAUX_MORTALITE_MAXIMUM = "TAUX_MORTALITE_MAXIMUM";
+    public static final String MARGE_MINIMUM_ACCEPTABLE = "MARGE_MINIMUM_ACCEPTABLE";
+    public static final String JOURS_AVANT_RUPTURE_STOCK = "JOURS_AVANT_RUPTURE_STOCK";
 
     private final ParametreSystemeRepository repository;
 
