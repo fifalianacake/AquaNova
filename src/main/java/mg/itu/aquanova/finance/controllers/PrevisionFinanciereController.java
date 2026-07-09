@@ -35,10 +35,17 @@ public class PrevisionFinanciereController {
             dateFin = dateDebut.plusMonths(6);
         }
 
-        List<PrevisionFinanciereDTO> previsions = previsionFinanciereService.genererPrevisions(dateDebut, dateFin);
-        model.addAttribute("previsions", previsions);
         model.addAttribute("dateDebut", dateDebut);
         model.addAttribute("dateFin", dateFin);
+
+        if (dateFin.isBefore(dateDebut)) {
+            model.addAttribute("erreur", "La date de fin doit être postérieure ou égale à la date de début.");
+            model.addAttribute("previsions", List.<PrevisionFinanciereDTO>of());
+            return "finance/prevision/list";
+        }
+
+        List<PrevisionFinanciereDTO> previsions = previsionFinanciereService.genererPrevisions(dateDebut, dateFin);
+        model.addAttribute("previsions", previsions);
 
         return "finance/prevision/list";
     }

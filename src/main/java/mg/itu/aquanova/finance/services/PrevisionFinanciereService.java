@@ -38,33 +38,18 @@ public class PrevisionFinanciereService {
         return venteRepository.estimerPrixMoyenVenteKg();
     }
 
-    private Double estimerBiomasseVendable(Long lotId) {
-        Double total = 0.0;
-
-        if (lotId == null) {
-            return total;
+    private Double estimerBiomasseVendable(LotModels lot) {
+        if (lot == null || lot.getPoidsMoyenActuel() == null || lot.getEffectifActuel() == null) {
+            return 0.0;
         }
 
-        LotModels lot = lotRepository.findById(lotId).orElse(null);
-
-        if (lot.getPoidsMoyenActuel() == null || lot.getEffectifActuel() == null) {
-            return total;
-        }
-
-        total = (lot.getPoidsMoyenActuel() * lot.getEffectifActuel()) / 1000.0;
-
-        return total;
+        return (lot.getPoidsMoyenActuel() * lot.getEffectifActuel()) / 1000.0;
     }
 
-    private Double estimerCoutsFuturs(Long lotId) {
+    private Double estimerCoutsFuturs(Long lotId, LocalDate dateRecolteEstimee) {
         Double total = 0.0;
 
-        if (lotId == null) {
-            return total;
-        }
-
-        LocalDate dateRecolteEstimee = previsionRecolteService.estimerDateRecolte(lotId);
-        if (dateRecolteEstimee == null) {
+        if (lotId == null || dateRecolteEstimee == null) {
             return total;
         }
 
@@ -108,10 +93,11 @@ public class PrevisionFinanciereService {
                 continue;
             }
 
-            Double biomassePrevue = estimerBiomasseVendable(lot.getId());
-            String espece = lot.getEspece().getNom() != null ? lot.getEspece().getNom() : "Inconnue";
+            Double biomassePrevue = estimerBiomasseVendable(lot);
+            String espece = (lot.getEspece() != null && lot.getEspece().getNom() != null)
+                    ? lot.getEspece().getNom() : "Inconnue";
             String codeLot = lot.getCode() != null ? lot.getCode() : "Inconnu";
-            Double coutPrevisionnel = estimerCoutsFuturs(lot.getId());
+            Double coutPrevisionnel = estimerCoutsFuturs(lot.getId(), dateRecolteEstimee);
             Double caPrevisionnel = biomassePrevue * prixMoyenVenteKg;
             Double profitPrevisionnel = caPrevisionnel - coutPrevisionnel;
             Double margePrevisionnelle = (caPrevisionnel != 0) ? (profitPrevisionnel / caPrevisionnel) * 100 : 0.0;
