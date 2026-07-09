@@ -1,12 +1,14 @@
 package mg.itu.aquanova.vente.services;
 
 import mg.itu.aquanova.vente.models.Client;
+import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.repositories.ClientRepository;
 import mg.itu.aquanova.vente.repositories.VenteRepository;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class ClientService {
@@ -20,7 +22,7 @@ public class ClientService {
     }
 
     public List<Client> rechercher(Long id, String nom, Long typeId, String contact, Boolean actif) {
-        return clientRepository.filtrerClients(id, nom, typeId, contact, actif);
+        return clientRepository.filtrerClients(id, likePattern(nom), typeId, likePattern(contact), actif);
     }
 
     public Client trouverParId(Long id) {
@@ -31,6 +33,9 @@ public class ClientService {
     public Client enregistrer(Client client) {
         if (client.getNom() == null || client.getNom().trim().isEmpty()) {
             throw new IllegalArgumentException("Le nom du client est obligatoire.");
+        }
+        if (client.getTypeClient() == null || client.getTypeClient().getId() == null) {
+            throw new IllegalArgumentException("Le type de client est obligatoire.");
         }
         if (client.getEmail() != null && !client.getEmail().isEmpty() && !client.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             throw new IllegalArgumentException("L'adresse email n'est pas valide.");
@@ -61,9 +66,16 @@ public class ClientService {
     public Double calculerChiffreAffaires(Long clientId) {
         return obtenirHistoriqueVentes(clientId).stream()
                 .filter(v -> v.getStatutVente() != null && 
-                            (v.getStatutVente().getCode().name().equals("VALIDEE") || 
-                             v.getStatutVente().getCode().name().equals("PAYEE")))
+                            (StatutVenteEnum.VALIDEE == v.getStatutVente().getCode() || 
+                             StatutVenteEnum.PAYEE == v.getStatutVente().getCode()))
                 .mapToDouble(v -> v.getPoidsVendu() * v.getPrixUnitaire()) // Sécurité si montant_total n'est pas encore calculé
                 .sum();
+    }
+
+    private String likePattern(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return "%" + value.trim().toLowerCase(Locale.ROOT) + "%";
     }
 }

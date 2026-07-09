@@ -11,7 +11,6 @@
         <th>Actions</th>
     </tr>
 
-```
 <tr th:each="s : ${stades}">
     <td th:text="${s.id}"></td>
     <td th:text="${s.nom}"></td>
@@ -23,11 +22,10 @@
             Edit
         </a>
 
-        <a th:href="@{/stade-croissance/delete/{id}(id=${s.id})}">
+        <a th:href="@{/stade-croissance/{id}/delete(id=${s.id})}">
             Delete
         </a>
     </td>
 </tr>
-```
 
 </table>

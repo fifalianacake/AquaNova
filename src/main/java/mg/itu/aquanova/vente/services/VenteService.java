@@ -7,20 +7,31 @@ import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.repositories.VenteRepository;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
 import mg.itu.aquanova.production.models.Recoltes; // Modifié ici
+import mg.itu.aquanova.production.services.RecolteService;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class VenteService {
 
     private final VenteRepository repository;
     private final StatutVenteRepository statutRepository;
+    private final RecolteService recolteService;
 
-    public VenteService(VenteRepository repository, StatutVenteRepository statutRepository) {
+    public VenteService(VenteRepository repository, StatutVenteRepository statutRepository,
+            RecolteService recolteService) {
         this.repository = repository;
         this.statutRepository = statutRepository;
+        this.recolteService = recolteService;
+    }
+
+    private void rafraichirStatutRecolte(Long recolteId) {
+        Recoltes recolteAJour = recolteService.getRecolteById(recolteId);
+        Double dispoApres = calculerPoidsDisponibleRecolte(recolteAJour, null);
+        recolteService.mettreAJourStatutDisponibilite(recolteId, dispoApres);
     }
 
     public Double calculerPoidsDisponibleRecolte(Recoltes recolte, Long exceptionVenteId) {
@@ -47,7 +58,7 @@ public class VenteService {
 
     @Transactional
     public Vente create(Vente vente) {
-        if (vente.getClient() == null || vente.getClient().getNom() == null || vente.getClient().getNom().trim().isEmpty()) {
+        if (vente.getClient() == null || vente.getClient().getId() == null) {
             throw new RuntimeException("Client obligatoire");
         }
         if (vente.getRecolte() == null)
@@ -75,6 +86,7 @@ public class VenteService {
         vente.setStatutVente(statutCree);
 
         Vente sauvee = repository.save(vente);
+        rafraichirStatutRecolte(sauvee.getRecolte().getId());
         System.out.println("JOURNAL_VENTE: Création de la vente #" + sauvee.getId());
         return sauvee;
     }
@@ -82,16 +94,17 @@ public class VenteService {
     @Transactional
     public Vente update(Vente vente) {
         Vente ancienne = repository.findById(vente.getId()).orElseThrow();
-        if (ancienne.getStatutVente().getCode() == StatutVenteEnum.VALIDEE
-                || ancienne.getStatutVente().getCode() == StatutVenteEnum.PAYEE) {
-            throw new RuntimeException("Impossible de modifier une vente validée.");
+        if (ancienne.getStatutVente().getCode() != StatutVenteEnum.CREEE) {
+            throw new IllegalStateException(
+                    "Seule une vente au statut CREEE peut être modifiée (statut actuel : "
+                            + ancienne.getStatutVente().getCode() + ").");
         }
 
         // Empêche toute modification de la récolte / du statut via champs cachés
         vente.setRecolte(ancienne.getRecolte());
         vente.setStatutVente(ancienne.getStatutVente());
 
-        if (vente.getClient() == null || vente.getClient().getNom().trim().isEmpty())
+        if (vente.getClient() == null || vente.getClient().getId() == null)
             throw new RuntimeException("Client obligatoire");
         if (vente.getDateVente() == null)
             throw new RuntimeException("Date obligatoire");
@@ -114,21 +127,48 @@ public class VenteService {
             }
         }
 
-        return repository.save(vente);
+        Vente sauvegardee = repository.save(vente);
+        rafraichirStatutRecolte(sauvegardee.getRecolte().getId());
+        return sauvegardee;
     }
 
     @Transactional
     public void validerVente(Long id) {
         Vente v = repository.findById(id).orElseThrow();
+        if (v.getStatutVente().getCode() != StatutVenteEnum.CREEE) {
+            throw new IllegalStateException(
+                    "Seule une vente au statut CREEE peut être validée (statut actuel : "
+                            + v.getStatutVente().getCode() + ").");
+        }
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.VALIDEE));
+        repository.save(v);
+    }
+
+    @Transactional
+    public void marquerPayee(Long id) {
+        Vente v = repository.findById(id).orElseThrow();
+        if (v.getStatutVente().getCode() != StatutVenteEnum.VALIDEE) {
+            throw new IllegalStateException(
+                    "Seule une vente validée peut être marquée comme payée (statut actuel : "
+                            + v.getStatutVente().getCode() + ").");
+        }
+        v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.PAYEE));
         repository.save(v);
     }
 
     @Transactional
     public void annulerVente(Long id) {
         Vente v = repository.findById(id).orElseThrow();
+        StatutVenteEnum statutActuel = v.getStatutVente().getCode();
+        if (statutActuel == StatutVenteEnum.ANNULEE) {
+            throw new IllegalStateException("Cette vente est déjà annulée.");
+        }
+        if (statutActuel == StatutVenteEnum.PAYEE) {
+            throw new IllegalStateException("Impossible d'annuler une vente déjà payée.");
+        }
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.ANNULEE));
-        repository.save(v);
+        Vente sauvegardee = repository.save(v);
+        rafraichirStatutRecolte(sauvegardee.getRecolte().getId());
     }
 
     public List<Vente> search(TransactionFilterDTO filters) {
@@ -138,7 +178,7 @@ public class VenteService {
 
         return repository.searchTransactions(
                 filters.getId(),
-                filters.getClient(),
+                likePattern(filters.getClient()),
                 filters.getIdRecolte(),
                 filters.getIdLot(),
                 filters.getDateDebut(),
@@ -167,5 +207,12 @@ public class VenteService {
 
     public List<Vente> getByClient(Long id) {
         return repository.findByClientId(id);
+    }
+
+    private String likePattern(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return "%" + value.trim().toLowerCase(Locale.ROOT) + "%";
     }
 }

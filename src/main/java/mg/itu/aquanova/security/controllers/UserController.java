@@ -35,16 +35,27 @@ public class UserController {
         return "security/users/form"; 
     }
 
-    @PostMapping("/save")
-    public String saveUser(@ModelAttribute("user") User user) {
-        userService.saveUser(user);
-
-        return "redirect:/users";
+    @PostMapping
+    public String saveUser(@ModelAttribute("user") User user, Model model) {
+        try {
+            userService.saveUser(user);
+            return "redirect:/users";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", e.getMessage());
+            return "security/users/form";
+        }
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUser(id);
-        return "redirect:/users";
+    @GetMapping("/{id}/delete")
+    public String deleteUser(@PathVariable("id") Long id, Model model) {
+        try {
+            userService.deleteUser(id);
+            return "redirect:/users";
+        } catch (RuntimeException e) {
+            model.addAttribute("users", userService.getAllUsers());
+            model.addAttribute("error", "Impossible de supprimer cet utilisateur : " + e.getMessage());
+            return "security/users/list";
+        }
     }
 }

@@ -1,5 +1,6 @@
 package mg.itu.aquanova.production.repositories;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,5 +13,5 @@ import mg.itu.aquanova.production.models.StatutLotEnum;
 
 @Repository
 public interface LotRepository extends JpaRepository<LotModels, Long>, JpaSpecificationExecutor<LotModels> {
-    List<LotModels> findByBassinIdAndStatutLotLibelleNot(Long bassinId, StatutLotEnum statut);
+    List<LotModels> findByBassinIdAndStatutLotLibelleNotIn(Long bassinId, Collection<StatutLotEnum> statuts);
 }

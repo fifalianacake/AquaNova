@@ -11,33 +11,32 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 
 @Controller
-@RequestMapping("/production/pesee")
 public class PeseeController {
 
     private final PeseeService peseeService;
 
-    
+
     public PeseeController(PeseeService peseeService) {
         this.peseeService = peseeService;
     }
 
     //  l'HISTORIQUE (F6)
-    @GetMapping("/liste/{idLot}")
+    @GetMapping("/lots/{idLot}/pesees")
     public String listerPesees(@PathVariable Long idLot, Model model) {
-        
+
         model.addAttribute("pesees", this.peseeService.listerPeseesParLot(idLot));
         model.addAttribute("idLot", idLot);
         return "production/pesee/liste";
     }
 
-    @GetMapping("/ajouter/{idLot}")
+    @GetMapping("/lots/{idLot}/pesees/new")
     public String formAjouter(@PathVariable Long idLot, Model model) {
         model.addAttribute("idLot", idLot);
         return "production/pesee/formulaire";
     }
 
-    @PostMapping("/enregistrer")
-    public String enregistrer(@RequestParam Long idLot,
+    @PostMapping("/lots/{idLot}/pesees")
+    public String enregistrer(@PathVariable Long idLot,
                              @RequestParam LocalDate datePesee,
                              @RequestParam Integer nbEchantillon,
                              @RequestParam Double poidsTotal,
@@ -45,7 +44,7 @@ public class PeseeController {
                              Model model) {
         try {
             this.peseeService.enregistrerPesee(idLot, datePesee, nbEchantillon, poidsTotal, observation);
-            return "redirect:/production/pesee/liste/" + idLot;
+            return "redirect:/lots/" + idLot + "/pesees";
         } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("idLot", idLot);
@@ -57,7 +56,7 @@ public class PeseeController {
         }
     }
 
-    @GetMapping("/modifier/{id}")
+    @GetMapping("/pesees/{id}/edit")
     public String formModifier(@PathVariable Long id, Model model) {
         Pese pese = this.peseeService.trouverParId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pesée introuvable"));
@@ -65,8 +64,8 @@ public class PeseeController {
         return "production/pesee/modifier";
     }
 
-    @PostMapping("/modifier")
-    public String modifier(@RequestParam Long id,
+    @PostMapping("/pesees/{id}")
+    public String modifier(@PathVariable Long id,
                            @RequestParam LocalDate datePesee,
                            @RequestParam Integer nbEchantillon,
                            @RequestParam Double poidsTotal,
@@ -74,7 +73,7 @@ public class PeseeController {
                            Model model) {
         try {
             Pese updated = this.peseeService.modifierPesee(id, datePesee, nbEchantillon, poidsTotal, observation);
-            return "redirect:/production/pesee/liste/" + updated.getLot().getId();
+            return "redirect:/lots/" + updated.getLot().getId() + "/pesees";
         } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
             Pese pese = this.peseeService.trouverParId(id)
                     .orElseThrow(() -> new IllegalArgumentException("Pesée introuvable"));
@@ -84,11 +83,11 @@ public class PeseeController {
         }
     }
 
-    @GetMapping("/supprimer/{id}")
+    @GetMapping("/pesees/{id}/delete")
     public String supprimer(@PathVariable Long id) {
         Pese pese = this.peseeService.trouverParId(id).orElseThrow();
         Long idLot = pese.getLot().getId();
         this.peseeService.supprimerPesee(id);
-        return "redirect:/production/pesee/liste/" + idLot;
+        return "redirect:/lots/" + idLot + "/pesees";
     }
 }

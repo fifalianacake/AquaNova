@@ -2,7 +2,10 @@ package mg.itu.aquanova.achat.models;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -42,6 +46,9 @@ public class Depense {
 
     @Column(columnDefinition = "TEXT")
     private String observation;
+
+    @OneToMany(mappedBy = "depense", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DepensePaiement> paiements = new ArrayList<>();
 
     public Depense() {
     }
@@ -108,5 +115,34 @@ public class Depense {
 
     public void setObservation(String observation) {
         this.observation = observation;
+    }
+
+    public List<DepensePaiement> getPaiements() {
+        return paiements;
+    }
+
+    public void setPaiements(List<DepensePaiement> paiements) {
+        this.paiements = paiements == null ? new ArrayList<>() : paiements;
+        this.paiements.forEach(p -> p.setDepense(this));
+    }
+
+    public void addPaiement(DepensePaiement paiement) {
+        if (paiement != null) {
+            paiement.setDepense(this);
+            this.paiements.add(paiement);
+        }
+    }
+
+    public BigDecimal calculerTotalPaiements() {
+        return paiements.stream()
+                .map(paiement -> paiement.getMontant())
+                .filter(m -> m != null)
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
+    }
+
+    public void reglerTotalPaiements() {
+        if (paiements != null && !paiements.isEmpty()) {
+            this.montant = calculerTotalPaiements();
+        }
     }
 }

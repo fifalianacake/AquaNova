@@ -11,4 +11,6 @@ import mg.itu.aquanova.production.models.StatutLotModels;
 @Repository
 public interface StatutLotRepository extends JpaRepository<StatutLotModels, Long> {
     Optional<StatutLotModels> findByLibelle(StatutLotEnum libelle);
+
+    boolean existsByLibelle(StatutLotEnum libelle);
 }

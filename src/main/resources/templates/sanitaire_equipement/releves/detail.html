@@ -57,13 +57,14 @@
         Retour
     </a>
 
-    <a th:href="@{'/releves-eau/edit/' + ${releve.id}}">
+    <a th:href="@{'/releves-eau/' + ${releve.id} + '/edit'}">
         Modifier
     </a>
 
-    <a th:href="@{'/releves-eau/delete/' + ${releve.id}}">
-        Supprimer
-    </a>
+    <form th:action="@{'/releves-eau/' + ${releve.id} + '/delete'}" method="post" style="display:inline;"
+        onsubmit="return confirm('Supprimer ce relevé ?');">
+        <button type="submit">Supprimer</button>
+    </form>
 
 </body>
 

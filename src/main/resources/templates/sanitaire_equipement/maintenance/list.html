@@ -92,8 +92,7 @@
                 <td th:text="${m.cout != null ? m.cout + ' €' : '0.00 €'}">150 €</td>
                 <td th:text="${m.dateResolution != null ? m.dateResolution : '-'}">-</td>
                 <td>
-                    <a th:href="@{/maintenances/{id}(id=${m.id})}">Détails</a> | 
-                    <a th:href="@{/maintenances/delete/{id}(id=${m.id})}" onclick="return confirm('Confirmer la suppression ?')">Supprimer</a>
+                    <a th:href="@{/maintenances/{id}(id=${m.id})}">Détails</a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(maintenances)}">

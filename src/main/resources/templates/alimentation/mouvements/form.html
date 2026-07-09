@@ -2,7 +2,7 @@
     <p th:text="${error}"></p>
 </div>
 <form method="post"
-    th:action="${mouvement.id} == null ? @{/stocks/mouvements} : @{'/stocks/mouvements/edit/' + ${mouvement.id}}"
+    th:action="${mouvement.id} == null ? @{/stocks/mouvements} : @{'/stocks/mouvements/' + ${mouvement.id}}"
     th:object="${mouvement}">
 
     <label>Date</label>

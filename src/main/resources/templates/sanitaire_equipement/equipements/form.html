@@ -5,7 +5,7 @@
         Saisie Équipement
     </h1>
 
-    <form th:action="${equipement.id == null} ? @{/equipements/save} : @{/equipements/edit/{id}(id=${equipement.id})}"
+    <form th:action="${equipement.id == null} ? @{/equipements} : @{/equipements/{id}(id=${equipement.id})}"
           th:object="${equipement}"
           method="post">
         <label>Nom :</label> <input type="text" th:field="*{nom}" required /><br/>

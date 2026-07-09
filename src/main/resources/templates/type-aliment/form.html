@@ -1,14 +1,13 @@
 <h2>Form Type Aliment</h2>
 
-<form action="/type-aliment" method="post" th:object="${type}">
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
+<form action="/types-aliments" method="post" th:object="${type}">
     <input type="hidden" th:field="*{id}" />
 
-```
-Nom :
-<input type="text" th:field="*{nom}" />
-<br/>
+    Nom :
+    <input type="text" th:field="*{nom}" />
+    <br/>
 
-<button type="submit">Save</button>
-```
-
+    <button type="submit">Save</button>
 </form>

@@ -30,9 +30,15 @@ public class StadeCroissanceController {
     }
 
     @PostMapping
-    public String save(@ModelAttribute StadeCroissanceModels stade) {
-        service.save(stade);
-        return "redirect:/stade-croissance";
+    public String save(@ModelAttribute StadeCroissanceModels stade, Model model) {
+        try {
+            service.save(stade);
+            return "redirect:/stade-croissance";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("stade", stade);
+            model.addAttribute("error", e.getMessage());
+            return "stade-croissance/form";
+        }
     }
 
     @GetMapping("/{id}")
@@ -41,7 +47,7 @@ public class StadeCroissanceController {
         return "stade-croissance/form";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String delete(@PathVariable Integer id) {
         service.delete(id);
         return "redirect:/stade-croissance";

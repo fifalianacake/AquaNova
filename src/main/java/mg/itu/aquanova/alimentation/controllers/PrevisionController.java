@@ -24,13 +24,13 @@ public class PrevisionController {
             @RequestParam(required = false) Long alimentId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false, defaultValue = "30") Integer horizonJours,
+            @RequestParam(required = false) Integer horizonJours,
             Model model
     ) {
         LocalDate dateReference = date != null ? date : LocalDate.now();
 
         if (horizonJours == null || horizonJours <= 0) {
-            horizonJours = 30;
+            horizonJours = previsionService.getHorizonPrevisionJours();
         }
 
         try {
@@ -60,10 +60,5 @@ public class PrevisionController {
 
             return "alimentation/prevision/list";
         }
-    }
-
-    @GetMapping("/alimentation/prevision")
-    public String redirectToPrevision() {
-        return "redirect:/prevision";
     }
 }

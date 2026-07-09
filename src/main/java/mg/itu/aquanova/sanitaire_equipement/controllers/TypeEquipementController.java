@@ -22,7 +22,7 @@ public class TypeEquipementController {
         return "sanitaire_equipement/equipements/types";
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public String enregistrer(@ModelAttribute TypeEquipement type) {
         service.creer(type);
         return "redirect:/types-equipements";

@@ -8,7 +8,7 @@
 <h1>Types de récolte</h1>
 
 <div>
-    <a th:href="@{/type-recoltes/new}">Créer un type de récolte</a>
+    <a th:href="@{/types-recoltes/new}">Créer un type de récolte</a>
     <a th:href="@{/recoltes}">Retour aux récoltes</a>
 </div>
 
@@ -27,9 +27,9 @@
         <td th:text="${type.libelle}"></td>
         <td th:text="${type.description}"></td>
         <td>
-            <a th:href="@{/type-recoltes/{id}(id=${type.id})}">Voir</a>
-            <a th:href="@{/type-recoltes/{id}/edit(id=${type.id})}">Modifier</a>
-            <a th:href="@{/type-recoltes/{id}/delete(id=${type.id})}"
+            <a th:href="@{/types-recoltes/{id}(id=${type.id})}">Voir</a>
+            <a th:href="@{/types-recoltes/{id}/edit(id=${type.id})}">Modifier</a>
+            <a th:href="@{/types-recoltes/{id}/delete(id=${type.id})}"
                onclick="return confirm('Supprimer ce type de récolte ?')">Supprimer</a>
         </td>
     </tr>

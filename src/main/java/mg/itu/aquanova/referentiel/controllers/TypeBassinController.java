@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/referentiel/types-bassins")
+@RequestMapping("/types-bassins")
 public class TypeBassinController {
 
     @Autowired
@@ -22,30 +22,30 @@ public class TypeBassinController {
     }
 
     // 2. Afficher le formulaire d'ajout
-    @GetMapping("/nouveau")
+    @GetMapping("/new")
     public String formulaireModification(Model model) {
         model.addAttribute("typeBassin", new TypeBassin());
         return "referentiel/types-bassins/saisie";
     }
 
     // 3. Afficher le formulaire de modification
-    @GetMapping("/modifier/{id}")
+    @GetMapping("/{id}/edit")
     public String formulaireModification(@PathVariable Long id, Model model) {
         model.addAttribute("typeBassin", bassinService.getTypeBassinById(id));
         return "referentiel/types-bassins/saisie";
     }
 
     // 4. Traiter l'enregistrement (Ajout ou Modification)
-    @PostMapping("/enregistrer")
+    @PostMapping
     public String enregistrer(@ModelAttribute("typeBassin") TypeBassin typeBassin) {
         bassinService.saveTypeBassin(typeBassin);
-        return "redirect:/referentiel/types-bassins";
+        return "redirect:/types-bassins";
     }
 
     // 5. Supprimer un type
-    @GetMapping("/supprimer/{id}")
+    @GetMapping("/{id}/delete")
     public String supprimer(@PathVariable Long id) {
         bassinService.deleteTypeBassin(id);
-        return "redirect:/referentiel/types-bassins";
+        return "redirect:/types-bassins";
     }
 }

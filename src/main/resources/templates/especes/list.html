@@ -18,7 +18,7 @@
         <td th:text="${e.image}"></td>
         <td>
             <a th:href="@{/especes/{id}(id=${e.id})}">Edit</a>
-            <a th:href="@{/especes/delete/{id}(id=${e.id})}">Delete</a>
+            <a th:href="@{/especes/{id}/delete(id=${e.id})}">Delete</a>
         </td>
     </tr>
 </table>

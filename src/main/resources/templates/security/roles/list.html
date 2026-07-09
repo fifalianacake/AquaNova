@@ -10,6 +10,8 @@
 
     <h1>Liste des Rôles</h1>
 
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
     <a th:href="@{/roles/new}"> Ajouter un nouveau rôle</a>
     <br><br>
 
@@ -26,7 +28,7 @@
                 <td th:text="${role.id}">1</td>
                 <td th:text="${role.name}">ROLE_ADMIN</td>
                 <td>
-                    <a th:href="@{/roles/delete/{id}(id=${role.id})}"
+                    <a th:href="@{/roles/{id}/delete(id=${role.id})}"
                         onclick="return confirm('Êtes-vous sur de vouloir supprimer ce rôle ?');">
                         Supprimer
                     </a>

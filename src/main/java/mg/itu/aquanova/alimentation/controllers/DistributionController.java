@@ -15,7 +15,7 @@ import mg.itu.aquanova.alimentation.services.DistributionService;
 import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.referentiel.services.AlimentService;
 
-@RequestMapping("/alimentation/distribution")
+@RequestMapping("/distributions")
 @Controller
 public class DistributionController {
 
@@ -23,7 +23,7 @@ public class DistributionController {
     private final LotService lotService;
     private final AlimentService alimentService;
 
-    public DistributionController(DistributionService distributionService, 
+    public DistributionController(DistributionService distributionService,
         LotService lotService, AlimentService alimentService ) {
         this.distributionService = distributionService;
         this.lotService = lotService;
@@ -47,13 +47,32 @@ public class DistributionController {
         return "alimentation/distribution/form";
     }
 
-    @PostMapping("/save")
-    public String saveDistribution(@ModelAttribute DistributionDTO distributionDTO) {
-        distributionService.saveDistribution(distributionDTO);
-        return "redirect:/alimentation/distribution";
+    @PostMapping
+    public String createDistribution(@ModelAttribute DistributionDTO distributionDTO, Model model) {
+        return saveDistribution(distributionDTO, model);
     }
 
-    @GetMapping("/edit/{id}")
+    @PostMapping("/{id}")
+    public String updateDistribution(@PathVariable Long id, @ModelAttribute DistributionDTO distributionDTO,
+            Model model) {
+        distributionDTO.setId(id);
+        return saveDistribution(distributionDTO, model);
+    }
+
+    private String saveDistribution(DistributionDTO distributionDTO, Model model) {
+        try {
+            distributionService.saveDistribution(distributionDTO);
+            return "redirect:/distributions";
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("distribution", distributionDTO);
+            model.addAttribute("lots", lotService.listerTous());
+            model.addAttribute("aliments", alimentService.findAll());
+            return "alimentation/distribution/form";
+        }
+    }
+
+    @GetMapping("/{id}/edit")
     public String editDistributionForm(@PathVariable Long id, Model model) {
         Distribution distribution = distributionService.getDistributionById(id);
 
@@ -81,10 +100,10 @@ public class DistributionController {
         return "alimentation/distribution/details";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String deleteDistribution(@PathVariable Long id) {
         distributionService.deleteDistribution(id);
-        return "redirect:/alimentation/distribution";
+        return "redirect:/distributions";
     }
 
 }

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Historique achats et dépenses</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        .filters, .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+        .filters label { display: flex; flex-direction: column; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background: #f5f5f5; }
+        .empty { padding: 16px; color: #555; }
+    </style>
+</head>
+<body>
+<h1>Historique des achats et dépenses</h1>
+
+<form th:action="@{/achats-depenses/historique}" th:object="${filter}" method="get" class="filters">
+    <label>Type opération
+        <select th:field="*{typeOperation}">
+            <option value="">Tous</option>
+            <option th:each="op : ${operations}" th:value="${op}" th:text="${op.libelle}"></option>
+        </select>
+    </label>
+
+    <label>Fournisseur
+        <select th:field="*{fournisseurId}">
+            <option value="">Tous</option>
+            <option th:each="f : ${fournisseurs}" th:value="${f.id}" th:text="${f.nom}"></option>
+        </select>
+    </label>
+
+    <label>Catégorie
+        <select th:field="*{categorieDepenseId}">
+            <option value="">Toutes</option>
+            <option th:each="c : ${categoriesDepense}" th:value="${c.id}"
+                    th:text="${c.code + ' - ' + c.libelle}"></option>
+        </select>
+    </label>
+
+    <label>Date début
+        <input type="date" th:field="*{dateDebut}" />
+    </label>
+
+    <label>Date fin
+        <input type="date" th:field="*{dateFin}" />
+    </label>
+
+    <label>Montant min
+        <input type="number" min="0" step="0.01" th:field="*{montantMin}" />
+    </label>
+
+    <label>Montant max
+        <input type="number" min="0" step="0.01" th:field="*{montantMax}" />
+    </label>
+
+    <div style="display:flex; gap:8px; align-items:center;">
+        <button type="submit">Filtrer</button>
+        <a th:href="@{/achats-depenses/historique}">Réinitialiser</a>
+    </div>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Date</th>
+        <th>Fournisseur</th>
+        <th>Catégorie</th>
+        <th>Détails</th>
+        <th>Montant</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${#lists.isEmpty(historiques)}">
+        <td class="empty" colspan="7">Aucun résultat pour ces critères.</td>
+    </tr>
+    <tr th:each="item : ${historiques}">
+        <td th:text="${item.id}"></td>
+        <td th:text="${item.typeOperation.libelle}"></td>
+        <td th:text="${item.date}"></td>
+        <td th:text="${item.fournisseur ?: '-'}"></td>
+        <td th:text="${item.categorie}"></td>
+        <td th:text="${item.details ?: '-'}"></td>
+        <td th:text="${item.montant}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

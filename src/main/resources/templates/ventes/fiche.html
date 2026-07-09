@@ -30,14 +30,16 @@
             <h2>Fiche de Vente #<span th:text="${vente.id}"></span></h2>
             <span th:class="'badge badge-' + ${#strings.toLowerCase(vente.statutVente.code)}" th:text="${vente.statutVente.libelle}"></span>
         </div>
-        
+
+        <div class="error" th:if="${erreur}" th:text="${erreur}" style="color: red; background: #fce8e6; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;"></div>
+
         <div class="info-row">
             <div class="info-label">Date de vente</div>
             <div class="info-value" th:text="${vente.dateVente}"></div>
         </div>
         <div class="info-row">
             <div class="info-label">Client</div>
-            <div class="info-value" th:text="${vente.client}" style="font-weight: bold;"></div>
+            <div class="info-value" th:text="${vente.client != null ? vente.client.nom : '-'}" style="font-weight: bold;"></div>
         </div>
         <div class="info-row">
             <div class="info-label">Récolte d'origine</div>
@@ -73,13 +75,18 @@
             
             <th:block th:if="${vente.statutVente.code.name() == 'CREEE'}">
                 <a th:href="@{/ventes/{id}/edit(id=${vente.id})}" class="btn btn-warning">Modifier</a>
-                
+
                 <form th:action="@{/ventes/{id}/valider(id=${vente.id})}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-success">Valider la vente</button>
                 </form>
             </th:block>
 
-            <form th:if="${vente.statutVente.code.name() != 'ANNULEE' && vente.statutVente.code.name() != 'PAYEE'}" 
+            <form th:if="${vente.statutVente.code.name() == 'VALIDEE'}"
+                  th:action="@{/ventes/{id}/payer(id=${vente.id})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-success">Marquer comme payée</button>
+            </form>
+
+            <form th:if="${vente.statutVente.code.name() != 'ANNULEE' && vente.statutVente.code.name() != 'PAYEE'}"
                   th:action="@{/ventes/{id}/annuler(id=${vente.id})}" method="post" class="btn-right"
                   onsubmit="return confirm('Confirmer l\'annulation de cette vente ? Les stocks de récolte seront restitués.')">
                 <button type="submit" class="btn btn-danger">Annuler la vente</button>

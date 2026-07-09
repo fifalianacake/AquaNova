@@ -16,6 +16,7 @@ import mg.itu.aquanova.export_pdf.models.FichePdfData;
 import mg.itu.aquanova.export_pdf.models.ListePdfData;
 import mg.itu.aquanova.export_pdf.services.PdfExportService;
 import mg.itu.aquanova.export_pdf.models.PdfResponses;
+import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
 
@@ -63,7 +64,7 @@ public class HistoriqueExportController {
         for (Vente v : ventes) {
             // Ignorer les ventes annuldes pour les totaux
             boolean isAnnulee = v.getStatutVente() != null && 
-                    v.getStatutVente().getCode().name().equals("ANNULEE");
+                    StatutVenteEnum.ANNULEE == v.getStatutVente().getCode();
             
             if (!isAnnulee) {
                 totalPoids += v.getPoidsVendu() != null ? v.getPoidsVendu() : 0;

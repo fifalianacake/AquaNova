@@ -43,13 +43,21 @@ public class UserRoleController {
         return "security/user-roles/form";
     }
 
-    @PostMapping("/save")
-    public String saveUserRole(@ModelAttribute("userRole") UserRoleModels userRole) {
-        userRoleService.saveUserRole(userRole);
-        return "redirect:/user-roles";
+    @PostMapping
+    public String saveUserRole(@ModelAttribute("userRole") UserRoleModels userRole, Model model) {
+        try {
+            userRoleService.saveUserRole(userRole);
+            return "redirect:/user-roles";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("userRole", userRole);
+            model.addAttribute("users", userService.getAllUsers());
+            model.addAttribute("roles", roleService.getAllRoles());
+            model.addAttribute("error", e.getMessage());
+            return "security/user-roles/form";
+        }
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String deleteUserRole(@PathVariable("id") Long id) {
         userRoleService.deleteUserRole(id);
         return "redirect:/user-roles";

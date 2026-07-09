@@ -13,7 +13,7 @@
 
 <p>
     <a th:href="@{/recoltes/new}">Créer une récolte</a>
-    <a th:href="@{/type-recoltes}">Gérer les types de récolte</a>
+    <a th:href="@{/types-recoltes}">Gérer les types de récolte</a>
 </p>
 
 <form method="get" th:action="@{/recoltes}">
@@ -53,6 +53,7 @@
         <th>Effectif récolté</th>
         <th>Poids total</th>
         <th>Poids moyen</th>
+        <th>Statut</th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -65,6 +66,7 @@
         <td th:text="${recolte.effectifRecolte}"></td>
         <td th:text="${recolte.poidsTotal}"></td>
         <td th:text="${recolte.poidsMoyen}"></td>
+        <td th:text="${recolte.statut}"></td>
         <td>
             <a th:href="@{/recoltes/{id}(id=${recolte.id})}">Voir</a>
         </td>

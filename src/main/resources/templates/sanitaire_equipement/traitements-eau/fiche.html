@@ -36,8 +36,8 @@
 
         <div>
             <a th:href="@{/traitements-eau}">Retour</a>
-            <a th:href="@{/traitements-eau/edit/{id}(id=${traitement.id})}">Modifier</a>
-            <form th:action="@{/traitements-eau/delete/{id}(id=${traitement.id})}" method="post" onsubmit="return confirm('Voulez-vous vraiment effacer ce traitement ?')">
+            <a th:href="@{/traitements-eau/{id}/edit(id=${traitement.id})}">Modifier</a>
+            <form th:action="@{/traitements-eau/{id}/delete(id=${traitement.id})}" method="post" onsubmit="return confirm('Voulez-vous vraiment effacer ce traitement ?')">
                 <button type="submit">Supprimer</button>
             </form>
         </div>

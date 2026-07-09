@@ -35,9 +35,16 @@ public class ParametreSystemeController {
     }
 
     @PostMapping
-    public String save(@ModelAttribute ParametreSysteme parametre) {
-        service.create(parametre);
-        return "redirect:/parametres-systeme";
+    public String save(@ModelAttribute ParametreSysteme parametre, Model model) {
+        try {
+            service.create(parametre);
+            return "redirect:/parametres-systeme";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("parametre", parametre);
+            model.addAttribute("typesValeur", TypeValeur.values());
+            model.addAttribute("error", e.getMessage());
+            return "admin/parametre-systeme/form";
+        }
     }
 
     @GetMapping("/{id}")
@@ -56,16 +63,30 @@ public class ParametreSystemeController {
     @PostMapping("/{id}")
     public String update(
             @PathVariable Long id,
-            @ModelAttribute ParametreSysteme parametre) {
+            @ModelAttribute ParametreSysteme parametre,
+            Model model) {
 
-        service.update(id, parametre);
-
-        return "redirect:/parametres-systeme";
+        try {
+            service.update(id, parametre);
+            return "redirect:/parametres-systeme";
+        } catch (IllegalArgumentException e) {
+            parametre.setId(id);
+            model.addAttribute("parametre", parametre);
+            model.addAttribute("typesValeur", TypeValeur.values());
+            model.addAttribute("error", e.getMessage());
+            return "admin/parametre-systeme/form";
+        }
     }
 
     @GetMapping("/{id}/delete")
-    public String delete(@PathVariable Long id) {
-        service.delete(id);
-        return "redirect:/parametres-systeme";
+    public String delete(@PathVariable Long id, Model model) {
+        try {
+            service.delete(id);
+            return "redirect:/parametres-systeme";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("parametres", service.findAll());
+            model.addAttribute("error", e.getMessage());
+            return "admin/parametre-systeme/list";
+        }
     }
 }

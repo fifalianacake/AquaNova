@@ -10,7 +10,6 @@ import mg.itu.aquanova.referentiel.repositories.TypeBassinRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -42,56 +41,47 @@ public class BassinService {
                 .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable avec l'ID : " + id));
     }
 
-    public void saveBassin(Bassin bassin) {
-        bassinRepository.save(bassin);
-    }
-
-    public void deleteBassin(Long id) {
-        bassinRepository.deleteById(id);
-    }
-
-    // ==========================
-    // Création avec validation
-    // ==========================
-
     @Transactional
-    public Bassin creerBassin(String reference,
-            Long idStatut,
-            Long idType,
-            Double capaciteM3) {
-
-        if (reference == null || reference.trim().isEmpty()) {
+    public Bassin saveBassin(Bassin bassin) {
+        if (bassin.getReference() == null || bassin.getReference().trim().isEmpty()) {
             throw new IllegalArgumentException("La référence du bassin est obligatoire.");
         }
 
-        if (idStatut == null) {
-            throw new IllegalArgumentException("Le statut du bassin est obligatoire.");
-        }
-
-        if (capaciteM3 == null || capaciteM3 <= 0) {
+        if (bassin.getCapaciteM3() == null || bassin.getCapaciteM3().signum() <= 0) {
             throw new IllegalArgumentException(
                     "La capacité en m³ doit être strictement supérieure à 0.");
         }
 
-        if (bassinRepository.findByReference(reference).isPresent()) {
-            throw new IllegalStateException(
-                    "Erreur : Le bassin '" + reference + "' existe déjà.");
+        if (bassin.getTypeBassin() == null || bassin.getTypeBassin().getId() == null) {
+            throw new IllegalArgumentException("Le type de bassin est obligatoire.");
         }
 
-        TypeBassin typeBassin = typeBassinRepository.findById(idType)
+        if (bassin.getStatut() == null || bassin.getStatut().getId() == null) {
+            throw new IllegalArgumentException("Le statut du bassin est obligatoire.");
+        }
+
+        bassinRepository.findByReference(bassin.getReference())
+                .filter(autre -> !autre.getId().equals(bassin.getId()))
+                .ifPresent(autre -> {
+                    throw new IllegalStateException(
+                            "Erreur : Le bassin '" + bassin.getReference() + "' existe déjà.");
+                });
+
+        TypeBassin typeBassin = typeBassinRepository.findById(bassin.getTypeBassin().getId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Le type de bassin spécifié n'existe pas."));
-        StatutBassin statut = statutBassinRepository.findById(idStatut)
+        StatutBassin statut = statutBassinRepository.findById(bassin.getStatut().getId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Le statut spécifié n'existe pas."));
 
-        Bassin bassin = new Bassin();
-        bassin.setReference(reference);
-        bassin.setStatut(statut);
-        bassin.setCapaciteM3(BigDecimal.valueOf(capaciteM3));
         bassin.setTypeBassin(typeBassin);
+        bassin.setStatut(statut);
 
         return bassinRepository.save(bassin);
+    }
+
+    public void deleteBassin(Long id) {
+        bassinRepository.deleteById(id);
     }
 
     // ==========================

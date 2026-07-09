@@ -40,8 +40,6 @@
                 <td th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></td>
                 <td>
                     <a th:href="@{'/transferts/' + ${transfert.id}}">Voir</a>
-                    <a th:href="@{'/transferts/delete/' + ${transfert.id}}"
-                        onclick="return confirm('Supprimer ce transfert ?');">Supprimer</a>
                 </td>
             </tr>
         </tbody>

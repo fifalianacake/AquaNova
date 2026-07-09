@@ -35,6 +35,10 @@ public class StatutBassinService {
     public StatutBassin update(Long id, StatutBassin data) {
         StatutBassin statutBassin = findById(id);
 
+        if (statutBassin == null) {
+            throw new IllegalArgumentException("Statut de bassin introuvable avec l'ID : " + id);
+        }
+
         statutBassin.setLibelle(data.getLibelle());
 
         return statutBassinRepository.save(statutBassin);

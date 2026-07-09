@@ -11,6 +11,8 @@
     Statut Bassin Form
 </h2>
 
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
 <form th:action="${statut.id == null ? '/statuts-bassins' : '/statuts-bassins/' + statut.id}"
       th:object="${statut}"
       method="post"

@@ -16,7 +16,7 @@ public class Vente {
     private Recoltes recolte; // Modifié en Recoltes
 
     @ManyToOne
-    @JoinColumn(name = "id_client")
+    @JoinColumn(name = "id_client", nullable = false)
     private Client client;
 
     @Column(name = "date_vente", nullable = false)

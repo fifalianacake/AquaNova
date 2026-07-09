@@ -25,6 +25,10 @@ public class TypeAlimentService {
     }
 
     public TypeAlimentModels save(TypeAlimentModels type) {
+        if (type.getNom() == null || type.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom du type d'aliment est obligatoire.");
+        }
+        type.setNom(type.getNom().trim());
         return repo.save(type);
     }
 

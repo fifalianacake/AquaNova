@@ -10,6 +10,8 @@
 
     <h1>Liste des Utilisateurs</h1>
 
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
     <a th:href="@{/users/new}">Ajouter un utilisateur</a> |
     <a th:href="@{/roles}">Gerer les rôles</a>
     <br><br>
@@ -33,7 +35,7 @@
                 <td th:text="${user.email}">email@exemple.com</td>
                 <td th:text="${user.dateHired}">2026-06-18</td>
                 <td>
-                    <a th:href="@{/users/delete/{id}(id=${user.id})}"
+                    <a th:href="@{/users/{id}/delete(id=${user.id})}"
                         onclick="return confirm('Supprimer cet utilisateur ?');">
                         Supprimer
                     </a>

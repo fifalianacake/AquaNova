@@ -5,6 +5,7 @@ import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.Recoltes;
 import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.StatutLotModels;
+import mg.itu.aquanova.production.models.StatutRecolteEnum;
 import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.models.TypeRecolteEnum;
 import mg.itu.aquanova.production.models.TypeRecoltes;
@@ -143,8 +144,10 @@ public class RecolteService {
         if (effectifRecolte == null || effectifRecolte <= 0) {
             throw new IllegalArgumentException("L'effectif récolté doit être strictement positif.");
         }
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot déjà clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot clôturé ou annulé.");
         }
         if (lot.getEffectifActuel() == null || lot.getEffectifActuel() <= 0) {
             throw new IllegalStateException("Ce lot ne contient plus d'individus récoltables.");
@@ -182,8 +185,22 @@ public class RecolteService {
             return;
         }
 
-        StatutLotModels statutPartiel = statutLotRepository.findByLibelle(StatutLotEnum.RECOLTE_PARTIELLE)
-                .orElseThrow(() -> new EntityNotFoundException("Statut de lot RECOLTE_PARTIELLE introuvable."));
-        lot.setStatutLot(statutPartiel);
+    }
+
+    @Transactional
+    public void mettreAJourStatutDisponibilite(Long recolteId, double poidsDisponible) {
+        Recoltes recolte = getRecolteById(recolteId);
+        StatutRecolteEnum nouveauStatut = poidsDisponible <= 0.01
+                ? StatutRecolteEnum.VENDU
+                : StatutRecolteEnum.DISPONIBLE;
+
+        if (recolte.getStatut() != nouveauStatut) {
+            recolte.setStatut(nouveauStatut);
+            recoltesRepository.save(recolte);
+        }
+    }
+
+    public List<Recoltes> getRecoltesDisponibles() {
+        return recoltesRepository.findByStatut(StatutRecolteEnum.DISPONIBLE);
     }
 }

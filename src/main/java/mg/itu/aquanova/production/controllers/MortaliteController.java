@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/production/mortalites")
 public class MortaliteController {
 
     private final MortaliteService mortaliteService;
@@ -22,14 +21,14 @@ public class MortaliteController {
     }
 
     // 1. Afficher la liste de toutes les mortalités
-    @GetMapping
+    @GetMapping("/mortalites")
     public String listeMortalites(Model model) {
         model.addAttribute("mortalites", mortaliteService.findAll());
         model.addAttribute("titre", "Suivi des Mortalités");
         return "production/mortalites/liste";
     }
 
-    @GetMapping("/lot/{lotId}")
+    @GetMapping("/lots/{lotId}/mortalites")
     public String listeMortalitesParLot(@PathVariable Long lotId, Model model) {
         LotModels lot = lotService.trouverParId(lotId);
         model.addAttribute("lot", lot);
@@ -39,14 +38,14 @@ public class MortaliteController {
     }
 
     // 2. Afficher le formulaire d'ajout d'une nouvelle mortalité
-    @GetMapping("/nouveau")
+    @GetMapping("/mortalites/new")
     public String formulaireCreation(Model model) {
         model.addAttribute("mortalite", new MortaliteModels());
         addFormLists(model);
         return "production/mortalites/saisie";
     }
 
-    @GetMapping("/nouveau/lot/{lotId}")
+    @GetMapping("/lots/{lotId}/mortalites/new")
     public String formulaireCreationPourLot(@PathVariable Long lotId, Model model) {
         MortaliteModels mortalite = new MortaliteModels();
         mortalite.setLot(lotService.trouverParId(lotId));
@@ -56,7 +55,7 @@ public class MortaliteController {
     }
 
     // 3. Afficher le formulaire de modification d'une mortalité existante
-    @GetMapping("/modifier/{id}")
+    @GetMapping("/mortalites/{id}/edit")
     public String formulaireModification(@PathVariable Integer id, Model model) {
         model.addAttribute("mortalite", mortaliteService.findById(id));
         addFormLists(model);
@@ -64,24 +63,17 @@ public class MortaliteController {
     }
 
     // 4. Traiter l'enregistrement (Ajout ou Modification)
-    @PostMapping("/enregistrer")
+    @PostMapping("/mortalites")
     public String enregistrerMortalite(@ModelAttribute("mortalite") MortaliteModels mortalite, Model model) {
         try {
             MortaliteModels saved = mortaliteService.save(mortalite);
-            return "redirect:/production/mortalites/lot/" + saved.getLot().getId();
+            return "redirect:/lots/" + saved.getLot().getId() + "/mortalites";
         } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("mortalite", mortalite);
             addFormLists(model);
             return "production/mortalites/saisie";
         }
-    }
-
-    // 5. Supprimer une mortalité
-    @GetMapping("/supprimer/{id}")
-    public String supprimerMortalite(@PathVariable Integer id) {
-        mortaliteService.delete(id);
-        return "redirect:/production/mortalites";
     }
 
     private void addFormLists(Model model) {

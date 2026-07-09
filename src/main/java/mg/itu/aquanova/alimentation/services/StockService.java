@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import mg.itu.aquanova.admin.service.ParametreSystemeService;
 import mg.itu.aquanova.alimentation.dto.StockDTO;
 import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.alimentation.models.MouvementStock;
@@ -23,6 +24,9 @@ public class StockService {
 
     @Autowired
     private AlimentRepository alimentRepository;
+
+    @Autowired
+    private ParametreSystemeService parametreSystemeService;
 
     public Page<StockDTO> getAllStocks(LocalDate date, String nom, int page, int size) {
 
@@ -70,7 +74,7 @@ public class StockService {
                 aliment.getId(),
                 aliment.getNom(),
                 stock,
-                100.0);
+                seuilStockMinimum());
     }
 
     public Double getStockAtDate(Long id, LocalDate date) {
@@ -90,5 +94,9 @@ public class StockService {
 
     public List<MouvementStock> getHistorique(Long id) {
         return repo.findByAlimentId(id);
+    }
+
+    private Double seuilStockMinimum() {
+        return parametreSystemeService.getDouble(ParametreSystemeService.STOCK_ALIMENT_MINIMUM_KG, 100.0);
     }
 }

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AquaNova - Modifier la Vente</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .form-container { background: white; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .form-group .readonly-value { padding: 8px 0; color: #555; }
+        .btn-box { display: flex; justify-content: space-between; margin-top: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; font-weight: bold; }
+        .btn-primary { background-color: #28a745; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .error { color: red; background: #fce8e6; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; }
+        .client-row { display: flex; gap: 8px; align-items: flex-start; }
+        .client-row select { flex: 1; }
+        .btn-link { white-space: nowrap; background-color: #17a2b8; color: white; padding: 8px 12px; }
+        dialog#modalNouveauClient { border: none; border-radius: 8px; padding: 20px; max-width: 420px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        dialog#modalNouveauClient::backdrop { background: rgba(0,0,0,0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Modifier la Vente #<span th:text="${vente.id}"></span></h2>
+
+        <div class="error" th:if="${erreur}" th:text="${erreur}"></div>
+
+        <form th:action="@{/ventes}" th:object="${vente}" method="post">
+
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{recolte.id}" />
+
+            <div class="form-group">
+                <label>Récolte d'origine</label>
+                <div class="readonly-value" th:text="'Récolte N° ' + ${vente.recolte.id} + ' [Poids total: ' + ${vente.recolte.poidsTotal} + 'kg]'"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Client *</label>
+                <div class="client-row">
+                    <select th:field="*{client.id}" id="clientSelect" required>
+                        <option value="">-- Sélectionner le client --</option>
+                        <option th:each="c : ${clients}" th:value="${c.id}" th:text="${c.nom}"></option>
+                    </select>
+                    <button type="button" class="btn btn-link" onclick="ouvrirModalClient()">+ Nouveau client</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Date de la vente *</label>
+                <input type="date" th:field="*{dateVente}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Poids vendu (kg) *</label>
+                <input type="number" step="0.01" th:field="*{poidsVendu}" min="0.01" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+                <label>Prix unitaire (Ar) *</label>
+                <input type="number" step="0.01" th:field="*{prixUnitaire}" min="0.01" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+                <label>Effectif vendu (Optionnel)</label>
+                <input type="number" th:field="*{effectifVendu}" min="1" placeholder="Nombre de pièces">
+            </div>
+
+            <div class="form-group">
+                <label>Observation</label>
+                <textarea th:field="*{observation}" rows="3" placeholder="Notes complémentaires..."></textarea>
+            </div>
+
+            <div class="btn-box">
+                <a th:href="@{/ventes/{id}(id=${vente.id})}" class="btn btn-secondary">Retour</a>
+                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+            </div>
+        </form>
+    </div>
+
+    <dialog id="modalNouveauClient">
+        <h3 style="margin-top:0;">Nouveau client</h3>
+        <div id="modalClientErreur" class="error" style="display:none;"></div>
+
+        <div class="form-group">
+            <label>Nom / Raison sociale *</label>
+            <input type="text" id="modalClientNom" placeholder="Nom du client">
+        </div>
+
+        <div class="form-group">
+            <label>Type de client *</label>
+            <select id="modalClientType">
+                <option value="">-- Choisir un type --</option>
+                <option th:each="t : ${typesClient}" th:value="${t.id}" th:text="${t.libelle}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Contact téléphonique</label>
+            <input type="text" id="modalClientContact" placeholder="Optionnel">
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="modalClientEmail" placeholder="Optionnel">
+        </div>
+
+        <div class="form-group">
+            <label>Adresse</label>
+            <input type="text" id="modalClientAdresse" placeholder="Optionnel">
+        </div>
+
+        <div class="btn-box">
+            <button type="button" class="btn btn-secondary" onclick="fermerModalClient()">Annuler</button>
+            <button type="button" class="btn btn-primary" onclick="creerClientModal()">Créer le client</button>
+        </div>
+    </dialog>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const urlCreationClient = /*[[@{/clients/api}]]*/ '/clients/api';
+
+        function ouvrirModalClient() {
+            document.getElementById('modalClientErreur').style.display = 'none';
+            document.getElementById('modalNouveauClient').showModal();
+        }
+
+        function fermerModalClient() {
+            document.getElementById('modalNouveauClient').close();
+        }
+
+        function creerClientModal() {
+            const nom = document.getElementById('modalClientNom').value.trim();
+            const typeClientId = document.getElementById('modalClientType').value;
+            const contact = document.getElementById('modalClientContact').value.trim();
+            const email = document.getElementById('modalClientEmail').value.trim();
+            const adresse = document.getElementById('modalClientAdresse').value.trim();
+            const erreurDiv = document.getElementById('modalClientErreur');
+            erreurDiv.style.display = 'none';
+
+            if (!nom || !typeClientId) {
+                erreurDiv.textContent = 'Le nom et le type de client sont obligatoires.';
+                erreurDiv.style.display = 'block';
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('nom', nom);
+            params.append('typeClientId', typeClientId);
+            if (contact) params.append('contact', contact);
+            if (email) params.append('email', email);
+            if (adresse) params.append('adresse', adresse);
+
+            fetch(urlCreationClient, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(async (res) => {
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur lors de la création du client.');
+                }
+                return data;
+            })
+            .then((data) => {
+                const select = document.getElementById('clientSelect');
+                const option = document.createElement('option');
+                option.value = data.id;
+                option.textContent = data.nom;
+                select.appendChild(option);
+                select.value = data.id;
+
+                document.getElementById('modalClientNom').value = '';
+                document.getElementById('modalClientType').value = '';
+                document.getElementById('modalClientContact').value = '';
+                document.getElementById('modalClientEmail').value = '';
+                document.getElementById('modalClientAdresse').value = '';
+
+                fermerModalClient();
+            })
+            .catch((err) => {
+                erreurDiv.textContent = err.message;
+                erreurDiv.style.display = 'block';
+            });
+        }
+        /*]]>*/
+    </script>
+
+</body>
+</html>
