@@ -108,14 +108,14 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
             @Param("fin") LocalDate fin);
             
 
-    // Répartition CA par type client (client est un String ici)
-    // On groupe directement par client
-    @Query("SELECT v.client, " +
+    // Répartition CA par client (v.client est une entité Client : on sélectionne
+    // explicitement son nom pour éviter de renvoyer l'entité elle-même)
+    @Query("SELECT v.client.nom, " +
            "COALESCE(SUM(v.poidsVendu * v.prixUnitaire), 0) " +
            "FROM Vente v " +
            "WHERE v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE) " +
            "AND v.dateVente BETWEEN :debut AND :fin " +
-           "GROUP BY v.client " +
+           "GROUP BY v.client.id, v.client.nom " +
            "ORDER BY SUM(v.poidsVendu * v.prixUnitaire) DESC")
     List<Object[]> findCaParClient(
             @Param("debut") LocalDate debut,
@@ -123,14 +123,14 @@ public interface VenteRepository extends JpaRepository<Vente, Long> {
 
 
     // Top 5 clients par CA
-    @Query("SELECT v.client, " +
+    @Query("SELECT v.client.nom, " +
            "COUNT(v), " +
            "COALESCE(SUM(v.poidsVendu), 0), " +
            "COALESCE(SUM(v.poidsVendu * v.prixUnitaire), 0) " +
            "FROM Vente v " +
            "WHERE v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE) " +
            "AND v.dateVente BETWEEN :debut AND :fin " +
-           "GROUP BY v.client " +
+           "GROUP BY v.client.id, v.client.nom " +
            "ORDER BY SUM(v.poidsVendu * v.prixUnitaire) DESC " +
            "LIMIT 5")
     List<Object[]> findTop5ClientsParCa(
