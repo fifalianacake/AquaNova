@@ -2,6 +2,7 @@ package mg.itu.aquanova.vente.repositories;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -9,10 +10,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import mg.itu.aquanova.production.models.Recoltes;
 import mg.itu.aquanova.vente.models.Vente;
 
 @Repository
 public interface VenteRepository extends JpaRepository<Vente, Long>, JpaSpecificationExecutor<Vente> {
+
+       Optional<Vente> findByRecolte(Recoltes recoltes);
 
     @Query("SELECT v FROM Vente v WHERE v.recolte.id = :recolteId AND v.statutVente.code <> mg.itu.aquanova.vente.models.StatutVenteEnum.ANNULEE")
     List<Vente> findActiveVentesByRecolte(@Param("recolteId") Long recolteId);
