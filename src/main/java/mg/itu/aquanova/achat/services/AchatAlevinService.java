@@ -3,7 +3,6 @@ package mg.itu.aquanova.achat.services;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -88,6 +87,11 @@ public class AchatAlevinService {
                 .orElseThrow(() -> new RuntimeException("Achat introuvable avec l'ID : " + id));
     }
 
+    public Achat trouverParId(Long id) {
+        return achatRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Achat introuvable : " + id));
+    }
+
     public Page<Achat> listerAchatsAlevin(AchatAlevinFilter filter, Pageable pageable) {
         return achatRepository.findAll(specificationAchatsAlevins(filter), pageable);
     }
@@ -161,6 +165,14 @@ public class AchatAlevinService {
             throw new IllegalArgumentException("La catégorie doit être ACHAT_ALEVINS.");
         }
 
+        // Le bassin est choisi dès le brouillon (contrôle de disponibilité immédiat pour l'utilisateur),
+        // mais le lot n'est réellement créé et le bassin occupé qu'à la validation de l'achat.
+        Bassin bassin = bassinsRepository.findById(form.getBassinId())
+                .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable : " + form.getBassinId()));
+        if (bassin.getStatut() == null || bassin.getStatut().getLibelle() != LibelleStatutBassin.LIBRE) {
+            throw new IllegalArgumentException("Le bassin sélectionné n'est pas libre.");
+        }
+
         BigDecimal montantLigne = BigDecimal.valueOf(form.getEffectif()).multiply(form.getPrixUnitaire());
 
         Achat achat = new Achat();
@@ -169,7 +181,7 @@ public class AchatAlevinService {
         achat.setCategorieDepense(categorie);
         achat.setReferenceFacture(blankToNull(form.getReferenceFacture()));
         achat.setObservation(blankToNull(null));
-        achat.setStatutAchat(StatutAchat.VALIDE);
+        achat.setStatutAchat(StatutAchat.BROUILLON);
         achat.setMontantTotal(montantLigne);
 
         LigneAchat ligne = new LigneAchat();
@@ -179,45 +191,93 @@ public class AchatAlevinService {
         ligne.setUnite("pièce");
         ligne.setPrixUnitaire(form.getPrixUnitaire());
         ligne.setMontantLigne(montantLigne);
-
-        LotModels lot = new LotModels();
-        lot.setEspece(especes);
-        lot.setCode(String.format("LOT-%03d", lotRepository.count()));
-
-        Bassin bassin = bassinsRepository.findById(form.getBassinId())
-                .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable : " + form.getBassinId()));
-        if (bassin.getStatut() == null || bassin.getStatut().getLibelle() != LibelleStatutBassin.LIBRE) {
-            throw new IllegalArgumentException("Le bassin sélectionné n'est pas libre.");
-        }
-
-        Optional<StatutLotModels> statutLotOptional = statutLotRepository.findByLibelle(StatutLotEnum.EN_CROISSANCE);
-        if(!statutLotOptional.isPresent()) {
-            throw new IllegalArgumentException("Veuillez bien verifiez le statut du lot");
-        }
-
-        StadeCroissanceModels stade = stadeCroissanceRepository.findAll().stream()
-                .filter(s -> s.correspondAuPoids(form.getPoidsMoyen()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Aucun stade de croissance ne correspond au poids moyen saisi (" + form.getPoidsMoyen() + ")."));
-
-        lot.setBassin(bassin);
-        lot.setStadeCroissance(stade);
-        lot.setStatutLot(statutLotOptional.orElse(null));
-        lot.setDateMiseEnCharge(LocalDate.now());
-        lot.setEffectifInitial(form.getEffectif());
-        lot.setEffectifActuel(form.getEffectif());
-        lot.setPoidsMoyenInitial(form.getPoidsMoyen().doubleValue());
-        lot.setPoidsMoyenActuel(form.getPoidsMoyen().doubleValue());
-
-        LotModels lotSauvegarde = lotService.creer(lot);
-
-        ligne.setLot(lotSauvegarde);
+        // Paramètres du futur lot, conservés jusqu'à la validation.
+        ligne.setBassin(bassin);
+        ligne.setPoidsMoyen(form.getPoidsMoyen());
         achat.addLigne(ligne);
 
         Achat sauvegarde = achatRepository.save(achat);
 
+        if (form.isValiderDirectement()) {
+            return validerAchat(sauvegarde.getId());
+        }
+
         return sauvegarde;
+    }
+
+    @Transactional
+    public Achat validerAchat(Long achatId) {
+        Achat achat = trouverParId(achatId);
+
+        if (achat.getStatutAchat() == StatutAchat.VALIDE) {
+            return achat;
+        }
+        if (achat.getStatutAchat() == StatutAchat.ANNULE) {
+            throw new IllegalStateException("Un achat annulé ne peut pas être validé.");
+        }
+        if (!categorieDepenseService.estCategorieAchatAlevin(achat.getCategorieDepense())) {
+            throw new IllegalStateException("Cet achat n'est pas un achat d'alevins.");
+        }
+
+        StatutLotModels statutEnCroissance = statutLotRepository.findByLibelle(StatutLotEnum.EN_CROISSANCE)
+                .orElseThrow(() -> new IllegalArgumentException("Veuillez bien vérifier le statut du lot (EN_CROISSANCE)."));
+
+        for (LigneAchat ligne : achat.getLignes()) {
+            if (ligne.getEspece() == null || ligne.getLot() != null) {
+                continue;
+            }
+            ligne.setLot(creerLotDepuisLigne(achat, ligne, statutEnCroissance));
+        }
+
+        achat.setStatutAchat(StatutAchat.VALIDE);
+        return achatRepository.save(achat);
+    }
+
+    @Transactional
+    public Achat annulerAchat(Long achatId) {
+        Achat achat = trouverParId(achatId);
+
+        if (achat.getStatutAchat() == StatutAchat.VALIDE) {
+            throw new IllegalStateException("Annulation refusée : cet achat a déjà créé un lot en élevage. Clôturez ou annulez plutôt le lot concerné.");
+        }
+        achat.setStatutAchat(StatutAchat.ANNULE);
+        return achatRepository.save(achat);
+    }
+
+    /**
+     * Construit et enregistre le lot correspondant à une ligne d'achat d'alevins.
+     * Le stade de croissance est déduit du poids moyen saisi et le bassin passe OCCUPE
+     * (via {@link LotService#creer}).
+     */
+    private LotModels creerLotDepuisLigne(Achat achat, LigneAchat ligne, StatutLotModels statutEnCroissance) {
+        Bassin bassin = bassinsRepository.findById(ligne.getBassin().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable : " + ligne.getBassin().getId()));
+        if (bassin.getStatut() == null || bassin.getStatut().getLibelle() != LibelleStatutBassin.LIBRE) {
+            throw new IllegalStateException("Le bassin « " + bassin.getReference() + " » n'est plus libre : impossible de valider l'achat.");
+        }
+
+        BigDecimal poidsMoyen = ligne.getPoidsMoyen();
+        StadeCroissanceModels stade = stadeCroissanceRepository.findAll().stream()
+                .filter(s -> s.correspondAuPoids(poidsMoyen))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucun stade de croissance ne correspond au poids moyen saisi (" + poidsMoyen + ")."));
+
+        int effectif = ligne.getQuantite().intValue();
+
+        LotModels lot = new LotModels();
+        lot.setEspece(ligne.getEspece());
+        lot.setCode(String.format("LOT-%03d", lotRepository.count()));
+        lot.setBassin(bassin);
+        lot.setStadeCroissance(stade);
+        lot.setStatutLot(statutEnCroissance);
+        lot.setDateMiseEnCharge(achat.getDateAchat() != null ? achat.getDateAchat() : LocalDate.now());
+        lot.setEffectifInitial(effectif);
+        lot.setEffectifActuel(effectif);
+        lot.setPoidsMoyenInitial(poidsMoyen.doubleValue());
+        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
+
+        return lotService.creer(lot);
     }
 
     private void validerFormulaire(AchatAlevinForm form) {

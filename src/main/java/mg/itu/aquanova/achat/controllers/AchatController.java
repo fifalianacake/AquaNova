@@ -4,16 +4,12 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import mg.itu.aquanova.achat.dto.AchatAlevinFilter;
@@ -23,6 +19,7 @@ import mg.itu.aquanova.achat.dto.AchatIntrantForm;
 import mg.itu.aquanova.achat.dto.AchatProvendeFilter;
 import mg.itu.aquanova.achat.dto.AchatProvendeForm;
 import mg.itu.aquanova.achat.models.Achat;
+import mg.itu.aquanova.achat.models.CategorieDepense;
 import mg.itu.aquanova.achat.models.StatutAchat;
 import mg.itu.aquanova.achat.services.AchatAlevinService;
 import mg.itu.aquanova.achat.services.AchatIntrantService;
@@ -184,12 +181,19 @@ public class AchatController {
     public String valider(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             Achat achat = achatIntrantService.trouverParId(id);
-            if (achat.getCategorieDepense() != null && "ACHAT_PROVENDE".equalsIgnoreCase(achat.getCategorieDepense().getCode())) {
+            CategorieDepense categorie = achat.getCategorieDepense();
+            String messageSucces;
+            if (categorieDepenseService.estCategorieAchatAlevin(categorie)) {
+                achatAlevinService.validerAchat(id);
+                messageSucces = "Achat validé et lot créé.";
+            } else if (categorie != null && "ACHAT_PROVENDE".equalsIgnoreCase(categorie.getCode())) {
                 achatProvendeService.validerAchat(id);
+                messageSucces = "Achat validé et stock alimenté.";
             } else {
                 achatIntrantService.validerAchat(id);
+                messageSucces = "Achat validé et stock alimenté.";
             }
-            redirectAttributes.addFlashAttribute("success", "Achat validé et stock alimenté.");
+            redirectAttributes.addFlashAttribute("success", messageSucces);
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
@@ -200,7 +204,10 @@ public class AchatController {
     public String annuler(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             Achat achat = achatIntrantService.trouverParId(id);
-            if (achat.getCategorieDepense() != null && "ACHAT_PROVENDE".equalsIgnoreCase(achat.getCategorieDepense().getCode())) {
+            CategorieDepense categorie = achat.getCategorieDepense();
+            if (categorieDepenseService.estCategorieAchatAlevin(categorie)) {
+                achatAlevinService.annulerAchat(id);
+            } else if (categorie != null && "ACHAT_PROVENDE".equalsIgnoreCase(categorie.getCode())) {
                 achatProvendeService.annulerAchat(id);
             } else {
                 achatIntrantService.annulerAchat(id);

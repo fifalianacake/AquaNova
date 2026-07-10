@@ -19,6 +19,7 @@ public class AchatAlevinForm {
     private String referenceFacture;
     private Long lotId;
     private Long bassinId;
+    private boolean validerDirectement;
 
     // getters and setters
     public LocalDate getDateAchat() {
@@ -86,5 +87,11 @@ public class AchatAlevinForm {
     }
     public void setBassinId(Long bassinId) {
         this.bassinId = bassinId;
+    }
+    public boolean isValiderDirectement() {
+        return validerDirectement;
+    }
+    public void setValiderDirectement(boolean validerDirectement) {
+        this.validerDirectement = validerDirectement;
     }
 }

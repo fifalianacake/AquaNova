@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.referentiel.models.Aliment;
+import mg.itu.aquanova.referentiel.models.Bassin;
 import mg.itu.aquanova.referentiel.models.EspecesModels;
 
 @Entity
@@ -58,6 +59,21 @@ public class LigneAchat {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_lot")
     private LotModels lot;
+
+    /**
+     * Bassin cible d'un achat d'alevins, choisi dès le brouillon mais utilisé
+     * seulement à la validation pour créer le lot et occuper le bassin.
+     */
+    @ManyToOne
+    @JoinColumn(name = "id_bassin")
+    private Bassin bassin;
+
+    /**
+     * Poids moyen (g) saisi pour un achat d'alevins, conservé jusqu'à la validation
+     * afin d'en déduire le stade de croissance du lot créé.
+     */
+    @Column(name = "poids_moyen", precision = 10, scale = 2)
+    private BigDecimal poidsMoyen;
 
     @Column(columnDefinition = "TEXT")
     private String observation;
@@ -151,6 +167,22 @@ public class LigneAchat {
 
     public void setLot(LotModels lot) {
         this.lot = lot;
+    }
+
+    public Bassin getBassin() {
+        return bassin;
+    }
+
+    public void setBassin(Bassin bassin) {
+        this.bassin = bassin;
+    }
+
+    public BigDecimal getPoidsMoyen() {
+        return poidsMoyen;
+    }
+
+    public void setPoidsMoyen(BigDecimal poidsMoyen) {
+        this.poidsMoyen = poidsMoyen;
     }
 
     public String getObservation() {

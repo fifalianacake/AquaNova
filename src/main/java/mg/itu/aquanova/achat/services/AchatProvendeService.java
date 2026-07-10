@@ -166,15 +166,14 @@ public class AchatProvendeService {
     public Achat validerAchat(Long achatId) {
         Achat achat = trouverParId(achatId);
 
-        if (!"ACHAT_PROVENDE".equalsIgnoreCase(achat.getCategorieDepense().getCode())) {
-            throw new IllegalArgumentException("Cet achat n'est pas un achat de provende.");
-        }
-
         if (achat.getStatutAchat() == StatutAchat.VALIDE) {
             return achat;
         }
         if (achat.getStatutAchat() == StatutAchat.ANNULE) {
             throw new IllegalStateException("Un achat annulé ne peut pas être validé.");
+        }
+        if (achat.getCategorieDepense() == null || !"ACHAT_PROVENDE".equalsIgnoreCase(achat.getCategorieDepense().getCode())) {
+            throw new IllegalStateException("Cet achat n'est pas un achat de provende.");
         }
 
         for (LigneAchat ligne : achat.getLignes()) {
@@ -201,23 +200,8 @@ public class AchatProvendeService {
     public Achat annulerAchat(Long achatId) {
         Achat achat = trouverParId(achatId);
 
-        if (!"ACHAT_PROVENDE".equalsIgnoreCase(achat.getCategorieDepense().getCode())) {
-            throw new IllegalArgumentException("Cet achat n'est pas un achat de provende.");
-        }
-
         if (achat.getStatutAchat() == StatutAchat.VALIDE) {
-            // L'achat a déjà été validé, on crée un mouvement inverse (SORTIE)
-            for (LigneAchat ligne : achat.getLignes()) {
-                if (ligne.getAliment() != null) {
-                    MouvementStock mouvement = new MouvementStock();
-                    mouvement.setDateMouvement(LocalDate.now());
-                    mouvement.setAliment(ligne.getAliment());
-                    mouvement.setTypeMouvement(TypeMouvement.SORTIE);
-                    mouvement.setQuantite(ligne.getQuantite().doubleValue());
-                    mouvement.setCommentaire("Annulation de l'achat provende #" + achat.getId());
-                    mouvementRepository.save(mouvement);
-                }
-            }
+            throw new IllegalStateException("Annulation refusée : cet achat a déjà alimenté le stock d'aliments. Créez plutôt un mouvement de correction si nécessaire.");
         }
         achat.setStatutAchat(StatutAchat.ANNULE);
         return achatRepository.save(achat);
