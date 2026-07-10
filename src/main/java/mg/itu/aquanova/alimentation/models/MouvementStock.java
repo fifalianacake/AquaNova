@@ -80,14 +80,14 @@ public class MouvementStock {
     }
 
     public void setCommentaire(String commentaire) {
-        this.commentaire = commentaire;
+    this.commentaire = commentaire;
     }
 
     public Distribution getDistribution() {
-        return distribution;
+    return distribution;
     }
 
     public void setDistribution(Distribution distribution) {
-        this.distribution = distribution;
+    this.distribution = distribution;
     }
 }

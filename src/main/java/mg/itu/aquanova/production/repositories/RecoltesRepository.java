@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RecoltesRepository extends JpaRepository<Recoltes, Long>, JpaSpecificationExecutor<Recoltes> {
     List<Recoltes> findByStatut(StatutRecolteEnum statut);
+
+    List<Recoltes> findByLotId(Long lotId);
 }
