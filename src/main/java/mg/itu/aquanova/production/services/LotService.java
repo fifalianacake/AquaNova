@@ -1,5 +1,7 @@
 package mg.itu.aquanova.production.services;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -94,6 +96,29 @@ public class LotService {
 
     public LotModels trouverParId(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Lot introuvable: " + id));
+    }
+
+    private static final DateTimeFormatter FORMAT_JOUR_CODE = DateTimeFormatter.BASIC_ISO_DATE; // yyyyMMdd
+
+    public String genererCodeLot(LocalDate date) {
+        LocalDate jour = date != null ? date : LocalDate.now();
+        String prefixe = "LOT-" + jour.format(FORMAT_JOUR_CODE) + "-";
+        int prochaineSequence = repository.findFirstByCodeStartingWithOrderByCodeDesc(prefixe)
+                .map(lot -> extraireSequence(lot.getCode()) + 1)
+                .orElse(1);
+        return prefixe + String.format("%03d", prochaineSequence);
+    }
+
+    private int extraireSequence(String code) {
+        if (code == null) {
+            return 0;
+        }
+        int dernierTiret = code.lastIndexOf('-');
+        try {
+            return Integer.parseInt(code.substring(dernierTiret + 1));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public LotModels creer(LotModels lot) {

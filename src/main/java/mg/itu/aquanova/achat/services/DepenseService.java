@@ -150,8 +150,8 @@ public class DepenseService {
         }
 
         if (depense.getPaiements() == null || depense.getPaiements().isEmpty()) {
-            if (depense.getMontant() == null || depense.getMontant().compareTo(BigDecimal.ZERO) < 0) {
-                throw new IllegalArgumentException("Le montant doit être supérieur ou égal à zéro.");
+            if (depense.getMontant() == null || depense.getMontant().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Le montant doit être strictement supérieur à zéro.");
             }
         } else {
             boolean anyPayment = false;

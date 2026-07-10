@@ -25,7 +25,6 @@ import mg.itu.aquanova.achat.repositories.FournisseurRepository;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.StatutLotModels;
-import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.repositories.StatutLotRepository;
 import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.referentiel.models.Bassin;
@@ -44,7 +43,6 @@ public class AchatAlevinService {
     private final AchatRepository achatRepository;
     private final FournisseurRepository fournisseurRepository;
     private final CategorieDepenseRepository categorieDepenseRepository;
-    private final LotRepository lotRepository;
     private final CategorieDepenseService categorieDepenseService;
     private final EspecesRepository especesRepository;
     private final BassinsRepository bassinsRepository;
@@ -57,7 +55,6 @@ public class AchatAlevinService {
             AchatRepository achatRepository,
             FournisseurRepository fournisseurRepository,
             CategorieDepenseRepository categorieDepenseRepository,
-            LotRepository lotRepository,
             CategorieDepenseService categorieDepenseService,
             EspecesRepository especesRepository,
             BassinsRepository bassinsRepository,
@@ -68,7 +65,6 @@ public class AchatAlevinService {
         this.achatRepository = achatRepository;
         this.fournisseurRepository = fournisseurRepository;
         this.categorieDepenseRepository = categorieDepenseRepository;
-        this.lotRepository = lotRepository;
         this.categorieDepenseService = categorieDepenseService;
         this.especesRepository = especesRepository;
         this.bassinsRepository = bassinsRepository;
@@ -252,14 +248,15 @@ public class AchatAlevinService {
                         "Aucun stade de croissance ne correspond au poids moyen saisi (" + poidsMoyen + ")."));
 
         int effectif = ligne.getQuantite().intValue();
+        LocalDate dateMiseEnCharge = achat.getDateAchat() != null ? achat.getDateAchat() : LocalDate.now();
 
         LotModels lot = new LotModels();
         lot.setEspece(ligne.getEspece());
-        lot.setCode(String.format("LOT-%03d", lotRepository.count()));
+        lot.setCode(lotService.genererCodeLot(dateMiseEnCharge));
         lot.setBassin(bassin);
         lot.setStadeCroissance(stade);
         lot.setStatutLot(statutEnCroissance);
-        lot.setDateMiseEnCharge(achat.getDateAchat() != null ? achat.getDateAchat() : LocalDate.now());
+        lot.setDateMiseEnCharge(dateMiseEnCharge);
         lot.setEffectifInitial(effectif);
         lot.setEffectifActuel(effectif);
         lot.setPoidsMoyenInitial(poidsMoyen.doubleValue());
@@ -296,9 +293,8 @@ public class AchatAlevinService {
         if(form.getPrixUnitaire() == null || form.getPrixUnitaire().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Le prix unitaire doit exister.");
         }
-        if(form.getMontantTotal() == null || form.getMontantTotal().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Le montant total doit exister.");
-        }
+        // Le montant total soumis (champ calculé côté JS) n'est pas validé ici : le service
+        // recalcule lui-même le montant à partir de l'effectif et du prix unitaire.
     }
 
     private String blankToNull(String value) {
