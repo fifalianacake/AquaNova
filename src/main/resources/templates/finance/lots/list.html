@@ -1,99 +1,79 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Analyse du coût de revient par lot</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background: #f4f4f4; }
-        .filter-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
-        .filter-row label { display: flex; flex-direction: column; font-size: 0.9rem; }
-    </style>
 </head>
 <body>
-<h1>Analyse du coût de revient par lot</h1>
-<nav>
-    <a th:href="@{/lots}">Retour aux lots</a>
-</nav>
+<main>
 
-<form method="get" th:action="@{/finance/lots}">
-    <div class="filter-row">
-        <label>Id
-            <input type="number" name="id" th:value="${lotFilter.id}" />
-        </label>
-        <label>Code
-            <input type="text" name="code" th:value="${lotFilter.code}" />
-        </label>
-        <label>Date début
-            <input type="date" name="dateFrom" th:value="${lotFilter.dateFrom}" />
-        </label>
-        <label>Date fin
-            <input type="date" name="dateTo" th:value="${lotFilter.dateTo}" />
-        </label>
-        <label>Effectif min
-            <input type="number" name="effectifMin" th:value="${lotFilter.effectifMin}" />
-        </label>
-        <label>Effectif max
-            <input type="number" name="effectifMax" th:value="${lotFilter.effectifMax}" />
-        </label>
+    <div class="panel">
+        <div class="panel-header d-flex justify-content-between align-items-center">
+            <h5>Analyse du coût de revient par lot</h5>
+        </div>
+
+        <form method="get" th:action="@{/finance/lots}" class="filters-bar">
+            <input type="hidden" name="page" value="0" />
+            <input class="form-control fc-sm" type="number" name="id" placeholder="ID" th:value="${lotFilter.id}">
+            <input class="form-control" type="text" name="code" placeholder="Code du lot" th:value="${lotFilter.code}">
+            <div class="input-group">
+                <span class="input-group-text">Du</span>
+                <input class="form-control" type="date" name="dateFrom" th:value="${lotFilter.dateFrom}">
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Au</span>
+                <input class="form-control" type="date" name="dateTo" th:value="${lotFilter.dateTo}">
+            </div>
+            <input class="form-control fc-sm" type="number" name="effectifMin" placeholder="Eff. min" th:value="${lotFilter.effectifMin}">
+            <input class="form-control fc-sm" type="number" name="effectifMax" placeholder="Eff. max" th:value="${lotFilter.effectifMax}">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+            <a class="btn btn-outline-secondary" th:href="@{/finance/lots}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Code</th>
+                    <th>Espèce</th>
+                    <th>Bassin</th>
+                    <th>Statut</th>
+                    <th>Date mise en charge</th>
+                    <th class="text-end">Effectif actuel</th>
+                    <th class="text-end">Total achats</th>
+                    <th class="text-end">Total alimentation</th>
+                    <th class="text-end">Total dépenses</th>
+                    <th class="text-end">Total poids récolté</th>
+                    <th class="text-end">Coût / kg</th>
+                    <th class="text-end">Coût / individu</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="lot : ${lots}">
+                    <td th:text="${lot.lotId}"></td>
+                    <td class="fw-semibold" th:text="${lot.lotCode}"></td>
+                    <td th:text="${lot.espece}"></td>
+                    <td th:text="${lot.bassin}"></td>
+                    <td th:text="${lot.statut}"></td>
+                    <td th:text="${lot.dateMiseEnCharge}"></td>
+                    <td class="text-end" th:text="${lot.effectifActuel}"></td>
+                    <td class="text-end" th:text="${lot.totalAchat}"></td>
+                    <td class="text-end" th:text="${lot.totalDistribution}"></td>
+                    <td class="text-end" th:text="${lot.totalDepenses}"></td>
+                    <td class="text-end" th:text="${lot.totalPoidsRecolte}"></td>
+                    <td class="text-end" th:text="${lot.coutRevientParKg}"></td>
+                    <td class="text-end" th:text="${lot.coutRevientParIndividu}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(lots)}">
+                    <td colspan="13" class="text-center text-secondary py-4">Aucun lot trouvé.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:replace="~{fragments/tableau :: tableFooter(${page})}"></div>
     </div>
-    <div>
-        <button type="submit">Filtrer</button>
-        <a th:href="@{/finance/lots}">Réinitialiser</a>
-    </div>
-</form>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Code</th>
-        <th>Espèce</th>
-        <th>Bassin</th>
-        <th>Statut</th>
-        <th>Date mise en charge</th>
-        <th>Effectif actuel</th>
-        <th>Total achats</th>
-        <th>Total distribution</th>
-        <th>Total poids récolté</th>
-        <th>Coût / kg</th>
-        <th>Coût / individu</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="lot : ${lots}">
-        <td th:text="${lot.lotId}"></td>
-        <td th:text="${lot.lotCode}"></td>
-        <td th:text="${lot.espece}"></td>
-        <td th:text="${lot.bassin}"></td>
-        <td th:text="${lot.statut}"></td>
-        <td th:text="${lot.dateMiseEnCharge}"></td>
-        <td th:text="${lot.effectifActuel}"></td>
-        <td th:text="${lot.totalAchat}"></td>
-        <td th:text="${lot.totalDistribution}"></td>
-        <td th:text="${lot.totalPoidsRecolte}"></td>
-        <td th:text="${lot.coutRevientParKg}"></td>
-        <td th:text="${lot.coutRevientParIndividu}"></td>
-    </tr>
-    <tr th:if="${#lists.isEmpty(lots)}">
-        <td colspan="12">Aucun lot trouvé.</td>
-    </tr>
-    </tbody>
-</table>
-
-<div th:if="${totalPages > 0}" style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
-    <span th:if="${hasPrevious}">
-        <a th:href="@{/finance/lots(page=${currentPage - 1}, id=${lotFilter.id}, code=${lotFilter.code}, dateFrom=${lotFilter.dateFrom}, dateTo=${lotFilter.dateTo}, effectifMin=${lotFilter.effectifMin}, effectifMax=${lotFilter.effectifMax})}">&laquo; Précédent</a>
-    </span>
-    <span th:unless="${hasPrevious}" style="color: #999;">&laquo; Précédent</span>
-
-    <span th:text="'Page ' + (${currentPage} + 1) + ' sur ' + ${totalPages}"></span>
-
-    <span th:if="${hasNext}">
-        <a th:href="@{/finance/lots(page=${currentPage + 1}, id=${lotFilter.id}, code=${lotFilter.code}, dateFrom=${lotFilter.dateFrom}, dateTo=${lotFilter.dateTo}, effectifMin=${lotFilter.effectifMin}, effectifMax=${lotFilter.effectifMax})}">Suivant &raquo;</a>
-    </span>
-    <span th:unless="${hasNext}" style="color: #999;">Suivant &raquo;</span>
-</div>
+</main>
 </body>
 </html>

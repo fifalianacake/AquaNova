@@ -8,4 +8,5 @@ import mg.itu.aquanova.achat.models.LigneAchat;
 
 public interface LigneAchatRepository extends JpaRepository<LigneAchat, Long> {
     List<LigneAchat> findByAchatId(Long achatId);
+    List<LigneAchat> findByLotId(Long lotId);
 }
