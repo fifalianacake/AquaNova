@@ -23,7 +23,7 @@ import mg.itu.aquanova.achat.repositories.CategorieDepenseRepository;
 import mg.itu.aquanova.achat.repositories.FournisseurRepository;
 import mg.itu.aquanova.alimentation.models.MouvementStock;
 import mg.itu.aquanova.alimentation.models.TypeMouvement;
-import mg.itu.aquanova.alimentation.repositories.MouvementStockRepository;
+import mg.itu.aquanova.alimentation.services.MouvementService;
 import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 
@@ -34,19 +34,19 @@ public class AchatProvendeService {
     private final FournisseurRepository fournisseurRepository;
     private final CategorieDepenseRepository categorieDepenseRepository;
     private final AlimentRepository alimentRepository;
-    private final MouvementStockRepository mouvementRepository;
+    private final MouvementService mouvementService;
 
     public AchatProvendeService(
             AchatRepository achatRepository,
             FournisseurRepository fournisseurRepository,
             CategorieDepenseRepository categorieDepenseRepository,
             AlimentRepository alimentRepository,
-            MouvementStockRepository mouvementRepository) {
+            MouvementService mouvementService) {
         this.achatRepository = achatRepository;
         this.fournisseurRepository = fournisseurRepository;
         this.categorieDepenseRepository = categorieDepenseRepository;
         this.alimentRepository = alimentRepository;
-        this.mouvementRepository = mouvementRepository;
+        this.mouvementService = mouvementService;
     }
 
     public Achat trouverParId(Long id) {
@@ -193,7 +193,7 @@ public class AchatProvendeService {
         mouvement.setTypeMouvement(TypeMouvement.ENTREE);
         mouvement.setQuantite(ligne.getQuantite().doubleValue());
         mouvement.setCommentaire("Entrée automatique suite à la validation de l'achat provende #" + achat.getId());
-        mouvementRepository.save(mouvement);
+        mouvementService.create(mouvement);
     }
 
     @Transactional
