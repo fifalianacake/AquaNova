@@ -30,7 +30,6 @@ public class CoutRevientService {
     private final LigneAchatRepository ligneAchatRepository;
     private final DistributionRepository distributionRepository;
     private final MouvementStockRepository mouvementStockRepository;
-    private final mg.itu.aquanova.achat.repositories.DepenseRepository depenseRepository;
     private final RecoltesRepository recoltesRepository;
 
     public CoutRevientService(
@@ -38,13 +37,11 @@ public class CoutRevientService {
             LigneAchatRepository ligneAchatRepository,
             DistributionRepository distributionRepository,
             MouvementStockRepository mouvementStockRepository,
-            mg.itu.aquanova.achat.repositories.DepenseRepository depenseRepository,
             RecoltesRepository recoltesRepository) {
         this.lotService = lotService;
         this.ligneAchatRepository = ligneAchatRepository;
         this.distributionRepository = distributionRepository;
         this.mouvementStockRepository = mouvementStockRepository;
-        this.depenseRepository = depenseRepository;
         this.recoltesRepository = recoltesRepository;
     }
 
@@ -68,15 +65,13 @@ public class CoutRevientService {
 
         BigDecimal totalAchat = calculerTotalAchatPourLot(lot.getId());
         BigDecimal totalAlimentation = calculerTotalAlimentationPourLot(lot.getId());
-        BigDecimal totalDepensesImputees = calculerTotalDepensesImputeesPourLot(lot);
         BigDecimal totalPoidsRecolte = calculerTotalPoidsRecoltePourLot(lot.getId());
 
         dto.setTotalAchat(totalAchat);
         dto.setTotalDistribution(totalAlimentation);
         dto.setTotalPoidsRecolte(totalPoidsRecolte);
-        dto.setTotalDepenses(totalDepensesImputees);
 
-        BigDecimal baseCout = totalAchat.add(totalAlimentation).add(totalDepensesImputees);
+        BigDecimal baseCout = totalAchat.add(totalAlimentation);
         if (totalPoidsRecolte != null && totalPoidsRecolte.signum() > 0) {
             dto.setCoutRevientParKg(baseCout.divide(totalPoidsRecolte, 2, RoundingMode.HALF_UP));
         } else {
@@ -149,19 +144,6 @@ public class CoutRevientService {
         }).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private BigDecimal calculerTotalDepensesImputeesPourLot(LotModels lot) {
-        if (lot == null) return BigDecimal.ZERO;
-        String code = lot.getCode() != null ? lot.getCode().toLowerCase() : null;
-        List<mg.itu.aquanova.achat.models.Depense> depenses = depenseRepository.findAll();
-        return depenses.stream().filter(d -> {
-            if (code == null) return false;
-            if (d.getReference() != null && d.getReference().toLowerCase().contains(code)) return true;
-            if (d.getObservation() != null && d.getObservation().toLowerCase().contains(code)) return true;
-            if (d.getLibelle() != null && d.getLibelle().toLowerCase().contains(code)) return true;
-            return false;
-        }).map(d -> d.getMontant() != null ? d.getMontant() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 
     private BigDecimal calculerTotalPoidsRecoltePourLot(Long lotId) {
         if (lotId == null) {

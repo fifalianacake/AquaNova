@@ -14,7 +14,6 @@ public class CoutRevientLotDTO {
     private Integer effectifActuel;
     private BigDecimal totalAchat;
     private BigDecimal totalDistribution;
-    private BigDecimal totalDepenses;
     private BigDecimal totalPoidsRecolte;
     private BigDecimal coutRevientParKg;
     private BigDecimal coutRevientParIndividu;
@@ -22,7 +21,6 @@ public class CoutRevientLotDTO {
     public CoutRevientLotDTO() {
         this.totalAchat = BigDecimal.ZERO;
         this.totalDistribution = BigDecimal.ZERO;
-        this.totalDepenses = BigDecimal.ZERO;
         this.totalPoidsRecolte = BigDecimal.ZERO;
         this.coutRevientParKg = BigDecimal.ZERO;
         this.coutRevientParIndividu = BigDecimal.ZERO;
@@ -98,14 +96,6 @@ public class CoutRevientLotDTO {
 
     public void setTotalDistribution(BigDecimal totalDistribution) {
         this.totalDistribution = totalDistribution;
-    }
-
-    public BigDecimal getTotalDepenses() {
-        return totalDepenses;
-    }
-
-    public void setTotalDepenses(BigDecimal totalDepenses) {
-        this.totalDepenses = totalDepenses;
     }
 
     public BigDecimal getTotalPoidsRecolte() {
