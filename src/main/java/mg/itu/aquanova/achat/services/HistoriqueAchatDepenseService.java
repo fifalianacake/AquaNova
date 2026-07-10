@@ -14,6 +14,7 @@ import mg.itu.aquanova.achat.dto.HistoriqueAchatDepenseFilter;
 import mg.itu.aquanova.achat.dto.TypeOperation;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.Depense;
+import mg.itu.aquanova.achat.models.StatutAchat;
 import mg.itu.aquanova.achat.repositories.AchatRepository;
 import mg.itu.aquanova.achat.repositories.DepenseRepository;
 
@@ -94,7 +95,7 @@ public class HistoriqueAchatDepenseService {
 
     private Specification<Achat> specificationAchats(HistoriqueAchatDepenseFilter filter) {
         return (root, query, cb) -> {
-            var predicates = cb.conjunction();
+            var predicates = cb.equal(root.get("statutAchat"), StatutAchat.VALIDE);
 
             if (filter == null) {
                 return predicates;

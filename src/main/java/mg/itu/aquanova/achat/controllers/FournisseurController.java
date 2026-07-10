@@ -86,6 +86,17 @@ public class FournisseurController {
     }
 
     
+    @PostMapping("/fournisseurs/{id}/desactiver")
+    public String desactiverFournisseur(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        try {
+            service.desactiver(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Fournisseur désactivé.");
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/fournisseurs";
+    }
+
     @GetMapping("/fournisseurs/{id}/edit")
     public String modifierFournisseurForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
