@@ -2,6 +2,7 @@ package mg.itu.aquanova.finance.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,17 +24,13 @@ public class FinanceController {
     }
 
     @GetMapping("/lots")
-    public String listerLotsAvecCout(
+        public String listerLotsAvecCout(
+            @PageableDefault(size = 10, page = 0, sort = "id") Pageable pageable,
             @ModelAttribute("lotFilter") LotFilter lotFilter,
-            Pageable pageable,
             Model model) {
         Page<CoutRevientLotDTO> page = coutRevientService.listerLotsAvecCout(lotFilter, pageable);
-        model.addAttribute("lots", page.getContent());
         model.addAttribute("page", page);
-        model.addAttribute("currentPage", page.getNumber());
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("hasPrevious", page.hasPrevious());
-        model.addAttribute("hasNext", page.hasNext());
+        model.addAttribute("lots", page.getContent());
         model.addAttribute("lotFilter", lotFilter);
         return "finance/lots/list";
     }
