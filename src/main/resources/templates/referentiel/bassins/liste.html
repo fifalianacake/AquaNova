@@ -5,49 +5,53 @@
 </head>
 <body>
 <main>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Référentiel des Bassins / Happas</h2>
-        <div>
-            <a th:href="@{/types-bassins}" class="btn btn-outline-secondary">Gérer les Types</a>
-            <a th:href="@{/bassins/new}" class="btn btn-primary">Ajouter un Bassin</a>
-        </div>
+
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/bassins/new}"><i class="bi bi-plus-lg"></i> Ajouter un bassin</a>
+    <a class="btn btn-outline-primary" th:href="@{/types-bassins}">Gérer les types</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Référentiel des bassins / happas</h5>
+        <span class="result-count" th:text="${#lists.size(bassins)} + ' bassin(s)'"></span>
     </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Référence</th>
                 <th>Type</th>
-                <th>Capacité (m³)</th>
+                <th class="text-end">Capacité (m³)</th>
                 <th>Statut</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="b : ${bassins}">
-                <td th:text="${b.id}">1</td>
-                <td th:text="${b.reference}">BASSIN-01</td>
-                <td th:text="${b.typeBassin.libelle}">Happa</td>
-                <td th:text="${b.capaciteM3}">50.0</td>
+                <td th:text="${b.id}"></td>
+                <td class="fw-semibold" th:text="${b.reference}"></td>
+                <td th:text="${b.typeBassin.libelle}"></td>
+                <td class="text-end" th:text="${b.capaciteM3}"></td>
                 <td>
                     <span th:text="${b.statut.libelle}"
-                        th:classappend="${b.statut.libelle == T(mg.itu.aquanova.referentiel.models.LibelleStatutBassin).LIBRE ? 'badge bg-success' : (b.statut.libelle == T(mg.itu.aquanova.referentiel.models.LibelleStatutBassin).OCCUPE ? 'badge bg-warning text-dark' : 'badge bg-danger')}">
-                        Libre
-                    </span>
+                          th:classappend="${b.statut.libelle == T(mg.itu.aquanova.referentiel.models.LibelleStatutBassin).LIBRE ? 'badge bg-success' : (b.statut.libelle == T(mg.itu.aquanova.referentiel.models.LibelleStatutBassin).OCCUPE ? 'badge bg-warning text-dark' : 'badge bg-danger')}"></span>
                 </td>
-                <td>
-                    <a th:href="@{/bassins/{id}/edit(id=${b.id})}"
-                        class="btn btn-sm btn-outline-primary">Modifier</a>
-                    <a th:href="@{/bassins/{id}/delete(id=${b.id})}" class="btn btn-sm btn-danger"
-                        onclick="return confirm('Voulez-vous supprimer ce bassin ?')">Supprimer</a>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/bassins/{id}/edit(id=${b.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/bassins/{id}/delete(id=${b.id})}" title="Supprimer"
+                       onclick="return confirm('Voulez-vous supprimer ce bassin ?')"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(bassins)}">
-                <td colspan="6" class="text-center">Aucun bassin enregistré.</td>
+                <td colspan="6" class="text-center text-secondary py-4">Aucun bassin enregistré.</td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

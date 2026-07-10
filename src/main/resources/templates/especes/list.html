@@ -5,30 +5,46 @@
 </head>
 <body>
 <main>
-<h2>Liste des espèces</h2>
 
-<a class="btn btn-primary" href="/especes/new">Ajouter</a>
+<div class="toolbar">
+    <a class="btn btn-primary" href="/especes/new"><i class="bi bi-plus-lg"></i> Ajouter une espèce</a>
+</div>
 
-<table class="table table-hover align-middle">
-    <tr>
-        <th>ID</th>
-        <th>Nom</th>
-        <th>Poids</th>
-        <th>Image</th>
-        <th>Actions</th>
-    </tr>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des espèces</h5>
+        <span class="result-count" th:text="${#lists.size(especes)} + ' espèce(s)'"></span>
+    </div>
 
-    <tr th:each="e : ${especes}">
-        <td th:text="${e.id}"></td>
-        <td th:text="${e.nom}"></td>
-        <td th:text="${e.poidsCibleMoyen}"></td>
-        <td th:text="${e.image}"></td>
-        <td>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/especes/{id}(id=${e.id})}">Edit</a>
-            <a class="btn btn-sm btn-outline-danger" th:href="@{/especes/{id}/delete(id=${e.id})}">Delete</a>
-        </td>
-    </tr>
-</table>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th class="text-end">Poids</th>
+                <th>Image</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${especes}">
+                <td th:text="${e.id}"></td>
+                <td class="fw-semibold" th:text="${e.nom}"></td>
+                <td class="text-end" th:text="${e.poidsCibleMoyen}"></td>
+                <td th:text="${e.image}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/especes/{id}(id=${e.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/especes/{id}/delete(id=${e.id})}" title="Supprimer"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(especes)}">
+                <td colspan="5" class="text-center text-secondary py-4">Aucune espèce enregistrée.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

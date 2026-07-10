@@ -5,40 +5,45 @@
 </head>
 <body>
 <main>
-    <h1>Liste des Rôles</h1>
 
-    <p class="error" th:if="${error}" th:text="${error}"></p>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/roles/new}"><i class="bi bi-plus-lg"></i> Ajouter un rôle</a>
+    <a class="btn btn-outline-primary" th:href="@{/users}">Retour à la liste des utilisateurs</a>
+</div>
 
-    <a class="btn btn-primary" th:href="@{/roles/new}"> Ajouter un nouveau rôle</a>
-    <br><br>
+<p class="error" th:if="${error}" th:text="${error}"></p>
 
-    <table class="table table-hover align-middle">
-        <thead>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des rôles</h5>
+        <span class="result-count" th:text="${#lists.size(roles)} + ' rôle(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
-                <th>Nom du Rôle</th>
-                <th>Actions</th>
+                <th>Nom du rôle</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="role : ${roles}">
-                <td th:text="${role.id}">1</td>
-                <td th:text="${role.name}">ROLE_ADMIN</td>
-                <td>
-                    <a class="btn btn-sm btn-outline-danger" th:href="@{/roles/{id}/delete(id=${role.id})}"
-                        onclick="return confirm('Êtes-vous sur de vouloir supprimer ce rôle ?');">
-                        Supprimer
-                    </a>
+                <td th:text="${role.id}"></td>
+                <td class="fw-semibold" th:text="${role.name}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/roles/{id}/delete(id=${role.id})}" title="Supprimer"
+                       onclick="return confirm('Êtes-vous sur de vouloir supprimer ce rôle ?');"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(roles)}">
-                <td class="text-center" colspan="3">Aucun rôle trouve.</td>
+                <td colspan="3" class="text-center text-secondary py-4">Aucun rôle trouve.</td>
             </tr>
-        </tbody>
-    </table>
-
-    <br>
-    <a class="btn btn-secondary" th:href="@{/users}">Retour à la liste des utilisateurs</a>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

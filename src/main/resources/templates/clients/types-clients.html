@@ -5,28 +5,39 @@
 </head>
 <body>
 <main>
-    
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Types de Clients</h2>
-        <a th:href="@{/clients}" class="btn btn-secondary">Retour aux clients</a>
+
+<div class="toolbar">
+    <a class="btn btn-outline-primary" th:href="@{/clients}">Retour aux clients</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Types de clients</h5>
+        <span class="result-count" th:text="${#lists.size(types)} + ' type(s)'"></span>
     </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
-                <th>Code Interne</th>
+                <th>Code interne</th>
                 <th>Libellé de la catégorie</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="t : ${types}">
                 <td th:text="${t.id}"></td>
                 <td th:text="${t.code}"></td>
-                <td th:text="${t.libelle}"></td>
+                <td class="fw-semibold" th:text="${t.libelle}"></td>
             </tr>
-        </tbody>
-    </table>
+            <tr th:if="${#lists.isEmpty(types)}">
+                <td colspan="3" class="text-center text-secondary py-4">Aucun type de client enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

@@ -5,40 +5,45 @@
 </head>
 <body>
 <main>
-    <h1>Liste des Rôles par Utilisateur</h1>
 
-    <a th:href="@{/user-roles/new}">Affecter un rôle à un utilisateur</a>
-    <br><br>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/user-roles/new}"><i class="bi bi-plus-lg"></i> Affecter un rôle à un utilisateur</a>
+    <a class="btn btn-outline-primary" th:href="@{/users}">Retour à la liste des utilisateurs</a>
+</div>
 
-    <table class="table table-hover align-middle">
-        <thead>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des rôles par utilisateur</h5>
+        <span class="result-count" th:text="${#lists.size(userRoles)} + ' affectation(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Utilisateur (Email)</th>
                 <th>Rôle Assigne</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="ur : ${userRoles}">
-                <td th:text="${ur.id}">1</td>
-                <td th:text="${ur.user.email}">user@exemple.com</td>
-                <td th:text="${ur.role.name}">ROLE_USER</td>
-                <td>
-                    <a th:href="@{/user-roles/{id}/delete(id=${ur.id})}"
-                        onclick="return confirm('Retirer ce rôle à l\'utilisateur ?');">
-                        Retirer le rôle
-                    </a>
+                <td th:text="${ur.id}"></td>
+                <td class="fw-semibold" th:text="${ur.user.email}"></td>
+                <td th:text="${ur.role.name}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/user-roles/{id}/delete(id=${ur.id})}" title="Retirer le rôle"
+                       onclick="return confirm('Retirer ce rôle à l\'utilisateur ?');"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(userRoles)}">
-                <td class="text-center" colspan="4">Aucune affectation trouvee.</td>
+                <td colspan="4" class="text-center text-secondary py-4">Aucune affectation trouvee.</td>
             </tr>
-        </tbody>
-    </table>
-
-    <br>
-    <a class="btn btn-secondary" th:href="@{/users}">Retour à la liste des utilisateurs</a>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

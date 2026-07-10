@@ -20,23 +20,32 @@
         </div>
     </form>
 
-    <table class="table table-hover align-middle">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Libellé</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:if="${#lists.isEmpty(types)}">
-                <td colspan="2">Aucun type d'équipement trouvé.</td>
-            </tr>
-            <tr th:each="type : ${types}">
-                <td th:text="${type.id}"></td>
-                <td th:text="${type.libelle}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="panel">
+        <div class="panel-header">
+            <h5>Types d'équipements</h5>
+            <span class="result-count" th:text="${#lists.size(types)} + ' type(s)'"></span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Libellé</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="type : ${types}">
+                    <td th:text="${type.id}"></td>
+                    <td class="fw-semibold" th:text="${type.libelle}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(types)}">
+                    <td colspan="2" class="text-center text-secondary py-4">Aucun type d'équipement trouvé.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </main>
 </body>
 </html>

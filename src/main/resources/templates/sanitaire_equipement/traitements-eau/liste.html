@@ -5,56 +5,74 @@
 </head>
 <body>
 <main>
-    <div>
-        <a class="btn btn-primary" th:href="@{/traitements-eau/new}">Saisir un traitement</a>
-        <h2>Traitements de l'Eau Appliqués</h2>
+
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/traitements-eau/new}"><i class="bi bi-plus-lg"></i> Saisir un traitement</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Traitements de l'eau appliqués</h5>
+        <span class="result-count" th:text="${#lists.size(traitements)} + ' traitement(s)'"></span>
     </div>
 
-    <div>
-        <form th:action="@{/traitements-eau}" method="get">
-            <input class="form-control" type="number" name="id" placeholder="id" th:value="${currentId}">
-            <select class="form-select" name="bassinId">
-                <option value="">-- bassin --</option>
-                <option th:each="b : ${bassins}"
-                        th:value="${b.id}"
-                        th:text="${b.reference}"
-                        th:selected="${b.id == currentBassinId}"></option>
-            </select>
-            <select class="form-select" name="typeId">
-                <option value="">-- type traitement --</option>
-                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}" th:selected="${t.id == currentTypeId}"></option>
-            </select>
+    <form th:action="@{/traitements-eau}" method="get" class="filters-bar">
+        <input class="form-control" type="number" name="id" placeholder="ID" th:value="${currentId}">
+        <select class="form-select" name="bassinId">
+            <option value="">Tous les bassins</option>
+            <option th:each="b : ${bassins}"
+                    th:value="${b.id}"
+                    th:text="${b.reference}"
+                    th:selected="${b.id == currentBassinId}"></option>
+        </select>
+        <select class="form-select" name="typeId">
+            <option value="">Tous les types</option>
+            <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}" th:selected="${t.id == currentTypeId}"></option>
+        </select>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
             <input class="form-control" type="date" name="debut" th:value="${currentDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
             <input class="form-control" type="date" name="fin" th:value="${currentFin}">
-            <button class="btn btn-primary" type="submit">Filtrer</button>
-        </form>
-    </div>
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/traitements-eau}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
 
-    <table class="table table-hover align-middle">
-        <thead>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
-                <th>id</th>
-                <th>date</th>
-                <th>bassin</th>
-                <th>type traitement</th>
-                <th>détail</th>
-                <th>utilisateur</th>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Bassin</th>
+                <th>Type traitement</th>
+                <th>Détail</th>
+                <th>Utilisateur</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
-            <tr th:each="t : ${traitements}" th:onclick="|window.location.href='@{/traitements-eau/}' + ${t.id}|">
+            </thead>
+            <tbody>
+            <tr th:each="t : ${traitements}">
                 <td th:text="${t.id}"></td>
                 <td th:text="${t.dateTraitement}"></td>
-                <td th:text="${t.bassin != null ? t.bassin.reference : 'N/A'}"></td>
-                <td><strong th:text="${t.typeTraitementEau.libelle}"></strong></td>
+                <td class="fw-semibold" th:text="${t.bassin != null ? t.bassin.reference : 'N/A'}"></td>
+                <td th:text="${t.typeTraitementEau.libelle}"></td>
                 <td th:text="${t.detail}"></td>
                 <td th:text="${t.utilisateur != null ? t.utilisateur.name : 'Utilisateur'}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/traitements-eau/' + ${t.id}}" title="Voir"><i class="bi bi-eye"></i></a>
+                </td>
             </tr>
             <tr th:if="${#lists.isEmpty(traitements)}">
-                <td colspan="6">Aucun traitement trouvé pour ces critères.</td>
+                <td colspan="7" class="text-center text-secondary py-4">Aucun traitement trouvé pour ces critères.</td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

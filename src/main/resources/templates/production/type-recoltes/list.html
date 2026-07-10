@@ -5,39 +5,47 @@
 </head>
 <body>
 <main>
-<h1>Types de récolte</h1>
 
-<div>
-    <a class="btn btn-primary" th:href="@{/types-recoltes/new}">Créer un type de récolte</a>
-    <a class="btn btn-secondary" th:href="@{/recoltes}">Retour aux récoltes</a>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/types-recoltes/new}"><i class="bi bi-plus-lg"></i> Créer un type de récolte</a>
+    <a class="btn btn-outline-primary" th:href="@{/recoltes}">Retour aux récoltes</a>
 </div>
 
-<table class="table table-hover align-middle">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Libellé</th>
-        <th>Description</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="type : ${types}">
-        <td th:text="${type.id}"></td>
-        <td th:text="${type.libelle}"></td>
-        <td th:text="${type.description}"></td>
-        <td>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/types-recoltes/{id}(id=${type.id})}">Voir</a>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/types-recoltes/{id}/edit(id=${type.id})}">Modifier</a>
-            <a class="btn btn-sm btn-outline-danger" th:href="@{/types-recoltes/{id}/delete(id=${type.id})}"
-               onclick="return confirm('Supprimer ce type de récolte ?')">Supprimer</a>
-        </td>
-    </tr>
-    <tr th:if="${#lists.isEmpty(types)}">
-        <td colspan="4">Aucun type de récolte enregistré.</td>
-    </tr>
-    </tbody>
-</table>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Types de récolte</h5>
+        <span class="result-count" th:text="${#lists.size(types)} + ' type(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Libellé</th>
+                <th>Description</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="type : ${types}">
+                <td th:text="${type.id}"></td>
+                <td class="fw-semibold" th:text="${type.libelle}"></td>
+                <td th:text="${type.description}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-recoltes/{id}(id=${type.id})}" title="Voir"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-recoltes/{id}/edit(id=${type.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/types-recoltes/{id}/delete(id=${type.id})}" title="Supprimer"
+                       onclick="return confirm('Supprimer ce type de récolte ?')"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(types)}">
+                <td colspan="4" class="text-center text-secondary py-4">Aucun type de récolte enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

@@ -5,42 +5,53 @@
 </head>
 <body>
 <main>
-    <h1>Liste des transferts</h1>
 
-    <p>
-        <a class="btn btn-primary" th:href="@{/transferts/new}">Creer un nouveau transfert</a>
-    </p>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/transferts/new}"><i class="bi bi-plus-lg"></i> Créer un transfert</a>
+</div>
 
-    <table class="table table-hover align-middle">
-        <thead>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des transferts</h5>
+        <span class="result-count" th:text="${#lists.size(transferts)} + ' transfert(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Date de transfert</th>
-                <th>Effectif</th>
-                <th>Poids moyen</th>
+                <th class="text-end">Effectif</th>
+                <th class="text-end">Poids moyen</th>
                 <th>Lot source</th>
                 <th>Lot destination</th>
                 <th>Bassin source</th>
                 <th>Bassin destination</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="transfert : ${transferts}">
                 <td th:text="${transfert.id}"></td>
                 <td th:text="${transfert.dateTransfert}"></td>
-                <td th:text="${transfert.effectif}"></td>
-                <td th:text="${transfert.poidsMoyen}"></td>
-                <td th:text="${transfert.lotSource != null ? transfert.lotSource.code : '-'}"></td>
-                <td th:text="${transfert.lotDestination != null ? transfert.lotDestination.code : '-'}"></td>
+                <td class="text-end" th:text="${transfert.effectif}"></td>
+                <td class="text-end" th:text="${transfert.poidsMoyen}"></td>
+                <td class="fw-semibold" th:text="${transfert.lotSource != null ? transfert.lotSource.code : '-'}"></td>
+                <td class="fw-semibold" th:text="${transfert.lotDestination != null ? transfert.lotDestination.code : '-'}"></td>
                 <td th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></td>
                 <td th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></td>
-                <td>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/transferts/' + ${transfert.id}}">Voir</a>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/transferts/' + ${transfert.id}}" title="Voir"><i class="bi bi-eye"></i></a>
                 </td>
             </tr>
-        </tbody>
-    </table>
+            <tr th:if="${#lists.isEmpty(transferts)}">
+                <td colspan="9" class="text-center text-secondary py-4">Aucun transfert enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

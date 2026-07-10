@@ -5,45 +5,50 @@
 </head>
 <body>
 <main>
-    <h2>Gestion des Aliments</h2>
 
-    <p>
-        <a class="btn btn-primary" th:href="@{/aliments/new}">+ Créer un nouvel aliment</a>
-    </p>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/aliments/new}"><i class="bi bi-plus-lg"></i> Créer un aliment</a>
+</div>
 
-    <form th:action="@{/aliments}" method="get">
-        <label class="form-label" for="search">Rechercher par nom :</label>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Gestion des aliments</h5>
+        <span class="result-count" th:text="${#lists.size(aliments)} + ' aliment(s)'"></span>
+    </div>
+
+    <form th:action="@{/aliments}" method="get" class="filters-bar">
         <input class="form-control" type="text" id="search" name="q" th:value="${q}" placeholder="Nom de l'aliment..." />
-        <button class="btn btn-primary" type="submit">Rechercher</button>
-        <a class="btn btn-secondary" th:if="${q != null}" th:href="@{/aliments}">Annuler la recherche</a>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/aliments}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
     </form>
 
-    <br/>
-
-    <table class="table table-hover align-middle">
-        <thead>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
-            <tr th:if="${#lists.isEmpty(aliments)}">
-                <td colspan="3">Aucun aliment trouvé.</td>
-            </tr>
+            </thead>
+            <tbody>
             <tr th:each="aliment : ${aliments}">
-                <td th:text="${aliment.id}">1</td>
-                <td th:text="${aliment.nom}">Exemple Aliment</td>
-                <td>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}(id=${aliment.id})}">Voir</a> | 
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}/edit(id=${aliment.id})}">Modifier</a> | 
-                    <a class="btn btn-sm btn-outline-danger" th:href="@{/aliments/{id}/delete(id=${aliment.id})}"
-                       th:onclick="return confirm('Supprimer cet aliment ?');">Supprimer</a>
+                <td th:text="${aliment.id}"></td>
+                <td class="fw-semibold" th:text="${aliment.nom}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}(id=${aliment.id})}" title="Voir"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}/edit(id=${aliment.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/aliments/{id}/delete(id=${aliment.id})}" title="Supprimer"
+                       onclick="return confirm('Supprimer cet aliment ?');"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
-        </tbody>
-    </table>
+            <tr th:if="${#lists.isEmpty(aliments)}">
+                <td colspan="3" class="text-center text-secondary py-4">Aucun aliment trouvé.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

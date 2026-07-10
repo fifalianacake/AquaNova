@@ -29,7 +29,12 @@ import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenance;
 import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenanceEnum;
 import mg.itu.aquanova.sanitaire_equipement.repositories.CategorieMaintenanceRepository;
 import mg.itu.aquanova.security.models.RoleModels;
+import mg.itu.aquanova.security.models.User;
+import mg.itu.aquanova.security.models.UserRoleModels;
 import mg.itu.aquanova.security.repositories.RoleRepository;
+import mg.itu.aquanova.security.repositories.UserRepository;
+import mg.itu.aquanova.security.repositories.UserRoleRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import mg.itu.aquanova.vente.models.StatutVente;
 import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.models.TypeClient;
@@ -97,7 +102,13 @@ public class ReferenceDataSeeder implements CommandLineRunner {
             CategorieMaintenanceEnum.NETTOYAGE, "Operation de nettoyage",
             CategorieMaintenanceEnum.REPARATION, "Operation de reparation");
 
+    private static final String ADMIN_EMAIL = "admin@aquanova.mg";
+    private static final String ADMIN_MOT_DE_PASSE = "admin123";
+
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final TypeBassinRepository typeBassinRepository;
     private final TypeAlimentRepository typeAlimentRepository;
     private final StatutBassinRepository statutBassinRepository;
@@ -111,6 +122,9 @@ public class ReferenceDataSeeder implements CommandLineRunner {
 
     public ReferenceDataSeeder(
             RoleRepository roleRepository,
+            UserRepository userRepository,
+            UserRoleRepository userRoleRepository,
+            PasswordEncoder passwordEncoder,
             TypeBassinRepository typeBassinRepository,
             TypeAlimentRepository typeAlimentRepository,
             StatutBassinRepository statutBassinRepository,
@@ -122,6 +136,9 @@ public class ReferenceDataSeeder implements CommandLineRunner {
             CategorieMaintenanceRepository categorieMaintenanceRepository,
             StadeCroissanceRepository stadeCroissanceRepository) {
         this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.passwordEncoder = passwordEncoder;
         this.typeBassinRepository = typeBassinRepository;
         this.typeAlimentRepository = typeAlimentRepository;
         this.statutBassinRepository = statutBassinRepository;
@@ -138,6 +155,7 @@ public class ReferenceDataSeeder implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         seedRoles();
+        seedAdminParDefaut();
         seedTypesBassin();
         seedTypesAliment();
         seedStatutsBassin();
@@ -156,6 +174,29 @@ public class ReferenceDataSeeder implements CommandLineRunner {
                 roleRepository.save(new RoleModels(role));
             }
         }
+    }
+
+    /**
+     * Compte administrateur par défaut (pré-rempli sur la page de connexion).
+     * Créé uniquement s'il n'existe pas encore ; le mot de passe n'est jamais
+     * réécrit sur un compte existant.
+     */
+    private void seedAdminParDefaut() {
+        if (userRepository.findByEmail(ADMIN_EMAIL) != null) {
+            return;
+        }
+
+        User admin = new User(
+                "Admin",
+                "AquaNova",
+                ADMIN_EMAIL,
+                passwordEncoder.encode(ADMIN_MOT_DE_PASSE),
+                new java.sql.Date(System.currentTimeMillis()));
+        admin = userRepository.save(admin);
+
+        RoleModels roleAdmin = roleRepository.findByName("ADMIN")
+                .orElseThrow(() -> new IllegalStateException("Rôle ADMIN introuvable au seed."));
+        userRoleRepository.save(new UserRoleModels(admin, roleAdmin));
     }
 
     private void seedTypesBassin() {
