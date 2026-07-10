@@ -49,10 +49,6 @@ public class LigneAchat {
     private Aliment aliment;
 
     @ManyToOne
-    @JoinColumn(name = "id_intrant")
-    private Intrant intrant;
-
-    @ManyToOne
     @JoinColumn(name = "id_espece")
     private EspecesModels espece;
 
@@ -60,18 +56,10 @@ public class LigneAchat {
     @JoinColumn(name = "id_lot")
     private LotModels lot;
 
-    /**
-     * Bassin cible d'un achat d'alevins, choisi dès le brouillon mais utilisé
-     * seulement à la validation pour créer le lot et occuper le bassin.
-     */
     @ManyToOne
     @JoinColumn(name = "id_bassin")
     private Bassin bassin;
 
-    /**
-     * Poids moyen (g) saisi pour un achat d'alevins, conservé jusqu'à la validation
-     * afin d'en déduire le stade de croissance du lot créé.
-     */
     @Column(name = "poids_moyen", precision = 10, scale = 2)
     private BigDecimal poidsMoyen;
 
@@ -143,14 +131,6 @@ public class LigneAchat {
 
     public void setAliment(Aliment aliment) {
         this.aliment = aliment;
-    }
-
-    public Intrant getIntrant() {
-        return intrant;
-    }
-
-    public void setIntrant(Intrant intrant) {
-        this.intrant = intrant;
     }
 
     public EspecesModels getEspece() {

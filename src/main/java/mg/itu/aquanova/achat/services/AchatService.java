@@ -10,9 +10,8 @@ package mg.itu.aquanova.achat.services;
 // import com.lowagie.text.pdf.PdfPTable;
 // import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
-import java.awt.Color;
-import java.io.ByteArrayOutputStream;
 
+import jakarta.persistence.EntityNotFoundException;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.repositories.AchatRepository;
 
@@ -25,6 +24,11 @@ public class AchatService {
         AchatRepository achatRepository
     ) {
         this.achatRepository = achatRepository;
+    }
+
+    public Achat trouverParId(Long id) {
+        return achatRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Achat introuvable : " + id));
     }
 
     public boolean estDejaUtilise(Long id) {

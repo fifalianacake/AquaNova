@@ -22,7 +22,6 @@ import mg.itu.aquanova.achat.models.StatutAchat;
 import mg.itu.aquanova.achat.repositories.AchatRepository;
 import mg.itu.aquanova.achat.repositories.CategorieDepenseRepository;
 import mg.itu.aquanova.achat.repositories.FournisseurRepository;
-import mg.itu.aquanova.achat.repositories.MouvementStockIntrantRepository;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.StatutLotModels;
@@ -48,7 +47,6 @@ public class AchatAlevinService {
     private final LotRepository lotRepository;
     private final CategorieDepenseService categorieDepenseService;
     private final EspecesRepository especesRepository;
-    private final MouvementStockIntrantRepository mouvementRepository;
     private final BassinsRepository bassinsRepository;
     private final StatutBassinRepository statutBassinRepository;
     private final LotService lotService;
@@ -62,7 +60,6 @@ public class AchatAlevinService {
             LotRepository lotRepository,
             CategorieDepenseService categorieDepenseService,
             EspecesRepository especesRepository,
-            MouvementStockIntrantRepository mouvementRepository,
             BassinsRepository bassinsRepository,
             StatutBassinRepository statutBassinRepository,
             LotService lotService,
@@ -74,7 +71,6 @@ public class AchatAlevinService {
         this.lotRepository = lotRepository;
         this.categorieDepenseService = categorieDepenseService;
         this.especesRepository = especesRepository;
-        this.mouvementRepository = mouvementRepository;
         this.bassinsRepository = bassinsRepository;
         this.statutBassinRepository = statutBassinRepository;
         this.lotService = lotService;
@@ -165,8 +161,6 @@ public class AchatAlevinService {
             throw new IllegalArgumentException("La catégorie doit être ACHAT_ALEVINS.");
         }
 
-        // Le bassin est choisi dès le brouillon (contrôle de disponibilité immédiat pour l'utilisateur),
-        // mais le lot n'est réellement créé et le bassin occupé qu'à la validation de l'achat.
         Bassin bassin = bassinsRepository.findById(form.getBassinId())
                 .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable : " + form.getBassinId()));
         if (bassin.getStatut() == null || bassin.getStatut().getLibelle() != LibelleStatutBassin.LIBRE) {
@@ -191,7 +185,6 @@ public class AchatAlevinService {
         ligne.setUnite("pièce");
         ligne.setPrixUnitaire(form.getPrixUnitaire());
         ligne.setMontantLigne(montantLigne);
-        // Paramètres du futur lot, conservés jusqu'à la validation.
         ligne.setBassin(bassin);
         ligne.setPoidsMoyen(form.getPoidsMoyen());
         achat.addLigne(ligne);
@@ -244,11 +237,6 @@ public class AchatAlevinService {
         return achatRepository.save(achat);
     }
 
-    /**
-     * Construit et enregistre le lot correspondant à une ligne d'achat d'alevins.
-     * Le stade de croissance est déduit du poids moyen saisi et le bassin passe OCCUPE
-     * (via {@link LotService#creer}).
-     */
     private LotModels creerLotDepuisLigne(Achat achat, LigneAchat ligne, StatutLotModels statutEnCroissance) {
         Bassin bassin = bassinsRepository.findById(ligne.getBassin().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable : " + ligne.getBassin().getId()));

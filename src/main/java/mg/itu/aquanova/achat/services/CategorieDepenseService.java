@@ -1,7 +1,6 @@
 package mg.itu.aquanova.achat.services;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -13,12 +12,6 @@ import mg.itu.aquanova.achat.repositories.CategorieDepenseRepository;
 @Service
 public class CategorieDepenseService {
 
-    public static final Set<String> CODES_ACHAT_INTRANTS = Set.of(
-            "ACHAT_MEDICAMENT",
-            "PRODUIT_TRAITEMENT",
-            "ACHAT_PRODUIT_TRAITEMENT"
-    );
-
     private final CategorieDepenseRepository repository;
 
     public CategorieDepenseService(CategorieDepenseRepository repository) {
@@ -29,15 +22,6 @@ public class CategorieDepenseService {
         return repository.findAllByOrderByLibelleAsc();
     }
 
-    public List<CategorieDepense> listerCategoriesAchatIntrants() {
-        return repository.findByCodeInOrderByLibelleAsc(CODES_ACHAT_INTRANTS);
-    }
-
-    /**
-     * Catégories sélectionnables depuis le formulaire de dépense générique : exclut les
-     * catégories de type ACHAT (alevins, provende, intrants), qui doivent obligatoirement
-     * passer par leur formulaire d'achat dédié (création de lot / mouvement de stock).
-     */
     public List<CategorieDepense> listerCategoriesDepenseGenerique() {
         return repository.findAllByOrderByLibelleAsc().stream()
                 .filter(c -> c.getTypeCategorie() != mg.itu.aquanova.achat.models.TypeCategorieDepenseEnum.ACHAT)
@@ -78,10 +62,6 @@ public class CategorieDepenseService {
     public void delete(Long id) {
         CategorieDepense cat = trouverParId(id);
         repository.delete(cat);
-    }
-
-    public boolean estCategorieAchatIntrant(CategorieDepense categorie) {
-        return categorie != null && categorie.getCode() != null && CODES_ACHAT_INTRANTS.contains(categorie.getCode());
     }
 
     public boolean estCategorieAchatAlevin(CategorieDepense categorie) {

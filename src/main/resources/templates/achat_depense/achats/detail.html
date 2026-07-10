@@ -23,10 +23,9 @@
 
 <div class="actions">
     <a class="btn btn-secondary" th:href="@{/achats}">Retour liste</a>
-    <a th:href="@{/achats/intrants/new}">Nouvel achat d'intrants</a>
 
     <form th:if="${achat.statutAchat.name() == 'BROUILLON'}" method="post" th:action="@{/achats/{id}/valider(id=${achat.id})}">
-        <button class="btn btn-primary" type="submit">Valider et alimenter le stock</button>
+        <button class="btn btn-primary" type="submit">Valider</button>
     </form>
 
     <form th:if="${achat.statutAchat.name() == 'BROUILLON'}" method="post" th:action="@{/achats/{id}/annuler(id=${achat.id})}"
@@ -41,24 +40,24 @@
     <tr>
         <th>ID</th>
         <th>Désignation</th>
-        <th>Intrant</th>
+        <th>Article</th>
         <th>Quantité</th>
         <th>Prix unitaire</th>
         <th>Montant ligne</th>
-        <th>Stock</th>
+        <th>Lot</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="ligne : ${achat.lignes}">
         <td th:text="${ligne.id}"></td>
         <td th:text="${ligne.designation}"></td>
-        <td th:text="${ligne.intrant != null ? ligne.intrant.nom : '-'}"></td>
+        <td th:text="${ligne.aliment != null ? ligne.aliment.nom : (ligne.espece != null ? ligne.espece.nom : '-')}"></td>
         <td th:text="${ligne.quantite + ' ' + ligne.unite}"></td>
         <td th:text="${ligne.prixUnitaire}"></td>
         <td th:text="${ligne.montantLigne}"></td>
         <td>
-            <a class="btn btn-sm btn-outline-primary" th:if="${ligne.intrant != null}" th:href="@{/intrants/{id}/stock(id=${ligne.intrant.id})}">Voir stock</a>
-            <span th:unless="${ligne.intrant != null}">-</span>
+            <a class="btn btn-sm btn-outline-primary" th:if="${ligne.lot != null}" th:href="@{/lots/{id}(id=${ligne.lot.id})}" th:text="${ligne.lot.code}"></a>
+            <span th:unless="${ligne.lot != null}">-</span>
         </td>
     </tr>
     </tbody>

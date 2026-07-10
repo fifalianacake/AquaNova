@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Injecte le menu de navigation latéral dans le modèle de toutes les pages,
- * avec l'élément correspondant à l'URL courante marqué comme actif.
- */
 @ControllerAdvice
 public class NavigationControllerAdvice {
 
@@ -51,13 +47,11 @@ public class NavigationControllerAdvice {
                         new NavigationItemDTO("Maintenances", "/maintenances"))),
 
                 new NavigationItemDTO("Achats & Dépenses", "bi-cart3", List.of(
-                        new NavigationItemDTO("Achats d'intrants", "/achats/intrants"),
                         new NavigationItemDTO("Achats d'alevins", "/achats/alevins"),
                         new NavigationItemDTO("Achats de provende", "/achats/provende"),
                         new NavigationItemDTO("Dépenses", "/depenses"),
                         new NavigationItemDTO("Catégories de dépenses", "/categories-depenses"),
                         new NavigationItemDTO("Fournisseurs", "/fournisseurs"),
-                        new NavigationItemDTO("Intrants", "/intrants"),
                         new NavigationItemDTO("Historique", "/achats-depenses/historique"))),
 
                 new NavigationItemDTO("Ventes", "bi-currency-exchange", List.of(
@@ -93,10 +87,6 @@ public class NavigationControllerAdvice {
                         new NavigationItemDTO("Attribution des rôles", "/user-roles"))));
     }
 
-    /**
-     * Marque comme actif le lien dont l'URL correspond le mieux (préfixe le plus long)
-     * à l'URI courante, pour éviter que "/stocks" et "/stocks/mouvements" soient actifs en même temps.
-     */
     private void marquerActif(List<NavigationItemDTO> menu, String uri) {
         NavigationItemDTO meilleur = null;
         int longueurMax = -1;
