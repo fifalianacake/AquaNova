@@ -29,13 +29,10 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label" for="categorieDepenseId">Catégorie *</label>
-        <select class="form-select" id="categorieDepenseId" th:field="*{categorieDepenseId}" required>
-            <option value="">-- Choisir --</option>
-            <option th:each="c : ${categoriesDepense}"
-                    th:value="${c.id}"
-                    th:text="${c.code + ' - ' + c.libelle}"></option>
-        </select>
+        <label class="form-label">Catégorie</label>
+        <div class="readonly-value"
+             th:text="${#lists.isEmpty(categoriesDepense) ? 'Aucune catégorie d achat d intrant configurée' : categoriesDepense[0].code + ' - ' + categoriesDepense[0].libelle}"></div>
+        <input type="hidden" th:field="*{categorieDepenseId}" />
     </div>
 
     <div class="mb-3">

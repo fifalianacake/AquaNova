@@ -32,9 +32,11 @@ import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.referentiel.models.Bassin;
 import mg.itu.aquanova.referentiel.models.EspecesModels;
 import mg.itu.aquanova.referentiel.models.LibelleStatutBassin;
+import mg.itu.aquanova.referentiel.models.StadeCroissanceModels;
 import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
 import mg.itu.aquanova.referentiel.repositories.EspecesRepository;
+import mg.itu.aquanova.referentiel.repositories.StadeCroissanceRepository;
 import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
 
 @Service
@@ -51,6 +53,7 @@ public class AchatAlevinService {
     private final StatutBassinRepository statutBassinRepository;
     private final LotService lotService;
     private final StatutLotRepository statutLotRepository;
+    private final StadeCroissanceRepository stadeCroissanceRepository;
 
     public AchatAlevinService(
             AchatRepository achatRepository,
@@ -63,7 +66,8 @@ public class AchatAlevinService {
             BassinsRepository bassinsRepository,
             StatutBassinRepository statutBassinRepository,
             LotService lotService,
-            StatutLotRepository statutLotRepository) {
+            StatutLotRepository statutLotRepository,
+            StadeCroissanceRepository stadeCroissanceRepository) {
         this.achatRepository = achatRepository;
         this.fournisseurRepository = fournisseurRepository;
         this.categorieDepenseRepository = categorieDepenseRepository;
@@ -75,6 +79,7 @@ public class AchatAlevinService {
         this.statutBassinRepository = statutBassinRepository;
         this.lotService = lotService;
         this.statutLotRepository = statutLotRepository;
+        this.stadeCroissanceRepository = stadeCroissanceRepository;
     }
 
     public Achat getById(Long id) {
@@ -164,6 +169,7 @@ public class AchatAlevinService {
         ligne.setDesignation(especes.getNom());
         ligne.setEspece(especes);
         ligne.setQuantite(BigDecimal.valueOf(form.getEffectif()));
+        ligne.setUnite("pièce");
         ligne.setPrixUnitaire(form.getPrixUnitaire());
         ligne.setMontantLigne(montantLigne);
 
@@ -184,8 +190,14 @@ public class AchatAlevinService {
             throw new IllegalArgumentException("Veuillez bien verifiez le statut du lot");
         }
 
+        StadeCroissanceModels stade = stadeCroissanceRepository.findAll().stream()
+                .filter(s -> s.correspondAuPoids(form.getPoidsMoyen()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucun stade de croissance ne correspond au poids moyen saisi (" + form.getPoidsMoyen() + ")."));
+
         lot.setBassin(bassinOptional.orElse(null));
-        lot.setStadeCroissance(null);
+        lot.setStadeCroissance(stade);
         lot.setStatutLot(statutLotOptional.orElse(null));
         lot.setDateMiseEnCharge(LocalDate.now());
         lot.setEffectifInitial(form.getEffectif());

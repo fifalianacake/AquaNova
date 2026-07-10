@@ -33,6 +33,17 @@ public class CategorieDepenseService {
         return repository.findByCodeInOrderByLibelleAsc(CODES_ACHAT_INTRANTS);
     }
 
+    /**
+     * Catégories sélectionnables depuis le formulaire de dépense générique : exclut les
+     * catégories de type ACHAT (alevins, provende, intrants), qui doivent obligatoirement
+     * passer par leur formulaire d'achat dédié (création de lot / mouvement de stock).
+     */
+    public List<CategorieDepense> listerCategoriesDepenseGenerique() {
+        return repository.findAllByOrderByLibelleAsc().stream()
+                .filter(c -> c.getTypeCategorie() != mg.itu.aquanova.achat.models.TypeCategorieDepenseEnum.ACHAT)
+                .toList();
+    }
+
     public CategorieDepense create(CategorieDepense cat) {
         try {
             return repository.save(cat);

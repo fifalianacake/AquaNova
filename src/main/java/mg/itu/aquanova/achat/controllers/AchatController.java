@@ -97,7 +97,14 @@ public class AchatController {
 
     @GetMapping("/achats/intrants/new")
     public String formulaireAchatIntrant(Model model) {
-        model.addAttribute("achatIntrantForm", new AchatIntrantForm());
+        AchatIntrantForm form = new AchatIntrantForm();
+        // Une seule catégorie d'achat d'intrant est actuellement configurée (ACHAT_MEDICAMENT) :
+        // le champ n'est pas modifiable côté vue, il faut donc pré-remplir la valeur transmise.
+        List<mg.itu.aquanova.achat.models.CategorieDepense> categories = categorieDepenseService.listerCategoriesAchatIntrants();
+        if (!categories.isEmpty()) {
+            form.setCategorieDepenseId(categories.get(0).getId());
+        }
+        model.addAttribute("achatIntrantForm", form);
         addFormIntrantAttributes(model);
         return "achat_depense/achats/form-intrant";
     }
@@ -119,7 +126,11 @@ public class AchatController {
 
     @GetMapping("/achats/alevins/new")
     public String formulaireAchatAlevin(Model model) {
-        model.addAttribute("achatAlevinForm", new AchatAlevinForm());
+        AchatAlevinForm form = new AchatAlevinForm();
+        // La catégorie est fixée et non modifiable dans ce formulaire (select désactivé côté vue) :
+        // il faut donc pré-remplir le champ cache qui porte réellement la valeur soumise.
+        form.setCategorieDepenseId(categorieDepenseService.trouverParCode("ACHAT_ALEVINS").getId());
+        model.addAttribute("achatAlevinForm", form);
         addFormAlevinAttributes(model);
         return "achat_depense/achats/form-alevin";
     }

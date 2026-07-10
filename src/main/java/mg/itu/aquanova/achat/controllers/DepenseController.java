@@ -131,7 +131,7 @@ public class DepenseController {
     }
 
     private void addFormAttributes(Model model) {
-        model.addAttribute("categoriesDepense", categorieDepenseService.listerTous());
+        model.addAttribute("categoriesDepense", categorieDepenseService.listerCategoriesDepenseGenerique());
     }
 
     private Depense creerDepenseFormulaire() {

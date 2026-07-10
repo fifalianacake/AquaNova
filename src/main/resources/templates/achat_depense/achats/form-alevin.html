@@ -29,19 +29,10 @@
         </select>
     </div>
 
-    <!-- SECTION MODIFIÉE : Catégorie fixée en lecture seule -->
     <div class="mb-3">
-        <label class="form-label">Catégorie de dépense *</label>
-        <!-- Champ caché pour renvoyer la valeur au serveur -->
+        <label class="form-label">Catégorie</label>
+        <div class="readonly-value" th:text="${categoriesDepense.code + ' - ' + categoriesDepense.libelle}"></div>
         <input type="hidden" th:field="*{categorieDepenseId}" />
-
-        <!-- Select visible mais bloqué (sans th:field pour ne pas écraser le hidden, on utilise th:value ou la boucle standard) -->
-        <select class="form-select readonly-field" disabled>
-            <option th:each="c : ${categoriesDepense}"
-                    th:value="${c.id}"
-                    th:text="${c.code + ' - ' + c.libelle}"
-                    th:selected="${achatAlevinForm.categorieDepenseId == c.id}"></option>
-        </select>
     </div>
 
     <div class="mb-3">
