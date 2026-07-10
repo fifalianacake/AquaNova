@@ -2,6 +2,7 @@ package mg.itu.aquanova.achat.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -91,6 +92,12 @@ public class AchatAlevinService {
         return achatRepository.findAll(specificationAchatsAlevins(filter), pageable);
     }
 
+    public List<Bassin> listerBassinsLibres() {
+        StatutBassin libre = statutBassinRepository.findByLibelle(LibelleStatutBassin.LIBRE)
+                .orElseThrow(() -> new IllegalArgumentException("Veuillez bien verifier le statut du bassin"));
+        return bassinsRepository.findAllByStatutOrderByReferenceAsc(libre);
+    }
+
     private Specification<Achat> specificationAchatsAlevins(AchatAlevinFilter filter) {
         return (root, query, cb) -> {
             if (query != null) {
@@ -177,14 +184,12 @@ public class AchatAlevinService {
         lot.setEspece(especes);
         lot.setCode(String.format("LOT-%03d", lotRepository.count()));
 
-        Optional<StatutBassin> statutBassinOptional = statutBassinRepository.findByLibelle(LibelleStatutBassin.LIBRE);
-        if(!statutBassinOptional.isPresent()) {
-            throw new IllegalArgumentException("Veuillez bien verifier le statut du bassin"); 
+        Bassin bassin = bassinsRepository.findById(form.getBassinId())
+                .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable : " + form.getBassinId()));
+        if (bassin.getStatut() == null || bassin.getStatut().getLibelle() != LibelleStatutBassin.LIBRE) {
+            throw new IllegalArgumentException("Le bassin sélectionné n'est pas libre.");
         }
-        Optional<Bassin> bassinOptional = bassinsRepository.findByStatut(statutBassinOptional.orElse(null));
-        if(!bassinOptional.isPresent()) {
-            throw new IllegalArgumentException("Aucun bassin n'est libre pour effectuer cette achat d'Alevin"); 
-        }
+
         Optional<StatutLotModels> statutLotOptional = statutLotRepository.findByLibelle(StatutLotEnum.EN_CROISSANCE);
         if(!statutLotOptional.isPresent()) {
             throw new IllegalArgumentException("Veuillez bien verifiez le statut du lot");
@@ -196,7 +201,7 @@ public class AchatAlevinService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Aucun stade de croissance ne correspond au poids moyen saisi (" + form.getPoidsMoyen() + ")."));
 
-        lot.setBassin(bassinOptional.orElse(null));
+        lot.setBassin(bassin);
         lot.setStadeCroissance(stade);
         lot.setStatutLot(statutLotOptional.orElse(null));
         lot.setDateMiseEnCharge(LocalDate.now());
@@ -205,9 +210,9 @@ public class AchatAlevinService {
         lot.setPoidsMoyenInitial(form.getPoidsMoyen().doubleValue());
         lot.setPoidsMoyenActuel(form.getPoidsMoyen().doubleValue());
 
-        lotService.validerLot(lot, null);
+        LotModels lotSauvegarde = lotService.creer(lot);
 
-        ligne.setLot(lot);
+        ligne.setLot(lotSauvegarde);
         achat.addLigne(ligne);
 
         Achat sauvegarde = achatRepository.save(achat);
@@ -230,6 +235,9 @@ public class AchatAlevinService {
         }
         if (form.getEspeceId() == null) {
             throw new IllegalArgumentException("L'espece est obligatoire.");
+        }
+        if (form.getBassinId() == null) {
+            throw new IllegalArgumentException("Le bassin est obligatoire.");
         }
         if (form.getEffectif() == null || form.getEffectif().compareTo(0) <= 0) {
             throw new IllegalArgumentException("L'effectif doit être strictement positive.");

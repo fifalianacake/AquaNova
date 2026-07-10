@@ -20,6 +20,7 @@ import mg.itu.aquanova.achat.dto.AchatAlevinFilter;
 import mg.itu.aquanova.achat.dto.AchatAlevinForm;
 import mg.itu.aquanova.achat.dto.AchatIntrantFilter;
 import mg.itu.aquanova.achat.dto.AchatIntrantForm;
+import mg.itu.aquanova.achat.dto.AchatProvendeFilter;
 import mg.itu.aquanova.achat.dto.AchatProvendeForm;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.StatutAchat;
@@ -93,6 +94,16 @@ public class AchatController {
         model.addAttribute("achats", achatAlevinService.listerAchatsAlevin(filter, pageable));
         addListAlevinAttributes(model);
         return "achat_depense/achats/liste-alevins";
+    }
+
+    @GetMapping("/achats/provende")
+    public String listeProvende(
+            @ModelAttribute("filter") AchatProvendeFilter filter,
+            @PageableDefault(size = 10, sort = "dateAchat") Pageable pageable,
+            Model model) {
+        model.addAttribute("achats", achatProvendeService.listerAchatsProvende(filter, pageable));
+        addListProvendeAttributes(model);
+        return "achat_depense/achats/liste-provende";
     }
 
     @GetMapping("/achats/intrants/new")
@@ -217,6 +228,18 @@ public class AchatController {
         model.addAttribute("pageSizes", PAGE_SIZES);
     }
 
+    private void addListProvendeAttributes(Model model) {
+        model.addAttribute("fournisseurs", fournisseurService.listerTous());
+        try {
+            model.addAttribute("categoriesDepense", Collections.singletonList(categorieDepenseService.trouverParCode("ACHAT_PROVENDE")));
+        } catch (Exception e) {
+            model.addAttribute("categoriesDepense", categorieDepenseService.listerTous());
+        }
+        model.addAttribute("aliments", alimentService.findAll());
+        model.addAttribute("statutsAchat", StatutAchat.values());
+        model.addAttribute("pageSizes", PAGE_SIZES);
+    }
+
     private void addFormIntrantAttributes(Model model) {
         model.addAttribute("fournisseurs", fournisseurService.listerActifs());
         model.addAttribute("categoriesDepense", categorieDepenseService.listerCategoriesAchatIntrants());
@@ -227,11 +250,20 @@ public class AchatController {
         model.addAttribute("fournisseurs", fournisseurService.listerActifs());
         model.addAttribute("categoriesDepense", categorieDepenseService.trouverParCode("ACHAT_ALEVINS"));
         model.addAttribute("especes", especesService.findAll());
+        model.addAttribute("bassins", achatAlevinService.listerBassinsLibres());
     }
 
     @GetMapping("/achats/provende/new")
     public String formulaireAchatProvende(Model model) {
-        model.addAttribute("achatProvendeForm", new AchatProvendeForm());
+        AchatProvendeForm form = new AchatProvendeForm();
+        // La catégorie est fixée et non modifiable dans ce formulaire (select désactivé côté vue) :
+        // il faut donc pré-remplir le champ caché qui porte réellement la valeur soumise.
+        try {
+            form.setCategorieDepenseId(categorieDepenseService.trouverParCode("ACHAT_PROVENDE").getId());
+        } catch (Exception ignored) {
+            // Aucune catégorie ACHAT_PROVENDE configurée : le formulaire l'affichera comme non disponible.
+        }
+        model.addAttribute("achatProvendeForm", form);
         addFormProvendeAttributes(model);
         return "achat_depense/achats/form-provende";
     }

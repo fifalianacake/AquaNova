@@ -53,6 +53,7 @@ public class NavigationControllerAdvice {
                 new NavigationItemDTO("Achats & Dépenses", "bi-cart3", List.of(
                         new NavigationItemDTO("Achats d'intrants", "/achats/intrants"),
                         new NavigationItemDTO("Achats d'alevins", "/achats/alevins"),
+                        new NavigationItemDTO("Achats de provende", "/achats/provende"),
                         new NavigationItemDTO("Dépenses", "/depenses"),
                         new NavigationItemDTO("Catégories de dépenses", "/categories-depenses"),
                         new NavigationItemDTO("Fournisseurs", "/fournisseurs"),

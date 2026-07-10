@@ -18,6 +18,7 @@ public class AchatAlevinForm {
     private BigDecimal montantTotal;
     private String referenceFacture;
     private Long lotId;
+    private Long bassinId;
 
     // getters and setters
     public LocalDate getDateAchat() {
@@ -79,7 +80,11 @@ public class AchatAlevinForm {
     }
     public void setPrixUnitaire(BigDecimal prixUnitaire) {
         this.prixUnitaire = prixUnitaire;
-    }  
-    
-    
+    }
+    public Long getBassinId() {
+        return bassinId;
+    }
+    public void setBassinId(Long bassinId) {
+        this.bassinId = bassinId;
+    }
 }
