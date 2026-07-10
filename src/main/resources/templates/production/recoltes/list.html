@@ -1,106 +1,88 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Liste des récoltes</title>
+    <title>AquaNova - Liste des récoltes</title>
 </head>
 <body>
 <main>
 
-<h1>Liste des récoltes</h1>
-
-<div>
-    <a class="btn btn-primary" th:href="@{/recoltes/new}">Créer une récolte</a>
-    <a th:href="@{/types-recoltes}">Gérer les types de récolte</a>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/recoltes/new}"><i class="bi bi-plus-lg"></i> Créer une récolte</a>
+    <a class="btn btn-outline-primary" th:href="@{/types-recoltes}">Gérer les types de récolte</a>
 </div>
 
-<form method="get" th:action="@{/recoltes}" class="filters">
-    <input type="hidden" name="page" value="0" />
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des récoltes</h5>
+        <span class="result-count"
+              th:text="${recoltes.totalElements} + ' récolte' + (${recoltes.totalElements} > 1 ? 's' : '') + ' trouvée' + (${recoltes.totalElements} > 1 ? 's' : '')"></span>
+    </div>
 
-    <label class="form-label">Lot
+    <form method="get" th:action="@{/recoltes}" class="filters-bar">
+        <input type="hidden" name="page" value="0" />
         <select class="form-select" name="lotId">
-            <option value="">--</option>
+            <option value="">Tous les lots</option>
             <option th:each="lot : ${lots}"
                     th:value="${lot.id}"
                     th:text="${lot.code}"
                     th:selected="${filter.lotId == lot.id}"></option>
         </select>
-    </label>
-
-    <label class="form-label">Type
         <select class="form-select" name="typeRecolteId">
-            <option value="">--</option>
+            <option value="">Tous les types</option>
             <option th:each="type : ${typesRecolte}"
                     th:value="${type.id}"
                     th:text="${type.libelle}"
                     th:selected="${filter.typeRecolteId == type.id}"></option>
         </select>
-    </label>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}">
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/recoltes}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
 
-    <label class="form-label">Date début
-        <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
-    </label>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Lot</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th class="text-end">Effectif récolté</th>
+                <th class="text-end">Poids total</th>
+                <th class="text-end">Poids moyen</th>
+                <th>Statut</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="recolte : ${recoltes.content}">
+                <td th:text="${recolte.id}"></td>
+                <td class="fw-semibold" th:text="${recolte.lot != null ? recolte.lot.code : '—'}"></td>
+                <td th:text="${recolte.typeRecolte != null ? recolte.typeRecolte.libelle : '—'}"></td>
+                <td th:text="${recolte.dateRecolte}"></td>
+                <td class="text-end" th:text="${recolte.effectifRecolte}"></td>
+                <td class="text-end" th:text="${recolte.poidsTotal}"></td>
+                <td class="text-end" th:text="${recolte.poidsMoyen}"></td>
+                <td><span class="badge badge-info" th:text="${recolte.statut}"></span></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/recoltes/{id}(id=${recolte.id})}" title="Voir les détails"><i class="bi bi-eye"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${recoltes.empty}">
+                <td colspan="9" class="text-center text-secondary py-4">Aucune récolte ne correspond à ces critères.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <label class="form-label">Date fin
-        <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
-    </label>
-
-    <label class="form-label">Lignes/page
-        <select class="form-select" name="size" onchange="this.form.submit()">
-            <option th:each="s : ${pageSizes}"
-                    th:value="${s}"
-                    th:text="${s}"
-                    th:selected="${recoltes.size == s}"></option>
-        </select>
-    </label>
-
-    <button class="btn btn-primary" type="submit">Filtrer</button>
-    <a th:href="@{/recoltes}">Réinitialiser</a>
-</form>
-
-<table class="table table-hover align-middle">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Lot</th>
-        <th>Type</th>
-        <th>Date</th>
-        <th>Effectif récolté</th>
-        <th>Poids total</th>
-        <th>Poids moyen</th>
-        <th>Statut</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="recolte : ${recoltes.content}">
-        <td th:text="${recolte.id}"></td>
-        <td th:text="${recolte.lot != null ? recolte.lot.code : ''}"></td>
-        <td th:text="${recolte.typeRecolte != null ? recolte.typeRecolte.libelle : ''}"></td>
-        <td th:text="${recolte.dateRecolte}"></td>
-        <td th:text="${recolte.effectifRecolte}"></td>
-        <td th:text="${recolte.poidsTotal}"></td>
-        <td th:text="${recolte.poidsMoyen}"></td>
-        <td th:text="${recolte.statut}"></td>
-        <td>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/recoltes/{id}(id=${recolte.id})}">Voir</a>
-        </td>
-    </tr>
-    <tr th:if="${recoltes.empty}">
-        <td colspan="9">Aucune récolte trouvée.</td>
-    </tr>
-    </tbody>
-</table>
-
-<div class="pagination" th:if="${recoltes.totalPages > 0}">
-    <a class="btn btn-secondary" th:if="${recoltes.hasPrevious()}"
-       th:href="@{/recoltes(page=${recoltes.number - 1}, size=${recoltes.size}, lotId=${filter.lotId}, typeRecolteId=${filter.typeRecolteId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
-    <span th:unless="${recoltes.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
-
-    <span th:text="'Page ' + ${recoltes.number + 1} + ' sur ' + ${recoltes.totalPages} + ' — ' + ${recoltes.totalElements} + ' résultat(s)'"></span>
-
-    <a th:if="${recoltes.hasNext()}"
-       th:href="@{/recoltes(page=${recoltes.number + 1}, size=${recoltes.size}, lotId=${filter.lotId}, typeRecolteId=${filter.typeRecolteId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
-    <span th:unless="${recoltes.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+    <div th:replace="~{fragments/tableau :: tableFooter(${recoltes})}"></div>
 </div>
 </main>
 </body>

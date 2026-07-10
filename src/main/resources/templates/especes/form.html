@@ -5,19 +5,33 @@
 </head>
 <body>
 <main>
-<h2>Form Espece</h2>
+    <h2>Form Espece</h2>
 
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-<form action="/especes" method="post" th:object="${espece}">
-    <input type="hidden" th:field="*{id}" />
+    <form class="form-panel" action="/especes" method="post" th:object="${espece}">
+        <input type="hidden" th:field="*{id}" />
 
-    Nom: <input class="form-control" type="text" th:field="*{nom}" /><br/>
-    Poids: <input class="form-control" type="number" step="0.01" th:field="*{poidsCibleMoyen}" /><br/>
-    Image: <input class="form-control" type="text" th:field="*{image}" /><br/>
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom</label>
+            <input class="form-control" type="text" id="nom" th:field="*{nom}" />
+        </div>
 
-    <button class="btn btn-primary" type="submit">Save</button>
-</form>
+        <div class="mb-3">
+            <label class="form-label" for="poidsCibleMoyen">Poids</label>
+            <input class="form-control" type="number" step="0.01" id="poidsCibleMoyen" th:field="*{poidsCibleMoyen}" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="image">Image</label>
+            <input class="form-control" type="text" id="image" th:field="*{image}" />
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/especes}">Retour à la liste</a>
+        </div>
+    </form>
 </main>
 </body>
 </html>

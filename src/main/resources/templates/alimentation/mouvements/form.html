@@ -5,37 +5,51 @@
 </head>
 <body>
 <main>
-<div th:if="${error}" style="color:red;">
-    <p th:text="${error}"></p>
-</div>
-<form method="post"
-    th:action="${mouvement.id} == null ? @{/stocks/mouvements} : @{'/stocks/mouvements/' + ${mouvement.id}}"
-    th:object="${mouvement}">
+    <h2 th:text="${mouvement.id} == null ? 'Créer un mouvement de stock' : 'Modifier le mouvement de stock'"></h2>
 
-    <label class="form-label">Date</label>
-    <input class="form-control" type="date" th:field="*{dateMouvement}" required />
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <label class="form-label">Aliment</label>
-    <select class="form-select" th:field="*{aliment.id}">
-        <option th:each="a : ${aliments}" th:value="${a.id}" th:text="${a.nom}">
-        </option>
-    </select>
+    <form class="form-panel" method="post"
+          th:action="${mouvement.id} == null ? @{/stocks/mouvements} : @{'/stocks/mouvements/' + ${mouvement.id}}"
+          th:object="${mouvement}">
 
-    <label class="form-label">Type</label>
-    <select class="form-select" th:field="*{typeMouvement}">
-        <option value="ENTREE">ENTREE</option>
-        <option value="SORTIE">SORTIE</option>
-        <option value="PERTE">PERTE</option>
-    </select>
+        <div class="mb-3">
+            <label class="form-label" for="dateMouvement">Date</label>
+            <input class="form-control" type="date" id="dateMouvement" th:field="*{dateMouvement}" required />
+        </div>
 
-    <label class="form-label">Quantité</label>
-    <input class="form-control" type="number" step="0.01" th:field="*{quantite}" required />
+        <div class="mb-3">
+            <label class="form-label" for="aliment">Aliment</label>
+            <select class="form-select" id="aliment" th:field="*{aliment.id}">
+                <option value="">-- Choisir un aliment --</option>
+                <option th:each="a : ${aliments}" th:value="${a.id}" th:text="${a.nom}"></option>
+            </select>
+        </div>
 
-    <label class="form-label">Commentaire</label>
-    <input class="form-control" type="text" th:field="*{commentaire}" />
+        <div class="mb-3">
+            <label class="form-label" for="typeMouvement">Type</label>
+            <select class="form-select" id="typeMouvement" th:field="*{typeMouvement}">
+                <option value="ENTREE">ENTREE</option>
+                <option value="SORTIE">SORTIE</option>
+                <option value="PERTE">PERTE</option>
+            </select>
+        </div>
 
-    <button class="btn btn-primary" type="submit">Enregistrer</button>
-</form>
+        <div class="mb-3">
+            <label class="form-label" for="quantite">Quantité</label>
+            <input class="form-control" type="number" step="0.01" id="quantite" th:field="*{quantite}" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="commentaire">Commentaire</label>
+            <input class="form-control" type="text" id="commentaire" th:field="*{commentaire}" />
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/stocks/mouvements}">Retour à la liste</a>
+        </div>
+    </form>
 </main>
 </body>
 </html>

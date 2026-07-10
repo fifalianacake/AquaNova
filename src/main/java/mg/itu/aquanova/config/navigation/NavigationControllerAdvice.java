@@ -21,6 +21,12 @@ public class NavigationControllerAdvice {
         return menu;
     }
 
+    /** Tailles de page proposées par le pied de tableau standard (fragments/tableau :: tableFooter). */
+    @ModelAttribute("pageSizes")
+    public List<Integer> pageSizes() {
+        return List.of(5, 10, 20, 50, 100);
+    }
+
     private List<NavigationItemDTO> construireMenu() {
         return List.of(
                 new NavigationItemDTO("Production", "bi-droplet-half", List.of(

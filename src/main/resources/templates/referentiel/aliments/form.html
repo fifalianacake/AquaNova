@@ -7,22 +7,21 @@
 <main>
     <h2 th:text="${aliment.id == null} ? 'Créer un aliment' : 'Modifier l\'aliment'">Formulaire</h2>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="@{/aliments}" th:object="${aliment}" method="post">
-        
+    <form class="form-panel" th:action="@{/aliments}" th:object="${aliment}" method="post">
+
         <input type="hidden" th:field="*{id}" />
 
-        <p>
-            <label class="form-label" for="nom">Nom de l'aliment :</label><br/>
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom de l'aliment</label>
             <input class="form-control" type="text" id="nom" th:field="*{nom}" required />
-        </p>
+        </div>
 
-        <p>
-            <button class="btn btn-primary" type="submit" th:text="${aliment.id == null} ? 'Créer' : 'Enregistrer les modifications'">Enregistrer</button>
-            <a class="btn btn-secondary" th:href="@{/aliments}">Annuler</a>
-        </p>
-        
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/aliments}">Retour à la liste</a>
+        </div>
     </form>
 </main>
 </body>

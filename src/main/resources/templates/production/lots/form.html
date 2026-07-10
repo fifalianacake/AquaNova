@@ -5,65 +5,83 @@
 </head>
 <body>
 <main>
-<h1 th:text="${lot.id} == null ? 'Créer un lot' : 'Modifier le lot ' + ${lot.id}"></h1>
+    <h2 th:text="${lot.id} == null ? 'Créer un lot' : 'Modifier le lot ' + ${lot.id}"></h2>
 
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-<form th:action="${lot.id} == null ? @{/lots} : @{/lots/{id}(id=${lot.id})}" method="post" th:object="${lot}">
-    <div>
-        <label class="form-label">Code: <input class="form-control" type="text" th:field="*{code}"/></label>
-    </div>
-    <div>
-        <label class="form-label">Espece:
-            <select class="form-select" th:field="*{espece.id}">
-                <option value="">--</option>
+    <form class="form-panel" th:action="${lot.id} == null ? @{/lots} : @{/lots/{id}(id=${lot.id})}" method="post" th:object="${lot}">
+        <div class="mb-3">
+            <label class="form-label" for="code">Code</label>
+            <input class="form-control" type="text" id="code" th:field="*{code}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="espece">Espèce</label>
+            <select class="form-select" id="espece" th:field="*{espece.id}">
+                <option value="">-- Choisir une espèce --</option>
                 <option th:each="e : ${especes}" th:value="${e.id}" th:text="${e.nom}"></option>
             </select>
-        </label>
-    </div>
-    <div>
-        <label class="form-label">Bassin:
-            <select class="form-select" th:field="*{bassin.id}">
-                <option value="">--</option>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="bassin">Bassin</label>
+            <select class="form-select" id="bassin" th:field="*{bassin.id}">
+                <option value="">-- Choisir un bassin --</option>
                 <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}"></option>
             </select>
-        </label>
-    </div>
-    <div>
-        <label class="form-label">Stade:
-            <select class="form-select" th:field="*{stadeCroissance.id}">
-                <option value="">--</option>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="stadeCroissance">Stade</label>
+            <select class="form-select" id="stadeCroissance" th:field="*{stadeCroissance.id}">
+                <option value="">-- Choisir un stade --</option>
                 <option th:each="s : ${stades}" th:value="${s.id}" th:text="${s.nom}"></option>
             </select>
-        </label>
-    </div>
-    <div>
-        <label class="form-label">Statut:
-            <select class="form-select" th:field="*{statutLot.id}">
-                <option value="">--</option>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="statutLot">Statut</label>
+            <select class="form-select" id="statutLot" th:field="*{statutLot.id}">
+                <option value="">-- Choisir un statut --</option>
                 <option th:each="st : ${statuts}" th:value="${st.id}" th:text="${st.libelle}"></option>
             </select>
-        </label>
-    </div>
-    <div>
-        <label class="form-label">Date mise en charge: <input class="form-control" type="date" th:field="*{dateMiseEnCharge}"/></label>
-    </div>
-    <div>
-        <label class="form-label">Effectif initial: <input class="form-control" type="number" th:field="*{effectifInitial}"/></label>
-        <label class="form-label" th:if="${lot.id != null}">Effectif actuel: <input class="form-control" type="number" th:field="*{effectifActuel}"/></label>
-    </div>
-    <div>
-        <label class="form-label">Poids moyen initial: <input class="form-control" type="number" step="0.01" th:field="*{poidsMoyenInitial}"/></label>
-        <label class="form-label" th:if="${lot.id != null}">Poids moyen actuel: <input class="form-control" type="number" step="0.01" th:field="*{poidsMoyenActuel}"/></label>
-    </div>
-    <div>
-        <label class="form-label">Observation: <textarea class="form-control" th:field="*{observation}"></textarea></label>
-    </div>
-    <div>
-        <button class="btn btn-primary" type="submit">Save</button>
-        <a th:href="@{/lots}">Cancel</a>
-    </div>
-</form>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="dateMiseEnCharge">Date mise en charge</label>
+            <input class="form-control" type="date" id="dateMiseEnCharge" th:field="*{dateMiseEnCharge}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="effectifInitial">Effectif initial</label>
+            <input class="form-control" type="number" id="effectifInitial" th:field="*{effectifInitial}"/>
+        </div>
+
+        <div class="mb-3" th:if="${lot.id != null}">
+            <label class="form-label" for="effectifActuel">Effectif actuel</label>
+            <input class="form-control" type="number" id="effectifActuel" th:field="*{effectifActuel}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="poidsMoyenInitial">Poids moyen initial</label>
+            <input class="form-control" type="number" step="0.01" id="poidsMoyenInitial" th:field="*{poidsMoyenInitial}"/>
+        </div>
+
+        <div class="mb-3" th:if="${lot.id != null}">
+            <label class="form-label" for="poidsMoyenActuel">Poids moyen actuel</label>
+            <input class="form-control" type="number" step="0.01" id="poidsMoyenActuel" th:field="*{poidsMoyenActuel}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" th:field="*{observation}"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/lots}">Retour à la liste</a>
+        </div>
+    </form>
 </main>
 </body>
 </html>

@@ -11,7 +11,7 @@
 
     <h1>Intervention ID #<span th:text="${maintenance.id}">12</span></h1>
 
-    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
+    <p class="error" th:if="${errorMessage}" th:text="${errorMessage}"></p>
 
     <ul>
         <li><strong>Statut actuel :</strong> <span th:text="${maintenance.statutIntervention}">OUVERTE</span></li>

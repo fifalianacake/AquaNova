@@ -1,70 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>AquaNova</title>
+    <title>AquaNova - États de stocks</title>
 </head>
 <body>
 <main>
-    <h2>États de stocks</h2>
 
-    <!-- FILTERS -->
-    <form method="get" action="/stocks">
+    <div class="toolbar">
+        <a class="btn btn-outline-primary" th:href="@{/stocks/mouvements}">Mouvements de stock</a>
+    </div>
 
-        <input class="form-control" type="date" name="date" th:value="${date}" />
-
-        <input class="form-control" type="text" name="nom" placeholder="Nom aliment" />
-
-        <!-- <select class="form-select" name="size">
-
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-        </select> -->
-
-        <button class="btn btn-primary" type="submit">Filtrer</button>
-    </form>
-
-    <!-- RECAP -->
-    <h3>Total stock : <span th:text="${total}"></span> kg</h3>
-
-    <!-- TABLE -->
-    <table class="table table-hover align-middle">
-        <tr>
-            <th>ID</th>
-            <th>Nom</th>
-            <th>Stock</th>
-            <th>Seuil</th>
-            <th>Action</th>
-        </tr>
-
-        <tr th:each="s : ${stocks.content}">
-            <td th:text="${s.id}"></td>
-            <td th:text="${s.nom}"></td>
-            <td th:text="${s.stock}"></td>
-            <td th:text="${s.seuil}"></td>
-            <td>
-                <a class="btn btn-sm btn-outline-primary" th:href="@{'/stocks/' + ${s.id} + '?date=' + ${date}}">Voir</a>
-            </td>
-        </tr>
-    </table>
-
-    <!-- PAGINATION -->
-    <div>
-        <span th:text="${stocks.number + 1}"></span>
-        /
-        <span th:text="${stocks.totalPages}"></span>
-
-        <div>
-            <a th:if="${stocks.hasPrevious()}"
-                th:href="@{/stocks(page=${stocks.number - 1}, size=${stocks.size}, date=${date}, nom=${param.nom})}">
-                Prev
-            </a>
-
-            <a th:if="${stocks.hasNext()}"
-                th:href="@{/stocks(page=${stocks.number + 1}, size=${stocks.size}, date=${date}, nom=${param.nom})}">
-                Next
-            </a>
+    <div class="panel">
+        <div class="panel-header">
+            <h5>États de stocks</h5>
+            <span class="result-count"
+                  th:text="${stocks.totalElements} + ' aliment' + (${stocks.totalElements} > 1 ? 's' : '') + ' — Total stock : ' + ${total} + ' kg'"></span>
         </div>
+
+        <form method="get" th:action="@{/stocks}" class="filters-bar">
+            <input type="hidden" name="page" value="0" />
+            <div class="input-group">
+                <span class="input-group-text">Au</span>
+                <input class="form-control" type="date" name="date" th:value="${date}">
+            </div>
+            <input class="form-control" type="text" name="nom" placeholder="Nom de l'aliment" th:value="${param.nom}">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+            <a class="btn btn-outline-secondary" th:href="@{/stocks}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th class="text-end">Stock</th>
+                    <th class="text-end">Seuil</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${stocks.content}">
+                    <td th:text="${s.id}"></td>
+                    <td class="fw-semibold" th:text="${s.nom}"></td>
+                    <td class="text-end" th:text="${s.stock}"></td>
+                    <td class="text-end" th:text="${s.seuil}"></td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{'/stocks/' + ${s.id} + '?date=' + ${date}}" title="Voir les détails"><i class="bi bi-eye"></i></a>
+                    </td>
+                </tr>
+                <tr th:if="${stocks.empty}">
+                    <td colspan="5" class="text-center text-secondary py-4">Aucun stock ne correspond à ces critères.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:replace="~{fragments/tableau :: tableFooter(${stocks})}"></div>
     </div>
 </main>
 </body>

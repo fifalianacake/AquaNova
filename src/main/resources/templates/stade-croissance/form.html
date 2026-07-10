@@ -5,27 +5,33 @@
 </head>
 <body>
 <main>
-<h2>Form Stade Croissance</h2>
+    <h2>Form Stade Croissance</h2>
 
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-<form action="/stade-croissance" method="post" th:object="${stade}">
-    <input type="hidden" th:field="*{id}" />
+    <form class="form-panel" action="/stade-croissance" method="post" th:object="${stade}">
+        <input type="hidden" th:field="*{id}" />
 
-    Nom :
-    <input class="form-control" type="text" th:field="*{nom}" />
-    <br/>
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom</label>
+            <input class="form-control" type="text" id="nom" th:field="*{nom}" />
+        </div>
 
-    Poids Min :
-    <input class="form-control" type="number" step="0.01" th:field="*{poidsMin}" />
-    <br/>
+        <div class="mb-3">
+            <label class="form-label" for="poidsMin">Poids Min</label>
+            <input class="form-control" type="number" step="0.01" id="poidsMin" th:field="*{poidsMin}" />
+        </div>
 
-    Poids Max :
-    <input class="form-control" type="number" step="0.01" th:field="*{poidsMax}" />
-    <br/>
+        <div class="mb-3">
+            <label class="form-label" for="poidsMax">Poids Max</label>
+            <input class="form-control" type="number" step="0.01" id="poidsMax" th:field="*{poidsMax}" />
+        </div>
 
-    <button class="btn btn-primary" type="submit">Save</button>
-</form>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/stade-croissance}">Retour à la liste</a>
+        </div>
+    </form>
 </main>
 </body>
 </html>

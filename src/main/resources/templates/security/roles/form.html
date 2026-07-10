@@ -5,21 +5,22 @@
 </head>
 <body>
 <main>
-    <h1>Formulaire d'ajout de rôle</h1>
+    <h2>Formulaire d'ajout de rôle</h2>
 
-    <form th:action="@{/roles}" th:object="${role}" method="post">
-        
+    <form class="form-panel" th:action="@{/roles}" th:object="${role}" method="post">
+
         <input type="hidden" th:field="*{id}" />
 
-        <label class="form-label" for="name">Nom du rôle :</label>
-        <input class="form-control" type="text" id="name" th:field="*{name}"  required>
-        <br><br>
+        <div class="mb-3">
+            <label class="form-label" for="name">Nom du rôle</label>
+            <input class="form-control" type="text" id="name" th:field="*{name}" required>
+        </div>
 
-        <button class="btn btn-primary" type="submit">Enregistrer</button>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/roles}">Retour à la liste</a>
+        </div>
     </form>
-
-    <br>
-    <a class="btn btn-secondary" th:href="@{/roles}">Annuler et retourner à la liste</a>
 </main>
 </body>
 </html>

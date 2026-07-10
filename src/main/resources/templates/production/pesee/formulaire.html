@@ -5,33 +5,35 @@
 </head>
 <body>
 <main>
-    <h1>Enregistrer une pesée pour le lot <span th:text="${idLot}"></span></h1>
+    <h2>Enregistrer une pesée pour le lot <span th:text="${idLot}"></span></h2>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="@{'/lots/' + ${idLot} + '/pesees'}" method="post">
+    <form class="form-panel" th:action="@{'/lots/' + ${idLot} + '/pesees'}" method="post">
+        <div class="mb-3">
+            <label class="form-label" for="datePesee">Date de pesée</label>
+            <input class="form-control" type="date" id="datePesee" name="datePesee" th:value="${datePesee}" required>
+        </div>
 
-        <div>
-            <label class="form-label">Date de pesée :</label>
-            <input class="form-control" type="date" name="datePesee" th:value="${datePesee}" required>
+        <div class="mb-3">
+            <label class="form-label" for="nbEchantillon">Nombre d'échantillons</label>
+            <input class="form-control" type="number" id="nbEchantillon" name="nbEchantillon" th:value="${nbEchantillon}" required>
         </div>
-        <div>
-            <label class="form-label">Nombre d'échantillons :</label>
-            <input class="form-control" type="number" name="nbEchantillon" th:value="${nbEchantillon}" required>
+
+        <div class="mb-3">
+            <label class="form-label" for="poidsTotal">Poids Total (kg)</label>
+            <input class="form-control" type="number" step="0.01" id="poidsTotal" name="poidsTotal" th:value="${poidsTotal}" required>
         </div>
-        <div>
-            <label class="form-label">Poids Total (kg) :</label>
-            <input class="form-control" type="number" step="0.01" name="poidsTotal" th:value="${poidsTotal}" required>
+
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" name="observation" th:text="${observation}"></textarea>
         </div>
-        <div>
-            <label class="form-label">Observation :</label>
-            <textarea class="form-control" name="observation" th:text="${observation}"></textarea>
-        </div>
-        
-        <p>
+
+        <div class="d-flex gap-2 mt-4">
             <button class="btn btn-primary" type="submit">Enregistrer</button>
-            <a class="btn btn-secondary" th:href="@{'/lots/' + ${idLot} + '/pesees'}">Annuler</a>
-        </p>
+            <a class="btn btn-secondary" th:href="@{'/lots/' + ${idLot} + '/pesees'}">Retour à la liste</a>
+        </div>
     </form>
 </main>
 </body>

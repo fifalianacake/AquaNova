@@ -5,42 +5,46 @@
 </head>
 <body>
 <main>
-<h1>Créer une récolte</h1>
+    <h2>Créer une récolte</h2>
 
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-<form th:action="@{/recoltes}" method="post" th:object="${recolteForm}">
-    <div>
-        <label class="form-label">Lot:
-            <select class="form-select" th:field="*{lotId}">
-                <option value="">--</option>
+    <form class="form-panel" th:action="@{/recoltes}" method="post" th:object="${recolteForm}">
+        <div class="mb-3">
+            <label class="form-label" for="lotId">Lot</label>
+            <select class="form-select" id="lotId" th:field="*{lotId}">
+                <option value="">-- Choisir un lot --</option>
                 <option th:each="lot : ${lots}"
                         th:value="${lot.id}"
                         th:text="${lot.code + ' - effectif actuel: ' + lot.effectifActuel + ' - poids moyen actuel: ' + lot.poidsMoyenActuel}"></option>
             </select>
-        </label>
-    </div>
-    <div>
-        <label class="form-label">Type de récolte:
-            <select class="form-select" th:field="*{typeRecolteId}">
-                <option value="">--</option>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="typeRecolteId">Type de récolte</label>
+            <select class="form-select" id="typeRecolteId" th:field="*{typeRecolteId}">
+                <option value="">-- Choisir un type de récolte --</option>
                 <option th:each="type : ${typesRecolte}"
                         th:value="${type.id}"
                         th:text="${type.libelle}"></option>
             </select>
-        </label>
-    </div>
-    <div>
-        <label class="form-label">Date de récolte: <input class="form-control" type="date" th:field="*{dateRecolte}"></label>
-    </div>
-    <div>
-        <label class="form-label">Effectif récolté: <input class="form-control" type="number" th:field="*{effectifRecolte}" min="1"></label>
-    </div>
-    <div>
-        <button class="btn btn-primary" type="submit">Enregistrer</button>
-        <a class="btn btn-secondary" th:href="@{/recoltes}">Annuler</a>
-    </div>
-</form>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="dateRecolte">Date de récolte</label>
+            <input class="form-control" type="date" id="dateRecolte" th:field="*{dateRecolte}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="effectifRecolte">Effectif récolté</label>
+            <input class="form-control" type="number" id="effectifRecolte" th:field="*{effectifRecolte}" min="1">
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/recoltes}">Retour à la liste</a>
+        </div>
+    </form>
 </main>
 </body>
 </html>

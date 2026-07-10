@@ -7,51 +7,50 @@
 <main>
     <h2>Nouveau relevé d'eau</h2>
 
-    <form method="post" th:action="${releve.id} == null ? @{/releves-eau} : @{'/releves-eau/' + ${releve.id}}"
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="form-panel" method="post" th:action="${releve.id} == null ? @{/releves-eau} : @{'/releves-eau/' + ${releve.id}}"
         th:object="${releve}">
 
-        <p>
-            <label class="form-label">Bassin</label>
-            <select class="form-select" th:field="*{bassin.id}" required>
+        <div class="mb-3">
+            <label class="form-label" for="bassin">Bassin</label>
+            <select class="form-select" id="bassin" th:field="*{bassin.id}" required>
                 <option value="">Choisir</option>
                 <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}">
                 </option>
             </select>
-        </p>
+        </div>
 
-        <p>
-            <label class="form-label">Date</label>
-            <input class="form-control" type="date" th:field="*{dateReleve}" required />
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="dateReleve">Date</label>
+            <input class="form-control" type="date" id="dateReleve" th:field="*{dateReleve}" required />
+        </div>
 
-        <p>
-            <label class="form-label">Température</label>
-            <input class="form-control" type="number" step="0.1" th:field="*{temperature}" required />
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="temperature">Température</label>
+            <input class="form-control" type="number" step="0.1" id="temperature" th:field="*{temperature}" required />
+        </div>
 
-        <p>
-            <label class="form-label">pH</label>
-            <input class="form-control" type="number" step="0.1" th:field="*{ph}" required />
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="ph">pH</label>
+            <input class="form-control" type="number" step="0.1" id="ph" th:field="*{ph}" required />
+        </div>
 
-        <p>
-            <label class="form-label">Oxygène</label>
-            <input class="form-control" type="number" step="0.1" th:field="*{oxygene}" required />
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="oxygene">Oxygène</label>
+            <input class="form-control" type="number" step="0.1" id="oxygene" th:field="*{oxygene}" required />
+        </div>
 
-        <p>
-            <label class="form-label">Observation</label>
-            <textarea class="form-control" th:field="*{observation}"></textarea>
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" th:field="*{observation}"></textarea>
+        </div>
 
-        <button class="btn btn-primary" type="submit">Enregistrer</button>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" href="/releves-eau">Retour à la liste</a>
+        </div>
     </form>
-
-    <br>
-
-    <a class="btn btn-secondary" href="/releves-eau">
-        Retour
-    </a>
 </main>
 </body>
 </html>

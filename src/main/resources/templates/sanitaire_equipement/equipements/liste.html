@@ -118,9 +118,9 @@
 
             |
 
-            <form th:action="@{/equipements/{id}/delete(id=${e.id})}"
+            <form class="inline-form" th:action="@{/equipements/{id}/delete(id=${e.id})}"
                   method="post"
-                  style="display:inline;">
+                 >
 
                 <button class="btn btn-danger" type="submit"
                         onclick="return confirm('Voulez-vous supprimer cet équipement ?');">

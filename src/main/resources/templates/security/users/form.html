@@ -5,28 +5,41 @@
 </head>
 <body>
 <main>
-<h1>Formulaire d'ajout d'utilisateur</h1>
+    <h2>Formulaire d'ajout d'utilisateur</h2>
 
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-<form th:action="@{/users}" th:object="${user}" method="post">
-    <label class="form-label" for="name">Nom:</label>
-    <input class="form-control" type="text" id="name" th:field="*{name}" required><br>
+    <form class="form-panel" th:action="@{/users}" th:object="${user}" method="post">
+        <div class="mb-3">
+            <label class="form-label" for="name">Nom</label>
+            <input class="form-control" type="text" id="name" th:field="*{name}" required>
+        </div>
 
-    <label class="form-label" for="lastname">Prenom:</label>
-    <input class="form-control" type="text" id="lastname" th:field="*{lastname}" required><br>
+        <div class="mb-3">
+            <label class="form-label" for="lastname">Prenom</label>
+            <input class="form-control" type="text" id="lastname" th:field="*{lastname}" required>
+        </div>
 
-    <label class="form-label" for="email">Email:</label>
-    <input class="form-control" type="email" id="email" th:field="*{email}" required><br>
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" type="email" id="email" th:field="*{email}" required>
+        </div>
 
-    <label class="form-label" for="password">Mot de passe:</label>
-    <input class="form-control" type="password" id="password" th:field="*{password}" required><br>
+        <div class="mb-3">
+            <label class="form-label" for="password">Mot de passe</label>
+            <input class="form-control" type="password" id="password" th:field="*{password}" required>
+        </div>
 
-    <label class="form-label" for="dateHired">Date d'embauche:</label>
-    <input class="form-control" type="date" id="dateHired" th:field="*{dateHired}" required><br>
+        <div class="mb-3">
+            <label class="form-label" for="dateHired">Date d'embauche</label>
+            <input class="form-control" type="date" id="dateHired" th:field="*{dateHired}" required>
+        </div>
 
-    <button class="btn btn-primary" type="submit">Enregistrer</button>
-</form>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/users}">Retour à la liste</a>
+        </div>
+    </form>
 </main>
 </body>
 </html>

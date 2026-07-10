@@ -1,141 +1,107 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Achats d'alevins</title>
+    <title>AquaNova - Achats d'alevins</title>
 </head>
 <body>
 <main>
 
-<h1>Historique des achats d'alevins</h1>
-
 <div class="toolbar">
-    <a class="btn btn-primary" th:href="@{/achats/alevins/new}">Nouvel achat alevins</a>
-    <a class="btn btn-sm btn-outline-secondary" th:href="@{/especes}">Catalogue espèces</a>
-    <a class="btn btn-sm btn-outline-secondary" th:href="@{/achats/intrants}">Achats d'intrants</a>
+    <a class="btn btn-primary" th:href="@{/achats/alevins/new}"><i class="bi bi-plus-lg"></i> Nouvel achat alevins</a>
+    <a class="btn btn-outline-primary" th:href="@{/especes}">Catalogue espèces</a>
+    <a class="btn btn-outline-primary" th:href="@{/achats/intrants}">Achats d'intrants</a>
 </div>
 
-<form method="get" th:action="@{/achats/alevins}" class="filters">
-    <input type="hidden" name="page" value="0" />
+<div class="panel">
+    <div class="panel-header">
+        <h5>Historique des achats d'alevins</h5>
+        <span class="result-count"
+              th:text="${achats.totalElements} + ' achat' + (${achats.totalElements} > 1 ? 's' : '') + ' trouvé' + (${achats.totalElements} > 1 ? 's' : '')"></span>
+    </div>
 
-    <label class="form-label">ID
-        <input class="form-control" type="number" name="id" th:value="${filter.id}" />
-    </label>
-
-    <label class="form-label">Fournisseur
+    <form method="get" th:action="@{/achats/alevins}" class="filters-bar">
+        <input type="hidden" name="page" value="0" />
+        <input class="form-control fc-sm" type="number" name="id" placeholder="ID" th:value="${filter.id}">
         <select class="form-select" name="fournisseurId">
-            <option value="">Tous</option>
+            <option value="">Tous les fournisseurs</option>
             <option th:each="f : ${fournisseurs}"
                     th:value="${f.id}"
                     th:text="${f.nom}"
                     th:selected="${filter.fournisseurId == f.id}"></option>
         </select>
-    </label>
-
-    <label class="form-label">Catégorie
         <select class="form-select" name="categorieDepenseId">
-            <option value="">Toutes</option>
+            <option value="">Toutes les catégories</option>
             <option th:each="c : ${categoriesDepense}"
                     th:value="${c.id}"
                     th:text="${c.code + ' - ' + c.libelle}"
                     th:selected="${filter.categorieDepenseId == c.id}"></option>
         </select>
-    </label>
-
-    <label class="form-label">Espèce
         <select class="form-select" name="especeId">
-            <option value="">Toutes</option>
+            <option value="">Toutes les espèces</option>
             <option th:each="e : ${especes}"
                     th:value="${e.id}"
                     th:text="${e.nom}"
                     th:selected="${filter.especeId == e.id}"></option>
         </select>
-    </label>
-
-    <label class="form-label">Statut
         <select class="form-select" name="statutAchat">
-            <option value="">Tous</option>
+            <option value="">Tous les statuts</option>
             <option th:each="s : ${statutsAchat}"
                     th:value="${s}"
                     th:text="${s}"
                     th:selected="${filter.statutAchat == s}"></option>
         </select>
-    </label>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}">
+        </div>
+        <input class="form-control fc-sm" type="number" step="0.01" min="0" name="montantMin" placeholder="Mt. min" th:value="${filter.montantMin}">
+        <input class="form-control fc-sm" type="number" step="0.01" min="0" name="montantMax" placeholder="Mt. max" th:value="${filter.montantMax}">
+        <input class="form-control" type="text" name="referenceFacture" placeholder="Référence facture" th:value="${filter.referenceFacture}">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/achats/alevins}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
 
-    <label class="form-label">Date début
-        <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
-    </label>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Fournisseur</th>
+                <th>Catégorie</th>
+                <th>Espèce</th>
+                <th class="text-end">Quantité</th>
+                <th class="text-end">Montant total</th>
+                <th>Statut</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="achatAlevin : ${achats.content}">
+                <td th:text="${achatAlevin.id}"></td>
+                <td th:text="${achatAlevin.dateAchat}"></td>
+                <td class="fw-semibold" th:text="${achatAlevin.fournisseur != null ? achatAlevin.fournisseur.nom : '—'}"></td>
+                <td th:text="${achatAlevin.categorieDepense != null ? achatAlevin.categorieDepense.code : '—'}"></td>
+                <td th:text="${!#lists.isEmpty(achatAlevin.lignes) && achatAlevin.lignes[0].espece != null ? achatAlevin.lignes[0].espece.nom : '—'}"></td>
+                <td class="text-end" th:text="${!#lists.isEmpty(achatAlevin.lignes) ? achatAlevin.lignes[0].quantite + ' ' + achatAlevin.lignes[0].unite : '—'}"></td>
+                <td class="text-end montant" th:text="${achatAlevin.montantTotal}"></td>
+                <td><span class="badge badge-info" th:text="${achatAlevin.statutAchat}"></span></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/achats/{id}(id=${achatAlevin.id})}" title="Voir la fiche"><i class="bi bi-eye"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${achats.empty}">
+                <td colspan="9" class="text-center text-secondary py-4">Aucun achat d'alevins ne correspond à ces critères.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <label class="form-label">Date fin
-        <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
-    </label>
-
-    <label class="form-label">Montant min
-        <input class="form-control" type="number" step="0.01" min="0" name="montantMin" th:value="${filter.montantMin}" />
-    </label>
-
-    <label class="form-label">Montant max
-        <input class="form-control" type="number" step="0.01" min="0" name="montantMax" th:value="${filter.montantMax}" />
-    </label>
-
-    <label class="form-label">Référence facture
-        <input class="form-control" type="text" name="referenceFacture" th:value="${filter.referenceFacture}" />
-    </label>
-
-    <label class="form-label">Lignes/page
-        <select class="form-select" name="size" onchange="this.form.submit()">
-            <option th:each="s : ${pageSizes}"
-                    th:value="${s}"
-                    th:text="${s}"
-                    th:selected="${achats.size == s}"></option>
-        </select>
-    </label>
-
-    <button class="btn btn-primary" type="submit">Filtrer</button>
-    <a th:href="@{/achats/alevins}">Réinitialiser</a>
-</form>
-
-<table class="table table-hover align-middle">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Date</th>
-        <th>Fournisseur</th>
-        <th>Catégorie</th>
-        <th>Espèce</th>
-        <th>Quantité</th>
-        <th>Montant total</th>
-        <th>Statut</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="achatAlevin : ${achats.content}">
-        <td th:text="${achatAlevin.id}"></td>
-        <td th:text="${achatAlevin.dateAchat}"></td>
-        <td th:text="${achatAlevin.fournisseur != null ? achatAlevin.fournisseur.nom : '-'}"></td>
-        <td th:text="${achatAlevin.categorieDepense != null ? achatAlevin.categorieDepense.code : '-'}"></td>
-        <td th:text="${!#lists.isEmpty(achatAlevin.lignes) && achatAlevin.lignes[0].espece != null ? achatAlevin.lignes[0].espece.nom : '-'}"></td>
-        <td th:text="${!#lists.isEmpty(achatAlevin.lignes) ? achatAlevin.lignes[0].quantite + ' ' + achatAlevin.lignes[0].unite : '-'}"></td>
-        <td th:text="${achatAlevin.montantTotal}"></td>
-        <td th:text="${achatAlevin.statutAchat}"></td>
-        <td><a class="btn btn-sm btn-outline-primary" th:href="@{/achats/{id}(id=${achatAlevin.id})}">Fiche</a></td>
-    </tr>
-    <tr th:if="${achats.empty}">
-        <td colspan="9">Aucun achat d'alevins trouvé.</td>
-    </tr>
-    </tbody>
-</table>
-
-<div class="pagination" th:if="${achats.totalPages > 0}">
-    <a class="btn btn-secondary" th:if="${achats.hasPrevious()}"
-       th:href="@{/achats/alevins(page=${achats.number - 1}, size=${achats.size}, id=${filter.id}, fournisseurId=${filter.fournisseurId}, categorieDepenseId=${filter.categorieDepenseId}, especeId=${filter.especeId}, statutAchat=${filter.statutAchat}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax}, referenceFacture=${filter.referenceFacture})}">&laquo; Précédent</a>
-    <span th:unless="${achats.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
-
-    <span th:text="'Page ' + ${achats.number + 1} + ' sur ' + ${achats.totalPages} + ' — ' + ${achats.totalElements} + ' achat(s)'"></span>
-
-    <a th:if="${achats.hasNext()}"
-       th:href="@{/achats/alevins(page=${achats.number + 1}, size=${achats.size}, id=${filter.id}, fournisseurId=${filter.fournisseurId}, categorieDepenseId=${filter.categorieDepenseId}, especeId=${filter.especeId}, statutAchat=${filter.statutAchat}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax}, referenceFacture=${filter.referenceFacture})}">Suivant &raquo;</a>
-    <span th:unless="${achats.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+    <div th:replace="~{fragments/tableau :: tableFooter(${achats})}"></div>
 </div>
 </main>
 </body>

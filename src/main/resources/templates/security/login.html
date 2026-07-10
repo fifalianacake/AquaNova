@@ -7,62 +7,38 @@
     <title>AquaNova - Connexion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link th:href="@{/css/aquanova.css}" rel="stylesheet"/>
-    <style>
-        .login-page {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #123a55;
-        }
-        .login-card {
-            width: 100%;
-            max-width: 400px;
-        }
-        .login-brand {
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        .login-brand .bi {
-            font-size: 2.5rem;
-        }
-    </style>
 </head>
 
 <body>
 
 <div class="login-page">
-    <div>
-        <div class="login-brand">
-            <i class="bi bi-water"></i>
-            <h1 class="h3 fw-bold mb-0">AquaNova</h1>
-            <p class="mb-0 small" style="color:#b4cddd;">Gestion de pisciculture</p>
+    <div class="card login-card">
+        <div class="login-head">
+            <span class="brand-badge"><i class="bi bi-water"></i></span>
+            <h3 class="mt-3 mb-1">AquaNova</h3>
+            <p class="text-secondary mb-0">Plateforme de gestion piscicole</p>
         </div>
+        <div class="card-body p-4">
+            <div th:if="${error}" class="alert alert-danger py-2" th:text="${error}"></div>
 
-        <div class="card login-card shadow-sm">
-            <div class="card-body p-4">
-                <h2 class="h5 mb-3">Connexion</h2>
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="email">Adresse e-mail</label>
+                    <input class="form-control" type="email" id="email" name="email" placeholder="vous@ferme.mg" required>
+                </div>
 
-                <div th:if="${error}" class="alert alert-danger py-2" th:text="${error}"></div>
+                <div class="mb-4">
+                    <label class="form-label" for="password">Mot de passe</label>
+                    <input class="form-control" type="password" id="password" name="password" required>
+                </div>
 
-                <form th:action="@{/login}" method="post">
-                    <div class="mb-3">
-                        <label class="form-label" for="email">Email</label>
-                        <input class="form-control" type="email" id="email" name="email" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label" for="password">Mot de passe</label>
-                        <input class="form-control" type="password" id="password" name="password" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">
-                        Se connecter
-                    </button>
-                </form>
-            </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    Se connecter
+                </button>
+            </form>
         </div>
     </div>
 </div>

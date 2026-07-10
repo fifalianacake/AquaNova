@@ -5,13 +5,19 @@
 </head>
 <body>
 <main>
-    <h1>Types d'équipements</h1>
+    <h2>Types d'équipements</h2>
 
-    <form th:action="@{/types-equipements}" th:object="${typeEquipement}" method="post">
-        <label class="form-label">Libellé :</label>
-        <input class="form-control" type="text" th:field="*{libelle}" required>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-        <button class="btn btn-primary" type="submit">Enregistrer</button>
+    <form class="form-panel" th:action="@{/types-equipements}" th:object="${typeEquipement}" method="post">
+        <div class="mb-3">
+            <label class="form-label" for="libelle">Libellé</label>
+            <input class="form-control" type="text" id="libelle" th:field="*{libelle}" required>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </div>
     </form>
 
     <table class="table table-hover align-middle">

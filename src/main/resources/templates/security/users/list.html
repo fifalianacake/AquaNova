@@ -7,7 +7,7 @@
 <main>
     <h1>Liste des Utilisateurs</h1>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
 
     <a class="btn btn-primary" th:href="@{/users/new}">Ajouter un utilisateur</a> |
     <a th:href="@{/roles}">Gerer les rôles</a>
@@ -39,7 +39,7 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(users)}">
-                <td colspan="6" style="text-align: center;">Aucun utilisateur trouve.</td>
+                <td class="text-center" colspan="6">Aucun utilisateur trouve.</td>
             </tr>
         </tbody>
     </table>

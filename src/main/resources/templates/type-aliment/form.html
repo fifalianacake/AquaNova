@@ -5,19 +5,23 @@
 </head>
 <body>
 <main>
-<h2>Form Type Aliment</h2>
+    <h2>Form Type Aliment</h2>
 
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-<form action="/types-aliments" method="post" th:object="${type}">
-    <input type="hidden" th:field="*{id}" />
+    <form class="form-panel" action="/types-aliments" method="post" th:object="${type}">
+        <input type="hidden" th:field="*{id}" />
 
-    Nom :
-    <input class="form-control" type="text" th:field="*{nom}" />
-    <br/>
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom</label>
+            <input class="form-control" type="text" id="nom" th:field="*{nom}" />
+        </div>
 
-    <button class="btn btn-primary" type="submit">Save</button>
-</form>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/types-aliments}">Retour à la liste</a>
+        </div>
+    </form>
 </main>
 </body>
 </html>

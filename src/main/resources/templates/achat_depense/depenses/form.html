@@ -6,102 +6,95 @@
 <body>
 <main>
 
-    <div class="container">
+    <h2 th:text="${depense.id == null ? 'Nouvelle dépense' : 'Modifier dépense'}"></h2>
 
-        <h1 th:text="${depense.id == null ? 'Nouvelle dépense' : 'Modifier dépense'}"></h1>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-        <div class="error" th:if="${error}" th:text="${error}"></div>
+    <form class="form-panel" method="post" th:object="${depense}"
+        th:action="${depense.id == null} ? @{/depenses} : @{/depenses/{id}(id=${depense.id})}">
 
-        <form method="post" th:object="${depense}"
-            th:action="${depense.id == null} ? @{/depenses} : @{/depenses/{id}(id=${depense.id})}">
+        <div class="mb-3">
+            <label class="form-label" for="dateDepense">Date *</label>
+            <input class="form-control" type="date" id="dateDepense" th:field="*{dateDepense}" required />
+        </div>
 
-            ```
-            <div class="grid">
-                <div>
-                    <label class="form-label">Date *</label>
-                    <input class="form-control" type="date" th:field="*{dateDepense}" required />
-                </div>
+        <div class="mb-3">
+            <label class="form-label" for="categorieDepense">Catégorie *</label>
+            <select class="form-select" id="categorieDepense" th:field="*{categorieDepense.id}" required>
+                <option value="">-- Choisir --</option>
+                <option th:each="c : ${categoriesDepense}" th:value="${c.id}"
+                    th:text="${c.code + ' - ' + c.libelle}">
+                </option>
+            </select>
+        </div>
 
-                <div>
-                    <label class="form-label">Catégorie *</label>
-                    <select class="form-select" th:field="*{categorieDepense.id}" required>
-                        <option value="">-- Choisir --</option>
-                        <option th:each="c : ${categoriesDepense}" th:value="${c.id}"
-                            th:text="${c.code + ' - ' + c.libelle}">
-                        </option>
-                    </select>
-                </div>
+        <div class="mb-3">
+            <label class="form-label" for="libelle">Libellé *</label>
+            <input class="form-control" type="text" id="libelle" th:field="*{libelle}" required />
+        </div>
 
-                <div class="full">
-                    <label class="form-label">Libellé *</label>
-                    <input class="form-control" type="text" th:field="*{libelle}" required />
-                </div>
+        <div class="mb-3">
+            <label class="form-label" for="totalMontant">Montant total</label>
+            <input type="number" step="0.01" th:field="*{montant}" readonly class="form-control readonly"
+                id="totalMontant" />
+        </div>
 
-                <div class="full">
-                    <label class="form-label">Montant total</label>
-                    <input type="number" step="0.01" th:field="*{montant}" readonly class="readonly"
-                        id="totalMontant" />
-                </div>
-            </div>
+        <fieldset class="mb-3">
+            <legend>Lignes de paiement</legend>
 
-            <fieldset>
-                <legend>Lignes de paiement</legend>
+            <div id="paiementsContainer">
+                <div th:each="paiement, stat : *{paiements}" class="paiement-line d-flex gap-2 align-items-end flex-wrap mb-3">
 
-                <div id="paiementsContainer">
-                    <div th:each="paiement, stat : *{paiements}" class="paiement-line">
-
-                        <div>
-                            <label class="form-label">Mode *</label>
-                            <select class="form-select" th:field="*{paiements[__${stat.index}__].modePaiement}" required>
-                                <option value="">-- Choisir --</option>
-                                <option th:each="mode : ${T(mg.itu.aquanova.achat.models.ModePaiementEnum).values()}"
-                                    th:value="${mode}" th:text="${mode.libelle}">
-                                </option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="form-label">Montant *</label>
-                            <input type="number" step="0.01" min="0" th:field="*{paiements[__${stat.index}__].montant}"
-                                class="montant-input" required />
-                        </div>
-
-                        <div>
-                            <label class="form-label">Référence</label>
-                            <input class="form-control" type="text" th:field="*{paiements[__${stat.index}__].reference}" />
-                        </div>
-
-                        <div>
-                            <label class="form-label">Observation</label>
-                            <input class="form-control" type="text" th:field="*{paiements[__${stat.index}__].observation}" />
-                        </div>
-
-                        <div>
-                            <button type="button" class="btn btn-danger" onclick="removeLine(this)">✕</button>
-                        </div>
-
-                        <input type="hidden" th:field="*{paiements[__${stat.index}__].id}" />
+                    <div>
+                        <label class="form-label">Mode *</label>
+                        <select class="form-select" th:field="*{paiements[__${stat.index}__].modePaiement}" required>
+                            <option value="">-- Choisir --</option>
+                            <option th:each="mode : ${T(mg.itu.aquanova.achat.models.ModePaiementEnum).values()}"
+                                th:value="${mode}" th:text="${mode.libelle}">
+                            </option>
+                        </select>
                     </div>
+
+                    <div>
+                        <label class="form-label">Montant *</label>
+                        <input type="number" step="0.01" min="0" th:field="*{paiements[__${stat.index}__].montant}"
+                            class="form-control montant-input" required />
+                    </div>
+
+                    <div>
+                        <label class="form-label">Référence</label>
+                        <input class="form-control" type="text" th:field="*{paiements[__${stat.index}__].reference}" />
+                    </div>
+
+                    <div>
+                        <label class="form-label">Observation</label>
+                        <input class="form-control" type="text" th:field="*{paiements[__${stat.index}__].observation}" />
+                    </div>
+
+                    <div>
+                        <button type="button" class="btn btn-danger" onclick="removeLine(this)">✕</button>
+                    </div>
+
+                    <input type="hidden" th:field="*{paiements[__${stat.index}__].id}" />
                 </div>
-
-                <button type="button" class="btn btn-secondary" onclick="addPaymentLine()">
-                    + Ajouter une ligne
-                </button>
-            </fieldset>
-
-            <div class="full">
-                <label class="form-label">Observation</label>
-                <textarea class="form-control" th:field="*{observation}" rows="3"></textarea>
             </div>
 
-            <div class="actions">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-                <a th:href="@{/depenses}" class="btn btn-secondary">Annuler</a>
-            </div>
-            ```
+            <button type="button" class="btn btn-secondary" onclick="addPaymentLine()">
+                + Ajouter une ligne
+            </button>
+        </fieldset>
 
-        </form>
-    </div>
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" th:field="*{observation}" rows="3"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a th:href="@{/depenses}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+    </form>
 
     <script>
         function updateTotal() {
@@ -123,7 +116,7 @@
             const index = container.children.length;
 
             const div = document.createElement('div');
-            div.className = 'paiement-line';
+            div.className = 'paiement-line d-flex gap-2 align-items-end flex-wrap mb-3';
 
             div.innerHTML = `
             <div>
@@ -140,9 +133,9 @@
 
             <div>
                 <label class="form-label">Montant *</label>
-                <input type="number" step="0.01" min="0" 
+                <input type="number" step="0.01" min="0"
                        name="paiements[${index}].montant"
-                       class="montant-input" required />
+                       class="form-control montant-input" required />
             </div>
 
             <div>

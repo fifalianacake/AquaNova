@@ -1,144 +1,100 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Prévision des stocks de provende</title>
+    <title>AquaNova - Prévision des stocks de provende</title>
 </head>
 <body>
 <main>
 
-    <h1>Prévision des stocks de provende</h1>
-    <p class="subtitle">
-        Suivi du stock restant, de la consommation moyenne journalière et de la date probable de rupture.
-    </p>
-
-    <div class="actions">
-        <a th:href="@{/stocks}">États de stocks</a>
-        <a th:href="@{/stocks/mouvements}">Mouvements de stock</a>
-        <a th:href="@{/distributions}">Distributions</a>
+    <div class="toolbar">
+        <a class="btn btn-outline-primary" th:href="@{/stocks}">États de stocks</a>
+        <a class="btn btn-outline-primary" th:href="@{/stocks/mouvements}">Mouvements de stock</a>
+        <a class="btn btn-outline-primary" th:href="@{/distributions}">Distributions</a>
     </div>
 
     <div class="error" th:if="${error != null}" th:text="${error}"></div>
 
-    <div class="filter-card">
-        <form method="get" th:action="@{/prevision}">
-            <div class="filter-row">
+    <div class="panel">
+        <div class="panel-header">
+            <h5>Prévision des stocks de provende</h5>
+            <span class="result-count"
+                  th:with="nb=${previsions != null ? #lists.size(previsions) : 0}"
+                  th:text="${nb} + ' aliment' + (${nb} > 1 ? 's' : '') + ' analysé' + (${nb} > 1 ? 's' : '')"></span>
+        </div>
 
-                <label class="form-label">
-                    Aliment
-                    <select class="form-select" name="alimentId">
-                        <option value="">-- Tous les aliments --</option>
-                        <option th:each="aliment : ${aliments}" th:value="${aliment.id}" th:text="${aliment.nom}"
-                            th:selected="${alimentId != null && alimentId == aliment.id}">
-                        </option>
-                    </select>
-                </label>
-
-                <label class="form-label">
-                    Date de référence
-                    <input class="form-control" type="date" name="date" th:value="${dateReference}">
-                </label>
-
-                <label class="form-label">
-                    Horizon suggestion achat, en jours
-                    <input class="form-control" type="number" name="horizonJours" min="1" th:value="${horizonJours}">
-                </label>
-
-                <button class="btn btn-primary" type="submit">Calculer</button>
-                <a class="reset-link" th:href="@{/prevision}">Réinitialiser</a>
-
+        <form method="get" th:action="@{/prevision}" class="filters-bar">
+            <select class="form-select" name="alimentId">
+                <option value="">Tous les aliments</option>
+                <option th:each="aliment : ${aliments}" th:value="${aliment.id}" th:text="${aliment.nom}"
+                        th:selected="${alimentId != null && alimentId == aliment.id}"></option>
+            </select>
+            <div class="input-group">
+                <span class="input-group-text">Au</span>
+                <input class="form-control" type="date" name="date" th:value="${dateReference}">
             </div>
+            <input class="form-control fc-sm" type="number" name="horizonJours" min="1"
+                   placeholder="Horizon (j)" th:value="${horizonJours}">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Calculer</button>
+            <a class="btn btn-outline-secondary" th:href="@{/prevision}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
         </form>
-    </div>
 
-    <div class="summary-card">
-        <div class="summary-grid">
-            <div class="summary-item">
-                <div class="summary-label">Date de calcul</div>
-                <div class="summary-value" th:text="${dateReference}">-</div>
-            </div>
-
-            <div class="summary-item">
-                <div class="summary-label">Stock total estimé</div>
-                <div class="summary-value" th:text="${stockTotal != null ? stockTotal + ' kg' : '-'}">
-                    -
+        <div class="summary-card">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Date de calcul</div>
+                    <div class="summary-value" th:text="${dateReference}">-</div>
                 </div>
-            </div>
 
-            <div class="summary-item">
-                <div class="summary-label">Nombre d’aliments analysés</div>
-                <div class="summary-value" th:text="${previsions != null ? #lists.size(previsions) : 0}">
-                    0
+                <div class="summary-item">
+                    <div class="summary-label">Stock total estimé</div>
+                    <div class="summary-value" th:text="${stockTotal != null ? stockTotal + ' kg' : '-'}">-</div>
+                </div>
+
+                <div class="summary-item">
+                    <div class="summary-label">Nombre d’aliments analysés</div>
+                    <div class="summary-value" th:text="${previsions != null ? #lists.size(previsions) : 0}">0</div>
                 </div>
             </div>
         </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>Aliment</th>
+                    <th class="text-end">Quantité restante</th>
+                    <th class="text-end">Consommation / jour</th>
+                    <th class="text-end">Jours restants</th>
+                    <th>Date de rupture</th>
+                    <th class="text-end">Suggestion d’achat</th>
+                    <th>Alerte</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="prevision : ${previsions}">
+                    <td class="fw-semibold" th:text="${prevision.alimentNom}"></td>
+                    <td class="text-end" th:text="${prevision.quantiteRestante != null ? prevision.quantiteRestante + ' kg' : '-'}"></td>
+                    <td class="text-end" th:text="${prevision.consommationJour != null ? prevision.consommationJour + ' kg/jour' : '-'}"></td>
+                    <td class="text-end" th:text="${prevision.joursRestants != null ? prevision.joursRestants + ' jours' : '-'}"></td>
+                    <td th:text="${prevision.dateRupture != null ? prevision.dateRupture : '-'}"></td>
+                    <td class="text-end" th:text="${prevision.suggestionQuantiteAchat != null ? prevision.suggestionQuantiteAchat + ' kg' : '-'}"></td>
+                    <td>
+                        <span th:if="${prevision.alerte == null}" class="badge badge-success">Stock suffisant</span>
+                        <span th:if="${prevision.alerte != null && prevision.joursRestants != null && prevision.joursRestants > 7}"
+                              class="badge badge-warning" th:text="${prevision.alerte}"></span>
+                        <span th:if="${prevision.alerte != null && (prevision.joursRestants == null || prevision.joursRestants <= 7)}"
+                              class="badge badge-danger" th:text="${prevision.alerte}"></span>
+                    </td>
+                </tr>
+                <tr th:if="${previsions == null || #lists.isEmpty(previsions)}">
+                    <td colspan="7" class="text-center text-secondary py-4">
+                        Aucune prévision disponible. Vérifiez les stocks, les mouvements et les distributions.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <table class="table table-hover align-middle">
-        <thead>
-            <tr>
-                <th>Aliment</th>
-                <th>Quantité restante</th>
-                <th>Consommation / jour</th>
-                <th>Jours restants</th>
-                <th>Date de rupture</th>
-                <th>Suggestion d’achat</th>
-                <th>Alerte</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr th:each="prevision : ${previsions}">
-                <td>
-                    <strong th:text="${prevision.alimentNom}">Aliment</strong>
-                </td>
-
-                <td th:text="${prevision.quantiteRestante != null ? prevision.quantiteRestante + ' kg' : '-'}">
-                    -
-                </td>
-
-                <td th:text="${prevision.consommationJour != null ? prevision.consommationJour + ' kg/jour' : '-'}">
-                    -
-                </td>
-
-                <td th:text="${prevision.joursRestants != null ? prevision.joursRestants + ' jours' : '-'}">
-                    -
-                </td>
-
-                <td th:text="${prevision.dateRupture != null ? prevision.dateRupture : '-'}">
-                    -
-                </td>
-
-                <td
-                    th:text="${prevision.suggestionQuantiteAchat != null ? prevision.suggestionQuantiteAchat + ' kg' : '-'}">
-                    -
-                </td>
-
-                <td>
-                    <span th:if="${prevision.alerte == null}" class="badge badge-ok">
-                        Stock suffisant
-                    </span>
-
-                    <span
-                        th:if="${prevision.alerte != null && prevision.joursRestants != null && prevision.joursRestants > 7}"
-                        class="badge badge-warning" th:text="${prevision.alerte}">
-                        Alerte
-                    </span>
-
-                    <span
-                        th:if="${prevision.alerte != null && (prevision.joursRestants == null || prevision.joursRestants <= 7)}"
-                        class="badge badge-danger" th:text="${prevision.alerte}">
-                        Rupture proche
-                    </span>
-                </td>
-            </tr>
-
-            <tr th:if="${previsions == null || #lists.isEmpty(previsions)}">
-                <td colspan="7" class="empty">
-                    Aucune prévision disponible. Vérifiez les stocks, les mouvements et les distributions.
-                </td>
-            </tr>
-        </tbody>
-    </table>
 </main>
 </body>
 </html>

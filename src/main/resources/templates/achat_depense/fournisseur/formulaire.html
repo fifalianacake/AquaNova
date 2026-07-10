@@ -5,58 +5,60 @@
 </head>
 <body>
 <main>
-    <h1 th:text="${fournisseur.id == null} ? 'Ajouter un fournisseur' : 'Modifier le fournisseur'">Formulaire</h1>
+    <h2 th:text="${fournisseur.id == null} ? 'Ajouter un fournisseur' : 'Modifier le fournisseur'">Formulaire</h2>
 
-    <form th:action="@{/fournisseurs}" th:object="${fournisseur}" method="post">
-        
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="form-panel" th:action="@{/fournisseurs}" th:object="${fournisseur}" method="post">
+
         <input type="hidden" th:field="*{id}" />
 
-        <div>
-            <label class="form-label" for="nom">Nom * (Obligatoire) :</label>
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom * (Obligatoire)</label>
             <input class="form-control" type="text" id="nom" th:field="*{nom}" required maxlength="150" />
         </div>
 
-        <div>
-            <label class="form-label" for="typeFournisseur">Type Fournisseur * (Obligatoire) :</label>
+        <div class="mb-3">
+            <label class="form-label" for="typeFournisseur">Type Fournisseur * (Obligatoire)</label>
             <select class="form-select" id="typeFournisseur" th:field="*{typeFournisseur}" required>
                 <option value="">-- Choisir un type --</option>
                 <option th:each="type : ${typesFournisseur}" th:value="${type}" th:text="${type}"></option>
             </select>
         </div>
 
-        <div>
-            <label class="form-label" for="contact">Contact (Recommandé) :</label>
+        <div class="mb-3">
+            <label class="form-label" for="contact">Contact (Recommandé)</label>
             <input class="form-control" type="text" id="contact" th:field="*{contact}" maxlength="100" />
         </div>
 
-        <div>
-            <label class="form-label" for="email">Email :</label>
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
             <input class="form-control" type="email" id="email" th:field="*{email}" maxlength="150" />
         </div>
 
-        <div>
-            <label class="form-label" for="adresse">Adresse :</label>
+        <div class="mb-3">
+            <label class="form-label" for="adresse">Adresse</label>
             <textarea class="form-control" id="adresse" th:field="*{adresse}"></textarea>
         </div>
 
-        <div>
-            <label class="form-label" for="nifStat">NIF / STAT :</label>
+        <div class="mb-3">
+            <label class="form-label" for="nifStat">NIF / STAT</label>
             <input class="form-control" type="text" id="nifStat" th:field="*{nifStat}" maxlength="100" />
         </div>
 
-        <div>
-            <label class="form-label" for="actif">Actif :</label>
+        <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" id="actif" th:field="*{actif}" />
+            <label class="form-check-label" for="actif">Actif</label>
         </div>
 
-        <div>
-            <label class="form-label" for="observation">Observation :</label>
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
             <textarea class="form-control" id="observation" th:field="*{observation}"></textarea>
         </div>
 
-        <div>
+        <div class="d-flex gap-2 mt-4">
             <button class="btn btn-primary" type="submit">Enregistrer</button>
-            <a class="btn btn-secondary" th:href="@{/fournisseurs}">Annuler</a>
+            <a class="btn btn-secondary" th:href="@{/fournisseurs}">Retour à la liste</a>
         </div>
     </form>
 </main>

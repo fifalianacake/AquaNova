@@ -1,47 +1,55 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Production - Liste des Mortalités</title>
+    <title>AquaNova - Suivi des mortalités</title>
 </head>
 <body>
 <main>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 th:text="${titre != null ? titre : 'Suivi des Mortalités'}">Suivi des Mortalités</h2>
-        <div>
-            <a th:if="${lot != null}" th:href="@{/lots/{id}/mortalites/new(id=${lot.id})}" class="btn btn-primary">Ajouter une Mortalité</a>
-            <a th:if="${lot == null}" th:href="@{/mortalites/new}" class="btn btn-primary">Ajouter une Mortalité</a>
-            <a th:if="${lot != null}" th:href="@{/lots/{id}(id=${lot.id})}" class="btn btn-secondary">Retour au lot</a>
-        </div>
+
+<div class="toolbar">
+    <a th:if="${lot != null}" th:href="@{/lots/{id}/mortalites/new(id=${lot.id})}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ajouter une mortalité</a>
+    <a th:if="${lot == null}" th:href="@{/mortalites/new}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ajouter une mortalité</a>
+    <a th:if="${lot != null}" th:href="@{/lots/{id}(id=${lot.id})}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Retour au lot</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5 th:text="${titre != null ? titre : 'Suivi des mortalités'}">Suivi des mortalités</h5>
+        <span class="result-count"
+              th:with="nb=${#lists.size(mortalites)}"
+              th:text="${nb} + ' mortalité' + (${nb} > 1 ? 's' : '') + ' enregistrée' + (${nb} > 1 ? 's' : '')"></span>
     </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Lot</th>
                 <th>Date</th>
-                <th>Nombre de Morts</th>
+                <th class="text-end">Nombre de morts</th>
                 <th>Cause</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="m : ${mortalites}">
-                <td th:text="${m.id}">1</td>
-                <td th:text="${m.lot != null ? m.lot.code : '-'}">LOT-001</td>
-                <td th:text="${#temporals.format(m.dateMortalite, 'dd/MM/yyyy')}">01/01/2026</td>
-                <td th:text="${m.nbMorts}">5</td>
-                <td th:text="${m.cause != null ? m.cause : '-'}">Maladie</td>
-                <td>
-                    <a th:href="@{/mortalites/{id}/edit(id=${m.id})}"
-                        class="btn btn-sm btn-outline-primary">Modifier</a>
+                <td th:text="${m.id}"></td>
+                <td class="fw-semibold" th:text="${m.lot != null ? m.lot.code : '—'}"></td>
+                <td th:text="${#temporals.format(m.dateMortalite, 'dd/MM/yyyy')}"></td>
+                <td class="text-end" th:text="${m.nbMorts}"></td>
+                <td th:text="${m.cause != null ? m.cause : '—'}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/mortalites/{id}/edit(id=${m.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(mortalites)}">
-                <td colspan="6" class="text-center">Aucune mortalité enregistrée.</td>
+                <td colspan="6" class="text-center text-secondary py-4">Aucune mortalité enregistrée.</td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+</div>
 </main>
 </body>
 </html>

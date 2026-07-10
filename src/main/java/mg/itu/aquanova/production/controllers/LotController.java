@@ -45,11 +45,7 @@ public class LotController {
     ) {
         Page<LotModels> lotPage = service.lister(filter, pageable);
 
-        model.addAttribute("lots", lotPage.getContent());
-        model.addAttribute("currentPage", lotPage.getNumber());
-        model.addAttribute("totalPages", lotPage.getTotalPages());
-        model.addAttribute("hasNext", lotPage.hasNext());
-        model.addAttribute("hasPrevious", lotPage.hasPrevious());
+        model.addAttribute("lotPage", lotPage);
 
         model.addAttribute("lots", lotPage.getContent());
         model.addAttribute("especes", especesService.findAll());

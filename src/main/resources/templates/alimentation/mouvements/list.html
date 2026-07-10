@@ -1,105 +1,87 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>AquaNova</title>
+    <title>AquaNova - Mouvements de stock</title>
 </head>
 <body>
 <main>
-    <div th:if="${error}" style="color:red;">
+
+    <div class="error" th:if="${error}">
         <p th:text="${error}"></p>
     </div>
 
-    <h2>Mouvements de stock</h2>
+    <div class="toolbar">
+        <a class="btn btn-primary" th:href="@{/stocks/mouvements/new}"><i class="bi bi-plus-lg"></i> Nouveau mouvement</a>
+    </div>
 
-    <form method="get" th:action="@{/stocks/mouvements}" class="filters">
-        <input type="hidden" name="page" value="0" />
+    <div class="panel">
+        <div class="panel-header">
+            <h5>Mouvements de stock</h5>
+            <span class="result-count"
+                  th:text="${mouvements.totalElements} + ' mouvement' + (${mouvements.totalElements} > 1 ? 's' : '') + ' trouvé' + (${mouvements.totalElements} > 1 ? 's' : '')"></span>
+        </div>
 
-        <label class="form-label">ID
-            <input class="form-control" type="number" name="id" th:value="${filter.id}" />
-        </label>
-
-        <label class="form-label">Type
+        <form method="get" th:action="@{/stocks/mouvements}" class="filters-bar">
+            <input type="hidden" name="page" value="0" />
+            <input class="form-control fc-sm" type="number" name="id" placeholder="ID" th:value="${filter.id}">
             <select class="form-select" name="type">
-                <option value="">Tous</option>
+                <option value="">Tous les types</option>
                 <option th:each="t : ${typesMouvement}"
                         th:value="${t}"
                         th:text="${t}"
                         th:selected="${filter.type == t}"></option>
             </select>
-        </label>
-
-        <label class="form-label">Aliment
             <select class="form-select" name="alimentId">
-                <option value="">Tous</option>
+                <option value="">Tous les aliments</option>
                 <option th:each="a : ${aliments}"
                         th:value="${a.id}"
                         th:text="${a.nom}"
                         th:selected="${filter.alimentId == a.id}"></option>
             </select>
-        </label>
+            <div class="input-group">
+                <span class="input-group-text">Du</span>
+                <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}">
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Au</span>
+                <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}">
+            </div>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+            <a class="btn btn-outline-secondary" th:href="@{/stocks/mouvements}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+        </form>
 
-        <label class="form-label">Date début
-            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
-        </label>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Aliment</th>
+                    <th>Type</th>
+                    <th class="text-end">Quantité</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${mouvements.content}">
+                    <td th:text="${m.id}"></td>
+                    <td th:text="${m.dateMouvement}"></td>
+                    <td class="fw-semibold" th:text="${m.aliment != null ? m.aliment.nom : '—'}"></td>
+                    <td><span class="badge badge-info" th:text="${m.typeMouvement}"></span></td>
+                    <td class="text-end" th:text="${m.quantite}"></td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/stocks/mouvements/{id}(id=${m.id})}" title="Voir les détails"><i class="bi bi-eye"></i></a>
+                    </td>
+                </tr>
+                <tr th:if="${mouvements.empty}">
+                    <td colspan="6" class="text-center text-secondary py-4">Aucun mouvement ne correspond à ces critères.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <label class="form-label">Date fin
-            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
-        </label>
-
-        <label class="form-label">Lignes/page
-            <select class="form-select" name="size" onchange="this.form.submit()">
-                <option th:each="s : ${pageSizes}"
-                        th:value="${s}"
-                        th:text="${s}"
-                        th:selected="${mouvements.size == s}"></option>
-            </select>
-        </label>
-
-        <button class="btn btn-primary" type="submit">Filtrer</button>
-        <a th:href="@{/stocks/mouvements}">Réinitialiser</a>
-    </form>
-
-    <table class="table table-hover align-middle">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Aliment</th>
-            <th>Type</th>
-            <th>Quantité</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="m : ${mouvements.content}">
-            <td th:text="${m.id}"></td>
-            <td th:text="${m.dateMouvement}"></td>
-            <td th:text="${m.aliment.nom}"></td>
-            <td th:text="${m.typeMouvement}"></td>
-            <td th:text="${m.quantite}"></td>
-            <td>
-                <a class="btn btn-sm btn-outline-primary" th:href="@{/stocks/mouvements/{id}(id=${m.id})}">Voir</a>
-            </td>
-        </tr>
-        <tr th:if="${mouvements.empty}">
-            <td colspan="6">Aucune donnée trouvée.</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="pagination" th:if="${mouvements.totalPages > 0}">
-        <a class="btn btn-secondary" th:if="${mouvements.hasPrevious()}"
-           th:href="@{/stocks/mouvements(page=${mouvements.number - 1}, size=${mouvements.size}, id=${filter.id}, type=${filter.type}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
-        <span th:unless="${mouvements.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
-
-        <span th:text="'Page ' + ${mouvements.number + 1} + ' sur ' + ${mouvements.totalPages} + ' — ' + ${mouvements.totalElements} + ' résultat(s)'"></span>
-
-        <a th:if="${mouvements.hasNext()}"
-           th:href="@{/stocks/mouvements(page=${mouvements.number + 1}, size=${mouvements.size}, id=${filter.id}, type=${filter.type}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
-        <span th:unless="${mouvements.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+        <div th:replace="~{fragments/tableau :: tableFooter(${mouvements})}"></div>
     </div>
-
-    <a class="btn btn-primary" href="/stocks/mouvements/new">Nouveau mouvement</a>
 </main>
 </body>
 </html>

@@ -7,7 +7,7 @@
 <main>
     <h1>Liste des Rôles</h1>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
 
     <a class="btn btn-primary" th:href="@{/roles/new}"> Ajouter un nouveau rôle</a>
     <br><br>
@@ -32,7 +32,7 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(roles)}">
-                <td colspan="3" style="text-align: center;">Aucun rôle trouve.</td>
+                <td class="text-center" colspan="3">Aucun rôle trouve.</td>
             </tr>
         </tbody>
     </table>

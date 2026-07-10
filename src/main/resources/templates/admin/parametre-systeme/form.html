@@ -5,28 +5,28 @@
 </head>
 <body>
 <main>
-    <h1 th:text="${parametre.id == null ? 'Creer un paramètre système' : 'Modifier un paramètre système'}"></h1>
+    <h2 th:text="${parametre.id == null ? 'Creer un paramètre système' : 'Modifier un paramètre système'}"></h2>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="@{${parametre.id == null} ? '/parametres-systeme' : '/parametres-systeme/' + ${parametre.id}}"
-        th:object="${parametre}" method="post">
-        <div>
+    <form class="form-panel" th:action="@{${parametre.id == null} ? '/parametres-systeme' : '/parametres-systeme/' + ${parametre.id}}"
+          th:object="${parametre}" method="post">
+        <div class="mb-3">
             <label class="form-label" for="code">Code</label>
             <input class="form-control" type="text" id="code" th:field="*{code}">
         </div>
 
-        <div>
+        <div class="mb-3">
             <label class="form-label" for="libelle">Libelle</label>
             <input class="form-control" type="text" id="libelle" th:field="*{libelle}">
         </div>
 
-        <div>
+        <div class="mb-3">
             <label class="form-label" for="valeur">Valeur</label>
             <input class="form-control" type="text" id="valeur" th:field="*{valeur}">
         </div>
 
-        <div>
+        <div class="mb-3">
             <label class="form-label" for="typeValeur">Type de valeur</label>
             <select class="form-select" id="typeValeur" th:field="*{typeValeur}">
                 <option value="" disabled>-- Choisir un type --</option>
@@ -35,12 +35,12 @@
             </select>
         </div>
 
-        <div>
+        <div class="mb-3">
             <label class="form-label" for="description">Description</label>
             <textarea class="form-control" id="description" th:field="*{description}"></textarea>
         </div>
 
-        <div>
+        <div class="d-flex gap-2 mt-4">
             <button class="btn btn-primary" type="submit">Enregistrer</button>
             <a class="btn btn-secondary" th:href="@{/parametres-systeme}">Retour à la liste</a>
         </div>

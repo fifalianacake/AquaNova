@@ -10,7 +10,7 @@
     <a class="btn btn-primary" th:href="@{/categories-depenses/new}">Ajouter une nouvelle catégorie</a>
     <br/><br/>
 
-    <div th:if="${error}" style="color: red;">
+    <div class="error" th:if="${error}">
         <p th:text="${error}"></p>
     </div>
 
@@ -37,7 +37,7 @@
                     
                     <span> | </span>
                     
-                    <form th:action="@{/categories-depenses/{id}/delete(id=${cat.id})}" method="POST" style="display:inline;">
+                    <form class="inline-form" th:action="@{/categories-depenses/{id}/delete(id=${cat.id})}" method="POST">
                         <button class="btn btn-danger" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">
                             Supprimer
                         </button>

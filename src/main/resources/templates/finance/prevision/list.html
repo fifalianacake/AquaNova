@@ -21,7 +21,7 @@
 
     <br />
 
-    <p th:if="${erreur}" th:text="${erreur}" style="color: red; font-weight: bold;"></p>
+    <p class="error" th:if="${erreur}" th:text="${erreur}"></p>
 
     <table class="table table-hover align-middle">
         <thead>
@@ -38,7 +38,7 @@
         </thead>
         <tbody>
             <tr th:if="${#lists.isEmpty(previsions)}">
-                <td colspan="8" style="text-align: center;">Aucune prévision financière disponible pour cette période
+                <td class="text-center" colspan="8">Aucune prévision financière disponible pour cette période
                 </td>
             </tr>
 

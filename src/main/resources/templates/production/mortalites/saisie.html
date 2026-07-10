@@ -5,39 +5,40 @@
 </head>
 <body>
 <main>
-    <h2 class="mb-4" th:text="${mortalite.id == null ? 'Nouvelle Mortalité' : 'Modifier la Mortalité'}">Saisie Mortalité</h2>
+    <h2 th:text="${mortalite.id == null ? 'Nouvelle Mortalité' : 'Modifier la Mortalité'}">Saisie Mortalité</h2>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="@{/mortalites}" th:object="${mortalite}" method="post" class="col-md-6">
+    <form class="form-panel" th:action="@{/mortalites}" th:object="${mortalite}" method="post">
         <input type="hidden" th:field="*{id}" />
 
         <div class="mb-3">
-            <label for="lot" class="form-label">Lot :</label>
-            <select id="lot" th:field="*{lot.id}" class="form-control" required>
+            <label class="form-label" for="lot">Lot</label>
+            <select class="form-select" id="lot" th:field="*{lot.id}" required>
                 <option value="">-- Choisir un lot --</option>
                 <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
             </select>
         </div>
 
         <div class="mb-3">
-            <label for="dateMortalite" class="form-label">Date :</label>
-            <input type="date" id="dateMortalite" th:field="*{dateMortalite}" class="form-control" required />
+            <label class="form-label" for="dateMortalite">Date</label>
+            <input class="form-control" type="date" id="dateMortalite" th:field="*{dateMortalite}" required />
         </div>
 
         <div class="mb-3">
-            <label for="nbMorts" class="form-label">Nombre de Morts :</label>
-            <input type="number" id="nbMorts" th:field="*{nbMorts}" class="form-control" required min="1" />
+            <label class="form-label" for="nbMorts">Nombre de Morts</label>
+            <input class="form-control" type="number" id="nbMorts" th:field="*{nbMorts}" required min="1" />
         </div>
 
         <div class="mb-3">
-            <label for="cause" class="form-label">Cause (Optionnelle) :</label>
-            <textarea id="cause" th:field="*{cause}" class="form-control" rows="3"></textarea>
+            <label class="form-label" for="cause">Cause (Optionnelle)</label>
+            <textarea class="form-control" id="cause" th:field="*{cause}" rows="3"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary"
-            th:text="${mortalite.id == null ? 'Créer' : 'Enregistrer'}">Enregistrer</button>
-        <a th:href="@{/mortalites}" class="btn btn-secondary">Annuler</a>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/mortalites}">Retour à la liste</a>
+        </div>
     </form>
 </main>
 </body>

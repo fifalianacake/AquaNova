@@ -47,7 +47,7 @@
         <span th:text="${releve.observation}"></span>
     </p>
 
-    <p th:if="${alerte}" style="color:red;">
+    <p class="error" th:if="${alerte}">
 
         ⚠ Une ou plusieurs valeurs sont hors seuil.
 
@@ -63,7 +63,7 @@
         Modifier
     </a>
 
-    <form th:action="@{'/releves-eau/' + ${releve.id} + '/delete'}" method="post" style="display:inline;"
+    <form class="inline-form" th:action="@{'/releves-eau/' + ${releve.id} + '/delete'}" method="post"
         onsubmit="return confirm('Supprimer ce relevé ?');">
         <button class="btn btn-danger" type="submit">Supprimer</button>
     </form>

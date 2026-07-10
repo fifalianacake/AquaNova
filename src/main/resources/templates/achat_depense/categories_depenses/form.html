@@ -5,49 +5,43 @@
 </head>
 <body>
 <main>
-    <h1 th:text="${categorie.id != null} ? 'Modifier la Catégorie' : 'Créer une Catégorie'">Gestion Catégorie</h1>
+    <h2 th:text="${categorie.id != null} ? 'Modifier la Catégorie' : 'Créer une Catégorie'">Gestion Catégorie</h2>
 
-    <div th:if="${error}" style="color: red;">
-        <p th:text="${error}"></p>
-    </div>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="${categorie.id != null} ? @{/categories-depenses/{id}(id=${categorie.id})} : @{/categories-depenses}" 
-          th:object="${categorie}" 
+    <form class="form-panel" th:action="${categorie.id != null} ? @{/categories-depenses/{id}(id=${categorie.id})} : @{/categories-depenses}"
+          th:object="${categorie}"
           method="POST">
 
         <input type="hidden" th:field="*{id}" />
 
-        <div>
-            <label class="form-label" for="code">Code :</label>
+        <div class="mb-3">
+            <label class="form-label" for="code">Code</label>
             <input class="form-control" type="text" id="code" th:field="*{code}" required placeholder="Ex: ACHAT_ALEVINS" />
         </div>
-        <br/>
 
-        <div>
-            <label class="form-label" for="libelle">Libellé :</label>
+        <div class="mb-3">
+            <label class="form-label" for="libelle">Libellé</label>
             <input class="form-control" type="text" id="libelle" th:field="*{libelle}" required placeholder="Ex: Achat d'alevins" />
         </div>
-        <br/>
 
-        <div>
-            <label class="form-label" for="description">Description :</label>
-            <textarea class="form-control" id="description" th:field="*{description}" rows="4" cols="30" placeholder="Description de la catégorie..."></textarea>
+        <div class="mb-3">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control" id="description" th:field="*{description}" rows="4" placeholder="Description de la catégorie..."></textarea>
         </div>
-        <br/>
 
-        <div>
-            <label class="form-label" for="typeCategorie">Type de catégorie :</label>
+        <div class="mb-3">
+            <label class="form-label" for="typeCategorie">Type de catégorie</label>
             <select class="form-select" id="typeCategorie" th:field="*{typeCategorie}" required>
                 <option th:value="'ACHAT'" th:text="'ACHAT'">ACHAT</option>
                 <option th:value="'DEPENSE'" th:text="'DEPENSE'">DEPENSE</option>
                 <option th:value="'MIXTE'" th:text="'MIXTE'">MIXTE</option>
             </select>
         </div>
-        <br/>
 
-        <div>
+        <div class="d-flex gap-2 mt-4">
             <button class="btn btn-primary" type="submit" th:text="${categorie.id != null} ? 'Enregistrer les modifications' : 'Créer la catégorie'"></button>
-            <a class="btn btn-secondary" th:href="@{/categories-depenses}">Annuler</a>
+            <a class="btn btn-secondary" th:href="@{/categories-depenses}">Retour à la liste</a>
         </div>
 
     </form>

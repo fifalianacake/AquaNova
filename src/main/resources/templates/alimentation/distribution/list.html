@@ -1,107 +1,88 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Liste des Distributions</title>
+    <title>AquaNova - Liste des distributions</title>
 </head>
 <body>
 <main>
-    <h2>Liste des Distributions d'Alimentation</h2>
 
-    <a class="btn btn-primary" th:href="@{/distributions/new}">Nouvelle Distribution</a>
-    <br/><br/>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/distributions/new}"><i class="bi bi-plus-lg"></i> Nouvelle distribution</a>
+</div>
 
-    <form method="get" th:action="@{/distributions}" class="filters">
+<div class="panel">
+    <div class="panel-header">
+        <h5>Distributions d'alimentation</h5>
+        <span class="result-count"
+              th:text="${distributions.totalElements} + ' distribution' + (${distributions.totalElements} > 1 ? 's' : '') + ' trouvée' + (${distributions.totalElements} > 1 ? 's' : '')"></span>
+    </div>
+
+    <form method="get" th:action="@{/distributions}" class="filters-bar">
         <input type="hidden" name="page" value="0" />
-
-        <label class="form-label">ID
-            <input class="form-control" type="number" name="id" th:value="${filter.id}" />
-        </label>
-
-        <label class="form-label">Lot
-            <select class="form-select" name="lotId">
-                <option value="">Tous</option>
-                <option th:each="l : ${lots}"
-                        th:value="${l.id}"
-                        th:text="${l.code}"
-                        th:selected="${filter.lotId == l.id}"></option>
-            </select>
-        </label>
-
-        <label class="form-label">Aliment
-            <select class="form-select" name="alimentId">
-                <option value="">Tous</option>
-                <option th:each="a : ${aliments}"
-                        th:value="${a.id}"
-                        th:text="${a.nom}"
-                        th:selected="${filter.alimentId == a.id}"></option>
-            </select>
-        </label>
-
-        <label class="form-label">Date début
-            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}" />
-        </label>
-
-        <label class="form-label">Date fin
-            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}" />
-        </label>
-
-        <label class="form-label">Lignes/page
-            <select class="form-select" name="size" onchange="this.form.submit()">
-                <option th:each="s : ${pageSizes}"
-                        th:value="${s}"
-                        th:text="${s}"
-                        th:selected="${distributions.size == s}"></option>
-            </select>
-        </label>
-
-        <button class="btn btn-primary" type="submit">Filtrer</button>
-        <a th:href="@{/distributions}">Réinitialiser</a>
+        <input class="form-control fc-sm" type="number" name="id" placeholder="ID" th:value="${filter.id}">
+        <select class="form-select" name="lotId">
+            <option value="">Tous les lots</option>
+            <option th:each="l : ${lots}"
+                    th:value="${l.id}"
+                    th:text="${l.code}"
+                    th:selected="${filter.lotId == l.id}"></option>
+        </select>
+        <select class="form-select" name="alimentId">
+            <option value="">Tous les aliments</option>
+            <option th:each="a : ${aliments}"
+                    th:value="${a.id}"
+                    th:text="${a.nom}"
+                    th:selected="${filter.alimentId == a.id}"></option>
+        </select>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}">
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/distributions}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
     </form>
 
-    <table class="table table-hover align-middle">
-        <thead border="1">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Date</th>
-                <th>ID Lot</th>
+                <th>Lot</th>
                 <th>Aliment</th>
-                <th>Ration Théorique</th>
-                <th>Quantité Distribuée</th>
-                <th>Actions</th>
+                <th class="text-end">Ration théorique</th>
+                <th class="text-end">Quantité distribuée</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="dist : ${distributions.content}">
                 <td th:text="${dist.id}"></td>
-                <td th:text="${dist.dateDistribution}">01/01/2026 08:00</td>
-                <td th:text="${dist.lot.id}">1</td>
-                <td th:text="${dist.aliment.nom}">Granulé</td>
-                <td th:text="${dist.rationTheorique + ' kg'}">0.00 kg</td>
-                <td th:text="${dist.quantite + ' kg'}">0.00 kg</td>
-                <td>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/distributions/{id}/edit(id=${dist.id})}">Modifier</a>
-                    |
-                    <a class="btn btn-sm btn-outline-danger" th:href="@{/distributions/{id}/delete(id=${dist.id})}"
-                       onclick="return confirm('Supprimer ?')">Supprimer</a>
+                <td th:text="${dist.dateDistribution}"></td>
+                <td class="fw-semibold" th:text="${dist.lot != null ? dist.lot.id : '—'}"></td>
+                <td th:text="${dist.aliment != null ? dist.aliment.nom : '—'}"></td>
+                <td class="text-end" th:text="${dist.rationTheorique + ' kg'}"></td>
+                <td class="text-end" th:text="${dist.quantite + ' kg'}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/distributions/{id}(id=${dist.id})}" title="Voir les détails"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/distributions/{id}/edit(id=${dist.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/distributions/{id}/delete(id=${dist.id})}" title="Supprimer"
+                       onclick="return confirm('Supprimer cette distribution ?')"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
             <tr th:if="${distributions.empty}">
-                <td colspan="7">Aucune donnée trouvée.</td>
+                <td colspan="7" class="text-center text-secondary py-4">Aucune distribution ne correspond à ces critères.</td>
             </tr>
-        </tbody>
-    </table>
-
-    <div class="pagination" th:if="${distributions.totalPages > 0}">
-        <a class="btn btn-secondary" th:if="${distributions.hasPrevious()}"
-           th:href="@{/distributions(page=${distributions.number - 1}, size=${distributions.size}, id=${filter.id}, lotId=${filter.lotId}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">&laquo; Précédent</a>
-        <span th:unless="${distributions.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
-
-        <span th:text="'Page ' + ${distributions.number + 1} + ' sur ' + ${distributions.totalPages} + ' — ' + ${distributions.totalElements} + ' résultat(s)'"></span>
-
-        <a th:if="${distributions.hasNext()}"
-           th:href="@{/distributions(page=${distributions.number + 1}, size=${distributions.size}, id=${filter.id}, lotId=${filter.lotId}, alimentId=${filter.alimentId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin})}">Suivant &raquo;</a>
-        <span th:unless="${distributions.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+            </tbody>
+        </table>
     </div>
+
+    <div th:replace="~{fragments/tableau :: tableFooter(${distributions})}"></div>
+</div>
 </main>
 </body>
 </html>

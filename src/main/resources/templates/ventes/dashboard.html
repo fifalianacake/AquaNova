@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <form th:action="@{/ventes/dashboard}" method="get" class="card card-body flex-row align-items-end gap-3 mb-4" style="flex-wrap: wrap;">
+    <form th:action="@{/ventes/dashboard}" method="get" class="card card-body flex-row align-items-end gap-3 mb-4 flex-wrap">
         <div>
             <label class="form-label" for="debut">Date début</label>
             <input class="form-control" id="debut" type="date" name="debut" th:value="${debut}">
@@ -29,38 +29,50 @@
 
     <div class="row g-3 mb-4">
         <div class="col-sm-6 col-lg-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-secondary small">Chiffre d'affaires</div>
-                    <div class="fs-4 fw-bold text-primary"
-                         th:text="${stats.chiffreAffaires != null ? stats.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</div>
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Chiffre d'affaires</div>
+                        <div class="kpi-value"
+                             th:text="${stats.chiffreAffaires != null ? stats.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-cash-coin"></i></div>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-secondary small">Volume écoulé</div>
-                    <div class="fs-4 fw-bold text-primary"
-                         th:text="${stats.volumeEcoule != null ? stats.volumeEcoule + ' kg' : '0 kg'}">0 kg</div>
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Volume écoulé</div>
+                        <div class="kpi-value"
+                             th:text="${stats.volumeEcoule != null ? stats.volumeEcoule + ' kg' : '0 kg'}">0 kg</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-droplet-half"></i></div>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-secondary small">Nombre de ventes</div>
-                    <div class="fs-4 fw-bold text-primary"
-                         th:text="${stats.nombreVentes != null ? stats.nombreVentes : 0}">0</div>
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Nombre de ventes</div>
+                        <div class="kpi-value"
+                             th:text="${stats.nombreVentes != null ? stats.nombreVentes : 0}">0</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-receipt"></i></div>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-secondary small">Prix moyen par kg</div>
-                    <div class="fs-4 fw-bold text-primary"
-                         th:text="${stats.prixMoyenKg != null ? stats.prixMoyenKg + ' Ar/kg' : '0 Ar/kg'}">0 Ar/kg</div>
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Prix moyen par kg</div>
+                        <div class="kpi-value"
+                             th:text="${stats.prixMoyenKg != null ? stats.prixMoyenKg + ' Ar/kg' : '0 Ar/kg'}">0 Ar/kg</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-graph-up-arrow"></i></div>
                 </div>
             </div>
         </div>
@@ -169,14 +181,14 @@
         const top5Values = JSON.parse(/*[[${top5Values}]]*/ '[]');
 
         const chartColors = [
-            '#2176ae',
-            '#4da3cf',
-            '#12344d',
-            '#7fc0e0',
-            '#1a628f',
-            '#a8d4ea',
-            '#5b8ba8',
-            '#2f8fc4'
+            '#1B9E8F',
+            '#2B5B8A',
+            '#DFA032',
+            '#7FB3AC',
+            '#116B60',
+            '#5D7B78',
+            '#C4534B',
+            '#0C3A43'
         ];
 
         new Chart(document.getElementById('caParJourChart'), {
@@ -186,8 +198,8 @@
                 datasets: [{
                     label: "Chiffre d'affaires",
                     data: caParJourValues,
-                    borderColor: '#2176ae',
-                    backgroundColor: 'rgba(33, 118, 174, 0.15)',
+                    borderColor: '#1B9E8F',
+                    backgroundColor: 'rgba(27, 158, 143, 0.12)',
                     fill: true,
                     tension: 0.3
                 }]
@@ -247,7 +259,7 @@
                 datasets: [{
                     label: "Chiffre d'affaires",
                     data: top5Values,
-                    backgroundColor: '#2176ae'
+                    backgroundColor: '#1B9E8F'
                 }]
             },
             options: {

@@ -1,107 +1,78 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Historique achats et dépenses</title>
+    <title>AquaNova - Historique achats et dépenses</title>
 </head>
 <body>
 <main>
 
-<h1>Historique des achats et dépenses</h1>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Historique des achats et dépenses</h5>
+        <span class="result-count"
+              th:text="${historiques.totalElements} + ' opération' + (${historiques.totalElements} > 1 ? 's' : '') + ' trouvée' + (${historiques.totalElements} > 1 ? 's' : '')"></span>
+    </div>
 
-<form th:action="@{/achats-depenses/historique}" th:object="${filter}" method="get" class="filters">
-    <input type="hidden" name="page" value="0" />
-
-    <label class="form-label">Type opération
+    <form method="get" th:action="@{/achats-depenses/historique}" th:object="${filter}" class="filters-bar">
+        <input type="hidden" name="page" value="0" />
         <select class="form-select" th:field="*{typeOperation}">
-            <option value="">Tous</option>
+            <option value="">Toutes les opérations</option>
             <option th:each="op : ${operations}" th:value="${op}" th:text="${op.libelle}"></option>
         </select>
-    </label>
-
-    <label class="form-label">Fournisseur
         <select class="form-select" th:field="*{fournisseurId}">
-            <option value="">Tous</option>
+            <option value="">Tous les fournisseurs</option>
             <option th:each="f : ${fournisseurs}" th:value="${f.id}" th:text="${f.nom}"></option>
         </select>
-    </label>
-
-    <label class="form-label">Catégorie
         <select class="form-select" th:field="*{categorieDepenseId}">
-            <option value="">Toutes</option>
+            <option value="">Toutes les catégories</option>
             <option th:each="c : ${categoriesDepense}" th:value="${c.id}"
                     th:text="${c.code + ' - ' + c.libelle}"></option>
         </select>
-    </label>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" th:field="*{dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" th:field="*{dateFin}">
+        </div>
+        <input class="form-control fc-sm" type="number" min="0" step="0.01" th:field="*{montantMin}" placeholder="Mt. min">
+        <input class="form-control fc-sm" type="number" min="0" step="0.01" th:field="*{montantMax}" placeholder="Mt. max">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/achats-depenses/historique}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
 
-    <label class="form-label">Date début
-        <input class="form-control" type="date" th:field="*{dateDebut}" />
-    </label>
-
-    <label class="form-label">Date fin
-        <input class="form-control" type="date" th:field="*{dateFin}" />
-    </label>
-
-    <label class="form-label">Montant min
-        <input class="form-control" type="number" min="0" step="0.01" th:field="*{montantMin}" />
-    </label>
-
-    <label class="form-label">Montant max
-        <input class="form-control" type="number" min="0" step="0.01" th:field="*{montantMax}" />
-    </label>
-
-    <label class="form-label">Lignes/page
-        <select class="form-select" name="size" onchange="this.form.submit()">
-            <option th:each="s : ${pageSizes}"
-                    th:value="${s}"
-                    th:text="${s}"
-                    th:selected="${historiques.size == s}"></option>
-        </select>
-    </label>
-
-    <div style="display:flex; gap:8px; align-items:center;">
-        <button class="btn btn-primary" type="submit">Filtrer</button>
-        <a th:href="@{/achats-depenses/historique}">Réinitialiser</a>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Fournisseur</th>
+                <th>Catégorie</th>
+                <th>Détails</th>
+                <th class="text-end">Montant</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${historiques.content}">
+                <td th:text="${item.id}"></td>
+                <td><span class="badge badge-info" th:text="${item.typeOperation.libelle}"></span></td>
+                <td th:text="${item.date}"></td>
+                <td class="fw-semibold" th:text="${item.fournisseur ?: '—'}"></td>
+                <td th:text="${item.categorie}"></td>
+                <td th:text="${item.details ?: '—'}"></td>
+                <td class="text-end montant" th:text="${item.montant}"></td>
+            </tr>
+            <tr th:if="${historiques.empty}">
+                <td colspan="7" class="text-center text-secondary py-4">Aucune opération ne correspond à ces critères.</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-</form>
 
-<table class="table table-hover align-middle">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Type</th>
-        <th>Date</th>
-        <th>Fournisseur</th>
-        <th>Catégorie</th>
-        <th>Détails</th>
-        <th>Montant</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:if="${historiques.empty}">
-        <td class="empty" colspan="7">Aucun résultat pour ces critères.</td>
-    </tr>
-    <tr th:each="item : ${historiques.content}">
-        <td th:text="${item.id}"></td>
-        <td th:text="${item.typeOperation.libelle}"></td>
-        <td th:text="${item.date}"></td>
-        <td th:text="${item.fournisseur ?: '-'}"></td>
-        <td th:text="${item.categorie}"></td>
-        <td th:text="${item.details ?: '-'}"></td>
-        <td th:text="${item.montant}"></td>
-    </tr>
-    </tbody>
-</table>
-
-<div class="pagination" th:if="${historiques.totalPages > 0}">
-    <a class="btn btn-secondary" th:if="${historiques.hasPrevious()}"
-       th:href="@{/achats-depenses/historique(page=${historiques.number - 1}, size=${historiques.size}, typeOperation=${filter.typeOperation}, fournisseurId=${filter.fournisseurId}, categorieDepenseId=${filter.categorieDepenseId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax})}">&laquo; Précédent</a>
-    <span th:unless="${historiques.hasPrevious()}" style="color:#999;">&laquo; Précédent</span>
-
-    <span th:text="'Page ' + ${historiques.number + 1} + ' sur ' + ${historiques.totalPages} + ' — ' + ${historiques.totalElements} + ' opération(s)'"></span>
-
-    <a th:if="${historiques.hasNext()}"
-       th:href="@{/achats-depenses/historique(page=${historiques.number + 1}, size=${historiques.size}, typeOperation=${filter.typeOperation}, fournisseurId=${filter.fournisseurId}, categorieDepenseId=${filter.categorieDepenseId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax})}">Suivant &raquo;</a>
-    <span th:unless="${historiques.hasNext()}" style="color:#999;">Suivant &raquo;</span>
+    <div th:replace="~{fragments/tableau :: tableFooter(${historiques})}"></div>
 </div>
 </main>
 </body>

@@ -5,34 +5,36 @@
 </head>
 <body>
 <main>
-    <h1>Affecter un rôle à un utilisateur</h1>
+    <h2>Affecter un rôle à un utilisateur</h2>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="@{/user-roles}" th:object="${userRole}" method="post">
+    <form class="form-panel" th:action="@{/user-roles}" th:object="${userRole}" method="post">
 
         <input type="hidden" th:field="*{id}" />
 
-        <label class="form-label" for="user">Choisir l'utilisateur :</label>
-        <select class="form-select" id="user" th:field="*{user.id}" required>
-            <option value="">-- Selectionner un utilisateur --</option>
-            <option th:each="u : ${users}" th:value="${u.id}"
-                th:text="${u.name} + ' ' + ${u.lastname} + ' (' + ${u.email} + ')'"></option>
-        </select>
-        <br><br>
+        <div class="mb-3">
+            <label class="form-label" for="user">Choisir l'utilisateur</label>
+            <select class="form-select" id="user" th:field="*{user.id}" required>
+                <option value="">-- Selectionner un utilisateur --</option>
+                <option th:each="u : ${users}" th:value="${u.id}"
+                    th:text="${u.name} + ' ' + ${u.lastname} + ' (' + ${u.email} + ')'"></option>
+            </select>
+        </div>
 
-        <label class="form-label" for="role">Choisir le rôle :</label>
-        <select class="form-select" id="role" th:field="*{role.id}" required>
-            <option value="">-- Selectionner un rôle --</option>
-            <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"></option>
-        </select>
-        <br><br>
+        <div class="mb-3">
+            <label class="form-label" for="role">Choisir le rôle</label>
+            <select class="form-select" id="role" th:field="*{role.id}" required>
+                <option value="">-- Selectionner un rôle --</option>
+                <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"></option>
+            </select>
+        </div>
 
-        <button class="btn btn-primary" type="submit">Lier le rôle</button>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Lier le rôle</button>
+            <a class="btn btn-secondary" th:href="@{/user-roles}">Retour à la liste</a>
+        </div>
     </form>
-
-    <br>
-    <a class="btn btn-secondary" th:href="@{/user-roles}">Annuler et retourner à la liste</a>
 </main>
 </body>
 </html>

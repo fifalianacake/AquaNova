@@ -12,7 +12,7 @@
 <p>Stock : <span th:text="${stock.stock}"></span> kg</p>
 <p>Seuil : <span th:text="${stock.seuil}"></span></p>
 
-<p th:if="${stock.alerte}" style="color:red;">
+<p class="error" th:if="${stock.alerte}">
     ⚠ Stock faible
 </p>
 
