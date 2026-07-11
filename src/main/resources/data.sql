@@ -55,8 +55,8 @@ VALUES
  'Nombre minimal de pesées nécessaires pour estimer une date de récolte.'),
 
 ('TAUX_MORTALITE_MAXIMUM', 'Taux de mortalité maximal', '10', 'DECIMAL',
- 'Pourcentage de mortalité cumulée d''un lot au-delà duquel une alerte est déclenchée.')
-ON CONFLICT (code) DO NOTHING;
+ 'Pourcentage de mortalité cumulée d''un lot au-delà duquel une alerte est déclenchée.'),
 
--- Aucune alerte n'est seedée : elles sont désormais générées automatiquement par les modules
--- métier (relevés d'eau, mouvements de stock, pesées, mortalités) via AnalyseVerificationService.
+('JOURS_AVANT_RUPTURE_STOCK', 'Jours avant rupture de stock', '7', 'INTEGER',
+ 'Nombre de jours restants (selon la consommation moyenne) en deçà duquel une alerte de rupture de stock est déclenchée.')
+ON CONFLICT (code) DO NOTHING;

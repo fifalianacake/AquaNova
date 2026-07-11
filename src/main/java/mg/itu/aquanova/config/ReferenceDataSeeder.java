@@ -176,11 +176,6 @@ public class ReferenceDataSeeder implements CommandLineRunner {
         }
     }
 
-    /**
-     * Compte administrateur par défaut (pré-rempli sur la page de connexion).
-     * Créé uniquement s'il n'existe pas encore ; le mot de passe n'est jamais
-     * réécrit sur un compte existant.
-     */
     private void seedAdminParDefaut() {
         if (userRepository.findByEmail(ADMIN_EMAIL) != null) {
             return;

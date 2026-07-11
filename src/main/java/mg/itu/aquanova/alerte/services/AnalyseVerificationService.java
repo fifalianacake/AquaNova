@@ -5,6 +5,7 @@ import mg.itu.aquanova.alerte.dto.AlerteCreateDTO;
 import mg.itu.aquanova.alerte.models.ModuleSource;
 import mg.itu.aquanova.alerte.models.NiveauCriticite;
 import mg.itu.aquanova.alerte.models.TypeAlerte;
+import mg.itu.aquanova.alimentation.services.PrevisionService;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.models.Bassin;
@@ -14,6 +15,8 @@ import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class AnalyseVerificationService {
 
@@ -21,15 +24,18 @@ public class AnalyseVerificationService {
     private final AlerteService alerteService;
     private final BassinsRepository bassinsRepository;
     private final AlimentRepository alimentRepository;
+    private final PrevisionService previsionService;
 
     public AnalyseVerificationService(ParametreSystemeService parametreSystemeService,
                                       AlerteService alerteService,
                                       BassinsRepository bassinsRepository,
-                                      AlimentRepository alimentRepository) {
+                                      AlimentRepository alimentRepository,
+                                      PrevisionService previsionService) {
         this.parametreSystemeService = parametreSystemeService;
         this.alerteService = alerteService;
         this.bassinsRepository = bassinsRepository;
         this.alimentRepository = alimentRepository;
+        this.previsionService = previsionService;
     }
     public void verifierQualiteEau(ReleveEau releve) {
         if (releve == null || releve.getBassin() == null) {
@@ -88,25 +94,70 @@ public class AnalyseVerificationService {
             return;
         }
 
-        Double seuilMin = parametreSystemeService.getDouble(ParametreSystemeService.STOCK_ALIMENT_MINIMUM_KG, null);
-        if (seuilMin == null || stockActuel >= seuilMin) {
+        // L'aliment peut n'être qu'une référence par id (binding de formulaire) : on le recharge.
+        Aliment aliment = alimentRepository.findById(alimentCible.getId()).orElse(null);
+        if (aliment == null) {
             return;
         }
 
-        Aliment aliment = alimentRepository.findById(alimentCible.getId()).orElse(null);
-        if (aliment == null) {
+        // 1) Rupture effective : le stock est épuisé.
+        if (stockActuel <= 0) {
+            leverRuptureStock(aliment,
+                    "Stock de « " + aliment.getNom() + " » épuisé (0 kg).");
+            return;
+        }
+
+        // 2) Rupture imminente : au rythme de consommation actuel, il ne reste que quelques jours.
+        Long joursRestants = estimerJoursRestants(aliment.getId(), stockActuel);
+        Integer joursAvantRupture = parametreSystemeService.getInteger(
+                ParametreSystemeService.JOURS_AVANT_RUPTURE_STOCK, null);
+
+        if (joursRestants != null && joursAvantRupture != null && joursRestants <= joursAvantRupture) {
+            leverRuptureStock(aliment,
+                    "Rupture de stock prévue dans " + joursRestants + " jour" + (joursRestants > 1 ? "s" : "")
+                            + " pour « " + aliment.getNom() + " » (" + arrondir(stockActuel)
+                            + " kg restants au rythme de consommation actuel).");
+            return;
+        }
+
+        // 3) Stock simplement bas : sous le seuil minimal, mais il en reste et la rupture n'est pas imminente.
+        Double seuilMin = parametreSystemeService.getDouble(ParametreSystemeService.STOCK_ALIMENT_MINIMUM_KG, null);
+        if (seuilMin == null || stockActuel >= seuilMin) {
             return;
         }
 
         String message = "Stock de « " + aliment.getNom() + " » à " + arrondir(stockActuel)
                 + " kg, sous le seuil minimal de " + seuilMin + " kg.";
 
-        NiveauCriticite niveau = stockActuel <= 0
-                ? NiveauCriticite.CRITIQUE
-                : NiveauCriticite.AVERTISSEMENT;
-
         alerteService.creerSiNonExiste(AlerteCreateDTO.pourAliment(
-                ModuleSource.ALIMENTATION, TypeAlerte.STOCK_BAS, niveau, message, aliment));
+                ModuleSource.ALIMENTATION, TypeAlerte.STOCK_BAS, NiveauCriticite.AVERTISSEMENT, message, aliment));
+    }
+
+    private void leverRuptureStock(Aliment aliment, String message) {
+        alerteService.creerSiNonExiste(AlerteCreateDTO.pourAliment(
+                ModuleSource.ALIMENTATION, TypeAlerte.RUPTURE_STOCK, NiveauCriticite.CRITIQUE, message, aliment));
+    }
+
+    /**
+     * Nombre de jours de stock restants, estimé à partir de la consommation moyenne observée sur
+     * les {@code PERIODE_ANALYSE_CONSO_JOURS} derniers jours. Retourne null si l'aliment n'a
+     * jamais été distribué (consommation nulle : aucune rupture prévisible).
+     */
+    private Long estimerJoursRestants(Long alimentId, double stockActuel) {
+        Integer periodeAnalyse = parametreSystemeService.getInteger(
+                ParametreSystemeService.PERIODE_ANALYSE_CONSO_JOURS, null);
+        if (periodeAnalyse == null || periodeAnalyse <= 0) {
+            return null;
+        }
+
+        LocalDate aujourdHui = LocalDate.now();
+        Double consoJour = previsionService.calculateConsumption(
+                alimentId, aujourdHui.minusDays(periodeAnalyse), aujourdHui);
+
+        if (consoJour == null || consoJour <= 0) {
+            return null;
+        }
+        return (long) Math.floor(stockActuel / consoJour);
     }
 
     public void verifierRecolteProche(LotModels lot) {
