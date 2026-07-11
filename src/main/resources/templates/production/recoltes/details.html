@@ -1,24 +1,103 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Détail récolte</title>
+    <title>AquaNova - Détail de la récolte</title>
 </head>
 <body>
 <main>
-<h1>Détail de la récolte</h1>
 
-<p>ID: <span th:text="${recolte.id}"></span></p>
-<p>Lot: <span th:text="${recolte.lot != null ? recolte.lot.code : ''}"></span></p>
-<p>Type: <span th:text="${recolte.typeRecolte != null ? recolte.typeRecolte.libelle : ''}"></span></p>
-<p>Date: <span th:text="${recolte.dateRecolte}"></span></p>
-<p>Effectif récolté: <span th:text="${recolte.effectifRecolte}"></span></p>
-<p>Poids total: <span th:text="${recolte.poidsTotal}"></span></p>
-<p>Poids moyen: <span th:text="${recolte.poidsMoyen}"></span></p>
-<p>Statut: <span th:text="${recolte.statut}"></span></p>
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Récolte</h2>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge badge-info" th:if="${recolte.typeRecolte != null}" th:text="${recolte.typeRecolte.libelle}"></span>
+            <span class="badge"
+                  th:if="${recolte.statut != null}"
+                  th:classappend="${recolte.statut.name() == 'DISPONIBLE'} ? 'badge-success' : 'badge-secondary'"
+                  th:text="${recolte.statut}"></span>
+            <span class="text-secondary small"
+                  th:text="'Récolte #' + ${recolte.id} + ' · '
+                           + ${recolte.dateRecolte != null ? #temporals.format(recolte.dateRecolte, 'dd/MM/yyyy') : '—'}"></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/recoltes}"><i class="bi bi-arrow-left"></i> Retour</a>
+        <a class="btn btn-outline-primary" th:if="${recolte.lot != null}"
+           th:href="@{/lots/{id}(id=${recolte.lot.id})}"><i class="bi bi-droplet-half"></i> Voir le lot</a>
+    </div>
+</div>
 
-<p>
-    <a class="btn btn-secondary" th:href="@{/recoltes}">Retour à la liste</a>
-</p>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Poids récolté</div>
+                    <div class="kpi-value"
+                         th:text="${recolte.poidsTotal != null ? #numbers.formatDecimal(recolte.poidsTotal, 1, 'WHITESPACE', 2, 'COMMA') + ' kg' : '—'}">—</div>
+                    <span class="small text-secondary"
+                          th:text="${recolte.poidsMoyen != null ? recolte.poidsMoyen + ' kg par individu' : 'poids moyen inconnu'}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-basket2"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Effectif récolté</div>
+                    <div class="kpi-value" th:text="${recolte.effectifRecolte}">0</div>
+                    <span class="small text-secondary"
+                          th:text="${recolte.typeRecolte != null ? 'récolte ' + recolte.typeRecolte.libelle : ''}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-123"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Informations</h5>
+    </div>
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-label">Lot d'origine</div>
+            <div class="info-value">
+                <a th:if="${recolte.lot != null}" th:href="@{/lots/{id}(id=${recolte.lot.id})}" th:text="${recolte.lot.code}">—</a>
+                <span th:unless="${recolte.lot != null}">—</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Type de récolte</div>
+            <div class="info-value" th:text="${recolte.typeRecolte != null ? recolte.typeRecolte.libelle : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date</div>
+            <div class="info-value"
+                 th:text="${recolte.dateRecolte != null ? #temporals.format(recolte.dateRecolte, 'dd/MM/yyyy') : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Statut</div>
+            <div class="info-value" th:text="${recolte.statut}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Effectif récolté</div>
+            <div class="info-value" th:text="${recolte.effectifRecolte}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Poids total</div>
+            <div class="info-value" th:text="${recolte.poidsTotal != null ? recolte.poidsTotal + ' kg' : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Poids moyen par individu</div>
+            <div class="info-value" th:text="${recolte.poidsMoyen != null ? recolte.poidsMoyen + ' kg' : '—'}">—</div>
+        </div>
+    </div>
+</div>
+
 </main>
 </body>
 </html>

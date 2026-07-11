@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import mg.itu.aquanova.admin.service.ParametreSystemeService;
 import mg.itu.aquanova.alerte.services.AnalyseVerificationService;
 import mg.itu.aquanova.sanitaire_equipement.dto.ReleveEauFilter;
 import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
@@ -20,9 +19,6 @@ public class ReleveEauService {
 
     @Autowired
     private ReleveEauRepository repo;
-
-    @Autowired
-    private ParametreSystemeService parametreSystemeService;
 
     @Autowired
     private AnalyseVerificationService analyseVerificationService;
@@ -119,26 +115,6 @@ public class ReleveEauService {
                 .toList();
     }
 
-    public boolean verifierSeuilsQualiteEau(ReleveEau releve) {
-
-        if (releve.getTemperature() < getTempEauMin())
-            return true;
-
-        if (releve.getTemperature() > getTempEauMax())
-            return true;
-
-        if (releve.getPh() < getPhMin())
-            return true;
-
-        if (releve.getPh() > getPhMax())
-            return true;
-
-        if (releve.getOxygene() < getOxygeneMin())
-            return true;
-
-        return false;
-    }
-
     private void validate(ReleveEau releve) {
 
         if (releve.getBassin() == null)
@@ -167,26 +143,6 @@ public class ReleveEauService {
 
         if (releve.getOxygene() < 0)
             throw new RuntimeException("L'oxygène ne peut pas être négatif.");
-    }
-
-    private Double getTempEauMin() {
-        return parametreSystemeService.getDouble(ParametreSystemeService.TEMP_EAU_MIN, 18.0);
-    }
-
-    private Double getTempEauMax() {
-        return parametreSystemeService.getDouble(ParametreSystemeService.TEMP_EAU_MAX, 30.0);
-    }
-
-    private Double getPhMin() {
-        return parametreSystemeService.getDouble(ParametreSystemeService.PH_MIN, 6.5);
-    }
-
-    private Double getPhMax() {
-        return parametreSystemeService.getDouble(ParametreSystemeService.PH_MAX, 8.5);
-    }
-
-    private Double getOxygeneMin() {
-        return parametreSystemeService.getDouble(ParametreSystemeService.OXYGENE_MIN_MG_L, 5.0);
     }
 
 }

@@ -1,33 +1,173 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Détails Lot</title>
+    <title>AquaNova - Détail du lot</title>
 </head>
 <body>
 <main>
-<h1>Détails du lot <span th:text="${lot.id}"></span></h1>
-<div>
-    <p><strong>Code:</strong> <span th:text="${lot.code}"></span></p>
-    <p><strong>Espece:</strong> <span th:text="${lot.espece != null ? lot.espece.nom : ''}"></span></p>
-    <p><strong>Bassin:</strong> <span th:text="${lot.bassin != null ? lot.bassin.reference : ''}"></span></p>
-    <p><strong>Stade:</strong> <span th:text="${lot.stadeCroissance != null ? lot.stadeCroissance.nom : ''}"></span></p>
-    <p><strong>Statut:</strong> <span th:text="${lot.statutLot != null ? lot.statutLot.libelle : ''}"></span></p>
-    <p><strong>Date mise en charge:</strong> <span th:text="${lot.dateMiseEnCharge}"></span></p>
-    <p><strong>Effectif initial:</strong> <span th:text="${lot.effectifInitial}"></span></p>
-    <p><strong>Effectif actuel:</strong> <span th:text="${lot.effectifActuel}"></span></p>
-    <p><strong>Poids moyen initial:</strong> <span th:text="${lot.poidsMoyenInitial}"></span></p>
-    <p><strong>Poids moyen actuel:</strong> <span th:text="${lot.poidsMoyenActuel}"></span></p>
-    <p><strong>Observation:</strong> <span th:text="${lot.observation}"></span></p>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1" th:text="${lot.code}">Lot</h2>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge"
+                  th:if="${lot.statutLot != null}"
+                  th:classappend="${lot.statutLot.libelle.name() == 'EN_CROISSANCE'} ? 'badge-success'
+                                : (${lot.statutLot.libelle.name() == 'CLOTURE'} ? 'badge-secondary' : 'badge-danger')"
+                  th:text="${lot.statutLot.libelle}"></span>
+            <span class="badge badge-info" th:if="${lot.stadeCroissance != null}" th:text="${lot.stadeCroissance.nom}"></span>
+            <span class="text-secondary small" th:text="${lot.espece != null ? lot.espece.nom : '—'}"></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/lots}"><i class="bi bi-arrow-left"></i> Retour</a>
+        <a class="btn btn-outline-primary" th:href="@{/lots/{id}/edit(id=${lot.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        <a class="btn btn-outline-danger" th:href="@{/lots/{id}/delete(id=${lot.id})}"
+           onclick="return confirm('Passer ce lot au statut ANNULE ?')"><i class="bi bi-x-circle"></i> Annuler</a>
+    </div>
 </div>
-<div>
-    <a th:href="@{/lots}">Back to list</a>
-    <a class="btn btn-sm btn-outline-primary" th:href="@{/lots/{id}/journal(id=${lot.id})}">Journal</a>
-    <a th:href="@{/lots/{id}/pesees(id=${lot.id})}">Pesées</a>
-    <a th:href="@{/lots/{id}/mortalites(id=${lot.id})}">Mortalités</a>
-    <a th:href="@{/production/previsions-recoltes(lotId=${lot.id})}">Prévision récolte</a>
-    <a class="btn btn-sm btn-outline-primary" th:href="@{'/lots/' + ${lot.id} + '/edit'}">Edit</a>
-    <a class="btn btn-sm btn-outline-danger" th:href="@{'/lots/' + ${lot.id} + '/delete'}" onclick="return confirm('Passer ce lot au statut ANNULE ?')">Delete</a>
+
+<!-- ══════════ Indicateurs du lot ══════════ -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Effectif actuel</div>
+                    <div class="kpi-value" th:text="${lot.effectifActuel}">0</div>
+                    <span class="small text-secondary"
+                          th:with="perdus=${lot.effectifInitial - lot.effectifActuel}"
+                          th:text="'sur ' + ${lot.effectifInitial} + ' initial' + (${perdus} > 0 ? ' · −' + ${perdus} : '')"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-123"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Poids moyen actuel</div>
+                    <div class="kpi-value" th:text="${lot.poidsMoyenActuel != null ? lot.poidsMoyenActuel + ' g' : '—'}">—</div>
+                    <span class="small text-secondary"
+                          th:text="'depuis ' + ${lot.poidsMoyenInitial != null ? lot.poidsMoyenInitial : '?'} + ' g'"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-speedometer2"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Biomasse</div>
+                    <div class="kpi-value"
+                         th:with="biomasse=${lot.effectifActuel != null and lot.poidsMoyenActuel != null
+                                             ? lot.effectifActuel * lot.poidsMoyenActuel / 1000.0 : 0}"
+                         th:text="${#numbers.formatDecimal(biomasse, 1, 'WHITESPACE', 1, 'COMMA')} + ' kg'">0 kg</div>
+                    <span class="small text-secondary">effectif × poids moyen</span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-droplet-half"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card"
+             th:with="cible=${lot.espece != null and lot.espece.poidsCibleMoyen != null ? lot.espece.poidsCibleMoyen : null}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Progression vers la récolte</div>
+                    <div class="kpi-value"
+                         th:with="pct=${cible != null and cible.doubleValue() > 0 and lot.poidsMoyenActuel != null
+                                        ? lot.poidsMoyenActuel / cible.doubleValue() * 100 : null}"
+                         th:text="${pct != null ? #numbers.formatDecimal(pct, 1, 0) + ' %' : '—'}">—</div>
+                    <span class="small text-secondary"
+                          th:text="${cible != null ? 'cible ' + cible + ' g' : 'poids cible non défini'}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-bullseye"></i></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- ══════════ Informations ══════════ -->
+<div class="panel mb-4">
+    <div class="panel-header">
+        <h5>Informations du lot</h5>
+    </div>
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-label">Code</div>
+            <div class="info-value fw-semibold" th:text="${lot.code}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Espèce</div>
+            <div class="info-value" th:text="${lot.espece != null ? lot.espece.nom : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Bassin</div>
+            <div class="info-value">
+                <a th:if="${lot.bassin != null}" th:href="@{/bassins}" th:text="${lot.bassin.reference}">—</a>
+                <span th:unless="${lot.bassin != null}">—</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Stade de croissance</div>
+            <div class="info-value" th:text="${lot.stadeCroissance != null ? lot.stadeCroissance.nom : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Statut</div>
+            <div class="info-value" th:text="${lot.statutLot != null ? lot.statutLot.libelle : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date de mise en charge</div>
+            <div class="info-value" th:text="${lot.dateMiseEnCharge != null ? #temporals.format(lot.dateMiseEnCharge, 'dd/MM/yyyy') : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Effectif initial</div>
+            <div class="info-value" th:text="${lot.effectifInitial}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Poids moyen initial</div>
+            <div class="info-value" th:text="${lot.poidsMoyenInitial != null ? lot.poidsMoyenInitial + ' g' : '—'}">—</div>
+        </div>
+        <div class="info-row info-row-full">
+            <div class="info-label">Observation</div>
+            <div class="info-value"
+                 th:text="${lot.observation != null and !lot.observation.isBlank() ? lot.observation : 'Aucune observation.'}">—</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ Suivi du lot ══════════ -->
+<div class="panel">
+    <div class="panel-header">
+        <h5>Suivi du lot</h5>
+    </div>
+    <div class="p-3">
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-primary" th:href="@{/lots/{id}/journal(id=${lot.id})}">
+                <i class="bi bi-journal-text"></i> Journal des événements
+            </a>
+            <a class="btn btn-outline-primary" th:href="@{/lots/{id}/pesees(id=${lot.id})}">
+                <i class="bi bi-speedometer2"></i> Pesées
+            </a>
+            <a class="btn btn-outline-primary" th:href="@{/lots/{id}/mortalites(id=${lot.id})}">
+                <i class="bi bi-activity"></i> Mortalités
+            </a>
+            <a class="btn btn-outline-primary" th:href="@{/production/previsions-recoltes(lotId=${lot.id})}">
+                <i class="bi bi-calendar-check"></i> Prévision de récolte
+            </a>
+            <a class="btn btn-outline-primary" th:href="@{/finance/lots/{id}/analyse(id=${lot.id})}">
+                <i class="bi bi-graph-up-arrow"></i> Rentabilité
+            </a>
+        </div>
+    </div>
+</div>
+
 </main>
 </body>
 </html>

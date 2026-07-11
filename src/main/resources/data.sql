@@ -58,5 +58,8 @@ VALUES
  'Pourcentage de mortalité cumulée d''un lot au-delà duquel une alerte est déclenchée.'),
 
 ('JOURS_AVANT_RUPTURE_STOCK', 'Jours avant rupture de stock', '7', 'INTEGER',
- 'Nombre de jours restants (selon la consommation moyenne) en deçà duquel une alerte de rupture de stock est déclenchée.')
+ 'Nombre de jours restants (selon la consommation moyenne) en deçà duquel une alerte de rupture de stock est déclenchée.'),
+
+('MARGE_MINIMUM_ACCEPTABLE', 'Marge brute minimale acceptable', '20', 'DECIMAL',
+ 'Taux de marge brute (%) en deçà duquel un lot vendu déclenche une alerte de marge insuffisante.')
 ON CONFLICT (code) DO NOTHING;

@@ -633,6 +633,23 @@ p.error, span.error {
 .info-row { display: flex; justify-content: space-between; padding: .7rem 0; border-bottom: 1px solid #ecf3f1; }
 .info-label { font-weight: 600; color: var(--aq-muted); }
 .info-value { color: var(--aq-ink); }
+
+/* Grille d'informations : deux colonnes sur écran large, une seule sur mobile.
+   Sans elle, une fiche se réduit à une colonne étroite qui laisse la page vide. */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
+    padding: 0 1.1rem 1.1rem;
+}
+.info-grid .info-row:last-child,
+.info-grid .info-row:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+@media (max-width: 767.98px) {
+    .info-grid { grid-template-columns: 1fr; }
+}
+/* Une ligne qui doit occuper toute la largeur (observation, message…) */
+.info-row-full { grid-column: 1 / -1; flex-direction: column; align-items: flex-start; gap: .25rem; }
+.info-row-full .info-value { white-space: pre-line; }
 .info-row-total {
     background-color: var(--aq-teal-soft);
     padding: .75rem .6rem;

@@ -6,6 +6,7 @@ import mg.itu.aquanova.vente.models.StatutVente;
 import mg.itu.aquanova.vente.models.StatutVenteEnum;
 import mg.itu.aquanova.vente.repositories.VenteRepository;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
+import mg.itu.aquanova.alerte.services.AnalyseVerificationService;
 import mg.itu.aquanova.production.models.Recoltes; // Modifié ici
 import mg.itu.aquanova.production.services.RecolteService;
 import org.springframework.data.domain.Page;
@@ -22,12 +23,14 @@ public class VenteService {
     private final VenteRepository repository;
     private final StatutVenteRepository statutRepository;
     private final RecolteService recolteService;
+    private final AnalyseVerificationService analyseVerificationService;
 
     public VenteService(VenteRepository repository, StatutVenteRepository statutRepository,
-            RecolteService recolteService) {
+            RecolteService recolteService, AnalyseVerificationService analyseVerificationService) {
         this.repository = repository;
         this.statutRepository = statutRepository;
         this.recolteService = recolteService;
+        this.analyseVerificationService = analyseVerificationService;
     }
 
     private void rafraichirStatutRecolte(Long recolteId) {
@@ -95,11 +98,6 @@ public class VenteService {
         return sauvee;
     }
 
-    /**
-     * Résout le couple poids/effectif vendu à partir d'un seul des deux champs (saisie exclusive
-     * imposée par le formulaire) : l'autre est déduit via le poids moyen individuel de la récolte.
-     * Rejette explicitement le cas où les deux seraient renseignés en même temps.
-     */
     private void resoudrePoidsEtEffectif(Vente vente) {
         boolean poidsRenseigne = vente.getPoidsVendu() != null;
         boolean effectifRenseigne = vente.getEffectifVendu() != null;
@@ -193,7 +191,8 @@ public class VenteService {
                             + v.getStatutVente().getCode() + ").");
         }
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.VALIDEE));
-        repository.save(v);
+        Vente sauvegardee = repository.save(v);
+        reevaluerRentabiliteDuLot(sauvegardee);
     }
 
     @Transactional
@@ -205,7 +204,15 @@ public class VenteService {
                             + v.getStatutVente().getCode() + ").");
         }
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.PAYEE));
-        repository.save(v);
+        Vente sauvegardee = repository.save(v);
+        reevaluerRentabiliteDuLot(sauvegardee);
+    }
+
+    private void reevaluerRentabiliteDuLot(Vente vente) {
+        if (vente == null || vente.getRecolte() == null || vente.getRecolte().getLot() == null) {
+            return;
+        }
+        analyseVerificationService.verifierRentabiliteLot(vente.getRecolte().getLot());
     }
 
     @Transactional
@@ -221,6 +228,7 @@ public class VenteService {
         v.setStatutVente(statutRepository.findByCode(StatutVenteEnum.ANNULEE));
         Vente sauvegardee = repository.save(v);
         rafraichirStatutRecolte(sauvegardee.getRecolte().getId());
+        reevaluerRentabiliteDuLot(sauvegardee);
     }
 
     public Page<Vente> lister(TransactionFilterDTO filter, Pageable pageable) {

@@ -1,24 +1,105 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>Details du transfert</title>
+    <title>AquaNova - Détail du transfert</title>
 </head>
 <body>
 <main>
-    <h1>Détails du transfert</h1>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
     <div>
-        <p><strong>ID:</strong> <span th:text="${transfert.id}"></span></p>
-        <p><strong>Date de transfert:</strong> <span th:text="${transfert.dateTransfert}"></span></p>
-        <p><strong>Effectif:</strong> <span th:text="${transfert.effectif}"></span></p>
-        <p><strong>Poids moyen:</strong> <span th:text="${transfert.poidsMoyen}"></span></p>
-        <p><strong>Lot source:</strong> <span th:text="${transfert.lotSource != null ? transfert.lotSource.code : '-'}"></span></p>
-        <p><strong>Lot destination:</strong> <span th:text="${transfert.lotDestination != null ? transfert.lotDestination.code : '-'}"></span></p>
-        <p><strong>Bassin source:</strong> <span th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '-'}"></span></p>
-        <p><strong>Bassin destination:</strong> <span th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '-'}"></span></p>
+        <h2 class="mb-1">Transfert de lot</h2>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge badge-info"
+                  th:text="${transfert.lotDestination != null and transfert.lotSource != null
+                            and transfert.lotDestination.id == transfert.lotSource.id} ? 'TOTAL' : 'PARTIEL'"></span>
+            <span class="text-secondary small"
+                  th:text="'Transfert #' + ${transfert.id} + ' · '
+                           + ${transfert.dateTransfert != null ? #temporals.format(transfert.dateTransfert, 'dd/MM/yyyy') : '—'}"></span>
+        </div>
     </div>
-    <div>
-        <a class="btn btn-secondary" th:href="@{/transferts}">Retour à la liste</a>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/transferts}"><i class="bi bi-arrow-left"></i> Retour</a>
+        <a class="btn btn-outline-primary" th:if="${transfert.lotSource != null}"
+           th:href="@{/lots/{id}(id=${transfert.lotSource.id})}"><i class="bi bi-droplet-half"></i> Lot source</a>
+        <a class="btn btn-outline-primary" th:if="${transfert.lotDestination != null}"
+           th:href="@{/lots/{id}(id=${transfert.lotDestination.id})}"><i class="bi bi-droplet-half"></i> Lot destination</a>
     </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Effectif transféré</div>
+                    <div class="kpi-value" th:text="${transfert.effectif}">0</div>
+                    <span class="small text-secondary"
+                          th:text="${transfert.poidsMoyen != null ? 'à ' + transfert.poidsMoyen + ' g en moyenne' : 'poids moyen inconnu'}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-arrow-left-right"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Biomasse déplacée</div>
+                    <div class="kpi-value"
+                         th:with="biomasse=${transfert.effectif != null and transfert.poidsMoyen != null
+                                             ? transfert.effectif * transfert.poidsMoyen.doubleValue() / 1000.0 : 0}"
+                         th:text="${#numbers.formatDecimal(biomasse, 1, 'WHITESPACE', 1, 'COMMA')} + ' kg'">0 kg</div>
+                    <span class="small text-secondary">effectif × poids moyen</span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-droplet-half"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Origine et destination</h5>
+    </div>
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-label">Lot source</div>
+            <div class="info-value">
+                <a th:if="${transfert.lotSource != null}" th:href="@{/lots/{id}(id=${transfert.lotSource.id})}"
+                   th:text="${transfert.lotSource.code}">—</a>
+                <span th:unless="${transfert.lotSource != null}">—</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Lot destination</div>
+            <div class="info-value">
+                <a th:if="${transfert.lotDestination != null}" th:href="@{/lots/{id}(id=${transfert.lotDestination.id})}"
+                   th:text="${transfert.lotDestination.code}">—</a>
+                <span th:unless="${transfert.lotDestination != null}">—</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Bassin source</div>
+            <div class="info-value" th:text="${transfert.bassinSource != null ? transfert.bassinSource.reference : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Bassin destination</div>
+            <div class="info-value" th:text="${transfert.bassinDestination != null ? transfert.bassinDestination.reference : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date du transfert</div>
+            <div class="info-value"
+                 th:text="${transfert.dateTransfert != null ? #temporals.format(transfert.dateTransfert, 'dd/MM/yyyy') : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Poids moyen au transfert</div>
+            <div class="info-value" th:text="${transfert.poidsMoyen != null ? transfert.poidsMoyen + ' g' : '—'}">—</div>
+        </div>
+    </div>
+</div>
+
 </main>
 </body>
 </html>

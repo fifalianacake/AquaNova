@@ -13,8 +13,13 @@ import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
 import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
 
+import mg.itu.aquanova.finance.dto.RentabiliteLotDTO;
+import mg.itu.aquanova.finance.models.StatutRentabilite;
+import mg.itu.aquanova.finance.services.RentabiliteLotService;
+
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
@@ -25,17 +30,55 @@ public class AnalyseVerificationService {
     private final BassinsRepository bassinsRepository;
     private final AlimentRepository alimentRepository;
     private final PrevisionService previsionService;
+    private final RentabiliteLotService rentabiliteLotService;
 
     public AnalyseVerificationService(ParametreSystemeService parametreSystemeService,
                                       AlerteService alerteService,
                                       BassinsRepository bassinsRepository,
                                       AlimentRepository alimentRepository,
-                                      PrevisionService previsionService) {
+                                      PrevisionService previsionService,
+                                      RentabiliteLotService rentabiliteLotService) {
         this.parametreSystemeService = parametreSystemeService;
         this.alerteService = alerteService;
         this.bassinsRepository = bassinsRepository;
         this.alimentRepository = alimentRepository;
         this.previsionService = previsionService;
+        this.rentabiliteLotService = rentabiliteLotService;
+    }
+
+    public void verifierRentabiliteLot(LotModels lot) {
+        if (lot == null || lot.getId() == null) {
+            return;
+        }
+
+        RentabiliteLotDTO rentabilite = rentabiliteLotService.construirePourLot(lot);
+
+        if (rentabilite.getStatutRentabilite() == StatutRentabilite.NON_CALCULABLE) {
+            return;
+        }
+
+        if (rentabilite.getStatutRentabilite() == StatutRentabilite.DEFICITAIRE) {
+            String message = "Le lot " + lot.getCode() + " est déficitaire : marge brute de "
+                    + rentabilite.getMargeBrute() + " Ar (chiffre d'affaires "
+                    + rentabilite.getChiffreAffaires() + " Ar pour "
+                    + rentabilite.getCoutsDirects() + " Ar de coûts directs).";
+
+            alerteService.creerSiNonExiste(AlerteCreateDTO.pourLot(
+                    ModuleSource.FINANCE, TypeAlerte.LOT_DEFICITAIRE, NiveauCriticite.CRITIQUE, message, lot));
+            return;
+        }
+
+        Double margeMin = parametreSystemeService.getDouble(ParametreSystemeService.MARGE_MINIMUM_ACCEPTABLE, null);
+        BigDecimal taux = rentabilite.getTauxMargeBrute();
+        if (margeMin == null || taux == null || taux.doubleValue() >= margeMin) {
+            return;
+        }
+
+        String message = "Marge insuffisante sur le lot " + lot.getCode() + " : "
+                + taux + " % seulement, en deçà du minimum acceptable de " + margeMin + " %.";
+
+        alerteService.creerSiNonExiste(AlerteCreateDTO.pourLot(
+                ModuleSource.FINANCE, TypeAlerte.MARGE_FAIBLE, NiveauCriticite.AVERTISSEMENT, message, lot));
     }
     public void verifierQualiteEau(ReleveEau releve) {
         if (releve == null || releve.getBassin() == null) {
