@@ -63,3 +63,22 @@ VALUES
 ('MARGE_MINIMUM_ACCEPTABLE', 'Marge brute minimale acceptable', '20', 'DECIMAL',
  'Taux de marge brute (%) en deçà duquel un lot vendu déclenche une alerte de marge insuffisante.')
 ON CONFLICT (code) DO NOTHING;
+
+-- Types d'équipement (pas de contrainte d'unicité sur libelle : garde par NOT EXISTS)
+INSERT INTO type_equipement (libelle, description)
+SELECT v.libelle, v.description
+FROM (VALUES
+    ('Pompe à eau', 'Pompe assurant la circulation ou le renouvellement de l''eau des bassins.'),
+    ('Aérateur', 'Aérateur de surface ou diffuseur d''air maintenant le taux d''oxygène dissous.'),
+    ('Système de filtration', 'Filtre mécanique ou biologique de traitement de l''eau.'),
+    ('Sonde de mesure', 'Sonde de température, pH ou oxygène dissous utilisée pour les relevés de qualité d''eau.'),
+    ('Distributeur d''aliment', 'Distributeur automatique ou semi-automatique de provende.'),
+    ('Groupe électrogène', 'Source d''alimentation électrique de secours de l''exploitation.'),
+    ('Filet et épuisette', 'Matériel de capture utilisé lors des pesées, transferts et récoltes.'),
+    ('Balance', 'Balance de pesée des poissons et des sacs de provende.'),
+    ('Bâche de bassin', 'Bâche ou géomembrane assurant l''étanchéité d''un bassin.'),
+    ('Chambre froide', 'Équipement de conservation du poisson récolté avant la vente.')
+) AS v(libelle, description)
+WHERE NOT EXISTS (
+    SELECT 1 FROM type_equipement t WHERE t.libelle = v.libelle
+);

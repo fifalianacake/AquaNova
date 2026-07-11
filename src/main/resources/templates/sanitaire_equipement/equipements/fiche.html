@@ -1,19 +1,105 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <title>AquaNova</title>
+    <title>AquaNova - Fiche équipement</title>
 </head>
 <body>
 <main>
-    <h1>Fiche Équipement : <span th:text="${equipement.nom}"></span></h1>
-    <ul>
-        <li><strong>Type :</strong> <span th:text="${equipement.typeEquipement.libelle}"></span></li>
-        <li><strong>Statut :</strong> <span th:text="${equipement.statut}"></span></li>
-        <li><strong>Bassin :</strong> <span th:text="${equipement.bassin != null ? equipement.bassin.nom : 'Non affecté'}"></span></li>
-        <li><strong>Installation :</strong> <span th:text="${equipement.dateInstallation}"></span></li>
-    </ul>
-    
-    <a class="btn btn-secondary" href="/equipements">Retour à la liste</a>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1" th:text="${equipement.nom}">Équipement</h2>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge"
+                  th:classappend="${equipement.statut.name() == 'EN_SERVICE' or equipement.statut.name() == 'DISPONIBLE'} ? 'badge-success'
+                                : (${equipement.statut.name() == 'EN_PANNE' or equipement.statut.name() == 'HORS_SERVICE'} ? 'badge-danger' : 'badge-warning')"
+                  th:text="${equipement.statut}"></span>
+            <span class="badge badge-info"
+                  th:if="${equipement.typeEquipement != null}"
+                  th:text="${equipement.typeEquipement.libelle}"></span>
+            <span class="text-secondary small" th:text="'Équipement #' + ${equipement.id}"></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/equipements}"><i class="bi bi-arrow-left"></i> Retour</a>
+        <a class="btn btn-outline-primary" th:href="@{/equipements/{id}/edit(id=${equipement.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        <a class="btn btn-outline-primary" th:href="@{/maintenances}"><i class="bi bi-wrench-adjustable"></i> Interventions</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Statut actuel</div>
+                    <div class="kpi-value" th:text="${equipement.statut}">—</div>
+                    <span class="small text-secondary"
+                          th:text="${equipement.bassin != null ? 'affecté au bassin ' + equipement.bassin.reference : 'équipement général'}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-gear"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Dernière maintenance</div>
+                    <div class="kpi-value"
+                         th:text="${equipement.derniereMaintenance != null
+                                   ? #temporals.format(equipement.derniereMaintenance, 'dd/MM/yyyy') : '—'}">—</div>
+                    <span class="small text-secondary"
+                          th:text="${equipement.derniereMaintenance != null ? 'dernière intervention clôturée' : 'aucune intervention clôturée'}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-wrench-adjustable"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header"><h5>Informations</h5></div>
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-label">Nom</div>
+            <div class="info-value fw-semibold" th:text="${equipement.nom}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Type d'équipement</div>
+            <div class="info-value" th:text="${equipement.typeEquipement != null ? equipement.typeEquipement.libelle : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Statut</div>
+            <div class="info-value" th:text="${equipement.statut}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Bassin affecté</div>
+            <div class="info-value"
+                 th:text="${equipement.bassin != null ? equipement.bassin.reference : 'Non affecté (équipement général)'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date d'installation</div>
+            <div class="info-value"
+                 th:text="${equipement.dateInstallation != null
+                           ? #temporals.format(equipement.dateInstallation, 'dd/MM/yyyy') : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Dernière maintenance</div>
+            <div class="info-value"
+                 th:text="${equipement.derniereMaintenance != null
+                           ? #temporals.format(equipement.derniereMaintenance, 'dd/MM/yyyy') : 'Aucune'}">—</div>
+        </div>
+        <div class="info-row info-row-full">
+            <div class="info-label">Observation</div>
+            <div class="info-value"
+                 th:text="${equipement.observation != null and !equipement.observation.isBlank()
+                           ? equipement.observation : 'Aucune observation.'}">—</div>
+        </div>
+    </div>
+</div>
+
 </main>
 </body>
 </html>
