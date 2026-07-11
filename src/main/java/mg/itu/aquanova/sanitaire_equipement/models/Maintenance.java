@@ -1,6 +1,7 @@
 package mg.itu.aquanova.sanitaire_equipement.models;
 
 import jakarta.persistence.*;
+import mg.itu.aquanova.achat.models.Depense;
 import mg.itu.aquanova.security.models.User;
 
 import java.math.BigDecimal;
@@ -40,6 +41,15 @@ public class Maintenance {
 
     @Column(name = "date_resolution")
     private LocalDate dateResolution;
+
+    /**
+     * Dépense générée automatiquement à la clôture de l'intervention (catégorie MAINTENANCE).
+     * Reste null tant que l'intervention n'est pas clôturée, ou si son coût final est nul.
+     * Sert aussi de garde d'idempotence : une intervention ne génère jamais deux dépenses.
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_depense")
+    private Depense depense;
 
     @Column(columnDefinition = "TEXT")
     private String observation;
@@ -131,6 +141,14 @@ public class Maintenance {
 
     public void setDateResolution(LocalDate dateResolution) {
         this.dateResolution = dateResolution;
+    }
+
+    public Depense getDepense() {
+        return depense;
+    }
+
+    public void setDepense(Depense depense) {
+        this.depense = depense;
     }
 
     public String getObservation() {

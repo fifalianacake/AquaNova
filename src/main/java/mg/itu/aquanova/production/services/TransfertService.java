@@ -29,6 +29,7 @@ public class TransfertService {
     private final StatutLotRepository statutLotRepository;
     private final StatutBassinRepository statutBassinRepository;
     private final JournalLotService journalLotService;
+    private final LotService lotService;
 
     public TransfertService(
             TransfertRepository transfertRepository,
@@ -36,13 +37,15 @@ public class TransfertService {
             BassinsRepository bassinRepository,
             StatutLotRepository statutLotRepository,
             StatutBassinRepository statutBassinRepository,
-            JournalLotService journalLotService) {
+            JournalLotService journalLotService,
+            LotService lotService) {
         this.transfertRepository = transfertRepository;
         this.lotRepository = lotRepository;
         this.bassinRepository = bassinRepository;
         this.statutLotRepository = statutLotRepository;
         this.statutBassinRepository = statutBassinRepository;
         this.journalLotService = journalLotService;
+        this.lotService = lotService;
     }
 
     public List<TransfertModels> getAllTransferts() {
@@ -163,8 +166,12 @@ public class TransfertService {
             throw new IllegalArgumentException("L'effectif transféré dépasse l'effectif actuel du lot source.");
         }
         boolean transfertPartiel = transfert.getEffectif() < lotSource.getEffectifActuel();
-        if (transfertPartiel && (transfert.getCodeLotDestination() == null || transfert.getCodeLotDestination().trim().isEmpty())) {
-            throw new IllegalArgumentException("Le code du nouveau lot destination est obligatoire pour un transfert partiel.");
+        if (transfertPartiel) {
+            if (transfert.getCodeLotDestination() == null || transfert.getCodeLotDestination().trim().isEmpty()) {
+                throw new IllegalArgumentException("Le code du nouveau lot destination est obligatoire pour un transfert partiel.");
+            }
+            // Le code du lot destination est saisi à la main : il doit être libre, comme tout code de lot.
+            lotService.verifierCodeDisponible(transfert.getCodeLotDestination().trim(), null);
         }
     }
 

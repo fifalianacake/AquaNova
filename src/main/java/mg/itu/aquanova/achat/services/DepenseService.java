@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -66,7 +67,16 @@ public class DepenseService {
         if (!depenseRepository.existsById(id)) {
             throw new EntityNotFoundException("Dépense introuvable : " + id);
         }
-        depenseRepository.deleteById(id);
+        try {
+            depenseRepository.deleteById(id);
+            depenseRepository.flush();
+        } catch (DataIntegrityViolationException ex) {
+            // Cas typique : la dépense a été générée par la clôture d'une intervention de
+            // maintenance, qui la référence. On refuse la suppression orpheline plutôt que
+            // de laisser remonter une erreur d'intégrité brute.
+            throw new IllegalStateException(
+                    "Suppression refusée : cette dépense est rattachée à une autre opération (par exemple une intervention de maintenance).");
+        }
     }
 
     public BigDecimal calculerTotalFiltre(DepenseFilter filter) {

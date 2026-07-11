@@ -2,6 +2,9 @@ package mg.itu.aquanova.sanitaire_equipement.controllers;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import jakarta.servlet.http.HttpSession;
+import mg.itu.aquanova.security.models.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
@@ -59,15 +62,19 @@ public class MaintenanceController {
     }
 
     @PostMapping
-    public String saveMaintenance(@ModelAttribute("maintenance") Maintenance maintenance, Model model) {
+    public String saveMaintenance(@ModelAttribute("maintenance") Maintenance maintenance, Model model,
+            HttpSession session) {
         try {
+            // L'auteur de l'intervention n'est pas saisi dans le formulaire : il est déduit de
+            // l'utilisateur connecté (le champ est obligatoire en base).
+            maintenance.setUtilisateur((User) session.getAttribute("user"));
             maintenanceService.create(maintenance);
             return "redirect:/maintenances";
         } catch (IllegalArgumentException e) {
             model.addAttribute("maintenance", maintenance);
             model.addAttribute("errorMessage", e.getMessage());
             addFormAttributes(model);
-            return "sanitaire_equipement/maintenance/form"; 
+            return "sanitaire_equipement/maintenance/form";
         }
     }
 

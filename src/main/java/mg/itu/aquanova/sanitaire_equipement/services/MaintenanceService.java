@@ -1,5 +1,8 @@
 package mg.itu.aquanova.sanitaire_equipement.services;
 
+import mg.itu.aquanova.achat.models.Depense;
+import mg.itu.aquanova.achat.services.CategorieDepenseService;
+import mg.itu.aquanova.achat.services.DepenseService;
 import mg.itu.aquanova.sanitaire_equipement.models.Maintenance;
 import mg.itu.aquanova.sanitaire_equipement.models.StatutEquipement;
 import mg.itu.aquanova.sanitaire_equipement.models.CategorieMaintenanceEnum;
@@ -19,12 +22,23 @@ import java.util.List;
 @Service
 public class MaintenanceService {
 
+    /** Code de la catégorie de dépense sous laquelle sont comptabilisées les interventions. */
+    private static final String CODE_CATEGORIE_MAINTENANCE = "MAINTENANCE";
+
     private final MaintenanceRepository repository;
     private final EquipementService equipementService;
+    private final DepenseService depenseService;
+    private final CategorieDepenseService categorieDepenseService;
 
-    public MaintenanceService(MaintenanceRepository repository, EquipementService equipementService) {
+    public MaintenanceService(
+            MaintenanceRepository repository,
+            EquipementService equipementService,
+            DepenseService depenseService,
+            CategorieDepenseService categorieDepenseService) {
         this.repository = repository;
         this.equipementService = equipementService;
+        this.depenseService = depenseService;
+        this.categorieDepenseService = categorieDepenseService;
     }
 
     private void validerMaintenance(Maintenance maintenance) {
@@ -35,7 +49,11 @@ public class MaintenanceService {
         if (maintenance.getEquipement() == null || maintenance.getEquipement().getId() == null) {
             throw new IllegalArgumentException("L'équipement associé est obligatoire.");
         }
-        
+
+        if (maintenance.getUtilisateur() == null || maintenance.getUtilisateur().getId() == null) {
+            throw new IllegalArgumentException("L'auteur de l'intervention est obligatoire : reconnectez-vous.");
+        }
+
         if (maintenance.getCategorieMaintenance() == null || maintenance.getCategorieMaintenance().getId() == null) {
             throw new IllegalArgumentException("La catégorie de maintenance est obligatoire.");
         }
@@ -182,6 +200,43 @@ public class MaintenanceService {
         equipementService.updateStatut(equipementId, statutApresCloture);
         equipementService.updateDerniereMaintenance(equipementId, dateResolution);
 
+        comptabiliserDepense(maintenance, dateResolution);
+
         return repository.save(maintenance);
+    }
+
+    /**
+     * Comptabilise le coût final de l'intervention sous forme de dépense (catégorie MAINTENANCE).
+     *
+     * La dépense n'est générée qu'à la clôture, seul moment où le coût est définitif : une
+     * intervention clôturée n'est plus modifiable, la dépense ne peut donc jamais diverger.
+     * Une intervention sans frais (coût nul ou non renseigné : nettoyage interne, garantie…)
+     * ne génère aucune dépense — cohérent avec la règle « montant strictement positif ».
+     * Le lien porté par {@code maintenance.depense} garantit l'idempotence.
+     */
+    private void comptabiliserDepense(Maintenance maintenance, LocalDate dateResolution) {
+        if (maintenance.getDepense() != null) {
+            return;
+        }
+        BigDecimal cout = maintenance.getCout();
+        if (cout == null || cout.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+
+        Depense depense = new Depense();
+        depense.setDateDepense(dateResolution);
+        depense.setCategorieDepense(categorieDepenseService.trouverParCode(CODE_CATEGORIE_MAINTENANCE));
+        depense.setMontant(cout);
+        depense.setLibelle(libelleDepense(maintenance));
+        depense.setObservation(maintenance.getObservation());
+
+        maintenance.setDepense(depenseService.enregistrer(depense));
+    }
+
+    private String libelleDepense(Maintenance maintenance) {
+        String equipement = maintenance.getEquipement() != null && maintenance.getEquipement().getNom() != null
+                ? maintenance.getEquipement().getNom()
+                : "équipement inconnu";
+        return "Maintenance #" + maintenance.getId() + " - " + equipement;
     }
 }

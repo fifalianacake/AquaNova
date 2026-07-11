@@ -121,6 +121,20 @@ public class LotService {
         }
     }
 
+    /**
+     * Le code de lot est l'identifiant métier du lot (il sert notamment de clé de regroupement
+     * dans les statistiques de vente) : il doit rester unique. {@code idLotIgnore} permet de
+     * ne pas se comparer à soi-même lors d'une modification.
+     */
+    public void verifierCodeDisponible(String code, Long idLotIgnore) {
+        boolean dejaPris = idLotIgnore == null
+                ? repository.existsByCode(code)
+                : repository.existsByCodeAndIdNot(code, idLotIgnore);
+        if (dejaPris) {
+            throw new IllegalArgumentException("Le code de lot « " + code + " » est déjà utilisé.");
+        }
+    }
+
     public LotModels creer(LotModels lot) {
         validerLot(lot, null);
         initialiserValeursActuelles(lot);
@@ -175,6 +189,9 @@ public class LotService {
         if (lot.getCode() == null || lot.getCode().trim().isEmpty()) {
             throw new IllegalArgumentException("Le code du lot est obligatoire.");
         }
+        lot.setCode(lot.getCode().trim());
+        verifierCodeDisponible(lot.getCode(), idLotIgnore);
+
         if (lot.getEspece() == null || lot.getEspece().getId() == null) {
             throw new IllegalArgumentException("Le lot doit être associé à une espèce.");
         }

@@ -6,6 +6,7 @@ import mg.itu.aquanova.alimentation.dto.DistributionFilter;
 import mg.itu.aquanova.alimentation.models.Distribution;
 import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.services.PrevisionRecolteService;
 import mg.itu.aquanova.referentiel.models.Aliment;
@@ -112,8 +113,13 @@ public class DistributionService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
 
+        if (lot.getStatutLot().getLibelle().equals(StatutLotEnum.ANNULE) || lot.getStatutLot().getLibelle().equals(StatutLotEnum.CLOTURE)) {
+            throw new IllegalArgumentException("Le lot est déjà clôturé ou annulé");
+        }
+
         if (distributionDTO.getIdAliment() == null)
             throw new IllegalArgumentException("ID de l'aliment est requis");
+
 
         Aliment aliment = alimentRepository.findById(distributionDTO.getIdAliment())
                 .orElseThrow(() -> new IllegalArgumentException(

@@ -18,4 +18,9 @@ public interface LotRepository extends JpaRepository<LotModels, Long>, JpaSpecif
 
     /** Dernier lot (code le plus élevé) dont le code commence par le préfixe donné (ex. "LOT-20260711-"). */
     Optional<LotModels> findFirstByCodeStartingWithOrderByCodeDesc(String prefixe);
+
+    boolean existsByCode(String code);
+
+    /** Unicité du code lors d'une modification : on ignore le lot en cours d'édition. */
+    boolean existsByCodeAndIdNot(String code, Long id);
 }

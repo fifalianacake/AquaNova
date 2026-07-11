@@ -74,11 +74,6 @@ public class AchatAlevinService {
         this.stadeCroissanceRepository = stadeCroissanceRepository;
     }
 
-    public Achat getById(Long id) {
-        return this.achatRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Achat introuvable avec l'ID : " + id));
-    }
-
     public Achat trouverParId(Long id) {
         return achatRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Achat introuvable : " + id));
