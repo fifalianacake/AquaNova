@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Dashboard financier</title>
+</head>
+<body>
+<main>
+
+<h2>Dashboard financier</h2>
+
+<p class="hint">
+    Marge brute = chiffre d'affaires réalisé − coûts directs traçables (alevins acquis + aliment distribué).
+    Profit net = marge brute − dépenses indirectes de la période (main d'œuvre, énergie, maintenance…),
+    qui ne sont rattachées à aucun lot.
+</p>
+
+<div class="panel">
+    <form method="get" th:action="@{/finance/dashboard}" class="filters-bar">
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${dashboard.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${dashboard.dateFin}">
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Appliquer</button>
+        <a th:href="@{/finance/dashboard}" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Année en cours</a>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Chiffre d'affaires</div>
+                    <div class="kpi-value" th:text="${#numbers.formatDecimal(dashboard.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+                    <div class="text-secondary small"
+                         th:text="${dashboard.nombreVentes} + ' vente' + (${dashboard.nombreVentes} > 1 ? 's' : '')"></div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-cash-coin"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Coûts directs</div>
+                    <div class="kpi-value" th:text="${#numbers.formatDecimal(dashboard.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+                    <div class="text-secondary small">Alevins + aliment distribué</div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-basket2"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Marge brute</div>
+                    <div class="kpi-value"
+                         th:classappend="${dashboard.margeBrute.signum() < 0} ? 'text-danger' : 'text-success'"
+                         th:text="${#numbers.formatDecimal(dashboard.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+                    <div class="text-secondary small"
+                         th:text="${dashboard.tauxMargeBrute != null} ? ${dashboard.tauxMargeBrute} + ' % du CA' : 'Non calculable'"></div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-graph-up"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Dépenses indirectes</div>
+                    <div class="kpi-value" th:text="${#numbers.formatDecimal(dashboard.depenses, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+                    <div class="text-secondary small">Non imputées aux lots</div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-receipt"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Profit net</div>
+                    <div class="kpi-value"
+                         th:classappend="${dashboard.profitNet.signum() < 0} ? 'text-danger' : 'text-success'"
+                         th:text="${#numbers.formatDecimal(dashboard.profitNet, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+                    <div class="text-secondary small"
+                         th:text="${dashboard.tauxMargeNette != null} ? ${dashboard.tauxMargeNette} + ' % du CA' : 'Non calculable'"></div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-wallet2"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Lots rentables / déficitaires</div>
+                    <div class="kpi-value" th:text="${dashboard.lotsRentables} + ' / ' + ${dashboard.lotsDeficitaires}"></div>
+                    <div class="text-secondary small"
+                         th:text="${dashboard.lotsNonCalculables} + ' lot(s) non encore vendu(s)'"></div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-droplet-half"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Évolution mensuelle</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Mois</th>
+                <th class="text-end">Chiffre d'affaires</th>
+                <th class="text-end">Coûts directs</th>
+                <th class="text-end">Marge brute</th>
+                <th class="text-end">Dépenses</th>
+                <th class="text-end">Profit net</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="m : ${dashboard.evolution}">
+                <td th:text="${m.mois}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(m.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(m.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant"
+                    th:classappend="${m.margeBrute.signum() < 0} ? 'text-danger' : ''"
+                    th:text="${#numbers.formatDecimal(m.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(m.depenses, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant fw-semibold"
+                    th:classappend="${m.profitNet.signum() < 0} ? 'text-danger' : 'text-success'"
+                    th:text="${#numbers.formatDecimal(m.profitNet, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.evolution)}">
+                <td colspan="6" class="text-center text-secondary py-4">Aucune donnée sur cette période.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Dépenses indirectes par catégorie</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Catégorie</th>
+                <th class="text-end">Montant</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="d : ${dashboard.depensesParCategorie}">
+                <td th:text="${d.libelle}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(d.montant, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.depensesParCategorie)}">
+                <td colspan="2" class="text-center text-secondary py-4">Aucune dépense sur cette période.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Lots les plus rentables</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Lot</th>
+                <th>Espèce</th>
+                <th class="text-end">CA</th>
+                <th class="text-end">Coûts directs</th>
+                <th class="text-end">Marge brute</th>
+                <th class="text-end">Taux</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="l : ${dashboard.topLotsRentables}">
+                <td><a th:href="@{/finance/lots/{id}/analyse(id=${l.lotId})}" th:text="${l.lotCode}"></a></td>
+                <td th:text="${l.espece}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(l.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(l.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant text-success" th:text="${#numbers.formatDecimal(l.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end" th:text="${l.tauxMargeBrute != null} ? ${l.tauxMargeBrute} + ' %' : '—'"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.topLotsRentables)}">
+                <td colspan="6" class="text-center text-secondary py-4">Aucun lot rentable pour l'instant.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Lots déficitaires</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Lot</th>
+                <th>Espèce</th>
+                <th class="text-end">CA</th>
+                <th class="text-end">Coûts directs</th>
+                <th class="text-end">Marge brute</th>
+                <th class="text-end">Taux</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="l : ${dashboard.lotsDeficitairesDetail}">
+                <td><a th:href="@{/finance/lots/{id}/analyse(id=${l.lotId})}" th:text="${l.lotCode}"></a></td>
+                <td th:text="${l.espece}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(l.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(l.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end montant text-danger" th:text="${#numbers.formatDecimal(l.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="text-end" th:text="${l.tauxMargeBrute != null} ? ${l.tauxMargeBrute} + ' %' : '—'"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.lotsDeficitairesDetail)}">
+                <td colspan="6" class="text-center text-secondary py-4">Aucun lot déficitaire.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</main>
+</body>
+</html>

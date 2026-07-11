@@ -19,6 +19,18 @@ public interface VenteRepository extends JpaRepository<Vente, Long>, JpaSpecific
 
     @Query("SELECT v FROM Vente v WHERE v.client.id = :clientId ORDER BY v.dateVente DESC")
     List<Vente> findByClientId(@Param("clientId") Long clientId);
+
+    @Query("SELECT COALESCE(SUM(v.poidsVendu * v.prixUnitaire), 0) FROM Vente v "
+            + "WHERE v.recolte.lot.id = :lotId "
+            + "AND v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE)")
+    Double sumChiffreAffairesParLot(@Param("lotId") Long lotId);
+
+    /** Poids réellement vendu d'un lot (même périmètre), pour le prix de revient au kg vendu. */
+    @Query("SELECT COALESCE(SUM(v.poidsVendu), 0) FROM Vente v "
+            + "WHERE v.recolte.lot.id = :lotId "
+            + "AND v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE)")
+    Double sumPoidsVenduParLot(@Param("lotId") Long lotId);
+
      // CA total (montantTotal = poidsVendu * prixUnitaire)
     @Query("SELECT COALESCE(SUM(v.poidsVendu * v.prixUnitaire), 0) FROM Vente v " +
            "WHERE v.statutVente.code IN (mg.itu.aquanova.vente.models.StatutVenteEnum.VALIDEE, mg.itu.aquanova.vente.models.StatutVenteEnum.PAYEE) " +

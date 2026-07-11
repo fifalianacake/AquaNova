@@ -21,7 +21,7 @@ public class Maintenance {
 
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
-    private User utilisateur; // Ou "User" selon le nom de ta classe
+    private User utilisateur;
 
     @ManyToOne
     @JoinColumn(name = "id_categorie_maintenance", nullable = false)
@@ -42,11 +42,6 @@ public class Maintenance {
     @Column(name = "date_resolution")
     private LocalDate dateResolution;
 
-    /**
-     * Dépense générée automatiquement à la clôture de l'intervention (catégorie MAINTENANCE).
-     * Reste null tant que l'intervention n'est pas clôturée, ou si son coût final est nul.
-     * Sert aussi de garde d'idempotence : une intervention ne génère jamais deux dépenses.
-     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_depense")
     private Depense depense;

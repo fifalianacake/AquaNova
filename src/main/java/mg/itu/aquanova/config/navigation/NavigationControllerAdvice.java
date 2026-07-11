@@ -60,8 +60,9 @@ public class NavigationControllerAdvice {
                         new NavigationItemDTO("Dashboard", "/ventes/dashboard"))),
 
                 new NavigationItemDTO("Finance", "bi-graph-up-arrow", List.of(
-                        new NavigationItemDTO("Prévisions financières", "/finance/previsions"),
-                        new NavigationItemDTO("Analyse coût par lot", "/finance/lots"))),
+                        new NavigationItemDTO("Dashboard financier", "/finance/dashboard"),
+                        new NavigationItemDTO("Marge brute par lot", "/finance/lots"),
+                        new NavigationItemDTO("Prévisions financières", "/finance/previsions"))),
 
                 new NavigationItemDTO("Alertes", "bi-bell", List.of(
                         new NavigationItemDTO("Alertes actives", "/alertes"),

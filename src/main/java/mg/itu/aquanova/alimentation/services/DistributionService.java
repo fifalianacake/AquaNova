@@ -34,13 +34,15 @@ public class DistributionService {
     private final AlimentRepository alimentRepository;
     private final ParametreSystemeService parametreSystemeService;
     private final PrevisionRecolteService previsionRecolteService;
+    private final CumpService cumpService;
 
     public DistributionService(DistributionRepository distributionRepository,
             LotRepository lotRepository,
             MouvementService mouvementStockService,
             AlimentRepository alimentRepository,
             ParametreSystemeService parametreSystemeService,
-            PrevisionRecolteService previsionRecolteService) {
+            PrevisionRecolteService previsionRecolteService,
+            CumpService cumpService) {
 
         this.distributionRepository = distributionRepository;
         this.lotRepository = lotRepository;
@@ -48,6 +50,7 @@ public class DistributionService {
         this.alimentRepository = alimentRepository;
         this.parametreSystemeService = parametreSystemeService;
         this.previsionRecolteService = previsionRecolteService;
+        this.cumpService = cumpService;
     }
 
     public List<mg.itu.aquanova.alimentation.models.Distribution> getAllDistributions() {
@@ -147,6 +150,9 @@ public class DistributionService {
         BigDecimal rationTheorique = CalculRationTheoriqueCible(distributionDTO);
 
         distribution.setRationTheorique(rationTheorique);
+
+        distribution.setCoutUnitaire(
+                cumpService.calculerCump(aliment.getId(), distribution.getDateDistribution()));
 
         distribution = distributionRepository.save(distribution);
 

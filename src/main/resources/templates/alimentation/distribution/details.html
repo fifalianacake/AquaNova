@@ -20,6 +20,19 @@
         <p><strong>Ration théorique prévue :</strong> <span
                 th:text="${distribution.rationTheorique != null ? distribution.rationTheorique + ' kg' : 'Aucune'}"></span>
         </p>
+        <p><strong>Valorisation :</strong>
+            <span th:if="${distribution.coutUnitaire != null}"
+                  th:text="${#numbers.formatDecimal(distribution.coutUnitaire, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar/kg'"></span>
+            <span th:if="${distribution.coutUnitaire != null and distribution.quantite != null}"
+                  class="text-secondary"
+                  th:text="'· coût total ' + ${#numbers.formatDecimal(distribution.coutUnitaire.multiply(distribution.quantite), 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></span>
+            <span th:if="${distribution.coutUnitaire == null}" class="text-secondary">Non valorisée</span>
+        </p>
+        <p class="hint">
+            Coût moyen pondéré du stock à la date de la distribution, calculé automatiquement à partir
+            de l'historique des achats. Figé : il ne change plus, même si le prix de référence de
+            l'aliment est modifié par la suite.
+        </p>
     </div>
 
     <hr />
