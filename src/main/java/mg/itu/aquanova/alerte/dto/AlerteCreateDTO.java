@@ -1,0 +1,72 @@
+package mg.itu.aquanova.alerte.dto;
+
+import mg.itu.aquanova.alerte.models.ModuleSource;
+import mg.itu.aquanova.alerte.models.NiveauCriticite;
+import mg.itu.aquanova.alerte.models.TypeAlerte;
+import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.referentiel.models.Bassin;
+
+public class AlerteCreateDTO {
+
+    //ATTRIBUTS
+    private ModuleSource moduleSource;
+    private TypeAlerte typeAlerte;
+    private NiveauCriticite niveauCriticite;
+    private String message;
+    private LotModels lot;
+    private Bassin bassin;
+
+    //CONSTRUCTORS
+    public AlerteCreateDTO() {
+    }
+    public AlerteCreateDTO(ModuleSource moduleSource, TypeAlerte typeAlerte, NiveauCriticite niveauCriticite,
+            String message, LotModels lot, Bassin bassin) {
+        this.moduleSource = moduleSource;
+        this.typeAlerte = typeAlerte;
+        this.niveauCriticite = niveauCriticite;
+        this.message = message;
+        this.lot = lot;
+        this.bassin = bassin;
+    }
+
+    //SETTERS
+    public void setModuleSource(ModuleSource moduleSource) {
+        this.moduleSource = moduleSource;
+    }
+    public void setTypeAlerte(TypeAlerte typeAlerte) {
+        this.typeAlerte = typeAlerte;
+    }
+    public void setNiveauCriticite(NiveauCriticite niveauCriticite) {
+        this.niveauCriticite = niveauCriticite;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    public void setLot(LotModels lot) {
+        this.lot = lot;
+    }
+    public void setBassin(Bassin bassin) {
+        this.bassin = bassin;
+    }
+
+    //GETTERS
+    public ModuleSource getModuleSource() {
+        return moduleSource;
+    }
+    public TypeAlerte getTypeAlerte() {
+        return typeAlerte;
+    }
+    public NiveauCriticite getNiveauCriticite() {
+        return niveauCriticite;
+    }
+    public String getMessage() {
+        return message;
+    }
+    public LotModels getLot() {
+        return lot;
+    }
+    public Bassin getBassin() {
+        return bassin;
+    }
+    
+}
