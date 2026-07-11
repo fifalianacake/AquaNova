@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import mg.itu.aquanova.admin.service.ParametreSystemeService;
+import mg.itu.aquanova.alerte.services.AnalyseVerificationService;
 import mg.itu.aquanova.sanitaire_equipement.dto.ReleveEauFilter;
 import mg.itu.aquanova.sanitaire_equipement.models.ReleveEau;
 import mg.itu.aquanova.sanitaire_equipement.repositories.ReleveEauRepository;
@@ -23,18 +24,21 @@ public class ReleveEauService {
     @Autowired
     private ParametreSystemeService parametreSystemeService;
 
-    // ==========================
-    // CRUD
-    // ==========================
+    @Autowired
+    private AnalyseVerificationService analyseVerificationService;
 
     public ReleveEau create(ReleveEau releve) {
         validate(releve);
-        return repo.save(releve);
+        ReleveEau sauvegarde = repo.save(releve);
+        analyseVerificationService.verifierQualiteEau(sauvegarde);
+        return sauvegarde;
     }
 
     public ReleveEau update(ReleveEau releve) {
         validate(releve);
-        return repo.save(releve);
+        ReleveEau sauvegarde = repo.save(releve);
+        analyseVerificationService.verifierQualiteEau(sauvegarde);
+        return sauvegarde;
     }
 
     public void delete(Long id) {
@@ -52,10 +56,6 @@ public class ReleveEauService {
     public ReleveEau getById(Long id) {
         return repo.findById(id).orElse(null);
     }
-
-    // ==========================
-    // LISTE / RECHERCHE
-    // ==========================
 
     public Page<ReleveEau> lister(ReleveEauFilter filter, Pageable pageable) {
         return repo.findAll(specification(filter), pageable);
@@ -103,10 +103,6 @@ public class ReleveEauService {
         };
     }
 
-    // ==========================
-    // BASSIN
-    // ==========================
-
     public List<ReleveEau> getByBassin(Long bassinId) {
 
         return repo.findByBassinId(bassinId);
@@ -122,10 +118,6 @@ public class ReleveEauService {
                 .limit(10)
                 .toList();
     }
-
-    // ==========================
-    // ALERTES
-    // ==========================
 
     public boolean verifierSeuilsQualiteEau(ReleveEau releve) {
 
@@ -146,10 +138,6 @@ public class ReleveEauService {
 
         return false;
     }
-
-    // ==========================
-    // VALIDATION
-    // ==========================
 
     private void validate(ReleveEau releve) {
 

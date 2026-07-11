@@ -40,18 +40,23 @@ public class AlerteService {
         this.pdfExportService = pdfExportService;
     }
 
-    /**
-     * Recherche paginée dans l'historique des alertes avec filtres dynamiques.
-     */
     public Page<Alerte> searchHistorique(AlerteFilterDTO filter, Pageable pageable) {
-        return alerteRepository.findAll(buildSpecification(filter), pageable);
+        return alerteRepository.findAll(specificationHistorique(filter), pageable);
     }
 
-    /**
-     * Export PDF de l'historique des alertes (toutes les lignes correspondant aux filtres).
-     */
+    public Page<Alerte> search(AlerteFilterDTO filter, Pageable pageable) {
+        Specification<Alerte> spec = buildSpecification(filter).and(
+                (root, query, cb) -> cb.not(root.get("statut").in(STATUTS_CLOTURES)));
+        return alerteRepository.findAll(spec, pageable);
+    }
+
+    private Specification<Alerte> specificationHistorique(AlerteFilterDTO filter) {
+        return buildSpecification(filter).and(
+                (root, query, cb) -> root.get("statut").in(STATUTS_CLOTURES));
+    }
+
     public byte[] exportHistoriquePdf(AlerteFilterDTO filter) {
-        List<Alerte> alertes = alerteRepository.findAll(buildSpecification(filter));
+        List<Alerte> alertes = alerteRepository.findAll(specificationHistorique(filter));
 
         List<String> colonnes = List.of(
                 "Date création", "Date résolution", "Module", "Type",
@@ -84,8 +89,6 @@ public class AlerteService {
 
         return pdfExportService.genererListe(data);
     }
-
-    // ── Construction de la Specification dynamique ──
 
     private Specification<Alerte> buildSpecification(AlerteFilterDTO filter) {
         return (root, query, cb) -> {
@@ -130,29 +133,23 @@ public class AlerteService {
         return dt != null ? dt.format(FMT) : "-";
     }
 
-    // Toutes les alertes actives (ni résolues, ni ignorées)
     public List<Alerte> getAlertesActives() {
         return alerteRepository.findByStatutNotInOrderByDateCreationDesc(STATUTS_CLOTURES);
     }
 
-    // Alertes critiques actives uniquement
     public List<Alerte> getAlertesCritiquesActives() {
         return alerteRepository.findByNiveauCriticiteAndStatutNotInOrderByDateCreationDesc(
                 NiveauCriticite.CRITIQUE, STATUTS_CLOTURES);
     }
 
-    // Compte badge critiques
     public long countCritiques() {
         return alerteRepository.countByNiveauCriticiteAndStatutNotIn(NiveauCriticite.CRITIQUE, STATUTS_CLOTURES);
     }
 
-    // Détail d'une alerte
     public Alerte getById(Long id) {
         return alerteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Alerte introuvable : " + id));
     }
-
-    // ============ FONCTIONS DE RESOLUTION ============
 
     @Transactional
     public void changerStatut(Long idAlerte, UpdateStatutAlerteDTO dto) {
@@ -166,12 +163,10 @@ public class AlerteService {
             throw new RuntimeException("Le nouveau statut est obligatoire");
         }
 
-        // Ne pas autoriser le changement si déjà résolue ou ignorée
         if (STATUTS_CLOTURES.contains(ancienStatut)) {
             throw new RuntimeException("Cette alerte est déjà clôturée et ne peut plus être modifiée");
         }
 
-        // Commentaire obligatoire pour clôturer une alerte (RESOLUE ou IGNOREE)
         if (STATUTS_CLOTURES.contains(nouveauStatut)
                 && (dto.getCommentaire() == null || dto.getCommentaire().isBlank())) {
             throw new RuntimeException("Un commentaire est obligatoire pour résoudre ou ignorer une alerte");
@@ -190,20 +185,21 @@ public class AlerteService {
 
     @Transactional
     public void marquerEnCours(Long idAlerte) {
-        // Le référentiel StatutAlerte ne définit que ACTIVE/RESOLUE/IGNOREE : aucun état "EN_COURS" distinct
-        // n'existe dans le modèle actuel, donc reprendre une alerte se traduit par la remettre à ACTIVE.
         Alerte alerte = alerteRepository.findById(idAlerte)
                 .orElseThrow(() -> new RuntimeException("Alerte introuvable : " + idAlerte));
 
         if (STATUTS_CLOTURES.contains(alerte.getStatut())) {
             throw new RuntimeException("Cette alerte est déjà clôturée");
         }
+        if (alerte.getStatut() == StatutAlerte.EN_COURS) {
+            throw new RuntimeException("Cette alerte est déjà prise en charge");
+        }
 
         StatutAlerte ancienStatut = alerte.getStatut();
-        alerte.setStatut(StatutAlerte.ACTIVE);
+        alerte.setStatut(StatutAlerte.EN_COURS);
         alerteRepository.save(alerte);
 
-        historiqueAlerteService.enregistrer(alerte, ancienStatut.name(), StatutAlerte.ACTIVE.name(),
+        historiqueAlerteService.enregistrer(alerte, ancienStatut.name(), StatutAlerte.EN_COURS.name(),
                 "Prise en charge de l'alerte");
     }
 
@@ -219,6 +215,7 @@ public class AlerteService {
 
     @Transactional
     public Alerte creerAlerte(AlerteCreateDTO dto){
+        validerCreation(dto);
 
         Alerte alerte = new Alerte();
 
@@ -228,22 +225,45 @@ public class AlerteService {
         alerte.setMessage(dto.getMessage());
         alerte.setLot(dto.getLot());
         alerte.setBassin(dto.getBassin());
+        alerte.setAliment(dto.getAliment());
 
         alerte.setStatut(StatutAlerte.ACTIVE);
         alerte.setDateCreation(LocalDateTime.now());
 
         return alerteRepository.save(alerte);
     }
+
+    /** Règles métier : type, criticité, module et message sont obligatoires (le statut est posé ici). */
+    private void validerCreation(AlerteCreateDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("L'alerte est obligatoire.");
+        }
+        if (dto.getModuleSource() == null) {
+            throw new IllegalArgumentException("Le module source de l'alerte est obligatoire.");
+        }
+        if (dto.getTypeAlerte() == null) {
+            throw new IllegalArgumentException("Le type de l'alerte est obligatoire.");
+        }
+        if (dto.getNiveauCriticite() == null) {
+            throw new IllegalArgumentException("Le niveau de criticité de l'alerte est obligatoire.");
+        }
+        if (dto.getMessage() == null || dto.getMessage().isBlank()) {
+            throw new IllegalArgumentException("Le message de l'alerte est obligatoire.");
+        }
+    }
+
     @Transactional
     public Alerte creerSiNonExiste(AlerteCreateDTO dto){
+        validerCreation(dto);
 
         Optional<Alerte> alerteExistante =
-                alerteRepository.findFirstByModuleSourceAndTypeAlerteAndLotAndBassinAndStatut(
+                alerteRepository.findFirstByModuleSourceAndTypeAlerteAndLotAndBassinAndAlimentAndStatutNotIn(
                         dto.getModuleSource(),
                         dto.getTypeAlerte(),
                         dto.getLot(),
                         dto.getBassin(),
-                        StatutAlerte.ACTIVE
+                        dto.getAliment(),
+                        STATUTS_CLOTURES
                 );
 
         if(alerteExistante.isPresent()){

@@ -10,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import mg.itu.aquanova.alerte.services.AnalyseVerificationService;
 import mg.itu.aquanova.alimentation.dto.MouvementFilter;
 import mg.itu.aquanova.alimentation.models.*;
 import mg.itu.aquanova.alimentation.repositories.MouvementStockRepository;
+import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 
 @Service
@@ -24,19 +26,29 @@ public class MouvementService {
     @Autowired
     private AlimentRepository alimentRepository;
 
+    @Autowired
+    private AnalyseVerificationService analyseVerificationService;
+
     public MouvementStock create(MouvementStock m) {
 
         validate(m);
 
         List<MouvementStock> all = repo.findByAlimentId(m.getAliment().getId());
 
-        // simulate insertion
         all.add(m);
 
-        // validate FULL timeline (past + future)
         validateTimelineList(all);
 
-        return repo.save(m);
+        MouvementStock sauvegarde = repo.save(m);
+        verifierStockApresMouvement(sauvegarde.getAliment());
+        return sauvegarde;
+    }
+
+    private void verifierStockApresMouvement(Aliment aliment) {
+        if (aliment == null || aliment.getId() == null) {
+            return;
+        }
+        analyseVerificationService.verifierStockAliment(aliment, getStock(aliment.getId()));
     }
 
     public Double getStockDisponibleADate(Long alimentId, LocalDate date) {

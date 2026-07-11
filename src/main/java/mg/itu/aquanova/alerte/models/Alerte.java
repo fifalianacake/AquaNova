@@ -2,14 +2,11 @@ package mg.itu.aquanova.alerte.models;
 
 import jakarta.persistence.*;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.models.Bassin;
 
 import java.time.LocalDateTime;
 
-/**
- * Entité représentant une alerte système.
- * L'historique des alertes sert à l'analyse ; les alertes ne doivent pas être supprimées.
- */
 @Entity
 @Table(name = "alerte")
 public class Alerte {
@@ -51,10 +48,20 @@ public class Alerte {
     @JoinColumn(name = "id_bassin")
     private Bassin bassin;
 
+    @ManyToOne
+    @JoinColumn(name = "id_aliment")
+    private Aliment aliment;
+
     public Alerte() {
     }
 
-    // ── Getters & Setters ──
+    public Aliment getAliment() {
+        return aliment;
+    }
+
+    public void setAliment(Aliment aliment) {
+        this.aliment = aliment;
+    }
 
     public Long getId() {
         return id;

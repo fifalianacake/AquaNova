@@ -12,6 +12,7 @@ import mg.itu.aquanova.alerte.models.NiveauCriticite;
 import mg.itu.aquanova.alerte.models.StatutAlerte;
 import mg.itu.aquanova.alerte.models.TypeAlerte;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.models.Bassin;
 
 public interface AlerteRepository extends JpaRepository<Alerte, Long>, JpaSpecificationExecutor<Alerte> {
@@ -23,11 +24,12 @@ public interface AlerteRepository extends JpaRepository<Alerte, Long>, JpaSpecif
 
     long countByNiveauCriticiteAndStatutNotIn(NiveauCriticite niveauCriticite, List<StatutAlerte> statutsExclus);
 
-    Optional<Alerte> findFirstByModuleSourceAndTypeAlerteAndLotAndBassinAndStatut(
+    Optional<Alerte> findFirstByModuleSourceAndTypeAlerteAndLotAndBassinAndAlimentAndStatutNotIn(
         ModuleSource moduleSource,
         TypeAlerte typeAlerte,
         LotModels lot,
         Bassin bassin,
-        StatutAlerte statut
+        Aliment aliment,
+        List<StatutAlerte> statutsExclus
     );
 }

@@ -4,32 +4,53 @@ import mg.itu.aquanova.alerte.models.ModuleSource;
 import mg.itu.aquanova.alerte.models.NiveauCriticite;
 import mg.itu.aquanova.alerte.models.TypeAlerte;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.models.Bassin;
 
 public class AlerteCreateDTO {
-
-    //ATTRIBUTS
     private ModuleSource moduleSource;
     private TypeAlerte typeAlerte;
     private NiveauCriticite niveauCriticite;
     private String message;
+
     private LotModels lot;
     private Bassin bassin;
+    private Aliment aliment;
 
-    //CONSTRUCTORS
     public AlerteCreateDTO() {
     }
+
     public AlerteCreateDTO(ModuleSource moduleSource, TypeAlerte typeAlerte, NiveauCriticite niveauCriticite,
             String message, LotModels lot, Bassin bassin) {
+        this(moduleSource, typeAlerte, niveauCriticite, message, lot, bassin, null);
+    }
+
+    public AlerteCreateDTO(ModuleSource moduleSource, TypeAlerte typeAlerte, NiveauCriticite niveauCriticite,
+            String message, LotModels lot, Bassin bassin, Aliment aliment) {
         this.moduleSource = moduleSource;
         this.typeAlerte = typeAlerte;
         this.niveauCriticite = niveauCriticite;
         this.message = message;
         this.lot = lot;
         this.bassin = bassin;
+        this.aliment = aliment;
     }
 
-    //SETTERS
+    public static AlerteCreateDTO pourLot(ModuleSource module, TypeAlerte type, NiveauCriticite niveau,
+            String message, LotModels lot) {
+        return new AlerteCreateDTO(module, type, niveau, message, lot, null, null);
+    }
+
+    public static AlerteCreateDTO pourBassin(ModuleSource module, TypeAlerte type, NiveauCriticite niveau,
+            String message, Bassin bassin) {
+        return new AlerteCreateDTO(module, type, niveau, message, null, bassin, null);
+    }
+
+    public static AlerteCreateDTO pourAliment(ModuleSource module, TypeAlerte type, NiveauCriticite niveau,
+            String message, Aliment aliment) {
+        return new AlerteCreateDTO(module, type, niveau, message, null, null, aliment);
+    }
+
     public void setModuleSource(ModuleSource moduleSource) {
         this.moduleSource = moduleSource;
     }
@@ -48,8 +69,10 @@ public class AlerteCreateDTO {
     public void setBassin(Bassin bassin) {
         this.bassin = bassin;
     }
+    public void setAliment(Aliment aliment) {
+        this.aliment = aliment;
+    }
 
-    //GETTERS
     public ModuleSource getModuleSource() {
         return moduleSource;
     }
@@ -68,5 +91,7 @@ public class AlerteCreateDTO {
     public Bassin getBassin() {
         return bassin;
     }
-    
+    public Aliment getAliment() {
+        return aliment;
+    }
 }

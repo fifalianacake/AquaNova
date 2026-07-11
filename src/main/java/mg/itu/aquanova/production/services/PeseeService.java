@@ -1,6 +1,7 @@
 package mg.itu.aquanova.production.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.alerte.services.AnalyseVerificationService;
 import mg.itu.aquanova.production.dto.PeseeFilter;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.Pese;
@@ -27,13 +28,16 @@ public class PeseeService {
     private final LotRepository lotRepository;
     private final JournalLotService journalLotService;
     private final StadeCroissanceRepository stadeCroissanceRepository;
+    private final AnalyseVerificationService analyseVerificationService;
 
     public PeseeService(PeseRepository peseeRepository, LotRepository lotRepository, JournalLotService journalLotService,
-            StadeCroissanceRepository stadeCroissanceRepository) {
+            StadeCroissanceRepository stadeCroissanceRepository,
+            AnalyseVerificationService analyseVerificationService) {
         this.peseeRepository = peseeRepository;
         this.lotRepository = lotRepository;
         this.journalLotService = journalLotService;
         this.stadeCroissanceRepository = stadeCroissanceRepository;
+        this.analyseVerificationService = analyseVerificationService;
     }
 
     public List<Pese> listerToutesLesPesees() {
@@ -207,7 +211,9 @@ public Double getDernierPoidsMoyen(Long idLot) {
                     .ifPresent(lot::setStadeCroissance);
         }
 
-        lotRepository.save(lot);
+        LotModels lotSauvegarde = lotRepository.save(lot);
+
+        analyseVerificationService.verifierRecolteProche(lotSauvegarde);
     }
 
     private Double round3(Double value) {

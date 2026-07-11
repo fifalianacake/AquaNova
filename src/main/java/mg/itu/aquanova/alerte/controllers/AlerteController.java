@@ -26,10 +26,6 @@ import mg.itu.aquanova.export_pdf.models.PdfResponses;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
 
-/**
- * Contrôleur web pour l'historique des alertes.
- * Lecture seule : aucune suppression n'est exposée (règle métier).
- */
 @Controller
 @RequestMapping("/alertes")
 public class AlerteController {
@@ -48,9 +44,19 @@ public class AlerteController {
         this.bassinsRepository = bassinsRepository;
     }
 
-    /**
-     * Page HTML : historique des alertes avec filtres et pagination.
-     */
+    @GetMapping
+    public String liste(
+            @ModelAttribute("filter") AlerteFilterDTO filter,
+            @PageableDefault(size = 10, sort = {"niveauCriticite", "dateCreation"},
+                    direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable,
+            Model model) {
+
+        model.addAttribute("alertes", alerteService.search(filter, pageable));
+        model.addAttribute("nbCritiques", alerteService.countCritiques());
+        addFilterAttributes(model);
+        return "alertes/list";
+    }
+
     @GetMapping("/historique")
     public String historique(
             @ModelAttribute("filter") AlerteFilterDTO filter,
@@ -62,9 +68,6 @@ public class AlerteController {
         return "alertes/historique";
     }
 
-    /**
-     * Export PDF de l'historique filtré.
-     */
     @GetMapping("/historique/export/pdf")
     @ResponseBody
     public ResponseEntity<byte[]> exportPdf(@ModelAttribute AlerteFilterDTO filter) {
@@ -72,17 +75,12 @@ public class AlerteController {
         return PdfResponses.attachment(pdf, "historique-alertes.pdf");
     }
 
-    /**
-     * Page HTML : détail d'une alerte, avec formulaire de changement de statut.
-     */
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         model.addAttribute("alerte", alerteService.getById(id));
         model.addAttribute("statuts", StatutAlerte.values());
         return "alertes/detail";
     }
-
-    // ── Attributs de formulaire pour les filtres ──
 
     private void addFilterAttributes(Model model) {
         model.addAttribute("moduleSources", ModuleSource.values());

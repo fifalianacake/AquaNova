@@ -64,6 +64,7 @@ public class NavigationControllerAdvice {
                         new NavigationItemDTO("Analyse coût par lot", "/finance/lots"))),
 
                 new NavigationItemDTO("Alertes", "bi-bell", List.of(
+                        new NavigationItemDTO("Alertes actives", "/alertes"),
                         new NavigationItemDTO("Historique des alertes", "/alertes/historique"))),
 
                 new NavigationItemDTO("Référentiel", "bi-collection", List.of(
