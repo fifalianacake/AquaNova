@@ -1,5 +1,6 @@
 package mg.itu.aquanova.alerte.services;
 
+import mg.itu.aquanova.alerte.dto.AlerteCreateDTO;
 import mg.itu.aquanova.alerte.dto.AlerteFilterDTO;
 import mg.itu.aquanova.alerte.dto.UpdateStatutAlerteDTO;
 import mg.itu.aquanova.alerte.models.Alerte;
@@ -19,6 +20,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AlerteService {
@@ -213,5 +215,41 @@ public class AlerteService {
     @Transactional
     public void ignorerAlerte(Long idAlerte, String commentaire) {
         changerStatut(idAlerte, new UpdateStatutAlerteDTO(StatutAlerte.IGNOREE, commentaire));
+    }
+
+    @Transactional
+    public Alerte creerAlerte(AlerteCreateDTO dto){
+
+        Alerte alerte = new Alerte();
+
+        alerte.setModuleSource(dto.getModuleSource());
+        alerte.setTypeAlerte(dto.getTypeAlerte());
+        alerte.setNiveauCriticite(dto.getNiveauCriticite());
+        alerte.setMessage(dto.getMessage());
+        alerte.setLot(dto.getLot());
+        alerte.setBassin(dto.getBassin());
+
+        alerte.setStatut(StatutAlerte.ACTIVE);
+        alerte.setDateCreation(LocalDateTime.now());
+
+        return alerteRepository.save(alerte);
+    }
+    @Transactional
+    public Alerte creerSiNonExiste(AlerteCreateDTO dto){
+
+        Optional<Alerte> alerteExistante =
+                alerteRepository.findFirstByModuleSourceAndTypeAlerteAndLotAndBassinAndStatut(
+                        dto.getModuleSource(),
+                        dto.getTypeAlerte(),
+                        dto.getLot(),
+                        dto.getBassin(),
+                        StatutAlerte.ACTIVE
+                );
+
+        if(alerteExistante.isPresent()){
+            return alerteExistante.get();
+        }
+
+        return creerAlerte(dto);
     }
 }
