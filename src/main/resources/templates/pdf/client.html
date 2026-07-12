@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout(${'Fiche client — ' + client.nom}, ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <table class="kpi-row">
+        <tr>
+            <td>
+                <div class="kpi-label">Chiffre d'affaires</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(totalMontant, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+                <div class="kpi-hint">hors ventes annulées</div>
+            </td>
+            <td>
+                <div class="kpi-label">Ventes</div>
+                <div class="kpi-value" th:text="${nbVentes}">0</div>
+                <div class="kpi-hint"
+                     th:text="'panier moyen ' + ${#numbers.formatDecimal(panierMoyen, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Poids acheté</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(totalPoids, 1, 'WHITESPACE', 2, 'COMMA')} + ' kg'">—</div>
+                <div class="kpi-hint"
+                     th:text="'à ' + ${#numbers.formatDecimal(prixMoyenKg, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar/kg'"></div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="panel">
+        <div class="panel-header">Informations générales</div>
+        <div class="panel-body">
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Nom</td>
+                    <td class="info-value" th:text="${client.nom}">—</td>
+                    <td class="info-label">Type de client</td>
+                    <td class="info-value"
+                        th:text="${client.typeClient != null ? client.typeClient.libelle : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Contact</td>
+                    <td class="info-value" th:text="${client.contact != null ? client.contact : '—'}">—</td>
+                    <td class="info-label">Email</td>
+                    <td class="info-value" th:text="${client.email != null ? client.email : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Statut</td>
+                    <td class="info-value">
+                        <span class="badge" th:classappend="${client.actif} ? 'badge-success' : 'badge-danger'"
+                              th:text="${client.actif} ? 'Actif' : 'Inactif'"></span>
+                    </td>
+                    <td class="info-label">Adresse</td>
+                    <td class="info-value" th:text="${client.adresse != null ? client.adresse : '—'}">—</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">Historique des ventes</div>
+        <table class="data">
+            <thead>
+            <tr>
+                <th>N°</th>
+                <th>Date</th>
+                <th>Lot</th>
+                <th class="num">Poids (kg)</th>
+                <th class="num">Montant (Ar)</th>
+                <th>Statut</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="v : ${ventes}">
+                <td th:text="${v.id}"></td>
+                <td th:text="${v.dateVente != null ? #temporals.format(v.dateVente, 'dd/MM/yyyy') : '—'}"></td>
+                <td th:text="${v.recolte != null and v.recolte.lot != null ? v.recolte.lot.code : '—'}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(v.poidsVendu, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(v.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td th:text="${v.statutVente != null ? v.statutVente.code : '—'}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(ventes)}">
+                <td colspan="6" class="vide">Aucune vente pour ce client.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="total-ligne"
+         th:text="'Total : ' + ${#numbers.formatDecimal(totalMontant, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+
+</contenu>
+</body>
+</html>

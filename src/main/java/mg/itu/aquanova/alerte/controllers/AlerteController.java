@@ -1,6 +1,9 @@
 package mg.itu.aquanova.alerte.controllers;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -23,6 +26,7 @@ import mg.itu.aquanova.alerte.models.StatutAlerte;
 import mg.itu.aquanova.alerte.models.TypeAlerte;
 import mg.itu.aquanova.alerte.services.AlerteService;
 import mg.itu.aquanova.export_pdf.models.PdfResponses;
+import mg.itu.aquanova.export_pdf.services.PdfRenderService;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
 
@@ -35,13 +39,16 @@ public class AlerteController {
     private final AlerteService alerteService;
     private final LotRepository lotRepository;
     private final BassinsRepository bassinsRepository;
+    private final PdfRenderService pdfRenderService;
 
     public AlerteController(AlerteService alerteService,
                             LotRepository lotRepository,
-                            BassinsRepository bassinsRepository) {
+                            BassinsRepository bassinsRepository,
+                            PdfRenderService pdfRenderService) {
         this.alerteService = alerteService;
         this.lotRepository = lotRepository;
         this.bassinsRepository = bassinsRepository;
+        this.pdfRenderService = pdfRenderService;
     }
 
     @GetMapping
@@ -71,8 +78,29 @@ public class AlerteController {
     @GetMapping("/historique/export/pdf")
     @ResponseBody
     public ResponseEntity<byte[]> exportPdf(@ModelAttribute AlerteFilterDTO filter) {
-        byte[] pdf = alerteService.exportHistoriquePdf(filter);
+        Map<String, String> filtres = new LinkedHashMap<>();
+        if (filter != null) {
+            ajouterFiltre(filtres, "Module", filter.getModuleSource());
+            ajouterFiltre(filtres, "Type", filter.getTypeAlerte());
+            ajouterFiltre(filtres, "Criticité", filter.getNiveauCriticite());
+            ajouterFiltre(filtres, "Statut", filter.getStatut());
+            ajouterFiltre(filtres, "Du", filter.getDateDebut());
+            ajouterFiltre(filtres, "Au", filter.getDateFin());
+        }
+
+        Map<String, Object> modele = new HashMap<>();
+        modele.put("alertes", alerteService.listerHistoriquePourExport(filter));
+        modele.put("filtres", filtres);
+        modele.put("sousTitre", "Alertes résolues ou ignorées");
+
+        byte[] pdf = pdfRenderService.rendre("alertes-historique", modele);
         return PdfResponses.attachment(pdf, "historique-alertes.pdf");
+    }
+
+    private void ajouterFiltre(Map<String, String> filtres, String libelle, Object valeur) {
+        if (valeur != null && !valeur.toString().isBlank()) {
+            filtres.put(libelle, valeur.toString());
+        }
     }
 
     @GetMapping("/{id}")

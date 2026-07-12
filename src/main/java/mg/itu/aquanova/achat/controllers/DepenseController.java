@@ -1,12 +1,14 @@
 package mg.itu.aquanova.achat.controllers;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,8 @@ import mg.itu.aquanova.achat.models.CategorieDepense;
 import mg.itu.aquanova.achat.models.Depense;
 import mg.itu.aquanova.achat.services.CategorieDepenseService;
 import mg.itu.aquanova.achat.services.DepenseService;
+import mg.itu.aquanova.export_pdf.models.PdfResponses;
+import mg.itu.aquanova.export_pdf.services.PdfRenderService;
 
 @Controller
 @RequestMapping("/depenses")
@@ -31,12 +35,15 @@ public class DepenseController {
 
     private final DepenseService depenseService;
     private final CategorieDepenseService categorieDepenseService;
+    private final PdfRenderService pdfRenderService;
 
     public DepenseController(
             DepenseService depenseService,
-            CategorieDepenseService categorieDepenseService) {
+            CategorieDepenseService categorieDepenseService,
+            PdfRenderService pdfRenderService) {
         this.depenseService = depenseService;
         this.categorieDepenseService = categorieDepenseService;
+        this.pdfRenderService = pdfRenderService;
     }
 
     @GetMapping
@@ -117,12 +124,56 @@ public class DepenseController {
 
     @GetMapping("/export-pdf")
     public ResponseEntity<byte[]> exportPdf(@ModelAttribute("filter") DepenseFilter filter) {
-        byte[] pdf = depenseService.exporterPdf(filter);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        ContentDisposition.attachment().filename("depenses.pdf").build().toString())
-                .body(pdf);
+        // L'export rejoue exactement les filtres de la page web : mêmes critères, mêmes lignes.
+        List<Depense> depenses = depenseService.listerPourExport(filter);
+        BigDecimal total = depenseService.calculerTotalFiltre(filter);
+
+        Map<String, Object> modele = new HashMap<>();
+        modele.put("depenses", depenses);
+        modele.put("total", total);
+        modele.put("moyenne", depenses.isEmpty()
+                ? null
+                : total.divide(BigDecimal.valueOf(depenses.size()), 2, RoundingMode.HALF_UP));
+        modele.put("filtres", construireFiltres(filter));
+        modele.put("sousTitre", construireSousTitre(filter));
+
+        byte[] pdf = pdfRenderService.rendre("depenses", modele);
+        return PdfResponses.attachment(pdf, "depenses.pdf");
+    }
+
+    private Map<String, String> construireFiltres(DepenseFilter filter) {
+        Map<String, String> filtres = new LinkedHashMap<>();
+        if (filter == null) {
+            return filtres;
+        }
+        if (filter.getDateDebut() != null) {
+            filtres.put("Du", filter.getDateDebut().toString());
+        }
+        if (filter.getDateFin() != null) {
+            filtres.put("Au", filter.getDateFin().toString());
+        }
+        if (filter.getCategorieDepenseId() != null) {
+            filtres.put("Catégorie",
+                    categorieDepenseService.trouverParId(filter.getCategorieDepenseId()).getLibelle());
+        }
+        if (filter.getModePaiement() != null && !filter.getModePaiement().isBlank()) {
+            filtres.put("Mode de paiement", filter.getModePaiement());
+        }
+        if (filter.getMontantMin() != null) {
+            filtres.put("Montant min", filter.getMontantMin().toString());
+        }
+        if (filter.getMontantMax() != null) {
+            filtres.put("Montant max", filter.getMontantMax().toString());
+        }
+        return filtres;
+    }
+
+    private String construireSousTitre(DepenseFilter filter) {
+        if (filter == null || (filter.getDateDebut() == null && filter.getDateFin() == null)) {
+            return "Toutes périodes confondues";
+        }
+        return "Période : " + (filter.getDateDebut() != null ? filter.getDateDebut() : "origine")
+                + " au " + (filter.getDateFin() != null ? filter.getDateFin() : "aujourd'hui");
     }
 
     private void addListAttributes(Model model) {

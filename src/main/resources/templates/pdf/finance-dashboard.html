@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout('Rapport financier', ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <table class="kpi-row">
+        <tr>
+            <td>
+                <div class="kpi-label">Chiffre d'affaires</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(dashboard.chiffreAffaires, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+                <div class="kpi-hint" th:text="${dashboard.nombreVentes} + ' vente(s) réalisée(s)'"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Marge brute</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(dashboard.margeBrute, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+                <div class="kpi-hint"
+                     th:text="${dashboard.tauxMargeBrute != null
+                               ? #numbers.formatDecimal(dashboard.tauxMargeBrute, 1, 'WHITESPACE', 2, 'COMMA') + ' %' : '—'}"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Profit net</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(dashboard.profitNet, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+                <div class="kpi-hint"
+                     th:text="${dashboard.tauxMargeNette != null
+                               ? #numbers.formatDecimal(dashboard.tauxMargeNette, 1, 'WHITESPACE', 2, 'COMMA') + ' %' : '—'}"></div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="panel">
+        <div class="panel-header">Compte de résultat de la période</div>
+        <div class="panel-body">
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Chiffre d'affaires réalisé</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(dashboard.chiffreAffaires, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                    <td class="info-label">Coût des alevins</td>
+                    <td class="info-value"
+                        th:text="'− ' + ${#numbers.formatDecimal(dashboard.coutAlevins, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                </tr>
+                <tr>
+                    <td class="info-label">Coût de l'alimentation</td>
+                    <td class="info-value"
+                        th:text="'− ' + ${#numbers.formatDecimal(dashboard.coutAlimentation, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                    <td class="info-label">Total des coûts directs</td>
+                    <td class="info-value"
+                        th:text="'− ' + ${#numbers.formatDecimal(dashboard.coutsDirects, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                </tr>
+                <tr>
+                    <td class="info-label">= Marge brute</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(dashboard.margeBrute, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                    <td class="info-label">Dépenses indirectes</td>
+                    <td class="info-value"
+                        th:text="'− ' + ${#numbers.formatDecimal(dashboard.depenses, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                </tr>
+                <tr>
+                    <td class="info-label">= Profit net</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(dashboard.profitNet, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                    <td class="info-label">Lots (rentables / déficitaires)</td>
+                    <td class="info-value"
+                        th:text="${dashboard.lotsRentables} + ' / ' + ${dashboard.lotsDeficitaires}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">Évolution mensuelle</div>
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Mois</th>
+                <th class="num">Chiffre d'affaires</th>
+                <th class="num">Coûts directs</th>
+                <th class="num">Marge brute</th>
+                <th class="num">Dépenses</th>
+                <th class="num">Profit net</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${dashboard.evolution}">
+                <td th:text="${e.mois}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(e.chiffreAffaires, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(e.coutsDirects, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(e.margeBrute, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(e.depenses, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(e.profitNet, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.evolution)}">
+                <td colspan="6" class="vide">Aucun mouvement sur la période.</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>Total</td>
+                <td class="num" th:text="${#numbers.formatDecimal(dashboard.chiffreAffaires, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(dashboard.coutsDirects, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(dashboard.margeBrute, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(dashboard.depenses, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(dashboard.profitNet, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">Dépenses par catégorie</div>
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Catégorie</th>
+                <th class="num">Montant (Ar)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="d : ${dashboard.depensesParCategorie}">
+                <td th:text="${d.libelle}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(d.montant, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.depensesParCategorie)}">
+                <td colspan="2" class="vide">Aucune dépense sur la période.</td>
+            </tr>
+            </tbody>
+            <tfoot th:if="${!#lists.isEmpty(dashboard.depensesParCategorie)}">
+            <tr>
+                <td>Total</td>
+                <td class="num" th:text="${#numbers.formatDecimal(dashboard.depenses, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+</contenu>
+</body>
+</html>

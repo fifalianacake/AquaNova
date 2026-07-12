@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(titre, sousTitre, contenu)">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${titre}">AquaNova</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 14mm 16mm 14mm;
+            @bottom-center {
+                content: "AquaNova — page " counter(page) " / " counter(pages);
+                font-family: "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                color: #8a9a97;
+            }
+        }
+
+        @page landscape {
+            size: A4 landscape;
+        }
+
+        body {
+            font-family: "DejaVu Sans", sans-serif;
+            font-size: 9pt;
+            color: #1f2d2b;
+            margin: 0;
+        }
+
+        /* ---------- En-tête ---------- */
+        .doc-header {
+            border-bottom: 2pt solid #0F6B60;
+            padding-bottom: 6pt;
+            margin-bottom: 12pt;
+        }
+        .marque {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #0F6B60;
+        }
+        .marque-sous {
+            font-size: 7.5pt;
+            color: #8a9a97;
+        }
+        .doc-titre {
+            font-size: 13pt;
+            font-weight: bold;
+            margin-top: 8pt;
+        }
+        .doc-sous-titre {
+            font-size: 8.5pt;
+            color: #6b7d7a;
+            margin-top: 2pt;
+        }
+        .doc-date {
+            font-size: 7.5pt;
+            color: #8a9a97;
+            margin-top: 3pt;
+        }
+
+        /* ---------- Badges ---------- */
+        .badge {
+            display: inline-block;
+            padding: 1.5pt 5pt;
+            border-radius: 3pt;
+            font-size: 7.5pt;
+            font-weight: bold;
+            background: #E8F5F2;
+            color: #0F6B60;
+        }
+        .badge-success { background: #DFF3E6; color: #0B6B2E; }
+        .badge-danger  { background: #FBE3E5; color: #9C0006; }
+        .badge-warning { background: #FDF1D6; color: #8A6100; }
+        .badge-info    { background: #E8F5F2; color: #0F6B60; }
+
+        /* ---------- Cartes d'indicateurs ---------- */
+        .kpi-row {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 6pt 0;
+            margin-bottom: 12pt;
+        }
+        .kpi-row td {
+            border: 0.7pt solid #d8e6e3;
+            border-radius: 4pt;
+            padding: 7pt 9pt;
+            background: #fbfdfd;
+            vertical-align: top;
+        }
+        .kpi-label {
+            font-size: 7.5pt;
+            color: #6b7d7a;
+        }
+        .kpi-value {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #0F6B60;
+            padding-top: 2pt;
+        }
+        .kpi-hint {
+            font-size: 7pt;
+            color: #8a9a97;
+            padding-top: 1pt;
+        }
+
+        /* ---------- Panneaux ---------- */
+        .panel {
+            border: 0.7pt solid #d8e6e3;
+            border-radius: 4pt;
+            margin-bottom: 12pt;
+        }
+        .panel-header {
+            background: #E8F5F2;
+            padding: 5pt 9pt;
+            font-weight: bold;
+            font-size: 9.5pt;
+            color: #0F6B60;
+            border-bottom: 0.7pt solid #d8e6e3;
+        }
+        .panel-body { padding: 8pt 9pt; }
+
+        /* ---------- Grille d'informations ---------- */
+        .info-grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-grid td {
+            padding: 4pt 6pt;
+            border-bottom: 0.5pt solid #eef4f3;
+            vertical-align: top;
+            width: 25%;
+        }
+        .info-label {
+            color: #6b7d7a;
+            font-size: 8pt;
+        }
+        .info-value {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        /* ---------- Tableaux ---------- */
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+        }
+        table.data thead th {
+            background: #0F6B60;
+            color: #ffffff;
+            text-align: left;
+            padding: 5pt 6pt;
+            font-size: 8pt;
+        }
+        table.data tbody td {
+            padding: 4pt 6pt;
+            border-bottom: 0.5pt solid #e4eeec;
+        }
+        table.data tbody tr:nth-child(even) td { background: #f7fbfa; }
+        table.data .num { text-align: right; }
+        table.data tfoot td {
+            padding: 5pt 6pt;
+            border-top: 1pt solid #0F6B60;
+            font-weight: bold;
+            background: #E8F5F2;
+        }
+        .vide {
+            text-align: center;
+            color: #8a9a97;
+            padding: 10pt;
+            font-style: italic;
+        }
+        .filtres {
+            font-size: 7.5pt;
+            color: #6b7d7a;
+            margin-bottom: 6pt;
+        }
+        .total-ligne {
+            text-align: right;
+            font-weight: bold;
+            font-size: 10pt;
+            color: #0F6B60;
+            margin-top: 6pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="doc-header">
+        <div class="marque">AquaNova</div>
+        <div class="marque-sous">Gestion de pisciculture</div>
+        <div class="doc-titre" th:text="${titre}">Titre</div>
+        <div class="doc-sous-titre" th:if="${sousTitre != null and !sousTitre.isEmpty()}" th:text="${sousTitre}"></div>
+        <div class="doc-date"
+             th:text="'Exporté le ' + ${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy à HH:mm')}"></div>
+    </div>
+
+    <div th:replace="${contenu}">Contenu</div>
+</body>
+</html>

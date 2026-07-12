@@ -1,8 +1,6 @@
 package mg.itu.aquanova.achat.services;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -84,31 +82,6 @@ public class DepenseService {
                 .map(depense -> depense.getMontant())
                 .filter(montant -> montant != null)
                 .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
-    }
-
-    public byte[] exporterPdf(DepenseFilter filter) {
-        List<Depense> depenses = listerPourExport(filter);
-        BigDecimal total = depenses.stream()
-                .map(depense -> depense.getMontant())
-                .filter(montant -> montant != null)
-                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
-
-        StringBuilder contenu = new StringBuilder();
-        contenu.append("DEPENSES DIVERSES\n");
-        contenu.append("Export filtre - ").append(LocalDate.now()).append("\n\n");
-        for (Depense depense : depenses) {
-            contenu.append("#").append(depense.getId())
-                    .append(" | ").append(depense.getDateDepense())
-                    .append(" | ").append(depense.getCategorieDepense() != null ? depense.getCategorieDepense().getLibelle() : "-")
-                    .append(" | ").append(depense.getLibelle())
-                    .append(" | ").append(depense.getMontant())
-                    .append(" | ").append(nullToDash(depense.getModePaiement()))
-                    .append(" | ").append(nullToDash(depense.getReference()))
-                    .append("\n");
-        }
-        contenu.append("\nTOTAL : ").append(total);
-
-        return creerPdfSimple(contenu.toString());
     }
 
     private Specification<Depense> specification(DepenseFilter filter) {
@@ -220,50 +193,5 @@ public class DepenseService {
 
     private String blankToNull(String value) {
         return value == null || value.trim().isEmpty() ? null : value.trim();
-    }
-
-    private String nullToDash(String value) {
-        return value == null || value.isBlank() ? "-" : value;
-    }
-
-    private byte[] creerPdfSimple(String texte) {
-        StringBuilder stream = new StringBuilder();
-        stream.append("BT\n/F1 10 Tf\n50 790 Td\n14 TL\n");
-        for (String ligne : texte.split("\\R")) {
-            stream.append("(").append(echapperPdf(ligne)).append(") Tj\nT*\n");
-        }
-        stream.append("ET");
-
-        byte[] streamBytes = stream.toString().getBytes(StandardCharsets.ISO_8859_1);
-        String header = "%PDF-1.4\n";
-        String obj1 = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n";
-        String obj2 = "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n";
-        String obj3 = "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n";
-        String obj4 = "4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n";
-        String obj5Prefix = "5 0 obj\n<< /Length " + streamBytes.length + " >>\nstream\n";
-        String obj5Suffix = "\nendstream\nendobj\n";
-
-        String[] objets = {obj1, obj2, obj3, obj4, obj5Prefix + stream + obj5Suffix};
-        StringBuilder pdf = new StringBuilder(header);
-        int[] offsets = new int[objets.length + 1];
-        for (int i = 0; i < objets.length; i++) {
-            offsets[i + 1] = pdf.toString().getBytes(StandardCharsets.ISO_8859_1).length;
-            pdf.append(objets[i]);
-        }
-        int xrefOffset = pdf.toString().getBytes(StandardCharsets.ISO_8859_1).length;
-        pdf.append("xref\n0 ").append(objets.length + 1).append("\n");
-        pdf.append("0000000000 65535 f \n");
-        for (int i = 1; i < offsets.length; i++) {
-            pdf.append(String.format("%010d 00000 n \n", offsets[i]));
-        }
-        pdf.append("trailer\n<< /Size ").append(objets.length + 1).append(" /Root 1 0 R >>\n");
-        pdf.append("startxref\n").append(xrefOffset).append("\n%%EOF");
-        return pdf.toString().getBytes(StandardCharsets.ISO_8859_1);
-    }
-
-    private String echapperPdf(String value) {
-        return value.replace("\\", "\\\\")
-                .replace("(", "\\(")
-                .replace(")", "\\)");
     }
 }

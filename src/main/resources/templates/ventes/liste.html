@@ -9,6 +9,10 @@
     <div class="toolbar">
         <a th:href="@{/ventes/new}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Saisir une vente</a>
         <a th:href="@{/ventes/dashboard}" class="btn btn-outline-primary">Dashboard</a>
+        <a class="btn btn-outline-secondary"
+           th:href="@{/ventes/historique/export-pdf(dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, clientNom=${filter.client}, statutId=${filter.statutId})}">
+            <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
+        </a>
     </div>
 
     <div class="panel">

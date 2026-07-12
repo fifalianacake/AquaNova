@@ -19,6 +19,9 @@
     <div class="d-flex gap-2 flex-wrap">
         <a class="btn btn-outline-secondary" th:href="@{/clients}"><i class="bi bi-arrow-left"></i> Retour</a>
         <a class="btn btn-outline-primary" th:href="@{/clients/{id}/edit(id=${client.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        <a class="btn btn-outline-secondary" th:href="@{/clients/{id}/export-pdf(id=${client.id})}">
+            <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
+        </a>
         <form class="inline-form" th:action="@{/clients/{id}/supprimer(id=${client.id})}" method="post"
               onsubmit="return confirm('Supprimer ou désactiver ce client ?');">
             <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash3"></i> Supprimer / Désactiver</button>

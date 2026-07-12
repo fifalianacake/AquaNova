@@ -6,7 +6,13 @@
 <body>
 <main>
 
-<h2>Dashboard financier</h2>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h2 class="mb-0">Dashboard financier</h2>
+    <a class="btn btn-outline-secondary"
+       th:href="@{/finance/dashboard/export-pdf(dateDebut=${dashboard.dateDebut}, dateFin=${dashboard.dateFin})}">
+        <i class="bi bi-file-earmark-pdf"></i> Rapport PDF
+    </a>
+</div>
 
 <p class="hint">
     Marge brute = chiffre d'affaires réalisé − coûts directs traçables (alevins acquis + aliment distribué).

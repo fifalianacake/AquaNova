@@ -74,7 +74,9 @@
             </form>
             
             <a th:if="${vente.statutVente.code.name() == 'VALIDEE' || vente.statutVente.code.name() == 'PAYEE'}"
-               th:href="@{/ventes/{id}/export-pdf(id=${vente.id})}" class="btn btn-primary btn-right">Facture PDF</a>
+               th:href="@{/ventes/{id}/export-pdf(id=${vente.id})}" class="btn btn-outline-secondary btn-right">
+                <i class="bi bi-file-earmark-pdf"></i> Facture PDF
+            </a>
         </div>
     </div>
 </main>

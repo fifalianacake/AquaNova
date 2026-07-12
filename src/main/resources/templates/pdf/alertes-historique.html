@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout('Historique des alertes', ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <div class="filtres" th:if="${filtres != null and !filtres.isEmpty()}">
+        <span th:each="f, i : ${filtres}"
+              th:text="${f.key} + ' : ' + ${f.value} + (${i.last} ? '' : '   |   ')"></span>
+    </div>
+
+    <table class="data">
+        <thead>
+        <tr>
+            <th>Créée le</th>
+            <th>Module</th>
+            <th>Type</th>
+            <th>Criticité</th>
+            <th>Message</th>
+            <th>Statut</th>
+            <th>Clôturée le</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${alertes}">
+            <td th:text="${a.dateCreation != null
+                          ? #temporals.format(a.dateCreation, 'dd/MM/yyyy HH:mm') : '—'}"></td>
+            <td th:text="${a.moduleSource}"></td>
+            <td th:text="${a.typeAlerte}"></td>
+            <td>
+                <span class="badge"
+                      th:classappend="${a.niveauCriticite.name() == 'CRITIQUE'} ? 'badge-danger' : 'badge-warning'"
+                      th:text="${a.niveauCriticite}"></span>
+            </td>
+            <td th:text="${a.message}"></td>
+            <td th:text="${a.statut}"></td>
+            <td th:text="${a.dateResolution != null
+                          ? #temporals.format(a.dateResolution, 'dd/MM/yyyy HH:mm') : '—'}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(alertes)}">
+            <td colspan="7" class="vide">Aucune alerte pour ces filtres.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="total-ligne" th:text="${#lists.size(alertes)} + ' alerte(s)'"></div>
+
+</contenu>
+</body>
+</html>

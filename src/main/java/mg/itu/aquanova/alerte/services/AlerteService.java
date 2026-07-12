@@ -7,8 +7,6 @@ import mg.itu.aquanova.alerte.models.Alerte;
 import mg.itu.aquanova.alerte.models.NiveauCriticite;
 import mg.itu.aquanova.alerte.models.StatutAlerte;
 import mg.itu.aquanova.alerte.repositories.AlerteRepository;
-import mg.itu.aquanova.export_pdf.models.ListePdfData;
-import mg.itu.aquanova.export_pdf.services.PdfExportService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,15 +27,12 @@ public class AlerteService {
     private static final List<StatutAlerte> STATUTS_CLOTURES = List.of(StatutAlerte.RESOLUE, StatutAlerte.IGNOREE);
 
     private final AlerteRepository alerteRepository;
-    private final PdfExportService pdfExportService;
     private final HistoriqueAlerteService historiqueAlerteService;
 
     public AlerteService(AlerteRepository alerteRepository,
-                         HistoriqueAlerteService historiqueAlerteService,
-                         PdfExportService pdfExportService) {
+                         HistoriqueAlerteService historiqueAlerteService) {
         this.alerteRepository = alerteRepository;
         this.historiqueAlerteService = historiqueAlerteService;
-        this.pdfExportService = pdfExportService;
     }
 
     public Page<Alerte> searchHistorique(AlerteFilterDTO filter, Pageable pageable) {
@@ -55,39 +50,9 @@ public class AlerteService {
                 (root, query, cb) -> root.get("statut").in(STATUTS_CLOTURES));
     }
 
-    public byte[] exportHistoriquePdf(AlerteFilterDTO filter) {
-        List<Alerte> alertes = alerteRepository.findAll(specificationHistorique(filter));
-
-        List<String> colonnes = List.of(
-                "Date création", "Date résolution", "Module", "Type",
-                "Criticité", "Statut", "Message");
-
-        List<List<String>> lignes = new ArrayList<>();
-        for (Alerte a : alertes) {
-            lignes.add(List.of(
-                    formatDate(a.getDateCreation()),
-                    formatDate(a.getDateResolution()),
-                    a.getModuleSource() != null ? a.getModuleSource().name() : "-",
-                    a.getTypeAlerte() != null ? a.getTypeAlerte().name() : "-",
-                    a.getNiveauCriticite() != null ? a.getNiveauCriticite().name() : "-",
-                    a.getStatut() != null ? a.getStatut().name() : "-",
-                    a.getMessage() != null ? a.getMessage() : "-"));
-        }
-
-        ListePdfData data = ListePdfData.of("Historique des alertes")
-                .filtre("Module", filter.getModuleSource())
-                .filtre("Type", filter.getTypeAlerte())
-                .filtre("Criticité", filter.getNiveauCriticite())
-                .filtre("Statut", filter.getStatut())
-                .filtre("Date début", filter.getDateDebut())
-                .filtre("Date fin", filter.getDateFin())
-                .filtre("Lot", filter.getLotId())
-                .filtre("Bassin", filter.getBassinId())
-                .colonnes(colonnes)
-                .lignes(lignes)
-                .total("Total alertes", String.valueOf(alertes.size()));
-
-        return pdfExportService.genererListe(data);
+    /** Liste (non paginée) de l'historique filtré, utilisée par l'export PDF. */
+    public List<Alerte> listerHistoriquePourExport(AlerteFilterDTO filter) {
+        return alerteRepository.findAll(specificationHistorique(filter));
     }
 
     private Specification<Alerte> buildSpecification(AlerteFilterDTO filter) {

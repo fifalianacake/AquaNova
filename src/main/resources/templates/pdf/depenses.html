@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout('Historique des dépenses', ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <div class="filtres" th:if="${filtres != null and !filtres.isEmpty()}">
+        <span th:each="f, i : ${filtres}"
+              th:text="${f.key} + ' : ' + ${f.value} + (${i.last} ? '' : '   |   ')"></span>
+    </div>
+
+    <table class="kpi-row">
+        <tr>
+            <td>
+                <div class="kpi-label">Total des dépenses</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(total, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+                <div class="kpi-hint" th:text="${#lists.size(depenses)} + ' dépense(s)'"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Dépense moyenne</div>
+                <div class="kpi-value"
+                     th:text="${moyenne != null
+                               ? #numbers.formatDecimal(moyenne, 1, 'WHITESPACE', 2, 'COMMA') + ' Ar' : '—'}">—</div>
+                <div class="kpi-hint">sur la période filtrée</div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="data">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Libellé</th>
+            <th>Catégorie</th>
+            <th>Mode de paiement</th>
+            <th>Référence</th>
+            <th class="num">Montant (Ar)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="d : ${depenses}">
+            <td th:text="${d.dateDepense != null ? #temporals.format(d.dateDepense, 'dd/MM/yyyy') : '—'}"></td>
+            <td th:text="${d.libelle}"></td>
+            <td th:text="${d.categorieDepense != null ? d.categorieDepense.libelle : '—'}"></td>
+            <td th:text="${d.modePaiement != null ? d.modePaiement : '—'}"></td>
+            <td th:text="${d.reference != null ? d.reference : '—'}"></td>
+            <td class="num" th:text="${#numbers.formatDecimal(d.montant, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(depenses)}">
+            <td colspan="6" class="vide">Aucune dépense pour ces filtres.</td>
+        </tr>
+        </tbody>
+        <tfoot th:if="${!#lists.isEmpty(depenses)}">
+        <tr>
+            <td colspan="5">Total</td>
+            <td class="num" th:text="${#numbers.formatDecimal(total, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+        </tr>
+        </tfoot>
+    </table>
+
+</contenu>
+</body>
+</html>

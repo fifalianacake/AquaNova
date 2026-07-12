@@ -22,6 +22,9 @@
     <div class="d-flex gap-2 flex-wrap">
         <a class="btn btn-outline-secondary" th:href="@{/lots}"><i class="bi bi-arrow-left"></i> Retour</a>
         <a class="btn btn-outline-primary" th:href="@{/lots/{id}/edit(id=${lot.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        <a class="btn btn-outline-secondary" th:href="@{/lots/{id}/export-pdf(id=${lot.id})}">
+            <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
+        </a>
         <a class="btn btn-outline-danger" th:href="@{/lots/{id}/delete(id=${lot.id})}"
            onclick="return confirm('Passer ce lot au statut ANNULE ?')"><i class="bi bi-x-circle"></i> Annuler</a>
     </div>
@@ -151,6 +154,9 @@
         <div class="d-flex gap-2 flex-wrap">
             <a class="btn btn-outline-primary" th:href="@{/lots/{id}/journal(id=${lot.id})}">
                 <i class="bi bi-journal-text"></i> Journal des événements
+            </a>
+            <a class="btn btn-outline-secondary" th:href="@{/lots/{id}/journal/export-pdf(id=${lot.id})}">
+                <i class="bi bi-file-earmark-pdf"></i> Journal en PDF
             </a>
             <a class="btn btn-outline-primary" th:href="@{/lots/{id}/pesees(id=${lot.id})}">
                 <i class="bi bi-speedometer2"></i> Pesées
