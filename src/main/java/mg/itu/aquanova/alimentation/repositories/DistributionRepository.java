@@ -38,6 +38,11 @@ public interface DistributionRepository extends JpaRepository<Distribution, Long
            "FROM Distribution d WHERE d.lot.id = :lotId")
     Double findPrixMoyenAlimentByLotId(@Param("lotId") Long lotId);
 
+    @Query("SELECT CASE WHEN COALESCE(SUM(d.quantite), 0) = 0 THEN 0.0 " +
+           "ELSE SUM(d.quantite * COALESCE(d.coutUnitaire, d.aliment.prixUnitaire)) / SUM(d.quantite) END " +
+           "FROM Distribution d")
+    Double findPrixMoyenAlimentGlobal();
+
     @Query("SELECT COALESCE(SUM(d.quantite * COALESCE(d.coutUnitaire, d.aliment.prixUnitaire)), 0) FROM Distribution d "
             + "WHERE d.dateDistribution BETWEEN :debut AND :fin")
     BigDecimal sumCoutAlimentationEntre(@Param("debut") LocalDate debut, @Param("fin") LocalDate fin);

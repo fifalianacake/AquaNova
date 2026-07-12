@@ -14,6 +14,7 @@ import mg.itu.aquanova.finance.dto.PrevisionFinanciereDTO;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.services.PrevisionRecolteService;
+import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 import mg.itu.aquanova.vente.repositories.VenteRepository;
 
 @Service
@@ -23,15 +24,17 @@ public class PrevisionFinanciereService {
     private final DistributionRepository distributionRepository;
     private final DistributionService distributionService;
     private final PrevisionRecolteService previsionRecolteService;
+    private final AlimentRepository alimentRepository;
 
     public PrevisionFinanciereService(LotRepository lotRepository, VenteRepository venteRepository,
             DistributionRepository distributionRepository, DistributionService distributionService,
-            PrevisionRecolteService previsionRecolteService) {
+            PrevisionRecolteService previsionRecolteService, AlimentRepository alimentRepository) {
         this.lotRepository = lotRepository;
         this.venteRepository = venteRepository;
         this.distributionRepository = distributionRepository;
         this.distributionService = distributionService;
         this.previsionRecolteService = previsionRecolteService;
+        this.alimentRepository = alimentRepository;
     }
 
     private Double estimerPrixMoyenVenteKg(Integer especeId) {
@@ -43,12 +46,35 @@ public class PrevisionFinanciereService {
         return venteRepository.estimerPrixMoyenVenteKg();
     }
 
-    private Double estimerBiomasseVendable(LotModels lot) {
-        if (lot == null || lot.getPoidsMoyenActuel() == null || lot.getEffectifActuel() == null) {
+    private Double estimerBiomasseVendable(LotModels lot, LocalDate dateRecolteEstimee) {
+        if (lot == null || lot.getEffectifActuel() == null) {
             return 0.0;
         }
 
-        return (lot.getPoidsMoyenActuel() * lot.getEffectifActuel()) / 1000.0;
+        Double poidsMoyen = previsionRecolteService.estimerPoidsMoyenA(lot, dateRecolteEstimee);
+        if (poidsMoyen == null) {
+            poidsMoyen = lot.getPoidsMoyenActuel();
+        }
+        if (poidsMoyen == null) {
+            return 0.0;
+        }
+
+        return (poidsMoyen * lot.getEffectifActuel()) / 1000.0;
+    }
+
+    private Double estimerPrixAlimentKg(Long lotId) {
+        Double prixDuLot = distributionRepository.findPrixMoyenAlimentByLotId(lotId);
+        if (prixDuLot != null && prixDuLot > 0) {
+            return prixDuLot;
+        }
+
+        Double prixExploitation = distributionRepository.findPrixMoyenAlimentGlobal();
+        if (prixExploitation != null && prixExploitation > 0) {
+            return prixExploitation;
+        }
+
+        Double prixCatalogue = alimentRepository.findPrixMoyenCatalogue();
+        return (prixCatalogue != null && prixCatalogue > 0) ? prixCatalogue : null;
     }
 
     private Double estimerCoutsFuturs(Long lotId, LocalDate dateRecolteEstimee) {
@@ -63,11 +89,8 @@ public class PrevisionFinanciereService {
             return total;
         }
 
-        // Ration journalière théorique (kg/jour, pour tout le lot) basée sur l'ICA système
-        // et le gain de poids cible restant à atteindre avant la récolte (même formule que
-        // DistributionService, réutilisée ici pour projeter le coût sur les jours restants).
         BigDecimal rationJournaliereKg = distributionService.calculRationTheoriqueCible(lotId);
-        Double prixMoyenAlimentKg = distributionRepository.findPrixMoyenAlimentByLotId(lotId);
+        Double prixMoyenAlimentKg = estimerPrixAlimentKg(lotId);
 
         if (rationJournaliereKg == null || prixMoyenAlimentKg == null) {
             return total;
@@ -98,7 +121,7 @@ public class PrevisionFinanciereService {
 
             Integer especeId = lot.getEspece() != null ? lot.getEspece().getId() : null;
             Double prixMoyenVenteKg = estimerPrixMoyenVenteKg(especeId);
-            Double biomassePrevue = estimerBiomasseVendable(lot);
+            Double biomassePrevue = estimerBiomasseVendable(lot, dateRecolteEstimee);
             String espece = (lot.getEspece() != null && lot.getEspece().getNom() != null)
                     ? lot.getEspece().getNom() : "Inconnue";
             String codeLot = lot.getCode() != null ? lot.getCode() : "Inconnu";
