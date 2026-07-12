@@ -35,6 +35,7 @@ public class RecolteService {
     private final StatutLotRepository statutLotRepository;
     private final StatutBassinRepository statutBassinRepository;
     private final JournalLotService journalLotService;
+    private final PrevisionRecolteService previsionRecolteService;
 
     public RecolteService(
             RecoltesRepository recoltesRepository,
@@ -42,13 +43,15 @@ public class RecolteService {
             TypeRecoltesRepository typeRecoltesRepository,
             StatutLotRepository statutLotRepository,
             StatutBassinRepository statutBassinRepository,
-            JournalLotService journalLotService) {
+            JournalLotService journalLotService,
+            PrevisionRecolteService previsionRecolteService) {
         this.recoltesRepository = recoltesRepository;
         this.lotRepository = lotRepository;
         this.typeRecoltesRepository = typeRecoltesRepository;
         this.statutLotRepository = statutLotRepository;
         this.statutBassinRepository = statutBassinRepository;
         this.journalLotService = journalLotService;
+        this.previsionRecolteService = previsionRecolteService;
     }
 
     @Transactional
@@ -72,11 +75,12 @@ public class RecolteService {
 
         validerRecolte(lot, typeRecolte, dateRecolte, effectifRecolte);
 
-        // lot.getPoidsMoyenActuel() est exprimé en grammes (convention utilisée dans tout le reste
-        // du code, cf. finance.PrevisionFinanciereService et alimentation.DistributionService) ;
-        // Recoltes.poidsMoyen/poidsTotal sont eux exprimés en kg (affichés tels quels dans les vues).
-        Double poidsMoyen = lot.getPoidsMoyenActuel() / 1000.0;
-        Double poidsTotal = calculerPoidsTotalRecolte(lot, effectifRecolte);
+        Double poidsMoyenEstime = previsionRecolteService.estimerPoidsMoyenA(lot, dateRecolte);
+        boolean poidsProjete = poidsMoyenEstime != null;
+        Double poidsMoyenGrammes = poidsProjete ? poidsMoyenEstime : lot.getPoidsMoyenActuel();
+
+        Double poidsMoyen = poidsMoyenGrammes / 1000.0;
+        Double poidsTotal = poidsMoyen * effectifRecolte;
         int nouvelEffectif = lot.getEffectifActuel() - effectifRecolte;
 
         Recoltes recolte = new Recoltes();
@@ -99,7 +103,10 @@ public class RecolteService {
                 "Récolte " + typeRecolte.getLibelle()
                         + " de " + effectifRecolte
                         + " individus, poids total " + poidsTotal
-                        + ", poids moyen " + poidsMoyen,
+                        + ", poids moyen " + poidsMoyen
+                        + (poidsProjete
+                                ? " (projeté à la date de récolte)"
+                                : " (dernière pesée)"),
                 dateRecolte);
 
         return saved;
@@ -178,10 +185,6 @@ public class RecolteService {
         if (lot.getPoidsMoyenActuel() == null || lot.getPoidsMoyenActuel() <= 0) {
             throw new IllegalStateException("Le poids moyen actuel du lot doit être renseigné pour calculer le poids récolté.");
         }
-    }
-
-    private Double calculerPoidsTotalRecolte(LotModels lot, Integer effectifRecolte) {
-        return (lot.getPoidsMoyenActuel() / 1000.0) * effectifRecolte;
     }
 
     private void appliquerStatutsApresRecolte(LotModels lot, int nouvelEffectif) {

@@ -56,6 +56,37 @@ public class PrevisionRecolteService {
                         / nombreJours);
     }
 
+    public Double estimerPoidsMoyenA(LotModels lot, LocalDate date) {
+        if (lot == null || date == null) {
+            return null;
+        }
+
+        Double croissanceJournaliere = calculerCroissanceMoyenne(lot);
+        if (croissanceJournaliere == null || croissanceJournaliere <= ZERO) {
+            return null;
+        }
+
+        List<Pese> pesees = peseRepository.findByLotIdOrderByDatePeseeDesc(lot.getId());
+        if (pesees.isEmpty() || pesees.get(0).getPoidsMoyen() == null) {
+            return null;
+        }
+
+        Pese dernierePesee = pesees.get(0);
+        long jours = ChronoUnit.DAYS.between(dernierePesee.getDatePesee(), date);
+        if (jours <= 0) {
+            return null;
+        }
+
+        double poidsProjete = dernierePesee.getPoidsMoyen().doubleValue() + croissanceJournaliere * jours;
+
+        Double poidsCible = resolvePoidsCible(lot);
+        if (poidsCible != null && poidsCible > ZERO && poidsProjete > poidsCible) {
+            poidsProjete = poidsCible;
+        }
+
+        return round3(poidsProjete);
+    }
+
     public LocalDate estimerDateRecolte(Long lotId) {
         LotModels lot = lotRepository.findById(lotId)
                 .orElseThrow(() -> new IllegalArgumentException("Lot introuvable: " + lotId));
