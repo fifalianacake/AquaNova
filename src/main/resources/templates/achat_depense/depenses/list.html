@@ -12,6 +12,7 @@
 <div class="toolbar">
     <a class="btn btn-primary" th:href="@{/depenses/new}"><i class="bi bi-plus-lg"></i> Nouvelle dépense</a>
     <a class="btn btn-outline-secondary" th:href="@{/depenses/export-pdf(id=${filter.id}, categorieDepenseId=${filter.categorieDepenseId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax}, modePaiement=${filter.modePaiement})}"><i class="bi bi-file-earmark-pdf"></i> Exporter en PDF</a>
+    <a class="btn btn-outline-secondary" th:href="@{/depenses/export-excel(id=${filter.id}, categorieDepenseId=${filter.categorieDepenseId}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax}, modePaiement=${filter.modePaiement})}"><i class="bi bi-file-earmark-spreadsheet"></i> Exporter en Excel</a>
 </div>
 
 <div class="panel">

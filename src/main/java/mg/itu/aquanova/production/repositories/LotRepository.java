@@ -21,6 +21,9 @@ public interface LotRepository extends JpaRepository<LotModels, Long>, JpaSpecif
 
     boolean existsByCode(String code);
 
+    /** Les fichiers importés désignent les lots par leur code, jamais par leur identifiant. */
+    Optional<LotModels> findByCode(String code);
+
     /** Unicité du code lors d'une modification : on ignore le lot en cours d'édition. */
     boolean existsByCodeAndIdNot(String code, Long id);
 }

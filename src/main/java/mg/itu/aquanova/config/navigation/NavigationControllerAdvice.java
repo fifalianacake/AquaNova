@@ -68,6 +68,9 @@ public class NavigationControllerAdvice {
                         new NavigationItemDTO("Alertes actives", "/alertes"),
                         new NavigationItemDTO("Historique des alertes", "/alertes/historique"))),
 
+                new NavigationItemDTO("Import / Export", "bi-file-earmark-spreadsheet", List.of(
+                        new NavigationItemDTO("Importer des données", "/imports"))),
+
                 new NavigationItemDTO("Référentiel", "bi-collection", List.of(
                         new NavigationItemDTO("Bassins", "/bassins"),
                         new NavigationItemDTO("Types de bassin", "/types-bassins"),

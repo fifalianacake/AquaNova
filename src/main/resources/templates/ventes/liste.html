@@ -13,6 +13,10 @@
            th:href="@{/ventes/historique/export-pdf(dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, clientNom=${filter.client}, statutId=${filter.statutId})}">
             <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
         </a>
+        <a class="btn btn-outline-secondary"
+           th:href="@{/ventes/export-excel(id=${filter.id}, client=${filter.client}, idRecolte=${filter.idRecolte}, idLot=${filter.idLot}, dateDebut=${filter.dateDebut}, dateFin=${filter.dateFin}, statutId=${filter.statutId}, montantMin=${filter.montantMin}, montantMax=${filter.montantMax})}">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Exporter en Excel
+        </a>
     </div>
 
     <div class="panel">

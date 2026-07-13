@@ -171,6 +171,109 @@ h1, h2, h3, h4, h5, .display-font {
     padding-left: .8rem;
 }
 
+/* ── Sidebar rétractable ────────────────────────────────────────────
+   Deux comportements distincts :
+   • sur grand écran, la sidebar se réduit à un rail d'icônes (72px) ;
+   • sous 992px, elle disparaît et s'ouvre en surimpression par-dessus le contenu,
+     car un rail de 72px reste trop coûteux sur un petit écran.
+   L'état est mémorisé dans le navigateur (voir aquanova.js).                     */
+
+.sidebar {
+    transition: width .18s ease;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: var(--aq-muted);
+    font-size: 1.35rem;
+    line-height: 1;
+    padding: .1rem .45rem;
+    border-radius: var(--aq-radius);
+    margin-right: .25rem;
+}
+
+.sidebar-toggle:hover {
+    background-color: rgba(0, 0, 0, .05);
+    color: var(--aq-ink);
+}
+
+.sidebar-backdrop {
+    display: none;
+}
+
+/* --- Mode rail (grand écran) --- */
+.app-shell.sidebar-collapsed .sidebar {
+    width: 72px;
+}
+
+.app-shell.sidebar-collapsed .sidebar-label {
+    display: none;
+}
+
+.app-shell.sidebar-collapsed .sidebar-brand,
+.app-shell.sidebar-collapsed .sidebar-section-toggle,
+.app-shell.sidebar-collapsed .sidebar-footer .sidebar-link {
+    justify-content: center;
+    gap: 0;
+}
+
+.app-shell.sidebar-collapsed .sidebar-section-toggle .chev {
+    display: none;
+}
+
+/* Les sous-menus n'ont pas d'icônes : illisibles dans un rail, on les masque.
+   Cliquer sur une section rouvre la sidebar (voir aquanova.js). */
+.app-shell.sidebar-collapsed .sidebar-nav .collapse,
+.app-shell.sidebar-collapsed .sidebar-nav .collapsing {
+    display: none !important;
+}
+
+.app-shell.sidebar-collapsed .sidebar-footer .sidebar-link {
+    display: flex;
+    padding-left: .8rem;
+    padding-right: .8rem;
+}
+
+/* --- Mobile : la sidebar passe par-dessus le contenu --- */
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1045;
+        transform: translateX(-100%);
+        transition: transform .18s ease;
+    }
+
+    /* Sur mobile, le bouton ouvre la sidebar au lieu de la réduire. */
+    .app-shell.sidebar-open .sidebar {
+        transform: translateX(0);
+        width: 260px;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar {
+        width: 260px;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar-label,
+    .app-shell.sidebar-collapsed .sidebar-section-toggle .chev {
+        display: initial;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar-nav .collapse.show {
+        display: block !important;
+    }
+
+    .app-shell.sidebar-open .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1040;
+        background-color: rgba(0, 0, 0, .45);
+    }
+}
+
 /* ── Topbar ─────────────────────────────────────────────────────── */
 
 .topbar {
@@ -311,6 +414,7 @@ tr[onclick] {
     font-size: 1.9rem;
     font-weight: 700;
     line-height: 1.1;
+    color: var(--aq-ink);
 }
 
 .kpi-icon {
