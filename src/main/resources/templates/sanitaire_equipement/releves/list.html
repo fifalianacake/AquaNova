@@ -48,12 +48,12 @@
         <table class="table table-hover align-middle">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Bassin</th>
-                <th class="text-end">Température</th>
-                <th class="text-end">pH</th>
-                <th class="text-end">Oxygène</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${releves}, 'id', 'ID', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${releves}, 'dateReleve', 'Date', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${releves}, 'bassin.reference', 'Bassin', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${releves}, 'temperature', 'Température', 'text-end')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${releves}, 'ph', 'pH', 'text-end')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${releves}, 'oxygene', 'Oxygène', 'text-end')}"></th>
                 <th>Utilisateur</th>
                 <th>Alerte</th>
                 <th class="text-end">Actions</th>

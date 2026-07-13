@@ -60,13 +60,13 @@
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>Client</th>
+                        <th th:replace="~{fragments/tableau :: sortableHeader(${ventes}, 'id', 'ID', '')}"></th>
+                        <th th:replace="~{fragments/tableau :: sortableHeader(${ventes}, 'dateVente', 'Date', '')}"></th>
+                        <th th:replace="~{fragments/tableau :: sortableHeader(${ventes}, 'client.nom', 'Client', '')}"></th>
                         <th>Récolte</th>
                         <th>Lot d'origine</th>
-                        <th class="text-end">Poids vendu (kg)</th>
-                        <th class="text-end">Prix unitaire (Ar/kg)</th>
+                        <th th:replace="~{fragments/tableau :: sortableHeader(${ventes}, 'poidsVendu', 'Poids vendu (kg)', 'text-end')}"></th>
+                        <th th:replace="~{fragments/tableau :: sortableHeader(${ventes}, 'prixUnitaire', 'Prix unitaire (Ar/kg)', 'text-end')}"></th>
                         <th class="text-end">Montant total (Ar)</th>
                         <th>Statut</th>
                     </tr>

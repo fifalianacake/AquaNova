@@ -46,6 +46,15 @@ public class RentabiliteLotService {
         this.distributionRepository = distributionRepository;
     }
 
+    /**
+     * Le Sort du Pageable est appliqué ici, sur LotModels, avant le calcul des
+     * montants : le tri ne peut donc porter que sur les champs réels du lot
+     * (code, espece.nom, bassin.reference, dateMiseEnCharge, statutLot.libelle),
+     * jamais sur les colonnes calculées du DTO (chiffreAffaires, margeBrute, ...) —
+     * celles-ci n'existent qu'après pagination et un Sort dessus donnerait un tri
+     * incorrect d'une page à l'autre. Le template ne doit donc proposer le tri que
+     * sur les premières.
+     */
     public Page<RentabiliteLotDTO> lister(LotFilter filter, Pageable pageable) {
         Page<LotModels> lots = lotService.lister(filter, pageable);
         List<RentabiliteLotDTO> contenu = lots.stream()

@@ -27,6 +27,22 @@ document.addEventListener('change', function (e) {
     window.location.href = url.toString();
 });
 
+/* Tri par en-tête de colonne (fragments/tableau :: sortableHeader).
+   Un clic remplace entièrement le paramètre "sort" par ce seul champ (on ne trie
+   que sur une colonne à la fois) et revient à la page 0 ; les autres filtres
+   restent inchangés dans l'URL. */
+document.addEventListener('click', function (e) {
+    const entete = e.target.closest('.js-sort-link');
+    if (!entete) {
+        return;
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.delete('sort');
+    url.searchParams.append('sort', entete.dataset.sortField + ',' + entete.dataset.sortDir);
+    url.searchParams.set('page', '0');
+    window.location.href = url.toString();
+});
+
 /* AquaNova — barre latérale rétractable.
    Sur grand écran, le bouton réduit la sidebar à un rail d'icônes et l'état est mémorisé
    d'une page à l'autre (localStorage). Sous 992px, le même bouton ouvre ou ferme la

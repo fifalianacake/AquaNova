@@ -3,6 +3,29 @@
 <body>
 
 <!-- ══════════════════════════════════════════════════════════════════
+     Fragment : en-tête de colonne triable.
+     Affiche le libellé et une flèche indiquant le sens de tri actif (▲/▼),
+     ou une flèche neutre sinon. Le clic (js-sort-link, cf. /js/aquanova.js)
+     bascule asc → desc → asc sur ce champ et revient à la page 0, en
+     préservant les filtres et la taille de page courants.
+     th:replace substitue tout le <th> appelant : les classes CSS (ex. alignement
+     à droite) se passent donc via le paramètre "classe", pas sur la balise hôte.
+     Usage : <th th:replace="~{fragments/tableau :: sortableHeader(${maPage}, 'dateVente', 'Date', '')}"></th>
+             <th th:replace="~{fragments/tableau :: sortableHeader(${maPage}, 'montant', 'Montant (Ar)', 'text-end')}"></th>
+     ══════════════════════════════════════════════════════════════════ -->
+<th th:fragment="sortableHeader(page, champ, libelle, classe)"
+    th:with="tri=${page.pageable.sort.getOrderFor(champ)},
+             sens=${tri != null and tri.direction.name() == 'ASC' ? 'desc' : 'asc'},
+             classeTri=${tri == null ? '' : (' sorted-' + #strings.toLowerCase(tri.direction.name()))}"
+    th:class="${'js-sort-link' + (#strings.isEmpty(classe) ? '' : ' ' + classe) + classeTri}"
+    th:attr="data-sort-field=${champ},data-sort-dir=${sens}">
+    <span th:text="${libelle}">Colonne</span>
+    <i class="bi sort-icon"
+       th:classappend="${tri == null} ? 'bi-arrow-down-up'
+                        : (${tri.direction.name() == 'ASC'} ? 'bi-sort-up' : 'bi-sort-down')"></i>
+</th>
+
+<!-- ══════════════════════════════════════════════════════════════════
      Fragment : pied de tableau standard.
      "Lignes par page" à gauche, compteur + pagination numérotée à droite.
      La navigation (js-page-link / js-page-size) préserve les filtres via

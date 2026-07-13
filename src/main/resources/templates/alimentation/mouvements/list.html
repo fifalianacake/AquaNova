@@ -54,11 +54,11 @@
             <table class="table table-hover align-middle">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Aliment</th>
-                    <th>Type</th>
-                    <th class="text-end">Quantité(kg)</th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${mouvements}, 'id', 'ID', '')}"></th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${mouvements}, 'dateMouvement', 'Date', '')}"></th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${mouvements}, 'aliment.nom', 'Aliment', '')}"></th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${mouvements}, 'typeMouvement', 'Type', '')}"></th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${mouvements}, 'quantite', 'Quantité(kg)', 'text-end')}"></th>
                     <th class="text-end">Actions</th>
                 </tr>
                 </thead>

@@ -3,6 +3,7 @@ package mg.itu.aquanova.achat.controllers;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,7 +39,7 @@ public class HistoriqueAchatDepenseController {
     @GetMapping("/historique")
     public String afficherHistorique(
             @ModelAttribute("filter") HistoriqueAchatDepenseFilter filter,
-            @PageableDefault(size = 10) Pageable pageable,
+            @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         model.addAttribute("historiques", historiqueAchatDepenseService.lister(filter, pageable));
         model.addAttribute("fournisseurs", fournisseurService.listerActifs());

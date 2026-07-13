@@ -37,13 +37,13 @@
         <table class="table table-hover align-middle">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Équipement</th>
-                <th>Catégorie</th>
-                <th>Statut</th>
-                <th class="text-end">Coût (Ar)</th>
-                <th>Date résolution</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${maintenances}, 'id', 'ID', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${maintenances}, 'dateMaintenance', 'Date', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${maintenances}, 'equipement.nom', 'Équipement', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${maintenances}, 'categorieMaintenance.libelle', 'Catégorie', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${maintenances}, 'statutIntervention', 'Statut', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${maintenances}, 'cout', 'Coût (Ar)', 'text-end')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${maintenances}, 'dateResolution', 'Date résolution', '')}"></th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>

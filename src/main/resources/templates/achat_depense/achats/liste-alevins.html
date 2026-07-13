@@ -70,14 +70,14 @@
         <table class="table table-hover align-middle">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Fournisseur</th>
-                <th>Catégorie</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${achats}, 'id', 'ID', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${achats}, 'dateAchat', 'Date', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${achats}, 'fournisseur.nom', 'Fournisseur', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${achats}, 'categorieDepense.code', 'Catégorie', '')}"></th>
                 <th>Espèce</th>
                 <th class="text-end">Quantité</th>
-                <th class="text-end">Montant total (Ar)</th>
-                <th>Statut</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${achats}, 'montantTotal', 'Montant total (Ar)', 'text-end')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${achats}, 'statutAchat', 'Statut', '')}"></th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>

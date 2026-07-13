@@ -940,3 +940,28 @@ main table form:not([class]) {
     margin-bottom: .3rem;
     font-weight: 500;
 }
+
+/* ===================================================================
+   En-têtes de colonne triables (fragments/tableau :: sortableHeader)
+   =================================================================== */
+
+.page-body .table thead th.js-sort-link {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.page-body .table thead th.js-sort-link:hover {
+    color: var(--aq-primary, #1f6f63);
+}
+
+.page-body .table thead th.js-sort-link .sort-icon {
+    margin-left: .35rem;
+    font-size: .7rem;
+    opacity: .45;
+}
+
+.page-body .table thead th.js-sort-link.sorted-asc .sort-icon,
+.page-body .table thead th.js-sort-link.sorted-desc .sort-icon {
+    opacity: 1;
+}

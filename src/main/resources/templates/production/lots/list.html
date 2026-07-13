@@ -56,14 +56,14 @@
         <table class="table table-hover align-middle">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Code</th>
-                <th>Espèce</th>
-                <th>Bassin</th>
-                <th>Stade</th>
-                <th>Statut</th>
-                <th>Date mise en charge</th>
-                <th class="text-end">Effectif actuel</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'id', 'ID', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'code', 'Code', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'espece.nom', 'Espèce', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'bassin.reference', 'Bassin', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'stadeCroissance.nom', 'Stade', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'statutLot.libelle', 'Statut', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'dateMiseEnCharge', 'Date mise en charge', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${lotPage}, 'effectifActuel', 'Effectif actuel', 'text-end')}"></th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>

@@ -52,12 +52,12 @@
         <table class="table table-hover align-middle">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Catégorie</th>
-                <th>Libellé</th>
-                <th class="text-end">Montant (Ar)</th>
-                <th>Mode paiement</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${depenses}, 'id', 'ID', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${depenses}, 'dateDepense', 'Date', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${depenses}, 'categorieDepense.code', 'Catégorie', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${depenses}, 'libelle', 'Libellé', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${depenses}, 'montant', 'Montant (Ar)', 'text-end')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${depenses}, 'modePaiement', 'Mode paiement', '')}"></th>
                 <th>Référence</th>
                 <th class="text-end">Actions</th>
             </tr>

@@ -50,16 +50,16 @@
             <table class="table table-hover align-middle">
                 <thead>
                 <tr>
-                    <th>Lot</th>
-                    <th>Espèce</th>
-                    <th>Bassin</th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${page}, 'code', 'Lot', '')}"></th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${page}, 'espece.nom', 'Espèce', '')}"></th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${page}, 'bassin.reference', 'Bassin', '')}"></th>
                     <th class="text-end">CA réalisé (Ar)</th>
                     <th class="text-end">Alevins (Ar)</th>
                     <th class="text-end">Alimentation (Ar)</th>
                     <th class="text-end">Coûts directs (Ar)</th>
                     <th class="text-end">Marge brute (Ar)</th>
                     <th class="text-end">Taux de marge (%)</th>
-                    <th>Statut</th>
+                    <th th:replace="~{fragments/tableau :: sortableHeader(${page}, 'statutLot.libelle', 'Statut', '')}"></th>
                     <th class="text-end">Actions</th>
                 </tr>
                 </thead>

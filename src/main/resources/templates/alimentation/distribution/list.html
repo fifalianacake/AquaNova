@@ -50,12 +50,12 @@
         <table class="table table-hover align-middle">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Lot</th>
-                <th>Aliment</th>
-                <th class="text-end">Ration théorique (kg)</th>
-                <th class="text-end">Quantité distribuée (kg)</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${distributions}, 'id', 'ID', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${distributions}, 'dateDistribution', 'Date', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${distributions}, 'lot.code', 'Lot', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${distributions}, 'aliment.nom', 'Aliment', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${distributions}, 'rationTheorique', 'Ration théorique (kg)', 'text-end')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${distributions}, 'quantite', 'Quantité distribuée (kg)', 'text-end')}"></th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>

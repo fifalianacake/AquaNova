@@ -10,8 +10,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import mg.itu.aquanova.achat.dto.AchatAlevinFilter;
 import mg.itu.aquanova.achat.dto.AchatAlevinForm;
 import mg.itu.aquanova.achat.models.Achat;
@@ -91,13 +94,8 @@ public class AchatAlevinService {
 
     private Specification<Achat> specificationAchatsAlevins(AchatAlevinFilter filter) {
         return (root, query, cb) -> {
-            if (query != null) {
-                query.distinct(true);
-            }
-
             var predicates = cb.conjunction();
-            var lignes = root.join("lignes", JoinType.LEFT);
-            predicates = cb.and(predicates, cb.isNotNull(lignes.get("espece").get("id")));
+            predicates = cb.and(predicates, existeLigneAvecEspece(root, query, cb, null));
 
             if (filter == null) {
                 return predicates;
@@ -112,7 +110,7 @@ public class AchatAlevinService {
                 predicates = cb.and(predicates, cb.equal(root.get("categorieDepense").get("id"), filter.getCategorieDepenseId()));
             }
             if (filter.getEspeceId() != null) {
-                predicates = cb.and(predicates, cb.equal(lignes.get("espece").get("id"), filter.getEspeceId()));
+                predicates = cb.and(predicates, existeLigneAvecEspece(root, query, cb, filter.getEspeceId()));
             }
             if (filter.getStatutAchat() != null) {
                 predicates = cb.and(predicates, cb.equal(root.get("statutAchat"), filter.getStatutAchat()));
@@ -135,6 +133,22 @@ public class AchatAlevinService {
 
             return predicates;
         };
+    }
+
+    private Predicate existeLigneAvecEspece(Root<Achat> root, CriteriaQuery<?> query, CriteriaBuilder cb, Long especeId) {
+        var sousRequete = query.subquery(Long.class);
+        var lignes = sousRequete.from(LigneAchat.class);
+        sousRequete.select(lignes.get("id"));
+
+        var condition = cb.and(
+                cb.equal(lignes.get("achat"), root),
+                cb.isNotNull(lignes.get("espece").get("id")));
+        if (especeId != null) {
+            condition = cb.and(condition, cb.equal(lignes.get("espece").get("id"), especeId));
+        }
+        sousRequete.where(condition);
+
+        return cb.exists(sousRequete);
     }
 
     @Transactional

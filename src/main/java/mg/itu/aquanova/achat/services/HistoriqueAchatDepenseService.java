@@ -1,11 +1,13 @@
 package mg.itu.aquanova.achat.services;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,7 @@ public class HistoriqueAchatDepenseService {
      * JpaSpecificationExecutor.
      */
     public Page<HistoriqueAchatDepenseDTO> lister(HistoriqueAchatDepenseFilter filter, Pageable pageable) {
-        List<HistoriqueAchatDepenseDTO> tout = construireListeTriee(filter);
+        List<HistoriqueAchatDepenseDTO> tout = construireListeTriee(filter, pageable.getSort());
 
         int total = tout.size();
         int debut = (int) pageable.getOffset();
@@ -56,7 +58,7 @@ public class HistoriqueAchatDepenseService {
         return new PageImpl<>(contenuPage, pageable, total);
     }
 
-    private List<HistoriqueAchatDepenseDTO> construireListeTriee(HistoriqueAchatDepenseFilter filter) {
+    private List<HistoriqueAchatDepenseDTO> construireListeTriee(HistoriqueAchatDepenseFilter filter, Sort sort) {
         List<HistoriqueAchatDepenseDTO> result = new ArrayList<>();
 
         if (filter == null || filter.getTypeOperation() == null || filter.getTypeOperation() == TypeOperation.ACHAT) {
@@ -66,19 +68,49 @@ public class HistoriqueAchatDepenseService {
             result.addAll(rechercherDepenses(filter));
         }
 
-        result.sort((first, second) -> {
-            if (first.getDate() == null && second.getDate() == null) {
-                return 0;
-            }
-            if (first.getDate() == null) {
-                return 1;
-            }
-            if (second.getDate() == null) {
-                return -1;
-            }
-            return second.getDate().compareTo(first.getDate());
-        });
+        result.sort(comparateurPour(sort));
         return result;
+    }
+
+    /**
+     * L'historique est une union en mémoire de deux entités distinctes (Achat et
+     * Depense) : un Sort JPA ne s'applique à aucune des deux requêtes sources, donc
+     * on retraduit ici le Pageable.getSort() reçu en Comparator sur le DTO fusionné.
+     * Par défaut (aucun tri demandé), on garde le comportement historique : date
+     * décroissante, valeurs nulles en dernier.
+     */
+    private Comparator<HistoriqueAchatDepenseDTO> comparateurPour(Sort sort) {
+        Comparator<HistoriqueAchatDepenseDTO> comparateur = null;
+        for (Sort.Order ordre : sort) {
+            Comparator<HistoriqueAchatDepenseDTO> champ = comparateurChamp(ordre.getProperty());
+            if (champ == null) {
+                continue;
+            }
+            if (ordre.isDescending()) {
+                champ = champ.reversed();
+            }
+            comparateur = comparateur == null ? champ : comparateur.thenComparing(champ);
+        }
+        // Comportement historique par défaut (aucun tri demandé) : date décroissante.
+        return comparateur != null ? comparateur : comparateurChamp("date").reversed();
+    }
+
+    private Comparator<HistoriqueAchatDepenseDTO> comparateurChamp(String champ) {
+        return switch (champ) {
+            case "id" -> Comparator.comparing(HistoriqueAchatDepenseDTO::getId,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            case "date" -> Comparator.comparing(HistoriqueAchatDepenseDTO::getDate,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            case "montant" -> Comparator.comparing(HistoriqueAchatDepenseDTO::getMontant,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            case "typeOperation" -> Comparator.comparing(dto -> dto.getTypeOperation() != null
+                    ? dto.getTypeOperation().name() : "", Comparator.nullsLast(Comparator.naturalOrder()));
+            case "fournisseur" -> Comparator.comparing(HistoriqueAchatDepenseDTO::getFournisseur,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            case "categorie" -> Comparator.comparing(HistoriqueAchatDepenseDTO::getCategorie,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            default -> null;
+        };
     }
 
     private List<HistoriqueAchatDepenseDTO> rechercherAchats(HistoriqueAchatDepenseFilter filter) {

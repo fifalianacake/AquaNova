@@ -86,11 +86,11 @@
         <table class="table table-hover align-middle">
             <thead>
             <tr>
-                <th>Date création</th>
-                <th>Module</th>
-                <th>Type</th>
-                <th>Criticité</th>
-                <th>Statut</th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${alertes}, 'dateCreation', 'Date création', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${alertes}, 'moduleSource', 'Module', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${alertes}, 'typeAlerte', 'Type', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${alertes}, 'niveauCriticite', 'Criticité', '')}"></th>
+                <th th:replace="~{fragments/tableau :: sortableHeader(${alertes}, 'statut', 'Statut', '')}"></th>
                 <th>Entité concernée</th>
                 <th>Message</th>
                 <th class="text-end">Actions</th>

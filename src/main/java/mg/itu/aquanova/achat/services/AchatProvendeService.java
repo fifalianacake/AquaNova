@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import mg.itu.aquanova.achat.dto.AchatProvendeFilter;
 import mg.itu.aquanova.achat.dto.AchatProvendeForm;
 import mg.itu.aquanova.achat.models.Achat;
@@ -58,15 +61,19 @@ public class AchatProvendeService {
         return achatRepository.findAll(specificationAchatsProvende(filter), pageable);
     }
 
+    /**
+     * Filtre "achats de provende" = achats ayant au moins une ligne avec un aliment.
+     * Exprimé en EXISTS (sous-requête) plutôt qu'en JOIN + DISTINCT : un JOIN sur une
+     * collection one-to-many duplique les lignes d'Achat et nécessite un SELECT
+     * DISTINCT, or PostgreSQL exige que toute colonne de l'ORDER BY figure dans le
+     * SELECT DISTINCT — un tri sur un champ comme fournisseur.nom échouait donc en
+     * base avec "for SELECT DISTINCT, ORDER BY expressions must appear in select list".
+     * EXISTS ne duplique rien : le tri fonctionne sur n'importe quelle colonne.
+     */
     private Specification<Achat> specificationAchatsProvende(AchatProvendeFilter filter) {
         return (root, query, cb) -> {
-            if (query != null) {
-                query.distinct(true);
-            }
-
             var predicates = cb.conjunction();
-            var lignes = root.join("lignes", JoinType.LEFT);
-            predicates = cb.and(predicates, cb.isNotNull(lignes.get("aliment").get("id")));
+            predicates = cb.and(predicates, existeLigneAvecAliment(root, query, cb, null));
 
             if (filter == null) {
                 return predicates;
@@ -81,7 +88,7 @@ public class AchatProvendeService {
                 predicates = cb.and(predicates, cb.equal(root.get("categorieDepense").get("id"), filter.getCategorieDepenseId()));
             }
             if (filter.getAlimentId() != null) {
-                predicates = cb.and(predicates, cb.equal(lignes.get("aliment").get("id"), filter.getAlimentId()));
+                predicates = cb.and(predicates, existeLigneAvecAliment(root, query, cb, filter.getAlimentId()));
             }
             if (filter.getStatutAchat() != null) {
                 predicates = cb.and(predicates, cb.equal(root.get("statutAchat"), filter.getStatutAchat()));
@@ -104,6 +111,22 @@ public class AchatProvendeService {
 
             return predicates;
         };
+    }
+
+    private Predicate existeLigneAvecAliment(Root<Achat> root, CriteriaQuery<?> query, CriteriaBuilder cb, Long alimentId) {
+        var sousRequete = query.subquery(Long.class);
+        var lignes = sousRequete.from(LigneAchat.class);
+        sousRequete.select(lignes.get("id"));
+
+        var condition = cb.and(
+                cb.equal(lignes.get("achat"), root),
+                cb.isNotNull(lignes.get("aliment").get("id")));
+        if (alimentId != null) {
+            condition = cb.and(condition, cb.equal(lignes.get("aliment").get("id"), alimentId));
+        }
+        sousRequete.where(condition);
+
+        return cb.exists(sousRequete);
     }
 
     @Transactional
