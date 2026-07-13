@@ -21,8 +21,9 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="poidsTotal">Poids Total (kg)</label>
-            <input class="form-control" type="number" step="0.01" id="poidsTotal" name="poidsTotal" th:value="${pese.poidsTotalEchantillon}" required>
+            <label class="form-label" for="poidsTotal">Poids total de l'échantillon (g)</label>
+            <input class="form-control" type="number" step="0.01" min="0" id="poidsTotal" name="poidsTotal" th:value="${pese.poidsTotalEchantillon}" required>
+            <div class="form-text">Le poids moyen (g) est recalculé automatiquement : poids total ÷ nombre d'échantillons.</div>
         </div>
 
         <div class="mb-3">

@@ -23,10 +23,10 @@ public class Pese {
     private Integer nbEchantillon;
 
     @Column(name = "poids_total_echantillon", nullable = false, precision = 10, scale = 2)
-    private BigDecimal poidsTotalEchantillon;
+    private BigDecimal poidsTotalEchantillon; // en grammes
 
     @Column(name = "poids_moyen", nullable = false, precision = 10, scale = 3)
-    private BigDecimal poidsMoyen; // Ce champ sera calculé automatiquement
+    private BigDecimal poidsMoyen; // en grammes, calculé automatiquement
 
     @Column(columnDefinition = "TEXT")
     private String observation;

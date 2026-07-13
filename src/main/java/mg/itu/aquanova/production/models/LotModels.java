@@ -53,10 +53,10 @@ public class LotModels {
     private Integer effectifActuel;
 
     @Column(name = "poids_moyen_initial")
-    private Double poidsMoyenInitial;
+    private Double poidsMoyenInitial; // en grammes
 
     @Column(name = "poids_moyen_actuel")
-    private Double poidsMoyenActuel;
+    private Double poidsMoyenActuel; // en grammes, issu de la dernière pesée du lot
 
     private String observation;
 

@@ -30,7 +30,8 @@ public class PeseeService {
     private final StadeCroissanceRepository stadeCroissanceRepository;
     private final AnalyseVerificationService analyseVerificationService;
 
-    public PeseeService(PeseRepository peseeRepository, LotRepository lotRepository, JournalLotService journalLotService,
+    public PeseeService(PeseRepository peseeRepository, LotRepository lotRepository,
+            JournalLotService journalLotService,
             StadeCroissanceRepository stadeCroissanceRepository,
             AnalyseVerificationService analyseVerificationService) {
         this.peseeRepository = peseeRepository;
@@ -58,7 +59,8 @@ public class PeseeService {
 
             if (filter != null) {
                 if (filter.getDateDebut() != null) {
-                    predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("datePesee"), filter.getDateDebut()));
+                    predicates = cb.and(predicates,
+                            cb.greaterThanOrEqualTo(root.get("datePesee"), filter.getDateDebut()));
                 }
                 if (filter.getDateFin() != null) {
                     predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("datePesee"), filter.getDateFin()));
@@ -74,11 +76,14 @@ public class PeseeService {
     }
 
     // CREATE
+    // poidsTotal est exprime en grammes, comme le poids moyen du lot, le poids
+    // cible de l'espece et les bornes des stades de croissance.
     @Transactional
-    public Pese enregistrerPesee(Long idLot, LocalDate datePesee, Integer nbEchantillon, Double poidsTotal, String observation) {
+    public Pese enregistrerPesee(Long idLot, LocalDate datePesee, Integer nbEchantillon, Double poidsTotal,
+            String observation) {
         LotModels lot = validerEtTrouverLot(idLot, datePesee);
         BigDecimal poidsTotalDecimal = poidsTotal != null ? BigDecimal.valueOf(poidsTotal) : null;
-        validerMesures(nbEchantillon, poidsTotalDecimal);
+        validerMesures(nbEchantillon, poidsTotalDecimal, lot);
         BigDecimal poidsMoyen = BigDecimal.valueOf(round3(poidsTotal / nbEchantillon));
 
         Pese pesee = new Pese();
@@ -96,8 +101,8 @@ public class PeseeService {
                 lot,
                 TypeEvenementLot.LibelleEvenement.PESEE,
                 "Pesée de " + nbEchantillon
-                        + " échantillons, poids total " + poidsTotal
-                        + ", poids moyen " + poidsMoyen,
+                        + " échantillons, poids total " + poidsTotal + " g"
+                        + ", poids moyen " + poidsMoyen + " g",
                 datePesee);
 
         return saved;
@@ -105,7 +110,8 @@ public class PeseeService {
 
     // UPDATE
     @Transactional
-    public Pese modifierPesee(Long id, LocalDate datePesee, Integer nbEchantillon, Double poidsTotal, String observation) {
+    public Pese modifierPesee(Long id, LocalDate datePesee, Integer nbEchantillon, Double poidsTotal,
+            String observation) {
         Pese pesee = peseeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pesée introuvable avec l'ID : " + id));
 
@@ -116,10 +122,11 @@ public class PeseeService {
                 : pesee.getPoidsTotalEchantillon();
 
         LotModels lot = validerEtTrouverLot(pesee.getLot(), nouvelleDate);
-        validerMesures(nouveauNbEchantillon, nouveauPoidsTotal);
+        validerMesures(nouveauNbEchantillon, nouveauPoidsTotal, lot);
 
         pesee.setDatePesee(nouvelleDate);
-        if (observation != null) pesee.setObservation(observation);
+        if (observation != null)
+            pesee.setObservation(observation);
         pesee.setNbEchantillon(nouveauNbEchantillon);
         pesee.setPoidsTotalEchantillon(nouveauPoidsTotal);
 
@@ -143,14 +150,13 @@ public class PeseeService {
         recalculerPoidsMoyenActuel(lot);
     }
 
-
-
-// Aider module Lot
-public Double getDernierPoidsMoyen(Long idLot) {
-    List<Pese> historique = this.peseeRepository.findByLotIdOrderByDatePeseeDesc(idLot);
-    if (historique.isEmpty()) return null;
-    return historique.get(0).getPoidsMoyen().doubleValue();
-}
+    // Aider module Lot
+    public Double getDernierPoidsMoyen(Long idLot) {
+        List<Pese> historique = this.peseeRepository.findByLotIdOrderByDatePeseeDesc(idLot);
+        if (historique.isEmpty())
+            return null;
+        return historique.get(0).getPoidsMoyen().doubleValue();
+    }
 
     private LotModels validerEtTrouverLot(Long idLot, LocalDate datePesee) {
         if (idLot == null) {
@@ -169,7 +175,8 @@ public Double getDernierPoidsMoyen(Long idLot) {
             throw new IllegalStateException("Impossible d'enregistrer une pesée sur un lot clôturé ou annulé.");
         }
         if (lot.getDateMiseEnCharge() != null && datePesee.isBefore(lot.getDateMiseEnCharge())) {
-            throw new IllegalArgumentException("La date de pesée ne peut pas être antérieure à la date de mise en charge du lot.");
+            throw new IllegalArgumentException(
+                    "La date de pesée ne peut pas être antérieure à la date de mise en charge du lot.");
         }
 
         return lot;
@@ -182,10 +189,15 @@ public Double getDernierPoidsMoyen(Long idLot) {
         return validerEtTrouverLot(lot.getId(), datePesee);
     }
 
-    private void validerMesures(Integer nbEchantillon, BigDecimal poidsTotal) {
+    private void validerMesures(Integer nbEchantillon, BigDecimal poidsTotal, LotModels lot) {
         if (nbEchantillon == null || nbEchantillon <= 0) {
             throw new IllegalArgumentException("Le nombre d'échantillons doit être supérieur à 0.");
         }
+
+        if (nbEchantillon > lot.getEffectifActuel()) {
+            throw new IllegalArgumentException("Le nombre d'échantillon ne peut pas être supérieur à l'effectif du lot (" + lot.getEffectifActuel() + ")");
+        }
+
         if (poidsTotal == null || poidsTotal.signum() <= 0) {
             throw new IllegalArgumentException("Le poids total de l'échantillon doit être supérieur à 0.");
         }
