@@ -91,7 +91,6 @@ public class NavigationControllerAdvice {
                 new NavigationItemDTO("Sanitaire & Équipements", "bi-heart-pulse", List.of(
                         new NavigationItemDTO("Relevés d'eau", "/releves-eau"),
                         new NavigationItemDTO("Traitements d'eau", "/traitements-eau"),
-                        new NavigationItemDTO("Types de traitement", "/types-traitements-eau"),
                         new NavigationItemDTO("Équipements", "/equipements"),
                         new NavigationItemDTO("Maintenances", "/maintenances"))),
 
@@ -132,6 +131,7 @@ public class NavigationControllerAdvice {
                         new NavigationItemDTO("Statuts de lot", "/statut-lots"),
                         new NavigationItemDTO("Types d'événement lot", "/types-evenements-lot"),
                         new NavigationItemDTO("Types de client", "/types-clients"),
+                        new NavigationItemDTO("Types de traitement", "/types-traitements-eau"),
                         new NavigationItemDTO("Types d'équipement", "/types-equipements"))),
 
                 new NavigationItemDTO("Administration", "bi-gear", List.of(
