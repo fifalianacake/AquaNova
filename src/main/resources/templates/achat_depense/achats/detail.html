@@ -48,7 +48,7 @@
                     <div class="kpi-value"
                          th:text="${#numbers.formatDecimal(achat.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">0 Ar</div>
                     <span class="small text-secondary"
-                          th:text="${#lists.size(achat.lignes)} + ' ligne' + (${#lists.size(achat.lignes)} > 1 ? 's' : '') + ' d''achat'"></span>
+                          th:text="${#lists.size(achat.lignes)} + (${#lists.size(achat.lignes)} > 1 ? ' lignes' : ' ligne')"></span>
                 </div>
                 <div class="kpi-icon"><i class="bi bi-cart3"></i></div>
             </div>
