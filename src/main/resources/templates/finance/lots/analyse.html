@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Analyse de rentabilité du lot</title>
+</head>
+<body>
+<main>
+
+<h2 th:text="'Rentabilité du lot ' + ${lot.lotCode}"></h2>
+
+<p class="hint">
+    Marge brute = chiffre d'affaires réalisé − coûts directs traçables. Les dépenses indirectes
+    (main d'œuvre, énergie, maintenance…) ne sont pas ventilées par lot : elles sont déduites
+    globalement dans le dashboard pour donner le profit net.
+</p>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Identité du lot</h5>
+        <span class="badge"
+              th:classappend="${lot.statutRentabilite.name() == 'RENTABLE'} ? 'badge-success' : (${lot.statutRentabilite.name() == 'DEFICITAIRE'} ? 'badge-danger' : 'badge-secondary')"
+              th:text="${lot.statutRentabilite.name() == 'NON_CALCULABLE'} ? 'NON VENDU' : ${lot.statutRentabilite}"></span>
+    </div>
+    <dl>
+        <dt>Code</dt><dd th:text="${lot.lotCode}"></dd>
+        <dt>Espèce</dt><dd th:text="${lot.espece != null ? lot.espece : '—'}"></dd>
+        <dt>Bassin</dt><dd th:text="${lot.bassin != null ? lot.bassin : '—'}"></dd>
+        <dt>Statut du lot</dt><dd th:text="${lot.statutLot != null ? lot.statutLot : '—'}"></dd>
+    </dl>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Décomposition</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <tbody>
+            <tr>
+                <td>Chiffre d'affaires réalisé <span class="text-secondary small">(ventes validées ou payées)</span></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+            </tr>
+            <tr>
+                <td class="ps-4">− Coût des alevins</td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.coutAlevins, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+            </tr>
+            <tr>
+                <td class="ps-4">− Coût de l'aliment distribué</td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.coutAlimentation, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+            </tr>
+            <tr class="fw-semibold">
+                <td>= Coûts directs</td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+            </tr>
+            <tr class="fw-semibold">
+                <td>= Marge brute</td>
+                <td class="text-end montant"
+                    th:classappend="${lot.margeBrute.signum() < 0} ? 'text-danger' : 'text-success'"
+                    th:text="${#numbers.formatDecimal(lot.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+            </tr>
+            <tr>
+                <td>Taux de marge brute</td>
+                <td class="text-end"
+                    th:text="${lot.tauxMargeBrute != null} ? ${lot.tauxMargeBrute} + ' %' : 'Non calculable (aucune vente)'"></td>
+            </tr>
+            <tr>
+                <td>Poids vendu</td>
+                <td class="text-end" th:text="${lot.poidsVendu} + ' kg'"></td>
+            </tr>
+            <tr>
+                <td>Coût direct par kg vendu</td>
+                <td class="text-end"
+                    th:text="${lot.coutDirectParKgVendu != null} ? ${#numbers.formatDecimal(lot.coutDirectParKgVendu, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar/kg' : 'Non calculable (aucune vente)'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mt-4">
+    <a class="btn btn-secondary" th:href="@{/finance/lots}">Retour à la liste</a>
+    <a class="btn btn-outline-primary" th:href="@{/lots/{id}(id=${lot.lotId})}">Voir le lot</a>
+</div>
+
+</main>
+</body>
+</html>

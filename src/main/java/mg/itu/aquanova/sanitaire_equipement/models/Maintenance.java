@@ -1,6 +1,7 @@
 package mg.itu.aquanova.sanitaire_equipement.models;
 
 import jakarta.persistence.*;
+import mg.itu.aquanova.achat.models.Depense;
 import mg.itu.aquanova.security.models.User;
 
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class Maintenance {
 
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
-    private User utilisateur; // Ou "User" selon le nom de ta classe
+    private User utilisateur;
 
     @ManyToOne
     @JoinColumn(name = "id_categorie_maintenance", nullable = false)
@@ -40,6 +41,10 @@ public class Maintenance {
 
     @Column(name = "date_resolution")
     private LocalDate dateResolution;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_depense")
+    private Depense depense;
 
     @Column(columnDefinition = "TEXT")
     private String observation;
@@ -131,6 +136,14 @@ public class Maintenance {
 
     public void setDateResolution(LocalDate dateResolution) {
         this.dateResolution = dateResolution;
+    }
+
+    public Depense getDepense() {
+        return depense;
+    }
+
+    public void setDepense(Depense depense) {
+        this.depense = depense;
     }
 
     public String getObservation() {

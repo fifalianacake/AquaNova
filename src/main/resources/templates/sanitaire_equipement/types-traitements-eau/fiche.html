@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Fiche type de traitement eau</title>
 </head>
 <body>
+<main>
     <h2>Type de traitement eau</h2>
 
     <section>
@@ -24,14 +24,15 @@
         </div>
 
         <div>
-            <a th:href="@{/types-traitements-eau}">Retour</a>
-            <a th:href="@{/types-traitements-eau/edit/{id}(id=${typeTraitement.id})}">Modifier</a>
-            <form th:action="@{/types-traitements-eau/delete/{id}(id=${typeTraitement.id})}"
+            <a class="btn btn-secondary" th:href="@{/types-traitements-eau}">Retour</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/types-traitements-eau/{id}/edit(id=${typeTraitement.id})}">Modifier</a>
+            <form th:action="@{/types-traitements-eau/{id}/delete(id=${typeTraitement.id})}"
                   method="post"
                   onsubmit="return confirm('Supprimer ce type de traitement ?')">
-                <button type="submit">Supprimer</button>
+                <button class="btn btn-danger" type="submit">Supprimer</button>
             </form>
         </div>
     </section>
+</main>
 </body>
 </html>

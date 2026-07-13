@@ -24,6 +24,8 @@ public class AlimentService {
     }
 
     public Aliment create(Aliment aliment) {
+        validerAliment(aliment);
+        normaliserAliment(aliment);
         return repo.save(aliment);
     }
 
@@ -63,14 +65,13 @@ public class AlimentService {
         if (aliment.getNom() == null || aliment.getNom().trim().isEmpty()) {
             throw new IllegalArgumentException("Le nom de l'aliment est obligatoire.");
         }
-        if (aliment.getTypeAliment() == null) {
-            throw new IllegalArgumentException("Le type de l'aliment est obligatoire.");
-        }
+        // Le type d'aliment n'est pas encore saisi par le formulaire actuel
+        // (referentiel/aliments/form.html) : pas de contrainte bloquante ici tant
+        // que ce champ n'y est pas ajouté.
     }
 
     private void normaliserAliment(Aliment aliment) {
         aliment.setNom(aliment.getNom().trim());
-        aliment.setTypeAliment(aliment.getTypeAliment());
     }
 
 }

@@ -1,33 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Liste Statut Lots</title>
 </head>
 <body>
-<h1>Liste des Statuts de Lots</h1>
-<div><a th:href="@{/statut-lots/new}">Créer un nouveau statut</a></div>
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Libelle</th>
-        <th>Description</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="s : ${statuts}">
-        <td th:text="${s.id}"></td>
-        <td th:text="${s.libelle}"></td>
-        <td th:text="${s.description}"></td>
-        <td>
-            <a th:href="@{'/statut-lots/' + ${s.id}}">View</a>
-            <a th:href="@{'/statut-lots/' + ${s.id} + '/edit'}">Edit</a>
-            <a th:href="@{'/statut-lots/' + ${s.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<main>
+
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/statut-lots/new}"><i class="bi bi-plus-lg"></i> Créer un statut</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des statuts de lots</h5>
+        <span class="result-count" th:text="${#lists.size(statuts)} + ' statut(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Libellé</th>
+                <th>Description</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${statuts}">
+                <td th:text="${s.id}"></td>
+                <td class="fw-semibold" th:text="${s.libelle}"></td>
+                <td th:text="${s.description}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/statut-lots/' + ${s.id}}" title="Voir"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/statut-lots/' + ${s.id} + '/edit'}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{'/statut-lots/' + ${s.id} + '/delete'}" title="Supprimer"
+                       onclick="return confirm('Supprimer?')"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(statuts)}">
+                <td colspan="4" class="text-center text-secondary py-4">Aucun statut de lot enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
 </body>
 </html>

@@ -1,0 +1,942 @@
+/* ===================================================================
+   AquaNova — thème global (design AquaGest adapté)
+   - Palette "eau profonde / teal", couleurs PLATES (aucun gradient)
+   - Formes carrées (radius minimal)
+   - Polices : Outfit (titres) / Inter (texte)
+   =================================================================== */
+
+:root {
+    --aq-deep: #0C3A43;          /* sidebar : eau profonde */
+    --aq-deep-2: #0F4652;
+    --aq-teal: #1B9E8F;          /* accent principal */
+    --aq-teal-dark: #158274;
+    --aq-teal-soft: #E1F2EF;
+    --aq-sand: #F4F8F7;          /* fond de page */
+    --aq-ink: #12333B;           /* texte principal */
+    --aq-muted: #5D7B78;         /* texte secondaire */
+    --aq-amber: #DFA032;
+    --aq-red: #C4534B;
+    --aq-border: #DCE7E5;
+    --aq-radius: 2px;            /* formes carrées */
+    --bs-primary: #1B9E8F;
+    --bs-primary-rgb: 27, 158, 143;
+    --bs-link-color: #1B9E8F;
+    --bs-link-hover-color: #158274;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--aq-sand);
+    color: var(--aq-ink);
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, .display-font {
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+}
+
+/* ── Structure générale ─────────────────────────────────────────── */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.app-main {
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-body {
+    padding: 1.5rem 2rem 3rem;
+    flex-grow: 1;
+}
+
+/* ── Sidebar (fond plat, sections repliables conservées) ────────── */
+
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background-color: var(--aq-deep);
+    color: #CFE5E1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: 1rem 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
+    text-decoration: none;
+    background-color: var(--aq-deep-2);
+}
+
+.sidebar-brand:hover {
+    color: #ffffff;
+}
+
+.brand-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--aq-radius);
+    background-color: var(--aq-teal);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: .5rem 0;
+}
+
+.sidebar-section-toggle {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    width: calc(100% - 1.2rem);
+    margin: .1rem .6rem;
+    padding: .55rem .8rem;
+    background: none;
+    border: none;
+    border-radius: var(--aq-radius);
+    color: #9FC4BF;
+    font-size: .9rem;
+    font-weight: 500;
+    text-align: left;
+}
+
+.sidebar-section-toggle:hover {
+    background-color: rgba(255, 255, 255, .08);
+    color: #ffffff;
+}
+
+.sidebar-section-toggle .chev {
+    margin-left: auto;
+    transition: transform .2s ease;
+    font-size: .72rem;
+}
+
+.sidebar-section-toggle.collapsed .chev {
+    transform: rotate(-90deg);
+}
+
+.sidebar-link {
+    display: block;
+    margin: .05rem .6rem;
+    padding: .42rem .8rem .42rem 2.4rem;
+    border-radius: var(--aq-radius);
+    color: #9FC4BF;
+    font-size: .86rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, .08);
+    color: #ffffff;
+}
+
+.sidebar-link.active {
+    background-color: var(--aq-teal);
+    color: #ffffff;
+}
+
+.sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, .15);
+    padding: .5rem 0;
+    font-size: .85rem;
+    color: #7FA8A2;
+}
+
+.sidebar-footer .sidebar-link {
+    padding-left: .8rem;
+}
+
+/* ── Sidebar rétractable ────────────────────────────────────────────
+   Deux comportements distincts :
+   • sur grand écran, la sidebar se réduit à un rail d'icônes (72px) ;
+   • sous 992px, elle disparaît et s'ouvre en surimpression par-dessus le contenu,
+     car un rail de 72px reste trop coûteux sur un petit écran.
+   L'état est mémorisé dans le navigateur (voir aquanova.js).                     */
+
+.sidebar {
+    transition: width .18s ease;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: var(--aq-muted);
+    font-size: 1.35rem;
+    line-height: 1;
+    padding: .1rem .45rem;
+    border-radius: var(--aq-radius);
+    margin-right: .25rem;
+}
+
+.sidebar-toggle:hover {
+    background-color: rgba(0, 0, 0, .05);
+    color: var(--aq-ink);
+}
+
+.sidebar-backdrop {
+    display: none;
+}
+
+/* --- Mode rail (grand écran) --- */
+.app-shell.sidebar-collapsed .sidebar {
+    width: 72px;
+}
+
+.app-shell.sidebar-collapsed .sidebar-label {
+    display: none;
+}
+
+.app-shell.sidebar-collapsed .sidebar-brand,
+.app-shell.sidebar-collapsed .sidebar-section-toggle,
+.app-shell.sidebar-collapsed .sidebar-footer .sidebar-link {
+    justify-content: center;
+    gap: 0;
+}
+
+.app-shell.sidebar-collapsed .sidebar-section-toggle .chev {
+    display: none;
+}
+
+/* Les sous-menus n'ont pas d'icônes : illisibles dans un rail, on les masque.
+   Cliquer sur une section rouvre la sidebar (voir aquanova.js). */
+.app-shell.sidebar-collapsed .sidebar-nav .collapse,
+.app-shell.sidebar-collapsed .sidebar-nav .collapsing {
+    display: none !important;
+}
+
+.app-shell.sidebar-collapsed .sidebar-footer .sidebar-link {
+    display: flex;
+    padding-left: .8rem;
+    padding-right: .8rem;
+}
+
+/* --- Mobile : la sidebar passe par-dessus le contenu --- */
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1045;
+        transform: translateX(-100%);
+        transition: transform .18s ease;
+    }
+
+    /* Sur mobile, le bouton ouvre la sidebar au lieu de la réduire. */
+    .app-shell.sidebar-open .sidebar {
+        transform: translateX(0);
+        width: 260px;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar {
+        width: 260px;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar-label,
+    .app-shell.sidebar-collapsed .sidebar-section-toggle .chev {
+        display: initial;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar-nav .collapse.show {
+        display: block !important;
+    }
+
+    .app-shell.sidebar-open .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1040;
+        background-color: rgba(0, 0, 0, .45);
+    }
+}
+
+/* ── Topbar ─────────────────────────────────────────────────────── */
+
+.topbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--aq-border);
+    padding: .7rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topbar .user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: var(--aq-ink);
+    font-size: .9rem;
+}
+
+.topbar .user-chip .bi {
+    color: var(--aq-teal);
+    font-size: 1.2rem;
+}
+
+/* ── Page de connexion (plate, sans gradient) ───────────────────── */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--aq-deep);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    border: 0;
+    border-radius: var(--aq-radius);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+    overflow: hidden;
+}
+
+.login-head {
+    background-color: var(--aq-teal-soft);
+    padding: 2rem 2rem 1.25rem;
+}
+
+.login-tagline {
+    color: #7FA8A2;
+}
+
+/* ── Overrides Bootstrap (couleurs plates, formes carrées) ──────── */
+
+.btn {
+    border-radius: var(--aq-radius);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--aq-teal);
+    --bs-btn-border-color: var(--aq-teal);
+    --bs-btn-hover-bg: var(--aq-teal-dark);
+    --bs-btn-hover-border-color: var(--aq-teal-dark);
+    --bs-btn-active-bg: var(--aq-teal-dark);
+    --bs-btn-active-border-color: var(--aq-teal-dark);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--aq-teal);
+    --bs-btn-border-color: var(--aq-teal);
+    --bs-btn-hover-bg: var(--aq-teal);
+    --bs-btn-hover-border-color: var(--aq-teal);
+    --bs-btn-active-bg: var(--aq-teal-dark);
+    --bs-btn-active-border-color: var(--aq-teal-dark);
+}
+
+.form-control, .form-select {
+    border-radius: var(--aq-radius);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--aq-teal);
+    box-shadow: 0 0 0 .2rem rgba(27, 158, 143, .15);
+}
+
+.card, .modal-content {
+    border-color: var(--aq-border);
+    border-radius: var(--aq-radius);
+}
+
+/* Tableaux façon "panel" : carte blanche, en-têtes majuscules discrets */
+.page-body .table {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+}
+
+.page-body .table thead th {
+    background-color: #ffffff;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--aq-muted);
+    border-bottom: 2px solid var(--aq-border);
+}
+
+.page-body .table tbody td {
+    vertical-align: middle;
+}
+
+tr[onclick] {
+    cursor: pointer;
+}
+
+/* ── Panels et cartes KPI (sans gradient, sans vague) ───────────── */
+
+.panel {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    padding: 1.25rem;
+    height: 100%;
+}
+
+.panel h5 {
+    font-weight: 600;
+}
+
+.kpi-card {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    padding: 1.1rem 1.25rem;
+    height: 100%;
+}
+
+.kpi-card .kpi-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--aq-ink);
+}
+
+.kpi-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--aq-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background-color: var(--aq-teal-soft);
+    color: var(--aq-teal);
+    flex-shrink: 0;
+}
+
+.chart-box { position: relative; height: 280px; }
+.chart-box-sm { position: relative; height: 240px; }
+
+/* ── Habillage des pages "brutes" (sans classes Bootstrap) ──────── */
+
+.page-body h1, .page-body h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--aq-ink);
+    margin-bottom: 1rem;
+}
+
+.page-body h3, .page-body h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--aq-ink);
+}
+
+.page-body main > table,
+.page-body main table:not([class]) {
+    width: 100%;
+    background-color: #ffffff;
+    border-collapse: collapse;
+    border: 1px solid var(--aq-border);
+    margin-bottom: 1rem;
+}
+
+.page-body main table:not([class]) th,
+.page-body main table:not([class]) td {
+    padding: .55rem .75rem;
+    border: 1px solid var(--aq-border);
+    font-size: .92rem;
+}
+
+.page-body main table:not([class]) thead th,
+.page-body main table:not([class]) tr:first-child th {
+    background-color: #ffffff;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--aq-muted);
+    border-bottom: 2px solid var(--aq-border);
+    text-align: left;
+}
+
+.page-body main table:not([class]) tbody tr:hover {
+    background-color: var(--aq-sand);
+}
+
+.page-body main input:not([class]):not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.page-body main select:not([class]),
+.page-body main textarea:not([class]) {
+    display: inline-block;
+    padding: .42rem .65rem;
+    font-size: .92rem;
+    border: 1px solid #c3d4d1;
+    border-radius: var(--aq-radius);
+    background-color: #ffffff;
+    color: var(--aq-ink);
+    margin-bottom: .35rem;
+    max-width: 100%;
+}
+
+.page-body main input:not([class]):focus,
+.page-body main select:not([class]):focus,
+.page-body main textarea:not([class]):focus {
+    outline: none;
+    border-color: var(--aq-teal);
+    box-shadow: 0 0 0 .2rem rgba(27, 158, 143, .15);
+}
+
+.page-body main label:not([class]) {
+    font-weight: 600;
+    font-size: .88rem;
+    margin-bottom: .2rem;
+}
+
+.page-body main button:not([class]),
+.page-body main input[type="submit"]:not([class]) {
+    display: inline-block;
+    padding: .45rem .95rem;
+    font-size: .92rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--aq-teal);
+    border: 1px solid var(--aq-teal);
+    border-radius: var(--aq-radius);
+}
+
+.page-body main button:not([class]):hover,
+.page-body main input[type="submit"]:not([class]):hover {
+    background-color: var(--aq-teal-dark);
+    border-color: var(--aq-teal-dark);
+}
+
+.page-body main a:not([class]) {
+    color: var(--aq-teal);
+    text-decoration: none;
+}
+
+.page-body main a:not([class]):hover {
+    color: var(--aq-teal-dark);
+    text-decoration: underline;
+}
+
+.page-body main form:not([class]) {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    max-width: 100%;
+}
+
+.page-body main ul:not([class]) {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    padding: 1rem 1rem 1rem 2.2rem;
+}
+
+.page-body main ul:not([class]) li {
+    padding: .25rem 0;
+}
+
+/* ===================================================================
+   Classes partagées
+   =================================================================== */
+
+/* Messages et textes d'état */
+.error {
+    color: #8F3A34;
+    background-color: #F7E4E2;
+    border: 1px solid #EBC5C1;
+    border-radius: var(--aq-radius);
+    padding: .6rem .9rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+p.error, span.error {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.success { color: #116B60; font-weight: 600; }
+.annule { color: #8F3A34; font-weight: 600; }
+.hint, .sub, .subtitle { color: var(--aq-muted); font-size: .88rem; }
+.subtitle, .sub { margin-bottom: 1.1rem; }
+.empty { color: var(--aq-muted); text-align: center; padding: 1rem; }
+.page-muted { color: #9aaba8; }
+.text-strong { font-size: 1.05em; color: var(--aq-ink); font-weight: 600; }
+.montant { font-weight: 700; color: var(--aq-teal-dark); }
+
+/* Barres d'outils et actions */
+.toolbar, .actions {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: .75rem 0;
+}
+
+.actions a { color: var(--aq-teal); text-decoration: none; }
+.actions a:hover { color: var(--aq-teal-dark); text-decoration: underline; }
+
+/* ── Filtres : barre horizontale compacte (2 lignes max) ────────── */
+
+.filters, .filter-row {
+    display: flex;
+    gap: .5rem .75rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    padding: .9rem 1.1rem;
+    margin: .75rem 0 1rem;
+}
+
+.filters label, .filter-row label {
+    display: flex;
+    flex-direction: column;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--aq-muted);
+    gap: .25rem;
+    margin-bottom: 0;
+}
+
+/* largeur compacte pour tenir sur deux lignes maximum */
+.filters .form-control, .filters .form-select,
+.filter-row .form-control, .filter-row .form-select {
+    width: 150px;
+    font-size: .88rem;
+    padding: .35rem .55rem;
+}
+
+.filters .btn, .filter-row .btn {
+    align-self: flex-end;
+}
+
+.filters > a:not(.btn), .filter-row > a:not(.btn) {
+    align-self: center;
+    color: var(--aq-muted);
+    font-size: .85rem;
+}
+
+/* ── Pagination (style carré, accent teal) ──────────────────────── */
+
+.pagination {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: .9rem 0;
+    font-size: .9rem;
+    color: var(--aq-muted);
+}
+
+.pagination a, .pagination a.btn {
+    display: inline-block;
+    padding: .35rem .8rem;
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    color: var(--aq-teal);
+    font-weight: 600;
+    font-size: .85rem;
+    text-decoration: none;
+}
+
+.pagination a:hover, .pagination a.btn:hover {
+    background-color: var(--aq-teal);
+    border-color: var(--aq-teal);
+    color: #ffffff;
+}
+
+.pagination .page-muted, .pagination span.page-muted {
+    padding: .35rem .8rem;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    background-color: var(--aq-sand);
+}
+
+/* Conteneurs type carte */
+.filter-box, .filter-card, .summary-card, .stock {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.stock { display: inline-block; }
+
+.summary-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
+.summary-item { min-width: 150px; }
+.summary-label { color: var(--aq-muted); font-size: .82rem; }
+.summary-value { font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--aq-teal-dark); margin-top: .15rem; }
+.summary { color: var(--aq-muted); font-weight: 600; margin: .5rem 0 1rem; }
+
+/* Formulaires "carte" centrés */
+.form-container {
+    background-color: #ffffff;
+    max-width: 560px;
+    margin: 1.5rem auto;
+    padding: 1.5rem;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+}
+
+.fiche-container {
+    background-color: #ffffff;
+    max-width: 640px;
+    margin: 1.5rem auto;
+    padding: 1.75rem;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+}
+
+.fiche-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--aq-border);
+    padding-bottom: .7rem;
+    margin-bottom: 1rem;
+}
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: .3rem; font-weight: 600; font-size: .9rem; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: .45rem .65rem;
+    border: 1px solid #c3d4d1;
+    border-radius: var(--aq-radius);
+    box-sizing: border-box;
+}
+.form-group .readonly-value { padding: .45rem 0; color: #556; }
+.readonly-field, .readonly { background-color: #e9efee; cursor: not-allowed; }
+
+/* Fiches détail */
+.info-row { display: flex; justify-content: space-between; padding: .7rem 0; border-bottom: 1px solid #ecf3f1; }
+.info-label { font-weight: 600; color: var(--aq-muted); }
+.info-value { color: var(--aq-ink); }
+
+/* Grille d'informations : deux colonnes sur écran large, une seule sur mobile.
+   Sans elle, une fiche se réduit à une colonne étroite qui laisse la page vide. */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
+    padding: 0 1.1rem 1.1rem;
+}
+.info-grid .info-row:last-child,
+.info-grid .info-row:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+@media (max-width: 767.98px) {
+    .info-grid { grid-template-columns: 1fr; }
+}
+/* Une ligne qui doit occuper toute la largeur (observation, message…) */
+.info-row-full { grid-column: 1 / -1; flex-direction: column; align-items: flex-start; gap: .25rem; }
+.info-row-full .info-value { white-space: pre-line; }
+.info-row-total {
+    background-color: var(--aq-teal-soft);
+    padding: .75rem .6rem;
+    border-radius: var(--aq-radius);
+    margin-top: .6rem;
+    border-bottom: none;
+}
+
+/* Boutons complémentaires */
+.btn-box { display: flex; gap: .6rem; margin-top: 1.25rem; }
+.btn-right { margin-left: auto; }
+.btn-link {
+    white-space: nowrap;
+    background-color: var(--aq-teal);
+    color: #ffffff;
+    padding: .45rem .75rem;
+    border: none;
+    border-radius: var(--aq-radius);
+    text-decoration: none;
+    font-weight: 600;
+}
+.btn-link:hover { background-color: var(--aq-teal-dark); color: #ffffff; }
+
+/* Badges de statut (pastels plats, formes carrées) */
+.badge { padding: .4em .7em; border-radius: var(--aq-radius); font-weight: 600; font-size: .78rem; }
+.badge-info, .badge-validee { background-color: #E7F0FA; color: #2B5B8A; }
+.badge-warning, .badge-creee { background-color: #FBEEDB; color: #8A5E17; }
+.badge-danger, .badge-annulee { background-color: #F7E4E2; color: #8F3A34; }
+.badge-success, .badge-payee, .badge-ok { background-color: var(--aq-teal-soft); color: #116B60; }
+.badge-secondary { background-color: #EEF1F1; color: #5D6B6A; }
+
+/* Harmonise aussi les badges Bootstrap pleins utilisés çà et là */
+.badge.bg-success { background-color: var(--aq-teal-soft) !important; color: #116B60; }
+.badge.bg-danger { background-color: #F7E4E2 !important; color: #8F3A34; }
+.badge.bg-warning { background-color: #FBEEDB !important; color: #8A5E17; }
+.badge.bg-info { background-color: #E7F0FA !important; color: #2B5B8A; }
+.badge.bg-secondary { background-color: #EEF1F1 !important; color: #5D6B6A; }
+
+/* Boîte de dialogue (modal client, etc.) */
+dialog {
+    border: none;
+    border-radius: var(--aq-radius);
+    padding: 1.25rem;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .2);
+}
+dialog::backdrop { background: rgba(12, 58, 67, .5); }
+
+.client-row { display: flex; gap: .5rem; align-items: flex-start; }
+.client-row select { flex: 1; }
+
+/* Formulaires d'action dans les tableaux : pas d'habillage carte */
+.inline-form,
+main table form:not([class]) {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline;
+}
+
+/* ===================================================================
+   Structure canonique des pages liste (panel + filtre + pied de table)
+   =================================================================== */
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.panel-header h5, .panel-header h2 {
+    margin-bottom: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.panel-header .result-count {
+    color: var(--aq-muted);
+    font-size: .85rem;
+}
+
+/* Barre de filtres horizontale sans labels (placeholders + selects) */
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.filters-bar .form-control,
+.filters-bar .form-select {
+    width: 170px;
+    font-size: .9rem;
+}
+
+.filters-bar .fc-sm { width: 100px; }
+.filters-bar .fc-lg { width: 230px; }
+
+.filters-bar .input-group {
+    width: auto;
+    flex-wrap: nowrap;
+}
+
+.filters-bar .input-group .form-control {
+    width: 150px;
+}
+
+.filters-bar .input-group-text {
+    font-size: .82rem;
+    color: var(--aq-muted);
+    background-color: #ffffff;
+    border-radius: var(--aq-radius);
+}
+
+/* Pied de tableau : lignes/page à gauche, numérotation à droite */
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-top: .75rem;
+}
+
+.pagination-nav {
+    display: flex;
+    list-style: none;
+    gap: .3rem;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-nav li a {
+    display: inline-block;
+    min-width: 2rem;
+    text-align: center;
+    padding: .3rem .55rem;
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    color: var(--aq-teal);
+    font-weight: 600;
+    font-size: .85rem;
+    text-decoration: none;
+}
+
+.pagination-nav li a:hover {
+    background-color: var(--aq-teal-soft);
+}
+
+.pagination-nav li.active a {
+    background-color: var(--aq-teal);
+    border-color: var(--aq-teal);
+    color: #ffffff;
+}
+
+.pagination-nav li.disabled a {
+    color: #a8bcb9;
+    background-color: var(--aq-sand);
+    pointer-events: none;
+}
+
+/* ===================================================================
+   Formulaire canonique (création / édition)
+   Titre h2 hors panel, panneau blanc pleine largeur, champs empilés
+   pleine largeur, boutons Enregistrer + Retour en bas.
+   =================================================================== */
+
+.form-panel {
+    background-color: #ffffff;
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.form-panel .form-label {
+    margin-bottom: .3rem;
+    font-weight: 500;
+}

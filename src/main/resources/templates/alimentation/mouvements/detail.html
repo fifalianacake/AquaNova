@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova</title>
+</head>
 <body>
-
+<main>
     <h2>Détail mouvement</h2>
 
     <p>ID : <span th:text="${mouvement.id}"></span></p>
@@ -12,14 +14,11 @@
     <p>Quantité : <span th:text="${mouvement.quantite}"></span></p>
     <p>Commentaire : <span th:text="${mouvement.commentaire}"></span></p>
 
-    <a href="/stocks/mouvements">Retour</a>
-    <a th:href="@{'/stocks/mouvements/edit/' + ${mouvement.id}}">Modifier</a>
-    <form th:action="@{'/stocks/mouvements/delete/' + ${mouvement.id}}" method="post">
-        <button type="submit">Supprimer</button>
+    <a class="btn btn-secondary" href="/stocks/mouvements">Retour</a>
+    <a class="btn btn-sm btn-outline-primary" th:href="@{'/stocks/mouvements/' + ${mouvement.id} + '/edit'}">Modifier</a>
+    <form th:action="@{'/stocks/mouvements/' + ${mouvement.id} + '/delete'}" method="post">
+        <button class="btn btn-danger" type="submit">Supprimer</button>
     </form>
-
-
-
+</main>
 </body>
-
 </html>

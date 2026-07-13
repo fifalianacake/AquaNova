@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout(${'Fiche du lot ' + lot.code}, ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <table class="kpi-row">
+        <tr>
+            <td>
+                <div class="kpi-label">Effectif actuel</div>
+                <div class="kpi-value" th:text="${lot.effectifActuel}">0</div>
+                <div class="kpi-hint" th:text="'sur ' + ${lot.effectifInitial} + ' initial'"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Poids moyen actuel</div>
+                <div class="kpi-value"
+                     th:text="${lot.poidsMoyenActuel != null
+                               ? #numbers.formatDecimal(lot.poidsMoyenActuel, 1, 'WHITESPACE', 1, 'COMMA') + ' g' : '—'}">—</div>
+                <div class="kpi-hint"
+                     th:text="${lot.poidsMoyenInitial != null
+                               ? 'depuis ' + #numbers.formatDecimal(lot.poidsMoyenInitial, 1, 'WHITESPACE', 1, 'COMMA') + ' g' : ''}"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Biomasse</div>
+                <div class="kpi-value"
+                     th:text="${biomasse != null
+                               ? #numbers.formatDecimal(biomasse, 1, 'WHITESPACE', 1, 'COMMA') + ' kg' : '—'}">—</div>
+                <div class="kpi-hint">effectif × poids moyen</div>
+            </td>
+            <td>
+                <div class="kpi-label">Progression vers la récolte</div>
+                <div class="kpi-value"
+                     th:text="${progression != null ? progression + ' %' : '—'}">—</div>
+                <div class="kpi-hint"
+                     th:text="${poidsCible != null
+                               ? 'cible ' + #numbers.formatDecimal(poidsCible, 1, 'WHITESPACE', 2, 'COMMA') + ' g' : 'cible non définie'}"></div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="panel">
+        <div class="panel-header">Informations du lot</div>
+        <div class="panel-body">
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Code</td>
+                    <td class="info-value" th:text="${lot.code}">—</td>
+                    <td class="info-label">Espèce</td>
+                    <td class="info-value" th:text="${lot.espece != null ? lot.espece.nom : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Bassin</td>
+                    <td class="info-value" th:text="${lot.bassin != null ? lot.bassin.reference : '—'}">—</td>
+                    <td class="info-label">Stade de croissance</td>
+                    <td class="info-value"
+                        th:text="${lot.stadeCroissance != null ? lot.stadeCroissance.nom : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Statut</td>
+                    <td class="info-value" th:text="${lot.statutLot != null ? lot.statutLot.libelle : '—'}">—</td>
+                    <td class="info-label">Date de mise en charge</td>
+                    <td class="info-value"
+                        th:text="${lot.dateMiseEnCharge != null
+                                  ? #temporals.format(lot.dateMiseEnCharge, 'dd/MM/yyyy') : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Effectif initial</td>
+                    <td class="info-value" th:text="${lot.effectifInitial}">—</td>
+                    <td class="info-label">Poids moyen initial</td>
+                    <td class="info-value"
+                        th:text="${lot.poidsMoyenInitial != null
+                                  ? #numbers.formatDecimal(lot.poidsMoyenInitial, 1, 'WHITESPACE', 1, 'COMMA') + ' g' : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Mortalités cumulées</td>
+                    <td class="info-value" th:text="${totalMorts} + ' individus'">—</td>
+                    <td class="info-label">Récolte estimée</td>
+                    <td class="info-value"
+                        th:text="${dateRecolteEstimee != null
+                                  ? #temporals.format(dateRecolteEstimee, 'dd/MM/yyyy') : 'non estimable'}">—</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel" th:if="${rentabilite != null}">
+        <div class="panel-header">Rentabilité</div>
+        <div class="panel-body">
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Chiffre d'affaires</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(rentabilite.chiffreAffaires, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                    <td class="info-label">Coût des alevins</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(rentabilite.coutAlevins, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                </tr>
+                <tr>
+                    <td class="info-label">Coût de l'alimentation</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(rentabilite.coutAlimentation, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                    <td class="info-label">Marge brute</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(rentabilite.margeBrute, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                </tr>
+                <tr>
+                    <td class="info-label">Taux de marge</td>
+                    <td class="info-value"
+                        th:text="${rentabilite.tauxMargeBrute != null
+                                  ? #numbers.formatDecimal(rentabilite.tauxMargeBrute, 1, 'WHITESPACE', 2, 'COMMA') + ' %' : '—'}"></td>
+                    <td class="info-label">Statut</td>
+                    <td class="info-value">
+                        <span class="badge"
+                              th:classappend="${rentabilite.statutRentabilite.name() == 'RENTABLE'} ? 'badge-success'
+                                            : (${rentabilite.statutRentabilite.name() == 'DEFICITAIRE'} ? 'badge-danger' : 'badge-info')"
+                              th:text="${rentabilite.statutRentabilite}"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">Historique des pesées</div>
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th class="num">Échantillon</th>
+                <th class="num">Poids total (g)</th>
+                <th class="num">Poids moyen (g)</th>
+                <th>Observation</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${pesees}">
+                <td th:text="${#temporals.format(p.datePesee, 'dd/MM/yyyy')}"></td>
+                <td class="num" th:text="${p.nbEchantillon}"></td>
+                <td class="num"
+                    th:text="${p.poidsTotalEchantillon != null
+                              ? #numbers.formatDecimal(p.poidsTotalEchantillon, 1, 'WHITESPACE', 1, 'COMMA') : '—'}"></td>
+                <td class="num"
+                    th:text="${#numbers.formatDecimal(p.poidsMoyen, 1, 'WHITESPACE', 1, 'COMMA')}"></td>
+                <td th:text="${p.observation != null ? p.observation : '—'}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(pesees)}">
+                <td colspan="5" class="vide">Aucune pesée enregistrée.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">Mortalités</div>
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th class="num">Individus morts</th>
+                <th>Cause</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="m : ${mortalites}">
+                <td th:text="${#temporals.format(m.dateMortalite, 'dd/MM/yyyy')}"></td>
+                <td class="num" th:text="${m.nbMorts}"></td>
+                <td th:text="${m.cause != null ? m.cause : '—'}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(mortalites)}">
+                <td colspan="3" class="vide">Aucune mortalité enregistrée.</td>
+            </tr>
+            </tbody>
+            <tfoot th:if="${!#lists.isEmpty(mortalites)}">
+            <tr>
+                <td>Total</td>
+                <td class="num" th:text="${totalMorts}"></td>
+                <td></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+</contenu>
+</body>
+</html>

@@ -1,12 +1,18 @@
 package mg.itu.aquanova.production.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.alerte.services.AnalyseVerificationService;
+import mg.itu.aquanova.production.dto.PeseeFilter;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.Pese;
 import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.repositories.PeseRepository;
+import mg.itu.aquanova.referentiel.repositories.StadeCroissanceRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +27,17 @@ public class PeseeService {
     private final PeseRepository peseeRepository;
     private final LotRepository lotRepository;
     private final JournalLotService journalLotService;
+    private final StadeCroissanceRepository stadeCroissanceRepository;
+    private final AnalyseVerificationService analyseVerificationService;
 
-    public PeseeService(PeseRepository peseeRepository, LotRepository lotRepository, JournalLotService journalLotService) {
+    public PeseeService(PeseRepository peseeRepository, LotRepository lotRepository, JournalLotService journalLotService,
+            StadeCroissanceRepository stadeCroissanceRepository,
+            AnalyseVerificationService analyseVerificationService) {
         this.peseeRepository = peseeRepository;
         this.lotRepository = lotRepository;
         this.journalLotService = journalLotService;
+        this.stadeCroissanceRepository = stadeCroissanceRepository;
+        this.analyseVerificationService = analyseVerificationService;
     }
 
     public List<Pese> listerToutesLesPesees() {
@@ -34,6 +46,27 @@ public class PeseeService {
 
     public List<Pese> listerPeseesParLot(Long idLot) {
         return peseeRepository.findByLotIdOrderByDatePeseeDesc(idLot);
+    }
+
+    public Page<Pese> lister(Long idLot, PeseeFilter filter, Pageable pageable) {
+        return peseeRepository.findAll(specification(idLot, filter), pageable);
+    }
+
+    private Specification<Pese> specification(Long idLot, PeseeFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.equal(root.get("lot").get("id"), idLot);
+
+            if (filter != null) {
+                if (filter.getDateDebut() != null) {
+                    predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("datePesee"), filter.getDateDebut()));
+                }
+                if (filter.getDateFin() != null) {
+                    predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("datePesee"), filter.getDateFin()));
+                }
+            }
+
+            return predicates;
+        };
     }
 
     public Optional<Pese> trouverParId(Long id) {
@@ -57,8 +90,7 @@ public class PeseeService {
         pesee.setObservation(observation);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
-        lotRepository.save(lot);
+        recalculerPoidsMoyenActuel(lot);
 
         journalLotService.inscrireEvenement(
                 lot,
@@ -96,8 +128,7 @@ public class PeseeService {
         pesee.setPoidsMoyen(poidsMoyen);
 
         Pese saved = peseeRepository.save(pesee);
-        lot.setPoidsMoyenActuel(poidsMoyen.doubleValue());
-        lotRepository.save(lot);
+        recalculerPoidsMoyenActuel(lot);
 
         return saved;
     }
@@ -105,10 +136,11 @@ public class PeseeService {
     // DELETE
     @Transactional
     public void supprimerPesee(Long id) {
-        if (!peseeRepository.existsById(id)) {
-            throw new IllegalArgumentException("Impossible de supprimer : Pesée introuvable.");
-        }
-        peseeRepository.deleteById(id);
+        Pese pesee = peseeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Impossible de supprimer : Pesée introuvable."));
+        LotModels lot = pesee.getLot();
+        peseeRepository.delete(pesee);
+        recalculerPoidsMoyenActuel(lot);
     }
 
 
@@ -131,8 +163,10 @@ public Double getDernierPoidsMoyen(Long idLot) {
         LotModels lot = lotRepository.findById(idLot)
                 .orElseThrow(() -> new EntityNotFoundException("Lot introuvable: " + idLot));
 
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une pesée sur un lot clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une pesée sur un lot clôturé ou annulé.");
         }
         if (lot.getDateMiseEnCharge() != null && datePesee.isBefore(lot.getDateMiseEnCharge())) {
             throw new IllegalArgumentException("La date de pesée ne peut pas être antérieure à la date de mise en charge du lot.");
@@ -155,6 +189,31 @@ public Double getDernierPoidsMoyen(Long idLot) {
         if (poidsTotal == null || poidsTotal.signum() <= 0) {
             throw new IllegalArgumentException("Le poids total de l'échantillon doit être supérieur à 0.");
         }
+    }
+
+    private void recalculerPoidsMoyenActuel(LotModels lot) {
+        if (lot == null || lot.getId() == null) {
+            return;
+        }
+
+        List<Pese> historique = peseeRepository.findByLotIdOrderByDatePeseeDesc(lot.getId());
+        Double poidsActuel = historique.isEmpty()
+                ? lot.getPoidsMoyenInitial()
+                : historique.get(0).getPoidsMoyen().doubleValue();
+
+        lot.setPoidsMoyenActuel(poidsActuel);
+
+        if (poidsActuel != null) {
+            BigDecimal poidsDecimal = BigDecimal.valueOf(poidsActuel);
+            stadeCroissanceRepository.findAll().stream()
+                    .filter(stade -> stade.correspondAuPoids(poidsDecimal))
+                    .findFirst()
+                    .ifPresent(lot::setStadeCroissance);
+        }
+
+        LotModels lotSauvegarde = lotRepository.save(lot);
+
+        analyseVerificationService.verifierRecolteProche(lotSauvegarde);
     }
 
     private Double round3(Double value) {

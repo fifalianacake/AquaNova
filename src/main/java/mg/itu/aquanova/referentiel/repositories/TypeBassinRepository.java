@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TypeBassinRepository extends JpaRepository<TypeBassin, Long> {
+    boolean existsByLibelleIgnoreCase(String libelle);
 }

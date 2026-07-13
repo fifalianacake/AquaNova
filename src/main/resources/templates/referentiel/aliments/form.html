@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${aliment.id == null} ? 'Nouveau Aliment' : 'Modifier l\'Aliment'">Formulaire</title>
+    <title>Formulaire</title>
 </head>
 <body>
-
+<main>
     <h2 th:text="${aliment.id == null} ? 'Créer un aliment' : 'Modifier l\'aliment'">Formulaire</h2>
 
-    <form th:action="@{/aliments}" th:object="${aliment}" method="post">
-        
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="form-panel" th:action="@{/aliments}" th:object="${aliment}" method="post">
+
         <input type="hidden" th:field="*{id}" />
 
-        <p>
-            <label for="nom">Nom de l'aliment :</label><br/>
-            <input type="text" id="nom" th:field="*{nom}" required />
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom de l'aliment</label>
+            <input class="form-control" type="text" id="nom" th:field="*{nom}" required />
+        </div>
 
-        <p>
-            <button type="submit" th:text="${aliment.id == null} ? 'Créer' : 'Enregistrer les modifications'">Enregistrer</button>
-            <a th:href="@{/aliments}">Annuler</a>
-        </p>
-        
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/aliments}">Retour à la liste</a>
+        </div>
     </form>
-
+</main>
 </body>
 </html>

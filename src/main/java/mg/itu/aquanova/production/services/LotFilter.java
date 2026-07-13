@@ -1,5 +1,9 @@
 package mg.itu.aquanova.production.services;
 
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class LotFilter {
     private Long id;
     private String code;
@@ -7,8 +11,13 @@ public class LotFilter {
     private Long bassinId;
     private Integer stadeId;
     private Long statutId;
-    private String dateFrom;
-    private String dateTo;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateFrom;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateTo;
+
     private Integer effectifMin;
     private Integer effectifMax;
 
@@ -27,10 +36,10 @@ public class LotFilter {
     public void setStadeId(Integer stadeId) { this.stadeId = stadeId; }
     public Long getStatutId() { return statutId; }
     public void setStatutId(Long statutId) { this.statutId = statutId; }
-    public String getDateFrom() { return dateFrom; }
-    public void setDateFrom(String dateFrom) { this.dateFrom = dateFrom; }
-    public String getDateTo() { return dateTo; }
-    public void setDateTo(String dateTo) { this.dateTo = dateTo; }
+    public LocalDate getDateFrom() { return dateFrom; }
+    public void setDateFrom(LocalDate dateFrom) { this.dateFrom = dateFrom; }
+    public LocalDate getDateTo() { return dateTo; }
+    public void setDateTo(LocalDate dateTo) { this.dateTo = dateTo; }
     public Integer getEffectifMin() { return effectifMin; }
     public void setEffectifMin(Integer effectifMin) { this.effectifMin = effectifMin; }
     public Integer getEffectifMax() { return effectifMax; }

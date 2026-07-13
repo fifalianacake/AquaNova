@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.alerte.services.AnalyseVerificationService;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.MortaliteModels;
 import mg.itu.aquanova.production.models.StatutLotEnum;
@@ -27,18 +28,21 @@ public class MortaliteService {
     private final StatutLotRepository statutLotRepository;
     private final StatutBassinRepository statutBassinRepository;
     private final JournalLotService journalLotService;
+    private final AnalyseVerificationService analyseVerificationService;
 
     public MortaliteService(
             MortaliteRepository repo,
             LotRepository lotRepository,
             StatutLotRepository statutLotRepository,
             StatutBassinRepository statutBassinRepository,
-            JournalLotService journalLotService) {
+            JournalLotService journalLotService,
+            AnalyseVerificationService analyseVerificationService) {
         this.repo = repo;
         this.lotRepository = lotRepository;
         this.statutLotRepository = statutLotRepository;
         this.statutBassinRepository = statutBassinRepository;
         this.journalLotService = journalLotService;
+        this.analyseVerificationService = analyseVerificationService;
     }
 
     public List<MortaliteModels> findAll() {
@@ -106,11 +110,9 @@ public class MortaliteService {
                         + (mortalite.getCause() != null ? ", cause: " + mortalite.getCause() : ""),
                 mortalite.getDateMortalite());
 
-        return saved;
-    }
+        analyseVerificationService.verifierMortalite(lot, repo.sumNbMortsByLotId(lot.getId()));
 
-    public void delete(Integer id) {
-        repo.deleteById(id);
+        return saved;
     }
 
     public Integer getTotalMortsByLot(Long lotId) {
@@ -195,8 +197,10 @@ public class MortaliteService {
     }
 
     private void verifierLotNonCloture(LotModels lot) {
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une mortalité sur un lot clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une mortalité sur un lot clôturé ou annulé.");
         }
     }
 

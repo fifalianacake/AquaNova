@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Prévisions financières</title>
+</head>
+<body>
+<main>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h2 class="mb-0">Prévisions financières</h2>
+    <a class="btn btn-outline-primary" th:href="@{/finance/dashboard}">
+        <i class="bi bi-speedometer2"></i> Dashboard financier
+    </a>
+</div>
+
+<p class="hint">
+    Pour chaque lot en cours, on projette la date à laquelle il atteindra le poids cible de son espèce,
+    puis la biomasse et le chiffre d'affaires attendus. Les dates ci-dessous ne bornent aucun calcul :
+    elles <strong>filtrent les lots</strong> dont la récolte estimée tombe dans cet intervalle.
+    <br>
+    Profit attendu = chiffre d'affaires − coûts déjà engagés (alevins + aliment déjà distribué)
+    − aliment restant à distribuer jusqu'à la récolte.
+    <br>
+    Cette page répond à « <strong>combien vais-je encaisser, et quand ?</strong> ». Pour savoir s'il vaut
+    mieux récolter plus tôt ou plus tard que cette date, ouvrez la <strong>simulation</strong> du lot.
+</p>
+
+<div class="panel">
+    <form th:action="@{/finance/previsions}" method="get" class="filters-bar">
+        <!--/* Ce n'est pas une période d'analyse (contrairement au dashboard financier) :
+               c'est un filtre sur la date de récolte estimée des lots. */-->
+        <div class="input-group">
+            <span class="input-group-text">Récoltes attendues entre</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${dateDebut}" required>
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">et</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${dateFin}" required>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Générer</button>
+        <a th:href="@{/finance/previsions}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> 6 prochains mois
+        </a>
+    </form>
+</div>
+
+<div class="error" th:if="${erreur}" th:text="${erreur}"></div>
+
+<div class="row g-3 mb-4" th:if="${!#lists.isEmpty(previsions)}">
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Lots à récolter</div>
+                    <div class="kpi-value" th:text="${#lists.size(previsions)}">0</div>
+                    <div class="text-secondary small">sur la période</div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-droplet-half"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Biomasse attendue</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(totalBiomasse, 1, 'WHITESPACE', 1, 'COMMA')} + ' kg'">0</div>
+                    <div class="text-secondary small">à la récolte</div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-basket2"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Chiffre d'affaires attendu</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(totalCa, 1, 'WHITESPACE', 0, 'COMMA')} + ' Ar'">0</div>
+                    <div class="text-secondary small">au prix moyen constaté</div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-cash-coin"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-secondary small">Marge brute attendue</div>
+                    <div class="kpi-value"
+                         th:classappend="${totalProfit < 0} ? 'text-danger' : 'text-success'"
+                         th:text="${#numbers.formatDecimal(totalProfit, 1, 'WHITESPACE', 0, 'COMMA')} + ' Ar'">0</div>
+                    <div class="text-secondary small">après tous les coûts directs</div>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-graph-up"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel" th:if="${!#lists.isEmpty(previsions)}">
+    <div class="panel-header">
+        <h5>Chiffre d'affaires attendu par lot</h5>
+    </div>
+    <div class="p-3">
+        <canvas id="previsionChart" height="90"></canvas>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Détail par lot</h5>
+        <span class="result-count" th:text="${#lists.size(previsions)} + ' lot(s)'"></span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+            <tr>
+                <th>Lot</th>
+                <th>Espèce</th>
+                <th>Récolte estimée</th>
+                <th class="text-end">Biomasse (kg)</th>
+                <th class="text-end">Prix (Ar/kg)</th>
+                <th class="text-end">CA attendu (Ar)</th>
+                <th class="text-end">Coûts engagés (Ar)</th>
+                <th class="text-end">Aliment restant (Ar)</th>
+                <th class="text-end">Marge attendue (Ar)</th>
+                <th class="text-end">Taux de marge (%)</th>
+                <th class="text-end">Décision</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${previsions}">
+                <td class="fw-semibold">
+                    <a th:href="@{/lots/{id}(id=${p.lotId})}" th:text="${p.codeLot}"></a>
+                </td>
+                <td th:text="${p.espece}"></td>
+                <td th:text="${p.dateRecolteEstimee != null
+                              ? #temporals.format(p.dateRecolteEstimee, 'dd/MM/yyyy') : '—'}"></td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(p.biomassePrevue, 1, 'WHITESPACE', 1, 'COMMA')}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(p.prixMoyenVenteKg, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(p.caPrevisionnel, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                <td class="text-end montant text-secondary" title="Alevins + aliment déjà distribué sur ce lot"
+                    th:text="'− ' + ${#numbers.formatDecimal(p.coutsDejaEngages, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                <td class="text-end montant text-secondary" title="Aliment restant à distribuer jusqu'à la récolte"
+                    th:text="'− ' + ${#numbers.formatDecimal(p.coutPrevisionnel, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                <td class="text-end montant fw-semibold"
+                    th:classappend="${p.profitPrevisionnel < 0} ? 'text-danger' : 'text-success'"
+                    th:text="${#numbers.formatDecimal(p.profitPrevisionnel, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                <td class="text-end"
+                    th:text="${#numbers.formatDecimal(p.margePrevisionnelle, 1, 'WHITESPACE', 1, 'COMMA')}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary"
+                       th:href="@{/finance/lots/{id}/simulation(id=${p.lotId})}"
+                       title="Quand faut-il récolter ce lot ?">
+                        <i class="bi bi-lightbulb"></i> Optimiser
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(previsions)}">
+                <td colspan="11" class="text-center text-secondary py-4">
+                    Aucun lot n'atteint son poids cible sur cette période.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:if="${!#lists.isEmpty(previsions)}">
+    <script th:inline="javascript">
+        const prevLabels = /*[[${previsions.![codeLot]}]]*/ [];
+        const prevCa     = /*[[${previsions.![caPrevisionnel]}]]*/ [];
+        const prevCout   = /*[[${previsions.![coutPrevisionnel]}]]*/ [];
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        new Chart(document.getElementById('previsionChart'), {
+            type: 'bar',
+            data: {
+                labels: prevLabels,
+                datasets: [
+                    { label: 'CA attendu (Ar)', data: prevCa, backgroundColor: '#128a7a', borderRadius: 4 },
+                    { label: 'Coût de l\'alimentation (Ar)', data: prevCout, backgroundColor: '#e0a72c', borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: c => c.dataset.label + ' : '
+                                    + new Intl.NumberFormat('fr-FR').format(Math.round(c.parsed.y)) + ' Ar'
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => new Intl.NumberFormat('fr-FR').format(v) } }
+                }
+            }
+        });
+    </script>
+</div>
+
+</main>
+</body>
+</html>

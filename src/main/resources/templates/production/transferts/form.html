@@ -1,67 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>AquaNova - Nouveau transfert</title>
 </head>
-
 <body>
-    <h1>Créer un nouveau transfert</h1>
+<main>
+    <h2>Créer un nouveau transfert</h2>
 
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="@{/transferts/save}" th:object="${transfert}" method="post">
-        <div>
-            <label for="dateTransfert">Date de transfert</label>
-            <input type="date" id="dateTransfert" th:field="*{dateTransfert}" required>
+    <form class="form-panel" th:action="@{/transferts}" th:object="${transfert}" method="post">
+        <div class="mb-3">
+            <label class="form-label" for="dateTransfert">Date de transfert</label>
+            <input class="form-control" type="date" id="dateTransfert" th:field="*{dateTransfert}" required>
         </div>
 
-        <div>
-            <label for="effectif">Effectif</label>
-            <input type="number" id="effectif" th:field="*{effectif}" min="1" required>
+        <div class="mb-3">
+            <label class="form-label" for="effectif">Effectif</label>
+            <input class="form-control" type="number" id="effectif" th:field="*{effectif}" min="1" required>
         </div>
 
-        <div>
-            <label for="poidsMoyen">Poids moyen</label>
-            <input type="number" step="0.01" id="poidsMoyen" th:field="*{poidsMoyen}" min="0.01" required>
+        <div class="mb-3">
+            <label class="form-label" for="poidsMoyen">Poids moyen</label>
+            <input class="form-control" type="number" step="0.01" id="poidsMoyen" th:field="*{poidsMoyen}" min="0.01" required>
         </div>
 
-        <div>
-            <label for="lotSource">Lot source</label>
-            <select id="lotSource" th:field="*{lotSource.id}" required>
+        <div class="mb-3">
+            <label class="form-label" for="lotSource">Lot source</label>
+            <select class="form-select" id="lotSource" th:field="*{lotSource.id}" required>
                 <option value="">-- Choisir un lot source --</option>
                 <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
             </select>
         </div>
 
-        <div>
-            <label for="codeLotDestination">Code du nouveau lot destination</label>
-            <input type="text" id="codeLotDestination" th:field="*{codeLotDestination}">
+        <div class="mb-3">
+            <label class="form-label" for="codeLotDestination">Code du nouveau lot destination</label>
+            <input class="form-control" type="text" id="codeLotDestination" th:field="*{codeLotDestination}">
         </div>
 
-        <div>
-            <label for="bassinSource">Bassin source</label>
-            <select id="bassinSource" th:field="*{bassinSource.id}" required>
+        <div class="mb-3">
+            <label class="form-label" for="bassinSource">Bassin source</label>
+            <select class="form-select" id="bassinSource" th:field="*{bassinSource.id}" required>
                 <option value="">-- Choisir un bassin source --</option>
                 <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
         </div>
 
-        <div>
-            <label for="bassinDestination">Bassin destination</label>
-            <select id="bassinDestination" th:field="*{bassinDestination.id}" required>
+        <div class="mb-3">
+            <label class="form-label" for="bassinDestination">Bassin destination</label>
+            <select class="form-select" id="bassinDestination" th:field="*{bassinDestination.id}" required>
                 <option value="">-- Choisir un bassin destination --</option>
                 <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
         </div>
 
-        <div>
-            <button type="submit">Enregistrer</button>
-            <a th:href="@{/transferts}">Retour à la liste</a>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/transferts}">Retour à la liste</a>
         </div>
     </form>
+</main>
 </body>
-
 </html>

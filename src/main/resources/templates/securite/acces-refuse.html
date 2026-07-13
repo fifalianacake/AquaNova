@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Accès refusé</title>
+</head>
+<body>
+<main>
+
+<div class="panel">
+    <div class="p-5 text-center">
+        <div class="mb-3" style="font-size: 3rem; color: var(--aq-muted);">
+            <i class="bi bi-shield-lock"></i>
+        </div>
+        <h2 class="mb-2">Accès refusé</h2>
+        <p class="text-secondary mb-1">
+            Votre rôle
+            <strong th:if="${session.role != null}" th:text="${session.role}">—</strong>
+            ne permet pas d'accéder à cette page.
+        </p>
+        <p class="text-secondary">
+            Si vous pensez qu'il s'agit d'une erreur, rapprochez-vous d'un administrateur.
+        </p>
+        <a class="btn btn-primary mt-2" th:href="@{/}">
+            <i class="bi bi-house"></i> Retour au tableau de bord
+        </a>
+    </div>
+</div>
+
+</main>
+</body>
+</html>

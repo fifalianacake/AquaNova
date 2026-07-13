@@ -1,9 +1,10 @@
 package mg.itu.aquanova.achat.controllers;
 
-import java.util.LinkedHashMap;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,21 +20,21 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.aquanova.achat.models.Achat;
 import mg.itu.aquanova.achat.models.Fournisseur;
+import mg.itu.aquanova.achat.models.StatutAchat;
 import mg.itu.aquanova.achat.models.TypeFournisseur;
 import mg.itu.aquanova.achat.services.FournisseurService;
-import mg.itu.aquanova.export_pdf.models.FichePdfData;
 import mg.itu.aquanova.export_pdf.models.PdfResponses;
-import mg.itu.aquanova.export_pdf.services.PdfExportService;
+import mg.itu.aquanova.export_pdf.services.PdfRenderService;
 
 @Controller
 public class FournisseurController {
 
     private final FournisseurService service;
-    private final PdfExportService pdfExportService;
+    private final PdfRenderService pdfRenderService;
 
-    public FournisseurController(FournisseurService service, PdfExportService pdfExportService) {
+    public FournisseurController(FournisseurService service, PdfRenderService pdfRenderService) {
         this.service = service;
-        this.pdfExportService = pdfExportService;
+        this.pdfRenderService = pdfRenderService;
     }
 
     @GetMapping("/fournisseurs")
@@ -86,6 +87,17 @@ public class FournisseurController {
     }
 
     
+    @PostMapping("/fournisseurs/{id}/desactiver")
+    public String desactiverFournisseur(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        try {
+            service.desactiver(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Fournisseur désactivé.");
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/fournisseurs";
+    }
+
     @GetMapping("/fournisseurs/{id}/edit")
     public String modifierFournisseurForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -100,60 +112,31 @@ public class FournisseurController {
     }
 
     
-@GetMapping("/fournisseurs/{id}/export/pdf")
-public ResponseEntity<byte[]> exporterFicheFournisseurPdf(@PathVariable("id") Long id) {
-    // 1. Récupération des données métiers depuis ton service habituel
-    Fournisseur fournisseur = service.trouverParId(id);
-    
-    // Imaginons que tu récupères la liste d'achats liée via ton service
-    List<Achat> achats = service.listerAchatsParFournisseur(id);
+    @GetMapping("/fournisseurs/{id}/export/pdf")
+    public ResponseEntity<byte[]> exporterFicheFournisseurPdf(@PathVariable("id") Long id) {
+        Fournisseur fournisseur = service.trouverParId(id);
+        List<Achat> achats = service.listerAchatsParFournisseur(id);
 
-    // 2. Préparation des champs de la section principale (Informations Générales)
-    Map<String, String> infosGenerales = new LinkedHashMap<>();
-    infosGenerales.put("ID du fournisseur", fournisseur.getId().toString());
-    infosGenerales.put("Type", fournisseur.getTypeFournisseur() != null ? fournisseur.getTypeFournisseur().name() : "-");
-    infosGenerales.put("Contact référent", fournisseur.getContact());
-    infosGenerales.put("Adresse Email", fournisseur.getEmail());
-    infosGenerales.put("Adresse physique", fournisseur.getAdresse());
-    infosGenerales.put("NIF / STAT", fournisseur.getNifStat());
-    infosGenerales.put("Statut de l'activité", fournisseur.getActif() ? "Actif (Ouvert)" : "Inactif (Désactivé)");
-    infosGenerales.put("Observation", fournisseur.getObservation());
+        // Seuls les achats validés constituent un engagement réel : les brouillons et les
+        // achats annulés sont affichés mais exclus du total, comme dans l'historique des dépenses.
+        List<Achat> valides = achats.stream()
+                .filter(a -> a.getStatutAchat() == StatutAchat.VALIDE)
+                .toList();
+        BigDecimal totalAchats = valides.stream()
+                .map(Achat::getMontantTotal)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    // 3. Préparation des lignes du tableau de l'historique d'achats
-    java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        Map<String, Object> modele = new HashMap<>();
+        modele.put("fournisseur", fournisseur);
+        modele.put("achats", achats);
+        modele.put("nbAchatsValides", valides.size());
+        modele.put("totalAchats", totalAchats);
+        modele.put("sousTitre", fournisseur.getTypeFournisseur() != null
+                ? "Fournisseur " + fournisseur.getTypeFournisseur()
+                : null);
 
-    List<List<String>> lignesAchats = achats.stream().map(achat -> {
-    // On prépare chaque variable sous forme de String pure
-    String ref = (achat.getReferenceFacture() != null) ? achat.getReferenceFacture() : "-";
-    
-    String date = "-";
-    if (achat.getDateAchat() != null) {
-        // Si c'est un LocalDateTime ou LocalDate
-        date = achat.getDateAchat().format(formatter); 
-        // Si c'est une java.util.Date classique, utilise plutôt :
-        // date = new java.text.SimpleDateFormat("dd/MM/yyyy").format(achat.getDateAchat());
+        byte[] pdf = pdfRenderService.rendre("fournisseur", modele);
+        return PdfResponses.attachment(pdf, "fiche-fournisseur-" + id + ".pdf");
     }
-    
-    String montant = (achat.getMontantTotal() != null) ? achat.getMontantTotal().toString() + " Ar" : "0 Ar";
-    String statut = (achat.getStatutAchat() != null) ? achat.getStatutAchat().name() : "-";
-
-    // On retourne explicitement une liste de String
-    return List.of(ref, date, montant, statut);
-    }).collect(Collectors.toList());
-
-    // 4. Construction de l'objet de données fluide (le DTO)
-    FichePdfData pdfData = FichePdfData.of("Fiche Fournisseur : " + fournisseur.getNom())
-        .sousTitre("Code interne AquaNova : #FOURN-" + fournisseur.getId())
-        .section("Informations Générales", infosGenerales)
-        .table("Historique des achats effectués", 
-               List.of("Référence Achat", "Date", "Montant Total", "Statut"), 
-               lignesAchats);
-
-    // 5. Génération du tableau d'octets (byte[]) par ton service partagé
-    byte[] pdfBytes = pdfExportService.genererFiche(pdfData);
-
-    // 6. Envoi de la réponse avec les bons en-têtes grâce à ta classe utilitaire
-    String nomFichier = "fiche_fournisseur_" + id + ".pdf";
-    return PdfResponses.attachment(pdfBytes, nomFichier);
-}
 }

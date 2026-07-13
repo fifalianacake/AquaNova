@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Gestion Catégorie</title>
+</head>
+<body>
+<main>
+    <h2 th:text="${categorie.id != null} ? 'Modifier la Catégorie' : 'Créer une Catégorie'">Gestion Catégorie</h2>
+
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="form-panel" th:action="${categorie.id != null} ? @{/categories-depenses/{id}(id=${categorie.id})} : @{/categories-depenses}"
+          th:object="${categorie}"
+          method="POST">
+
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-3">
+            <label class="form-label" for="code">Code</label>
+            <input class="form-control" type="text" id="code" th:field="*{code}" required placeholder="Ex: ACHAT_ALEVINS" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="libelle">Libellé</label>
+            <input class="form-control" type="text" id="libelle" th:field="*{libelle}" required placeholder="Ex: Achat d'alevins" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control" id="description" th:field="*{description}" rows="4" placeholder="Description de la catégorie..."></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="typeCategorie">Type de catégorie</label>
+            <select class="form-select" id="typeCategorie" th:field="*{typeCategorie}" required>
+                <option th:value="'ACHAT'" th:text="'ACHAT'">ACHAT</option>
+                <option th:value="'DEPENSE'" th:text="'DEPENSE'">DEPENSE</option>
+                <option th:value="'MIXTE'" th:text="'MIXTE'">MIXTE</option>
+            </select>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit" th:text="${categorie.id != null} ? 'Enregistrer les modifications' : 'Créer la catégorie'"></button>
+            <a class="btn btn-secondary" th:href="@{/categories-depenses}">Retour à la liste</a>
+        </div>
+
+    </form>
+</main>
+</body>
+</html>

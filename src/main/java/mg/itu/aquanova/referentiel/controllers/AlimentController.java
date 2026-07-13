@@ -41,9 +41,15 @@ public class AlimentController {
     }
 
     @PostMapping
-    public String save(@ModelAttribute Aliment aliment) {
-        service.create(aliment);
-        return "redirect:/aliments";
+    public String save(@ModelAttribute Aliment aliment, Model model) {
+        try {
+            service.create(aliment);
+            return "redirect:/aliments";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("aliment", aliment);
+            model.addAttribute("error", e.getMessage());
+            return "referentiel/aliments/form";
+        }
     }
 
     @GetMapping("/{id}")
@@ -60,7 +66,7 @@ public class AlimentController {
         return "referentiel/aliments/form";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         service.delete(id);
         return "redirect:/aliments";

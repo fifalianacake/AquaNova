@@ -1,54 +1,135 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Fiche Fournisseur</title>
+    <title>AquaNova - Fiche fournisseur</title>
 </head>
 <body>
+<main>
 
-    <h1>Fiche Fournisseur</h1>
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1" th:text="${fournisseur.nom}">Fournisseur</h2>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge" th:classappend="${fournisseur.actif} ? 'badge-success' : 'badge-danger'"
+                  th:text="${fournisseur.actif} ? 'Actif' : 'Inactif'"></span>
+            <span class="badge badge-info" th:if="${fournisseur.typeFournisseur != null}"
+                  th:text="${fournisseur.typeFournisseur}"></span>
+            <span class="text-secondary small" th:text="'Fournisseur #' + ${fournisseur.id}"></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/fournisseurs}"><i class="bi bi-arrow-left"></i> Retour</a>
+        <a class="btn btn-outline-primary" th:href="@{/fournisseurs/{id}/edit(id=${fournisseur.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        <a class="btn btn-outline-secondary" th:href="@{/fournisseurs/{id}/export/pdf(id=${fournisseur.id})}" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
+        </a>
+    </div>
+</div>
 
-    <p>
-        <a th:href="@{/fournisseurs}">Retour à la liste</a> | 
-        <a th:href="@{/fournisseurs/{id}/edit(id=${fournisseur.id})}">Modifier ce fournisseur</a> |
-        <a th:href="@{/fournisseurs/{id}/export/pdf(id=${fournisseur.id})}" target="_blank">Exporter en PDF</a>
-    </p>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Achats enregistrés</div>
+                    <div class="kpi-value" th:text="${#lists.size(achats)}">0</div>
+                    <span class="small text-secondary"
+                          th:text="${fournisseur.typeFournisseur != null ? 'fournisseur ' + fournisseur.typeFournisseur : ''}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-cart3"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <h2>Informations Générales</h2>
-    <ul>
-        <li><strong>ID :</strong> <span th:text="${fournisseur.id}"></span></li>
-        <li><strong>Nom :</strong> <span th:text="${fournisseur.nom}"></span></li>
-        <li><strong>Type :</strong> <span th:text="${fournisseur.typeFournisseur}"></span></li>
-        <li><strong>Contact :</strong> <span th:text="${fournisseur.contact}"></span></li>
-        <li><strong>Email :</strong> <span th:text="${fournisseur.email}"></span></li>
-        <li><strong>Adresse :</strong> <span th:text="${fournisseur.adresse}"></span></li>
-        <li><strong>NIF / STAT :</strong> <span th:text="${fournisseur.nifStat}"></span></li>
-        <li><strong>Statut :</strong> <span th:text="${fournisseur.actif ? 'Actif' : 'Inactif'}"></span></li>
-        <li><strong>Observation :</strong> <span th:text="${fournisseur.observation}"></span></li>
-    </ul>
+<div class="panel mb-4">
+    <div class="panel-header"><h5>Informations générales</h5></div>
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-label">Nom</div>
+            <div class="info-value fw-semibold" th:text="${fournisseur.nom}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Type</div>
+            <div class="info-value" th:text="${fournisseur.typeFournisseur != null ? fournisseur.typeFournisseur : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Contact</div>
+            <div class="info-value"
+                 th:text="${fournisseur.contact != null and !fournisseur.contact.isBlank() ? fournisseur.contact : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Email</div>
+            <div class="info-value"
+                 th:text="${fournisseur.email != null and !fournisseur.email.isBlank() ? fournisseur.email : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">NIF / STAT</div>
+            <div class="info-value"
+                 th:text="${fournisseur.nifStat != null and !fournisseur.nifStat.isBlank() ? fournisseur.nifStat : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Statut</div>
+            <div class="info-value" th:text="${fournisseur.actif} ? 'Actif' : 'Inactif'">—</div>
+        </div>
+        <div class="info-row info-row-full">
+            <div class="info-label">Adresse</div>
+            <div class="info-value"
+                 th:text="${fournisseur.adresse != null and !fournisseur.adresse.isBlank() ? fournisseur.adresse : 'Non renseignée.'}">—</div>
+        </div>
+        <div class="info-row info-row-full">
+            <div class="info-label">Observation</div>
+            <div class="info-value"
+                 th:text="${fournisseur.observation != null and !fournisseur.observation.isBlank() ? fournisseur.observation : 'Aucune observation.'}">—</div>
+        </div>
+    </div>
+</div>
 
-    <h2>Historique des Achats</h2>
-    <table border="1">
-        <thead>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Historique des achats</h5>
+        <span class="result-count"
+              th:text="${#lists.size(achats)} + ' achat' + (${#lists.size(achats)} > 1 ? 's' : '')"></span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
             <tr>
-                <th>Référence Achat</th>
+                <th>Référence facture</th>
                 <th>Date</th>
-                <th>Montant Total</th>
+                <th class="text-end">Montant total (Ar)</th>
                 <th>Statut</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="achat : ${achats}">
-                <td th:text="${achat.reference}"></td>
-                <td th:text="${#dates.format(achat.dateAchat, 'dd/MM/yyyy')}"></td>
-                <td th:text="${achat.montantTotal}"></td>
-                <td th:text="${achat.statut}"></td>
+                <td class="fw-semibold"
+                    th:text="${achat.referenceFacture != null and !achat.referenceFacture.isBlank()
+                              ? achat.referenceFacture : 'Achat #' + achat.id}"></td>
+                <td th:text="${achat.dateAchat != null ? #temporals.format(achat.dateAchat, 'dd/MM/yyyy') : '—'}"></td>
+                <td class="text-end montant"
+                    th:text="${#numbers.formatDecimal(achat.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${achat.statutAchat.name() == 'VALIDE'} ? 'badge-success'
+                                        : (${achat.statutAchat.name() == 'ANNULE'} ? 'badge-danger' : 'badge-warning')"
+                          th:text="${achat.statutAchat}"></span>
+                </td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/achats/{id}(id=${achat.id})}" title="Voir l'achat">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
             </tr>
             <tr th:if="${#lists.isEmpty(achats)}">
-                <td colspan="4">Aucun achat enregistré pour ce fournisseur.</td>
+                <td colspan="5" class="text-center text-secondary py-4">Aucun achat enregistré pour ce fournisseur.</td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+</div>
 
+</main>
 </body>
 </html>

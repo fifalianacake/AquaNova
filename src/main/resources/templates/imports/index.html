@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Import de données</title>
+</head>
+<body>
+<main>
+
+<div class="success" th:if="${success}" th:text="${success}"></div>
+<div class="error" th:if="${error}" th:text="${error}"></div>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Import de données</h2>
+        <div class="text-secondary small">
+            Reprise des relevés de terrain depuis un fichier Excel (.xlsx)
+        </div>
+    </div>
+</div>
+
+<p class="hint">
+    Seules les données d'observation sont importables : pesées, mortalités et distributions
+    d'aliment. Les ventes, les achats et les lots restent saisis dans l'application, où leur
+    cycle de vie et leurs effets de bord sont contrôlés.
+    <br>
+    Chaque import se fait en deux temps : le fichier est d'abord analysé et vous est présenté,
+    rien n'est enregistré tant que vous n'avez pas confirmé.
+</p>
+
+<div class="row g-3">
+    <div class="col-md-6 col-xl-4" th:each="type : ${types}">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <h5 th:text="${type.libelle}">Type</h5>
+            </div>
+            <div class="p-3 d-flex flex-column gap-3">
+
+                <div>
+                    <div class="text-secondary small mb-1">Colonnes attendues</div>
+                    <div class="d-flex gap-1 flex-wrap">
+                        <span class="badge badge-info" th:each="col : ${type.colonnes}" th:text="${col}"></span>
+                    </div>
+                </div>
+
+                <a class="btn btn-outline-primary"
+                   th:href="@{/imports/{slug}/modele(slug=${type.slug})}">
+                    <i class="bi bi-download"></i> Télécharger le modèle
+                </a>
+
+                <form method="post" enctype="multipart/form-data"
+                      th:action="@{/imports/{slug}/apercu(slug=${type.slug})}"
+                      class="d-flex flex-column gap-2">
+                    <input class="form-control" type="file" name="fichier" accept=".xlsx" required>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-upload"></i> Analyser le fichier
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel mt-4">
+    <div class="panel-header"><h5>Comment procéder</h5></div>
+    <div class="p-3">
+        <ol class="mb-0">
+            <li>
+                Téléchargez le modèle : il contient les bons en-têtes, une ligne d'exemple, et des
+                <strong>listes déroulantes</strong> alimentées par vos lots actifs et vos aliments.
+                Vous n'avez donc pas à recopier un code à la main
+            </li>
+            <li>Remplissez une ligne par relevé, puis enregistrez le fichier au format <code>.xlsx</code></li>
+            <li>Déposez-le ici : chaque ligne est vérifiée et vous voyez le résultat avant tout enregistrement</li>
+            <li>
+                Confirmez. L'import est <strong>tout ou rien</strong> : si une ligne est refusée à
+                l'enregistrement, aucune n'est écrite
+            </li>
+        </ol>
+    </div>
+</div>
+
+</main>
+</body>
+</html>

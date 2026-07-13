@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Achat de provende</title>
+</head>
+<body>
+<main>
+
+<h2>Saisie achat de provende (Aliment)</h2>
+
+<p class="hint">
+    L'achat est enregistré en brouillon par défaut. Le stock d'aliments est alimenté automatiquement lors de la validation de l'achat.
+</p>
+
+<div class="error" th:if="${error}" th:text="${error}"></div>
+
+<form class="form-panel" method="post" th:action="@{/achats/provende}" th:object="${achatProvendeForm}">
+    <div class="mb-3">
+        <label class="form-label" for="dateAchat">Date d'achat *</label>
+        <input class="form-control" type="date" id="dateAchat" th:field="*{dateAchat}" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="fournisseurId">Fournisseur *</label>
+        <select class="form-select" id="fournisseurId" th:field="*{fournisseurId}" required>
+            <option value="">-- Choisir --</option>
+            <option th:each="f : ${fournisseurs}" th:value="${f.id}" th:text="${f.nom}"></option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Catégorie</label>
+        <div class="readonly-value"
+             th:text="${#lists.isEmpty(categoriesDepense) ? 'Aucune catégorie d achat de provende configurée' : categoriesDepense[0].code + ' - ' + categoriesDepense[0].libelle}"></div>
+        <input type="hidden" th:field="*{categorieDepenseId}" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="alimentId">Aliment *</label>
+        <select class="form-select" id="alimentId" th:field="*{alimentId}" required>
+            <option value="">-- Choisir --</option>
+            <option th:each="a : ${aliments}"
+                    th:value="${a.id}"
+                    th:text="${a.nom}"></option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="quantite">Quantité *</label>
+        <input class="form-control" type="number" step="0.001" min="0.001" id="quantite" th:field="*{quantite}" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="prixUnitaire">Prix unitaire *</label>
+        <input class="form-control" type="number" step="0.01" min="0" id="prixUnitaire" th:field="*{prixUnitaire}" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="referenceFacture">Référence facture</label>
+        <input class="form-control" type="text" id="referenceFacture" th:field="*{referenceFacture}" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="observation">Observation</label>
+        <textarea class="form-control" rows="4" id="observation" th:field="*{observation}"></textarea>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="validerDirectement" th:field="*{validerDirectement}" />
+        <label class="form-check-label" for="validerDirectement">
+            Valider directement et créer le mouvement de stock ENTREE
+        </label>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+        <button class="btn btn-primary" type="submit">Enregistrer l'achat de provende</button>
+        <a class="btn btn-secondary" th:href="@{/achats/provende}">Retour à la liste</a>
+    </div>
+</form>
+</main>
+</body>
+</html>

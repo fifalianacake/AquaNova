@@ -1,10 +1,13 @@
 package mg.itu.aquanova.production.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.production.dto.RecolteFilter;
 import mg.itu.aquanova.production.services.RecolteService;
 import mg.itu.aquanova.production.services.TypeRecolteService;
 import mg.itu.aquanova.production.dto.RecolteForm;
 import mg.itu.aquanova.production.services.LotService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,14 +15,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/recoltes")
 public class RecolteController {
+
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
 
     private final RecolteService recolteService;
     private final LotService lotService;
@@ -36,18 +39,12 @@ public class RecolteController {
 
     @GetMapping
     public String list(
-            @RequestParam(required = false) Long lotId,
-            @RequestParam(required = false) Long typeRecolteId,
-            @RequestParam(required = false) String dateFrom,
-            @RequestParam(required = false) String dateTo,
+            @ModelAttribute("filter") RecolteFilter filter,
+            @PageableDefault(size = 10, sort = "dateRecolte") Pageable pageable,
             Model model) {
 
-        model.addAttribute("recoltes", recolteService.rechercherRecoltes(
-                lotId,
-                typeRecolteId,
-                parseDate(dateFrom),
-                parseDate(dateTo)));
-        addFormLists(model);
+        model.addAttribute("recoltes", recolteService.lister(filter, pageable));
+        addListAttributes(model);
         return "production/recoltes/list";
     }
 
@@ -65,8 +62,7 @@ public class RecolteController {
                     form.getLotId(),
                     form.getTypeRecolteId(),
                     form.getDateRecolte(),
-                    form.getEffectifRecolte(),
-                    form.getPoidsTotal());
+                    form.getEffectifRecolte());
             return "redirect:/recoltes";
         } catch (IllegalArgumentException | IllegalStateException | EntityNotFoundException ex) {
             model.addAttribute("error", ex.getMessage());
@@ -86,14 +82,8 @@ public class RecolteController {
         model.addAttribute("typesRecolte", typeRecolteService.getAllTypeRecoltes());
     }
 
-    private LocalDate parseDate(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(value);
-        } catch (DateTimeParseException ex) {
-            return null;
-        }
+    private void addListAttributes(Model model) {
+        addFormLists(model);
+        model.addAttribute("pageSizes", PAGE_SIZES);
     }
 }

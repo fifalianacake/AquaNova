@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Formulaire Rôle</title>
 </head>
 <body>
+<main>
+    <h2>Formulaire d'ajout de rôle</h2>
 
-    <h1>Formulaire d'ajout de rôle</h1>
+    <form class="form-panel" th:action="@{/roles}" th:object="${role}" method="post">
 
-    <form th:action="@{/roles/save}" th:object="${role}" method="post">
-        
         <input type="hidden" th:field="*{id}" />
 
-        <label for="name">Nom du rôle :</label>
-        <input type="text" id="name" th:field="*{name}"  required>
-        <br><br>
+        <div class="mb-3">
+            <label class="form-label" for="name">Nom du rôle</label>
+            <input class="form-control" type="text" id="name" th:field="*{name}" required>
+        </div>
 
-        <button type="submit">Enregistrer</button>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/roles}">Retour à la liste</a>
+        </div>
     </form>
-
-    <br>
-    <a th:href="@{/roles}">Annuler et retourner à la liste</a>
-
+</main>
 </body>
 </html>

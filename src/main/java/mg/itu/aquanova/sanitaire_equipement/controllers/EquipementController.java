@@ -61,13 +61,13 @@ public String formulaire(Model model){
     return "sanitaire_equipement/equipements/form";
 }
 
-    @PostMapping("/save")
+    @PostMapping
     public String enregistrer(@ModelAttribute Equipement equipement) {
         equipementService.creer(equipement);
         return "redirect:/equipements";
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/{id}/edit")
     public String formulaireModification(@PathVariable Long id, Model model) {
         model.addAttribute("equipement", equipementService.trouverParId(id));
         model.addAttribute("types", typeService.listerTous());
@@ -76,7 +76,7 @@ public String formulaire(Model model){
         return "sanitaire_equipement/equipements/form";
     }
 
-    @PostMapping("/edit/{id}")
+    @PostMapping("/{id}")
     public String modifier(@PathVariable Long id, @ModelAttribute Equipement equipement) {
         equipementService.modifier(id, equipement);
         return "redirect:/equipements/" + id;
@@ -88,7 +88,7 @@ public String formulaire(Model model){
         return "sanitaire_equipement/equipements/fiche";
     }
 
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     public String supprimer(@PathVariable Long id) {
         equipementService.supprimer(id);
         return "redirect:/equipements";

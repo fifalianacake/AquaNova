@@ -1,11 +1,12 @@
 package mg.itu.aquanova.production.services;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -44,78 +45,94 @@ public class LotService {
     }
 
     public Page<LotModels> lister(LotFilter filter, Pageable pageable) {
-        java.util.List<LotModels> lots = repository.findAll();
-        java.util.stream.Stream<LotModels> stream = lots.stream();
+        return repository.findAll(specification(filter), pageable);
+    }
 
-        if (filter != null) {
+    private Specification<LotModels> specification(LotFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter == null) {
+                return predicates;
+            }
             if (filter.getId() != null) {
-                stream = stream.filter(l -> l.getId() != null && l.getId().equals(filter.getId()));
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
             }
             if (filter.getCode() != null && !filter.getCode().isBlank()) {
-                String lower = filter.getCode().toLowerCase();
-                stream = stream.filter(l -> l.getCode() != null && l.getCode().toLowerCase().contains(lower));
+                predicates = cb.and(predicates, cb.like(cb.lower(root.get("code")), "%" + filter.getCode().trim().toLowerCase() + "%"));
             }
             if (filter.getEspeceId() != null) {
-                stream = stream.filter(l -> l.getEspece() != null && l.getEspece().getId() != null && l.getEspece().getId().equals(filter.getEspeceId()));
+                predicates = cb.and(predicates, cb.equal(root.get("espece").get("id"), filter.getEspeceId()));
             }
             if (filter.getBassinId() != null) {
-                stream = stream.filter(l -> l.getBassin() != null && l.getBassin().getId() != null && l.getBassin().getId().equals(filter.getBassinId()));
+                predicates = cb.and(predicates, cb.equal(root.get("bassin").get("id"), filter.getBassinId()));
             }
             if (filter.getStadeId() != null) {
-                stream = stream.filter(l -> l.getStadeCroissance() != null && l.getStadeCroissance().getId() != null && l.getStadeCroissance().getId().equals(filter.getStadeId()));
+                predicates = cb.and(predicates, cb.equal(root.get("stadeCroissance").get("id"), filter.getStadeId()));
             }
             if (filter.getStatutId() != null) {
-                stream = stream.filter(l -> l.getStatutLot() != null && l.getStatutLot().getId() != null && l.getStatutLot().getId().equals(filter.getStatutId()));
+                predicates = cb.and(predicates, cb.equal(root.get("statutLot").get("id"), filter.getStatutId()));
+            } else {
+                predicates = cb.and(predicates, cb.or(
+                        cb.isNull(root.get("statutLot")),
+                        cb.notEqual(root.get("statutLot").get("libelle"), StatutLotEnum.ANNULE)));
             }
-
-            java.time.LocalDate fromDate = null;
-            java.time.LocalDate toDate = null;
-            try {
-                if (filter.getDateFrom() != null && !filter.getDateFrom().isBlank()) fromDate = java.time.LocalDate.parse(filter.getDateFrom());
-            } catch (java.time.format.DateTimeParseException ex) {
-                fromDate = null;
+            if (filter.getDateFrom() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateMiseEnCharge"), filter.getDateFrom()));
             }
-            try {
-                if (filter.getDateTo() != null && !filter.getDateTo().isBlank()) toDate = java.time.LocalDate.parse(filter.getDateTo());
-            } catch (java.time.format.DateTimeParseException ex) {
-                toDate = null;
-            }
-            if (fromDate != null) {
-                java.time.LocalDate fd = fromDate;
-                stream = stream.filter(l -> l.getDateMiseEnCharge() != null && !l.getDateMiseEnCharge().isBefore(fd));
-            }
-            if (toDate != null) {
-                java.time.LocalDate td = toDate;
-                stream = stream.filter(l -> l.getDateMiseEnCharge() != null && !l.getDateMiseEnCharge().isAfter(td));
+            if (filter.getDateTo() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateMiseEnCharge"), filter.getDateTo()));
             }
             if (filter.getEffectifMin() != null) {
-                stream = stream.filter(l -> l.getEffectifActuel() != null && l.getEffectifActuel() >= filter.getEffectifMin());
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("effectifActuel"), filter.getEffectifMin()));
             }
             if (filter.getEffectifMax() != null) {
-                stream = stream.filter(l -> l.getEffectifActuel() != null && l.getEffectifActuel() <= filter.getEffectifMax());
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("effectifActuel"), filter.getEffectifMax()));
             }
-        }
-        
-        List<LotModels> resultatFiltre = stream.toList();
 
-        // On calcule l'index de départ
-        int start = (int) pageable.getOffset();
-        
-        // On calcule l'index de fin 
-        int end = Math.min((start + pageable.getPageSize()), resultatFiltre.size());
-
-        // Sécurité au cas où l'index de départ dépasse la taille de la liste
-        List<LotModels> pageContenu = new ArrayList<>();
-        if (start <= resultatFiltre.size()) {
-            pageContenu = resultatFiltre.subList(start, end);
-        }
-
-        // (avec la sous-liste, les infos de pagination, et la taille totale)
-        return new PageImpl<>(pageContenu, pageable, resultatFiltre.size());
+            return predicates;
+        };
     }
 
     public LotModels trouverParId(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Lot introuvable: " + id));
+    }
+
+    private static final DateTimeFormatter FORMAT_JOUR_CODE = DateTimeFormatter.BASIC_ISO_DATE; // yyyyMMdd
+
+    public String genererCodeLot(LocalDate date) {
+        LocalDate jour = date != null ? date : LocalDate.now();
+        String prefixe = "LOT-" + jour.format(FORMAT_JOUR_CODE) + "-";
+        int prochaineSequence = repository.findFirstByCodeStartingWithOrderByCodeDesc(prefixe)
+                .map(lot -> extraireSequence(lot.getCode()) + 1)
+                .orElse(1);
+        return prefixe + String.format("%03d", prochaineSequence);
+    }
+
+    private int extraireSequence(String code) {
+        if (code == null) {
+            return 0;
+        }
+        int dernierTiret = code.lastIndexOf('-');
+        try {
+            return Integer.parseInt(code.substring(dernierTiret + 1));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Le code de lot est l'identifiant métier du lot (il sert notamment de clé de regroupement
+     * dans les statistiques de vente) : il doit rester unique. {@code idLotIgnore} permet de
+     * ne pas se comparer à soi-même lors d'une modification.
+     */
+    public void verifierCodeDisponible(String code, Long idLotIgnore) {
+        boolean dejaPris = idLotIgnore == null
+                ? repository.existsByCode(code)
+                : repository.existsByCodeAndIdNot(code, idLotIgnore);
+        if (dejaPris) {
+            throw new IllegalArgumentException("Le code de lot « " + code + " » est déjà utilisé.");
+        }
     }
 
     public LotModels creer(LotModels lot) {
@@ -130,6 +147,8 @@ public class LotService {
     public LotModels modifier(Long id, LotModels lot) {
         validerLot(lot, id);
         LotModels exist = trouverParId(id);
+        boolean etaitActif = estActif(exist.getStatutLot());
+        Bassin ancienBassin = exist.getBassin();
         exist.setCode(lot.getCode());
         exist.setEspece(lot.getEspece());
         exist.setBassin(lot.getBassin());
@@ -141,21 +160,38 @@ public class LotService {
         exist.setPoidsMoyenInitial(lot.getPoidsMoyenInitial());
         exist.setPoidsMoyenActuel(lot.getPoidsMoyenActuel());
         exist.setObservation(lot.getObservation());
+
+        if (etaitActif && !estActif(exist.getStatutLot())) {
+            marquerBassinLibre(ancienBassin);
+        }
         return repository.save(exist);
     }
 
     public void supprimer(Long id) {
-        LotModels l = trouverParId(id);
-        repository.delete(l);
+        LotModels lot = trouverParId(id);
+        StatutLotModels statutAnnule = statutLotRepository.findByLibelle(StatutLotEnum.ANNULE)
+                .orElseThrow(() -> new EntityNotFoundException("Statut de lot ANNULE introuvable."));
+
+        boolean etaitActif = estActif(lot.getStatutLot());
+        lot.setStatutLot(statutAnnule);
+
+        if (etaitActif) {
+            marquerBassinLibre(lot.getBassin());
+        }
+
+        repository.save(lot);
     }
 
-    private void validerLot(LotModels lot, Long idLotIgnore) {
+    public void validerLot(LotModels lot, Long idLotIgnore) {
         if (lot == null) {
             throw new IllegalArgumentException("Le lot est obligatoire.");
         }
         if (lot.getCode() == null || lot.getCode().trim().isEmpty()) {
             throw new IllegalArgumentException("Le code du lot est obligatoire.");
         }
+        lot.setCode(lot.getCode().trim());
+        verifierCodeDisponible(lot.getCode(), idLotIgnore);
+
         if (lot.getEspece() == null || lot.getEspece().getId() == null) {
             throw new IllegalArgumentException("Le lot doit être associé à une espèce.");
         }
@@ -179,7 +215,9 @@ public class LotService {
     }
 
     private boolean estActif(StatutLotModels statut) {
-        return statut != null && statut.getLibelle() != StatutLotEnum.CLOTURE;
+        return statut != null
+                && statut.getLibelle() != StatutLotEnum.CLOTURE
+                && statut.getLibelle() != StatutLotEnum.ANNULE;
     }
 
     private void initialiserValeursActuelles(LotModels lot) {
@@ -197,10 +235,24 @@ public class LotService {
         lot.setBassin(bassinsRepository.save(bassin));
     }
 
+    private void marquerBassinLibre(Bassin bassinLot) {
+        if (bassinLot == null || bassinLot.getId() == null) {
+            return;
+        }
+
+        Bassin bassin = bassinsRepository.findById(bassinLot.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Bassin introuvable: " + bassinLot.getId()));
+        StatutBassin statutLibre = statutBassinRepository.findByLibelle(LibelleStatutBassin.LIBRE)
+                .orElseThrow(() -> new EntityNotFoundException("Statut de bassin LIBRE introuvable."));
+
+        bassin.setStatut(statutLibre);
+        bassinsRepository.save(bassin);
+    }
+
     private void verifierBassinDisponible(Long bassinId, Long idLotIgnore) {
-        List<LotModels> lotsActifsDuBassin = repository.findByBassinIdAndStatutLotLibelleNot(
+        List<LotModels> lotsActifsDuBassin = repository.findByBassinIdAndStatutLotLibelleNotIn(
                 bassinId,
-                StatutLotEnum.CLOTURE);
+                List.of(StatutLotEnum.CLOTURE, StatutLotEnum.ANNULE));
 
         boolean occupeParUnAutreLot = lotsActifsDuBassin.stream()
                 .anyMatch(lot -> idLotIgnore == null || !idLotIgnore.equals(lot.getId()));

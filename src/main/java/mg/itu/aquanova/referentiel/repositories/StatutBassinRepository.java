@@ -11,4 +11,6 @@ import mg.itu.aquanova.referentiel.models.StatutBassin;
 @Repository
 public interface StatutBassinRepository extends JpaRepository<StatutBassin, Long> {
     Optional<StatutBassin> findByLibelle(LibelleStatutBassin libelle);
+
+    boolean existsByLibelle(LibelleStatutBassin libelle);
 }

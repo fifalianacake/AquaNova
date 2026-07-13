@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Historique des alertes</title>
+</head>
+<body>
+<main>
+
+<div class="toolbar">
+    <a class="btn btn-outline-secondary"
+       th:href="@{/alertes/historique/export/pdf(
+            moduleSource=${filter.moduleSource},
+            typeAlerte=${filter.typeAlerte},
+            niveauCriticite=${filter.niveauCriticite},
+            statut=${filter.statut},
+            dateDebut=${filter.dateDebut},
+            dateFin=${filter.dateFin},
+            lotId=${filter.lotId},
+            bassinId=${filter.bassinId})}">
+        <i class="bi bi-download"></i> Exporter en PDF
+    </a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Historique des alertes</h5>
+        <span class="result-count"
+              th:text="${alertes.totalElements} + ' alerte' + (${alertes.totalElements} > 1 ? 's' : '') + ' trouvée' + (${alertes.totalElements} > 1 ? 's' : '')"></span>
+    </div>
+
+    <form method="get" th:action="@{/alertes/historique}" class="filters-bar">
+        <input type="hidden" name="page" value="0" />
+        <select class="form-select" name="moduleSource">
+            <option value="">Tous les modules</option>
+            <option th:each="m : ${moduleSources}"
+                    th:value="${m}"
+                    th:text="${m}"
+                    th:selected="${filter.moduleSource == m}"></option>
+        </select>
+        <select class="form-select" name="typeAlerte">
+            <option value="">Tous les types</option>
+            <option th:each="t : ${typesAlerte}"
+                    th:value="${t}"
+                    th:text="${t}"
+                    th:selected="${filter.typeAlerte == t}"></option>
+        </select>
+        <select class="form-select" name="niveauCriticite">
+            <option value="">Toutes les criticités</option>
+            <option th:each="n : ${niveauxCriticite}"
+                    th:value="${n}"
+                    th:text="${n}"
+                    th:selected="${filter.niveauCriticite == n}"></option>
+        </select>
+        <select class="form-select" name="statut">
+            <option value="">Tous les statuts</option>
+            <option th:each="s : ${statutsAlerte}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${filter.statut == s}"></option>
+        </select>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}">
+        </div>
+        <select class="form-select" name="lotId">
+            <option value="">Tous les lots</option>
+            <option th:each="l : ${lots}"
+                    th:value="${l.id}"
+                    th:text="${l.code}"
+                    th:selected="${filter.lotId == l.id}"></option>
+        </select>
+        <select class="form-select" name="bassinId">
+            <option value="">Tous les bassins</option>
+            <option th:each="b : ${bassins}"
+                    th:value="${b.id}"
+                    th:text="${b.reference}"
+                    th:selected="${filter.bassinId == b.id}"></option>
+        </select>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Filtrer</button>
+        <a th:href="@{/alertes/historique}" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Date création</th>
+                <th>Date résolution</th>
+                <th>Module</th>
+                <th>Type</th>
+                <th>Criticité</th>
+                <th>Statut</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${alertes.content}">
+                <td th:text="${#temporals.format(a.dateCreation, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${a.dateResolution != null ? #temporals.format(a.dateResolution, 'dd/MM/yyyy HH:mm') : '—'}"></td>
+                <td th:text="${a.moduleSource}"></td>
+                <td th:text="${a.typeAlerte}"></td>
+                <td>
+                    <span class="badge"
+                          th:text="${a.niveauCriticite}"
+                          th:classappend="${a.niveauCriticite.name() == 'CRITIQUE' ? 'badge-danger' : (a.niveauCriticite.name() == 'AVERTISSEMENT' ? 'badge-warning' : 'badge-info')}">
+                    </span>
+                </td>
+                <td>
+                    <span class="badge"
+                          th:text="${a.statut}"
+                          th:classappend="${a.statut.name() == 'RESOLUE' ? 'badge-success' : (a.statut.name() == 'IGNOREE' ? 'badge-secondary' : 'badge-info')}">
+                    </span>
+                </td>
+                <td th:text="${a.message}"></td>
+            </tr>
+            <tr th:if="${alertes.empty}">
+                <td colspan="7" class="text-center text-secondary py-4">Aucune alerte ne correspond à ces critères.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/tableau :: tableFooter(${alertes})}"></div>
+</div>
+</main>
+</body>
+</html>

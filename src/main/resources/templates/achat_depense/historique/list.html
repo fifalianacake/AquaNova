@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Historique achats et dépenses</title>
+</head>
+<body>
+<main>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Historique des achats et dépenses</h5>
+        <span class="result-count"
+              th:text="${historiques.totalElements} + ' opération' + (${historiques.totalElements} > 1 ? 's' : '') + ' trouvée' + (${historiques.totalElements} > 1 ? 's' : '')"></span>
+    </div>
+
+    <form method="get" th:action="@{/achats-depenses/historique}" th:object="${filter}" class="filters-bar">
+        <input type="hidden" name="page" value="0" />
+        <select class="form-select" th:field="*{typeOperation}">
+            <option value="">Toutes les opérations</option>
+            <option th:each="op : ${operations}" th:value="${op}" th:text="${op.libelle}"></option>
+        </select>
+        <select class="form-select" th:field="*{fournisseurId}">
+            <option value="">Tous les fournisseurs</option>
+            <option th:each="f : ${fournisseurs}" th:value="${f.id}" th:text="${f.nom}"></option>
+        </select>
+        <select class="form-select" th:field="*{categorieDepenseId}">
+            <option value="">Toutes les catégories</option>
+            <option th:each="c : ${categoriesDepense}" th:value="${c.id}"
+                    th:text="${c.code + ' - ' + c.libelle}"></option>
+        </select>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" th:field="*{dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" th:field="*{dateFin}">
+        </div>
+        <input class="form-control fc-sm" type="number" min="0" step="0.01" th:field="*{montantMin}" placeholder="Mt. min">
+        <input class="form-control fc-sm" type="number" min="0" step="0.01" th:field="*{montantMax}" placeholder="Mt. max">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/achats-depenses/historique}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Fournisseur</th>
+                <th>Catégorie</th>
+                <th>Détails</th>
+                <th class="text-end">Montant (Ar)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${historiques.content}">
+                <td th:text="${item.id}"></td>
+                <td><span class="badge badge-info" th:text="${item.typeOperation.libelle}"></span></td>
+                <td th:text="${item.date != null ? #temporals.format(item.date, 'dd/MM/yyyy') : '—'}"></td>
+                <td class="fw-semibold" th:text="${item.fournisseur ?: '—'}"></td>
+                <td th:text="${item.categorie}"></td>
+                <td th:text="${item.details ?: '—'}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(item.montant, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            </tr>
+            <tr th:if="${historiques.empty}">
+                <td colspan="7" class="text-center text-secondary py-4">Aucune opération ne correspond à ces critères.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/tableau :: tableFooter(${historiques})}"></div>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Liste des Catégories de Dépenses</title>
+</head>
+<body>
+<main>
+
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/categories-depenses/new}"><i class="bi bi-plus-lg"></i> Ajouter une catégorie</a>
+</div>
+
+<div class="error" th:if="${error}">
+    <p th:text="${error}"></p>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des catégories de dépenses</h5>
+        <span class="result-count" th:text="${#lists.size(categories)} + ' catégorie(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Code</th>
+                <th>Libellé</th>
+                <th>Description</th>
+                <th>Type de Catégorie</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cat : ${categories}">
+                <td th:text="${cat.id}"></td>
+                <td class="fw-semibold" th:text="${cat.code}"></td>
+                <td th:text="${cat.libelle}"></td>
+                <td th:text="${cat.description}"></td>
+                <td th:text="${cat.typeCategorie}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/categories-depenses/{id}/edit(id=${cat.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <form class="inline-form" th:action="@{/categories-depenses/{id}/delete(id=${cat.id})}" method="POST">
+                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Supprimer"
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');"><i class="bi bi-trash3"></i></button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(categories)}">
+                <td colspan="6" class="text-center text-secondary py-4">Aucune catégorie enregistrée.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
+</body>
+</html>

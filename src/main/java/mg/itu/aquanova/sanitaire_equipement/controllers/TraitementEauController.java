@@ -102,7 +102,7 @@ public class TraitementEauController {
         return "sanitaire_equipement/traitements-eau/fiche";
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/{id}/edit")
     public String afficherFormulaireModification(
             @PathVariable Long id,
             Model model,
@@ -117,7 +117,7 @@ public class TraitementEauController {
         return "sanitaire_equipement/traitements-eau/formulaire";
     }
 
-    @PostMapping("/edit/{id}")
+    @PostMapping("/{id}")
     public String modifier(
             @PathVariable Long id,
             @ModelAttribute("traitement") TraitementEau traitement,
@@ -142,7 +142,7 @@ public class TraitementEauController {
         }
     }
 
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     public String supprimer(@PathVariable Long id, HttpSession session) {
         if (session.getAttribute("user") == null) {
             return "redirect:/login";

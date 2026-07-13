@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Dashboard ventes</title>
+</head>
+<body>
+<main>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0">Dashboard ventes</h2>
+        <div>
+            <a th:href="@{/ventes}" class="btn btn-outline-primary btn-sm">Liste des ventes</a>
+            <a th:href="@{/ventes/new}" class="btn btn-primary btn-sm">Nouvelle vente</a>
+        </div>
+    </div>
+
+    <form th:action="@{/ventes/dashboard}" method="get" class="card card-body flex-row align-items-end gap-3 mb-4 flex-wrap">
+        <div>
+            <label class="form-label" for="debut">Date début</label>
+            <input class="form-control" id="debut" type="date" name="debut" th:value="${debut}">
+        </div>
+        <div>
+            <label class="form-label" for="fin">Date fin</label>
+            <input class="form-control" id="fin" type="date" name="fin" th:value="${fin}">
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Afficher</button>
+        </div>
+    </form>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Chiffre d'affaires</div>
+                        <div class="kpi-value"
+                             th:text="${stats.chiffreAffaires != null ? stats.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-cash-coin"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Volume écoulé</div>
+                        <div class="kpi-value"
+                             th:text="${stats.volumeEcoule != null ? stats.volumeEcoule + ' kg' : '0 kg'}">0 kg</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-droplet-half"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Nombre de ventes</div>
+                        <div class="kpi-value"
+                             th:text="${stats.nombreVentes != null ? stats.nombreVentes : 0}">0</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-receipt"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-secondary small">Prix moyen par kg</div>
+                        <div class="kpi-value"
+                             th:text="${stats.prixMoyenKg != null ? stats.prixMoyenKg + ' Ar/kg' : '0 Ar/kg'}">0 Ar/kg</div>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Chiffre d'affaires par jour</h3>
+                    <canvas id="caParJourChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Volume vendu par lot</h3>
+                    <canvas id="volumeParLotChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Chiffre d'affaires par client</h3>
+                    <canvas id="caClientChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">Top 5 clients par CA</h3>
+                    <canvas id="top5Chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="h6">Top clients</h3>
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Nombre de ventes</th>
+                        <th class="text-end">Volume acheté (kg)</th>
+                        <th class="text-end">Chiffre d'affaires (Ar)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="client : ${topClients}">
+                        <td th:text="${client.clientNom}">Client</td>
+                        <td th:text="${client.nombreVentes}">0</td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(client.volumeAchete != null ? client.volumeAchete : 0, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td class="text-end montant" th:text="${#numbers.formatDecimal(client.chiffreAffaires != null ? client.chiffreAffaires : 0, 1, 'WHITESPACE', 0, 'COMMA')}">0</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(topClients)}">
+                        <td colspan="4">Aucun client trouvé.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="h6">Volumes par lot et récolte</h3>
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Lot</th>
+                        <th>Récolte</th>
+                        <th class="text-end">Poids vendu (kg)</th>
+                        <th class="text-end">Effectif vendu</th>
+                        <th class="text-end">Montant total (Ar)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ligne : ${parLot}">
+                        <td th:text="${ligne.lotNom}">Lot</td>
+                        <td th:text="${ligne.recolteReference}">Récolte</td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(ligne.poidsVendu != null ? ligne.poidsVendu : 0, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td class="text-end" th:text="${ligne.effectifVendu != null ? ligne.effectifVendu : 0}">0</td>
+                        <td class="text-end montant" th:text="${#numbers.formatDecimal(ligne.montantTotal != null ? ligne.montantTotal : 0, 1, 'WHITESPACE', 0, 'COMMA')}">0</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(parLot)}">
+                        <td colspan="5">Aucune donnée trouvée.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        const caParJourLabels = JSON.parse(/*[[${caParJourLabels}]]*/ '[]');
+        const caParJourValues = JSON.parse(/*[[${caParJourValues}]]*/ '[]');
+        const volumeParLotLabels = JSON.parse(/*[[${volumeParLotLabels}]]*/ '[]');
+        const volumeParLotValues = JSON.parse(/*[[${volumeParLotValues}]]*/ '[]');
+        const caClientLabels = JSON.parse(/*[[${caClientLabels}]]*/ '[]');
+        const caClientValues = JSON.parse(/*[[${caClientValues}]]*/ '[]');
+        const top5Labels = JSON.parse(/*[[${top5Labels}]]*/ '[]');
+        const top5Values = JSON.parse(/*[[${top5Values}]]*/ '[]');
+
+        const chartColors = [
+            '#1B9E8F',
+            '#2B5B8A',
+            '#DFA032',
+            '#7FB3AC',
+            '#116B60',
+            '#5D7B78',
+            '#C4534B',
+            '#0C3A43'
+        ];
+
+        new Chart(document.getElementById('caParJourChart'), {
+            type: 'line',
+            data: {
+                labels: caParJourLabels,
+                datasets: [{
+                    label: "Chiffre d'affaires",
+                    data: caParJourValues,
+                    borderColor: '#1B9E8F',
+                    backgroundColor: 'rgba(27, 158, 143, 0.12)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Ariary'
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('volumeParLotChart'), {
+            type: 'bar',
+            data: {
+                labels: volumeParLotLabels,
+                datasets: [{
+                    label: 'Volume vendu',
+                    data: volumeParLotValues,
+                    backgroundColor: chartColors
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Kg'
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('caClientChart'), {
+            type: 'pie',
+            data: {
+                labels: caClientLabels,
+                datasets: [{
+                    label: "Répartition du chiffre d'affaires",
+                    data: caClientValues,
+                    backgroundColor: chartColors
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('top5Chart'), {
+            type: 'bar',
+            data: {
+                labels: top5Labels,
+                datasets: [{
+                    label: "Chiffre d'affaires",
+                    data: top5Values,
+                    backgroundColor: '#1B9E8F'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Ariary'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</main>
+</body>
+</html>

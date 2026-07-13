@@ -40,9 +40,7 @@ public class FournisseurService {
         return repository.save(fournisseur);
     }
 
-    public void supprimer(Long id) {
-        // repository.deleteById(id);
-    
+    public void desactiver(Long id) {
         Fournisseur fournisseur = trouverParId(id);
         fournisseur.setActif(false);
         repository.save(fournisseur);

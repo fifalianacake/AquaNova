@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Modifier Client</title>
+</head>
+<body>
+<main>
+    <h2>Modifier le client n°<span th:text="${client.id}"></span></h2>
+
+    <div class="error" th:if="${erreur}" th:text="${erreur}"></div>
+
+    <form class="form-panel" th:action="@{/clients/{id}/edit(id=${client.id})}" th:object="${client}" method="post">
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom / Raison Sociale *</label>
+            <input type="text" id="nom" th:field="*{nom}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="typeClient">Type de client *</label>
+            <select id="typeClient" th:field="*{typeClient.id}" class="form-select" required>
+                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="contact">Contact téléphonique</label>
+            <input type="text" id="contact" th:field="*{contact}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="email">Adresse Email</label>
+            <input type="email" id="email" th:field="*{email}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="adresse">Adresse physique</label>
+            <input type="text" id="adresse" th:field="*{adresse}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="actif">Statut du compte</label>
+            <select id="actif" th:field="*{actif}" class="form-select">
+                <option value="true">Actif</option>
+                <option value="false">Désactivé / Bloqué</option>
+            </select>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+            <a th:href="@{/clients}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

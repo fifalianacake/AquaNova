@@ -2,6 +2,7 @@ package mg.itu.aquanova.achat.models;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.referentiel.models.Aliment;
+import mg.itu.aquanova.referentiel.models.Bassin;
 import mg.itu.aquanova.referentiel.models.EspecesModels;
 
 @Entity
@@ -47,16 +49,19 @@ public class LigneAchat {
     private Aliment aliment;
 
     @ManyToOne
-    @JoinColumn(name = "id_intrant")
-    private Intrant intrant;
-
-    @ManyToOne
     @JoinColumn(name = "id_espece")
     private EspecesModels espece;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_lot")
     private LotModels lot;
+
+    @ManyToOne
+    @JoinColumn(name = "id_bassin")
+    private Bassin bassin;
+
+    @Column(name = "poids_moyen", precision = 10, scale = 2)
+    private BigDecimal poidsMoyen;
 
     @Column(columnDefinition = "TEXT")
     private String observation;
@@ -128,14 +133,6 @@ public class LigneAchat {
         this.aliment = aliment;
     }
 
-    public Intrant getIntrant() {
-        return intrant;
-    }
-
-    public void setIntrant(Intrant intrant) {
-        this.intrant = intrant;
-    }
-
     public EspecesModels getEspece() {
         return espece;
     }
@@ -150,6 +147,22 @@ public class LigneAchat {
 
     public void setLot(LotModels lot) {
         this.lot = lot;
+    }
+
+    public Bassin getBassin() {
+        return bassin;
+    }
+
+    public void setBassin(Bassin bassin) {
+        this.bassin = bassin;
+    }
+
+    public BigDecimal getPoidsMoyen() {
+        return poidsMoyen;
+    }
+
+    public void setPoidsMoyen(BigDecimal poidsMoyen) {
+        this.poidsMoyen = poidsMoyen;
     }
 
     public String getObservation() {

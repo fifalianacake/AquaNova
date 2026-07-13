@@ -1,14 +1,27 @@
-<h2>Form Type Aliment</h2>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Form Type Aliment</title>
+</head>
+<body>
+<main>
+    <h2>Form Type Aliment</h2>
 
-<form action="/type-aliment" method="post" th:object="${type}">
-    <input type="hidden" th:field="*{id}" />
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-```
-Nom :
-<input type="text" th:field="*{nom}" />
-<br/>
+    <form class="form-panel" action="/types-aliments" method="post" th:object="${type}">
+        <input type="hidden" th:field="*{id}" />
 
-<button type="submit">Save</button>
-```
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom</label>
+            <input class="form-control" type="text" id="nom" th:field="*{nom}" />
+        </div>
 
-</form>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/types-aliments}">Retour à la liste</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

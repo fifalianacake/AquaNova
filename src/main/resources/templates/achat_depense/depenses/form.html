@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Dépense</title>
+</head>
+<body>
+<main>
+
+    <h2 th:text="${depense.id == null ? 'Nouvelle dépense' : 'Modifier dépense'}"></h2>
+
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="form-panel" method="post" th:object="${depense}"
+        th:action="${depense.id == null} ? @{/depenses} : @{/depenses/{id}(id=${depense.id})}">
+
+        <div class="mb-3">
+            <label class="form-label" for="dateDepense">Date *</label>
+            <input class="form-control" type="date" id="dateDepense" th:field="*{dateDepense}" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="categorieDepense">Catégorie *</label>
+            <select class="form-select" id="categorieDepense" th:field="*{categorieDepense.id}" required>
+                <option value="">-- Choisir --</option>
+                <option th:each="c : ${categoriesDepense}" th:value="${c.id}"
+                    th:text="${c.code + ' - ' + c.libelle}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="libelle">Libellé *</label>
+            <input class="form-control" type="text" id="libelle" th:field="*{libelle}" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="totalMontant">Montant total</label>
+            <input type="number" step="0.01" th:field="*{montant}" readonly class="form-control readonly"
+                id="totalMontant" />
+        </div>
+
+        <fieldset class="mb-3">
+            <legend>Lignes de paiement</legend>
+
+            <div id="paiementsContainer">
+                <div th:each="paiement, stat : *{paiements}" class="paiement-line d-flex gap-2 align-items-end flex-wrap mb-3">
+
+                    <div>
+                        <label class="form-label">Mode *</label>
+                        <select class="form-select" th:field="*{paiements[__${stat.index}__].modePaiement}" required>
+                            <option value="">-- Choisir --</option>
+                            <option th:each="mode : ${T(mg.itu.aquanova.achat.models.ModePaiementEnum).values()}"
+                                th:value="${mode}" th:text="${mode.libelle}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Montant *</label>
+                        <input type="number" step="0.01" min="0" th:field="*{paiements[__${stat.index}__].montant}"
+                            class="form-control montant-input" required />
+                    </div>
+
+                    <div>
+                        <label class="form-label">Référence</label>
+                        <input class="form-control" type="text" th:field="*{paiements[__${stat.index}__].reference}" />
+                    </div>
+
+                    <div>
+                        <label class="form-label">Observation</label>
+                        <input class="form-control" type="text" th:field="*{paiements[__${stat.index}__].observation}" />
+                    </div>
+
+                    <div>
+                        <button type="button" class="btn btn-danger" onclick="removeLine(this)">✕</button>
+                    </div>
+
+                    <input type="hidden" th:field="*{paiements[__${stat.index}__].id}" />
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary" onclick="addPaymentLine()">
+                + Ajouter une ligne
+            </button>
+        </fieldset>
+
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" th:field="*{observation}" rows="3"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a th:href="@{/depenses}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+    </form>
+
+    <script>
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('.montant-input').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalMontant').value = total.toFixed(2);
+        }
+
+        document.addEventListener('input', function (e) {
+            if (e.target.classList.contains('montant-input')) {
+                updateTotal();
+            }
+        });
+
+        function addPaymentLine() {
+            const container = document.getElementById('paiementsContainer');
+            const index = container.children.length;
+
+            const div = document.createElement('div');
+            div.className = 'paiement-line d-flex gap-2 align-items-end flex-wrap mb-3';
+
+            div.innerHTML = `
+            <div>
+                <label class="form-label">Mode *</label>
+                <select class="form-select" name="paiements[${index}].modePaiement" required>
+                    <option value="">-- Choisir --</option>
+                    <option value="ESPECES">Espèces</option>
+                    <option value="MOBILE_MONEY">Mobile money</option>
+                    <option value="VIREMENT">Virement</option>
+                    <option value="CHEQUE">Chèque</option>
+                    <option value="AUTRE">Autre</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label">Montant *</label>
+                <input type="number" step="0.01" min="0"
+                       name="paiements[${index}].montant"
+                       class="form-control montant-input" required />
+            </div>
+
+            <div>
+                <label class="form-label">Référence</label>
+                <input class="form-control" type="text" name="paiements[${index}].reference" />
+            </div>
+
+            <div>
+                <label class="form-label">Observation</label>
+                <input class="form-control" type="text" name="paiements[${index}].observation" />
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-danger" onclick="removeLine(this)">✕</button>
+            </div>
+
+            <input type="hidden" name="paiements[${index}].id" />
+        `;
+
+            container.appendChild(div);
+        }
+
+        function removeLine(button) {
+            button.closest('.paiement-line').remove();
+            updateTotal();
+        }
+    </script>
+</main>
+</body>
+</html>

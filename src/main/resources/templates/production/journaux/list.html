@@ -1,80 +1,81 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Journaux des lots</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    </style>
+    <title>AquaNova - Journaux des lots</title>
 </head>
 <body>
-<h1>Journaux des lots</h1>
+<main>
 
-<p>
-    <a th:href="@{/lots}">Retour à la liste des lots</a>
-</p>
+<div class="toolbar">
+    <a class="btn btn-outline-primary" th:href="@{/lots}"><i class="bi bi-arrow-left"></i> Retour à la liste des lots</a>
+</div>
 
-<form method="get" th:action="@{/journaux}">
-    <div>
-        <label>Lot:
-            <select name="lotId">
-                <option value="">-- Tous --</option>
-                <option th:each="lot : ${lots}"
-                        th:value="${lot.id}"
-                        th:text="${lot.code}"
-                        th:selected="${filter != null && filter.lotId != null && filter.lotId == lot.id}"></option>
-            </select>
-        </label>
-
-        <label>Type:
-            <select name="typeEvenement">
-                <option value="">-- Tous --</option>
-                <option th:each="type : ${typesEvenement}"
-                        th:value="${type}"
-                        th:text="${type}"
-                        th:selected="${filter != null && filter.typeEvenement == type}"></option>
-            </select>
-        </label>
-
-        <label>Du:
-            <input type="date" name="dateDebut" th:value="${filter != null ? filter.dateDebut : null}">
-        </label>
-
-        <label>Au:
-            <input type="date" name="dateFin" th:value="${filter != null ? filter.dateFin : null}">
-        </label>
-
-        <button type="submit">Filtrer</button>
-        <a th:href="@{/journaux}">Réinitialiser</a>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Journaux des lots</h5>
+        <span class="result-count"
+              th:text="${journaux.totalElements} + ' événement' + (${journaux.totalElements} > 1 ? 's' : '') + ' trouvé' + (${journaux.totalElements} > 1 ? 's' : '')"></span>
     </div>
-</form>
 
-<table>
-    <thead>
-    <tr>
-        <th>Date</th>
-        <th>Lot</th>
-        <th>Type</th>
-        <th>Description</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="journal : ${journaux}">
-        <td th:text="${#temporals.format(journal.dateEvenement, 'dd/MM/yyyy HH:mm')}"></td>
-        <td>
-            <a th:if="${journal.lot != null}"
-               th:href="@{/lots/{id}(id=${journal.lot.id})}"
-               th:text="${journal.lot.code}"></a>
-            <span th:if="${journal.lot == null}">-</span>
-        </td>
-        <td th:text="${journal.typeEvenement != null ? journal.typeEvenement.libelle : '-'}"></td>
-        <td th:text="${journal.description}"></td>
-    </tr>
-    <tr th:if="${#lists.isEmpty(journaux)}">
-        <td colspan="4">Aucun événement enregistré.</td>
-    </tr>
-    </tbody>
-</table>
+    <form method="get" th:action="@{/journaux-lots}" class="filters-bar">
+        <input type="hidden" name="page" value="0" />
+        <select class="form-select" name="lotId">
+            <option value="">Tous les lots</option>
+            <option th:each="lot : ${lots}"
+                    th:value="${lot.id}"
+                    th:text="${lot.code}"
+                    th:selected="${filter.lotId != null && filter.lotId == lot.id}"></option>
+        </select>
+        <select class="form-select" name="typeEvenement">
+            <option value="">Tous les types</option>
+            <option th:each="type : ${typesEvenement}"
+                    th:value="${type}"
+                    th:text="${type}"
+                    th:selected="${filter.typeEvenement == type}"></option>
+        </select>
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}">
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/journaux-lots}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Lot</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="journal : ${journaux.content}">
+                <td th:text="${#temporals.format(journal.dateEvenement, 'dd/MM/yyyy HH:mm')}"></td>
+                <td class="fw-semibold">
+                    <a th:if="${journal.lot != null}"
+                       th:href="@{/lots/{id}(id=${journal.lot.id})}"
+                       th:text="${journal.lot.code}"></a>
+                    <span th:if="${journal.lot == null}">—</span>
+                </td>
+                <td><span class="badge badge-info" th:text="${journal.typeEvenement != null ? journal.typeEvenement.libelle : '—'}"></span></td>
+                <td th:text="${journal.description}"></td>
+            </tr>
+            <tr th:if="${journaux.empty}">
+                <td colspan="4" class="text-center text-secondary py-4">Aucun événement ne correspond à ces critères.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/tableau :: tableFooter(${journaux})}"></div>
+</div>
+</main>
 </body>
 </html>

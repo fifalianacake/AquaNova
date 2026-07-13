@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Types d'événements de lot</title>
+</head>
+<body>
+<main>
+
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/types-evenements-lot/new}"><i class="bi bi-plus-lg"></i> Créer un type d'événement</a>
+    <a class="btn btn-outline-primary" th:href="@{/journaux-lots}">Retour aux journaux</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Types d'événements de lot</h5>
+        <span class="result-count" th:text="${#lists.size(types)} + ' type(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Code</th>
+                <th>Libellé</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="type : ${types}">
+                <td th:text="${type.id}"></td>
+                <td th:text="${type.code}"></td>
+                <td class="fw-semibold" th:text="${type.libelle}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-evenements-lot/{id}(id=${type.id})}" title="Voir"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-evenements-lot/{id}/edit(id=${type.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/types-evenements-lot/{id}/delete(id=${type.id})}" title="Supprimer"
+                       onclick="return confirm('Supprimer ce type d’événement ?')"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(types)}">
+                <td colspan="4" class="text-center text-secondary py-4">Aucun type d'événement enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
+</body>
+</html>

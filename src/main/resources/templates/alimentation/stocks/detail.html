@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova</title>
+</head>
 <body>
-
+<main>
 <h2>Détail stock</h2>
 
 <!-- MAIN INFO -->
@@ -9,20 +12,20 @@
 <p>Stock : <span th:text="${stock.stock}"></span> kg</p>
 <p>Seuil : <span th:text="${stock.seuil}"></span></p>
 
-<p th:if="${stock.alerte}" style="color:red;">
+<p class="error" th:if="${stock.alerte}">
     ⚠ Stock faible
 </p>
 
 <!-- DATE FILTER -->
 <form method="get">
-    <input type="date" name="date"/>
-    <button>Changer date</button>
+    <input class="form-control" type="date" name="date"/>
+    <button class="btn btn-primary">Changer date</button>
 </form>
 
 <!-- RECENT MOVEMENTS -->
 <h3>Mouvements récents</h3>
 
-<table border="1">
+<table class="table table-hover align-middle">
     <tr>
         <th>Date</th>
         <th>Type</th>
@@ -37,9 +40,9 @@
 </table>
 
 <!-- BUTTONS -->
-<a href="/stocks">Retour</a>
-<a th:href="@{'/stocks/edit/' + ${stock.id}}">Modifier</a>
-<a th:href="@{'/stocks/delete/' + ${stock.id}}">Supprimer</a>
-
+<a class="btn btn-secondary" href="/stocks">Retour</a>
+<a class="btn btn-sm btn-outline-primary" th:href="@{'/stocks/edit/' + ${stock.id}}">Modifier</a>
+<a class="btn btn-sm btn-outline-danger" th:href="@{'/stocks/delete/' + ${stock.id}}">Supprimer</a>
+</main>
 </body>
 </html>

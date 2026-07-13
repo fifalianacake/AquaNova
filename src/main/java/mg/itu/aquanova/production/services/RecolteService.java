@@ -1,10 +1,12 @@
 package mg.itu.aquanova.production.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.production.dto.RecolteFilter;
 import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.Recoltes;
 import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.models.StatutLotModels;
+import mg.itu.aquanova.production.models.StatutRecolteEnum;
 import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.models.TypeRecolteEnum;
 import mg.itu.aquanova.production.models.TypeRecoltes;
@@ -15,12 +17,14 @@ import mg.itu.aquanova.production.repositories.TypeRecoltesRepository;
 import mg.itu.aquanova.referentiel.models.LibelleStatutBassin;
 import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.repositories.StatutBassinRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class RecolteService {
@@ -31,6 +35,7 @@ public class RecolteService {
     private final StatutLotRepository statutLotRepository;
     private final StatutBassinRepository statutBassinRepository;
     private final JournalLotService journalLotService;
+    private final PrevisionRecolteService previsionRecolteService;
 
     public RecolteService(
             RecoltesRepository recoltesRepository,
@@ -38,13 +43,15 @@ public class RecolteService {
             TypeRecoltesRepository typeRecoltesRepository,
             StatutLotRepository statutLotRepository,
             StatutBassinRepository statutBassinRepository,
-            JournalLotService journalLotService) {
+            JournalLotService journalLotService,
+            PrevisionRecolteService previsionRecolteService) {
         this.recoltesRepository = recoltesRepository;
         this.lotRepository = lotRepository;
         this.typeRecoltesRepository = typeRecoltesRepository;
         this.statutLotRepository = statutLotRepository;
         this.statutBassinRepository = statutBassinRepository;
         this.journalLotService = journalLotService;
+        this.previsionRecolteService = previsionRecolteService;
     }
 
     @Transactional
@@ -52,8 +59,7 @@ public class RecolteService {
             Long lotId,
             Long typeRecolteId,
             LocalDate dateRecolte,
-            Integer effectifRecolte,
-            Double poidsTotal) {
+            Integer effectifRecolte) {
 
         if (lotId == null) {
             throw new IllegalArgumentException("Le lot est obligatoire.");
@@ -67,9 +73,14 @@ public class RecolteService {
         TypeRecoltes typeRecolte = typeRecoltesRepository.findById(typeRecolteId)
                 .orElseThrow(() -> new EntityNotFoundException("Type de récolte introuvable avec l'id : " + typeRecolteId));
 
-        validerRecolte(lot, typeRecolte, dateRecolte, effectifRecolte, poidsTotal);
+        validerRecolte(lot, typeRecolte, dateRecolte, effectifRecolte);
 
-        Double poidsMoyen = poidsTotal / effectifRecolte;
+        Double poidsMoyenEstime = previsionRecolteService.estimerPoidsMoyenA(lot, dateRecolte);
+        boolean poidsProjete = poidsMoyenEstime != null;
+        Double poidsMoyenGrammes = poidsProjete ? poidsMoyenEstime : lot.getPoidsMoyenActuel();
+
+        Double poidsMoyen = poidsMoyenGrammes / 1000.0;
+        Double poidsTotal = poidsMoyen * effectifRecolte;
         int nouvelEffectif = lot.getEffectifActuel() - effectifRecolte;
 
         Recoltes recolte = new Recoltes();
@@ -81,7 +92,6 @@ public class RecolteService {
         recolte.setPoidsMoyen(poidsMoyen);
 
         lot.setEffectifActuel(nouvelEffectif);
-        lot.setPoidsMoyenActuel(poidsMoyen);
         appliquerStatutsApresRecolte(lot, nouvelEffectif);
 
         Recoltes saved = recoltesRepository.save(recolte);
@@ -93,7 +103,10 @@ public class RecolteService {
                 "Récolte " + typeRecolte.getLibelle()
                         + " de " + effectifRecolte
                         + " individus, poids total " + poidsTotal
-                        + ", poids moyen " + poidsMoyen,
+                        + ", poids moyen " + poidsMoyen
+                        + (poidsProjete
+                                ? " (projeté à la date de récolte)"
+                                : " (dernière pesée)"),
                 dateRecolte);
 
         return saved;
@@ -108,36 +121,42 @@ public class RecolteService {
                 .orElseThrow(() -> new EntityNotFoundException("Récolte introuvable avec l'id : " + id));
     }
 
-    public List<Recoltes> rechercherRecoltes(
-            Long lotId,
-            Long typeRecolteId,
-            LocalDate dateFrom,
-            LocalDate dateTo) {
+    public Page<Recoltes> lister(RecolteFilter filter, Pageable pageable) {
+        return recoltesRepository.findAll(specification(filter), pageable);
+    }
 
-        Stream<Recoltes> stream = recoltesRepository.findAll().stream();
+    private Specification<Recoltes> specification(RecolteFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
 
-        if (lotId != null) {
-            stream = stream.filter(r -> r.getLot() != null && lotId.equals(r.getLot().getId()));
-        }
-        if (typeRecolteId != null) {
-            stream = stream.filter(r -> r.getTypeRecolte() != null && typeRecolteId.equals(r.getTypeRecolte().getId()));
-        }
-        if (dateFrom != null) {
-            stream = stream.filter(r -> r.getDateRecolte() != null && !r.getDateRecolte().isBefore(dateFrom));
-        }
-        if (dateTo != null) {
-            stream = stream.filter(r -> r.getDateRecolte() != null && !r.getDateRecolte().isAfter(dateTo));
-        }
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getLotId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("lot").get("id"), filter.getLotId()));
+            }
+            if (filter.getTypeRecolteId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("typeRecolte").get("id"), filter.getTypeRecolteId()));
+            }
+            if (filter.getStatut() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("statut"), filter.getStatut()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateRecolte"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateRecolte"), filter.getDateFin()));
+            }
 
-        return stream.toList();
+            return predicates;
+        };
     }
 
     private void validerRecolte(
             LotModels lot,
             TypeRecoltes typeRecolte,
             LocalDate dateRecolte,
-            Integer effectifRecolte,
-            Double poidsTotal) {
+            Integer effectifRecolte) {
 
         if (dateRecolte == null) {
             throw new IllegalArgumentException("La date de récolte est obligatoire.");
@@ -145,11 +164,10 @@ public class RecolteService {
         if (effectifRecolte == null || effectifRecolte <= 0) {
             throw new IllegalArgumentException("L'effectif récolté doit être strictement positif.");
         }
-        if (poidsTotal == null || poidsTotal <= 0) {
-            throw new IllegalArgumentException("Le poids total doit être strictement positif.");
-        }
-        if (lot.getStatutLot() != null && lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE) {
-            throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot déjà clôturé.");
+        if (lot.getStatutLot() != null
+                && (lot.getStatutLot().getLibelle() == StatutLotEnum.CLOTURE
+                        || lot.getStatutLot().getLibelle() == StatutLotEnum.ANNULE)) {
+            throw new IllegalStateException("Impossible d'enregistrer une récolte sur un lot clôturé ou annulé.");
         }
         if (lot.getEffectifActuel() == null || lot.getEffectifActuel() <= 0) {
             throw new IllegalStateException("Ce lot ne contient plus d'individus récoltables.");
@@ -163,6 +181,9 @@ public class RecolteService {
         if (typeRecolte.getLibelle() == TypeRecolteEnum.TOTALE
                 && !effectifRecolte.equals(lot.getEffectifActuel())) {
             throw new IllegalArgumentException("Une récolte totale doit porter sur tout l'effectif actuel du lot.");
+        }
+        if (lot.getPoidsMoyenActuel() == null || lot.getPoidsMoyenActuel() <= 0) {
+            throw new IllegalStateException("Le poids moyen actuel du lot doit être renseigné pour calculer le poids récolté.");
         }
     }
 
@@ -180,8 +201,22 @@ public class RecolteService {
             return;
         }
 
-        StatutLotModels statutPartiel = statutLotRepository.findByLibelle(StatutLotEnum.RECOLTE_PARTIELLE)
-                .orElseThrow(() -> new EntityNotFoundException("Statut de lot RECOLTE_PARTIELLE introuvable."));
-        lot.setStatutLot(statutPartiel);
+    }
+
+    @Transactional
+    public void mettreAJourStatutDisponibilite(Long recolteId, double poidsDisponible) {
+        Recoltes recolte = getRecolteById(recolteId);
+        StatutRecolteEnum nouveauStatut = poidsDisponible <= 0.01
+                ? StatutRecolteEnum.VENDU
+                : StatutRecolteEnum.DISPONIBLE;
+
+        if (recolte.getStatut() != nouveauStatut) {
+            recolte.setStatut(nouveauStatut);
+            recoltesRepository.save(recolte);
+        }
+    }
+
+    public List<Recoltes> getRecoltesDisponibles() {
+        return recoltesRepository.findByStatut(StatutRecolteEnum.DISPONIBLE);
     }
 }

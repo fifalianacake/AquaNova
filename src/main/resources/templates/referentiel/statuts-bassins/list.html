@@ -1,39 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Statuts Bassins</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-<body class="container mt-5">
+<body>
+<main>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Statuts Bassins</h2>
-    <a th:href="@{/statuts-bassins/new}" class="btn btn-primary">New</a>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/statuts-bassins/new}"><i class="bi bi-plus-lg"></i> Créer un statut</a>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-    <tr>
-        <th>ID</th>
-        <th>Libelle</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="statut : ${statuts}">
-        <td th:text="${statut.id}">1</td>
-        <td th:text="${statut.libelle}">LIBRE</td>
-        <td>
-            <a th:href="@{/statuts-bassins/{id}(id=${statut.id})}" class="btn btn-sm btn-info">Details</a>
-            <a th:href="@{/statuts-bassins/{id}/edit(id=${statut.id})}" class="btn btn-sm btn-warning">Edit</a>
-            <a th:href="@{/statuts-bassins/{id}/delete(id=${statut.id})}"
-               class="btn btn-sm btn-danger"
-               onclick="return confirm('Delete this status ?')">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Statuts des bassins</h5>
+        <span class="result-count" th:text="${#lists.size(statuts)} + ' statut(s)'"></span>
+    </div>
 
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Libellé</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="statut : ${statuts}">
+                <td th:text="${statut.id}"></td>
+                <td class="fw-semibold" th:text="${statut.libelle}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/statuts-bassins/{id}(id=${statut.id})}" title="Voir"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/statuts-bassins/{id}/edit(id=${statut.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/statuts-bassins/{id}/delete(id=${statut.id})}" title="Supprimer"
+                       onclick="return confirm('Delete this status ?')"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(statuts)}">
+                <td colspan="3" class="text-center text-secondary py-4">Aucun statut enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
 </body>
 </html>

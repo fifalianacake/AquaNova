@@ -1,80 +1,72 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Saisie Maintenance ou Panne</title>
 </head>
 <body>
+<main>
+    <h2 th:text="${maintenance.id == null} ? 'Déclarer une intervention / Panne' : 'Modifier l\'intervention'">Saisie Intervention</h2>
 
-    <div th:if="${errorMessage}" style="color: red; font-weight: bold;">
-        <p th:text="${errorMessage}"></p>
-    </div>
+    <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
-    <h1 th:text="${maintenance.id == null} ? 'Déclarer une intervention / Panne' : 'Modifier l\'intervention'">Saisie Intervention</h1>
-    
-    <form th:action="@{/maintenances/save}" th:object="${maintenance}" method="post">
+    <form class="form-panel" th:action="${maintenance.id} == null ? @{/maintenances} : @{/maintenances/{id}(id=${maintenance.id})}"
+          th:object="${maintenance}" method="post">
         <input type="hidden" th:field="*{id}">
 
-        <p>
-            <label>Équipement * :</label><br>
-            <select th:field="*{equipement.id}" required>
+        <div class="mb-3">
+            <label class="form-label" for="equipement">Équipement *</label>
+            <select class="form-select" id="equipement" th:field="*{equipement.id}" required>
                 <option value="">-- Choisir un équipement --</option>
-                <option th:each="equipement : ${equipements}" 
-                        th:value="${equipement.id}" 
+                <option th:each="equipement : ${equipements}"
+                        th:value="${equipement.id}"
                         th:text="'ID #' + ${equipement.id} + ' - ' + ${equipement.nom}"></option>
             </select>
-        </p>
+        </div>
 
-        <p>
-            <label>Catégorie de Maintenance * :</label><br>
-            <select th:field="*{categorieMaintenance.id}" required>
+        <div class="mb-3">
+            <label class="form-label" for="categorieMaintenance">Catégorie de Maintenance *</label>
+            <select class="form-select" id="categorieMaintenance" th:field="*{categorieMaintenance.id}" required>
                 <option value="">-- Choisir une catégorie --</option>
-                <option th:each="cat : ${categories}" 
-                        th:value="${cat.id}" 
+                <option th:each="cat : ${categories}"
+                        th:value="${cat.id}"
                         th:text="${cat.libelle}"></option>
             </select>
-        </p>
+        </div>
 
-        <p>
-            <label>Date Maintenance * :</label><br>
-            <input type="date" th:field="*{dateMaintenance}" required>
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="dateMaintenance">Date Maintenance *</label>
+            <input class="form-control" type="date" id="dateMaintenance" th:field="*{dateMaintenance}" required>
+        </div>
 
-        <p>
-            <label>Description * :</label><br>
-            <textarea th:field="*{description}" required rows="4" cols="50"></textarea>
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="description">Description *</label>
+            <textarea class="form-control" id="description" th:field="*{description}" required rows="4"></textarea>
+        </div>
 
-        <p>
-            <label>Coût (€) * :</label><br>
-            <input type="number" step="0.01" min="0" th:field="*{cout}" required>
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="cout">Coût (€) *</label>
+            <input class="form-control" type="number" step="0.01" min="0" id="cout" th:field="*{cout}" required>
+        </div>
 
-        <p>
-            <label>Statut Intervention * :</label><br>
-            <select th:field="*{statutIntervention}" required>
-                <option th:each="statut : ${T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).values()}"
-                        th:value="${statut}" th:text="${statut}"></option>
+        <div class="mb-3">
+            <label class="form-label" for="statutIntervention">Statut Intervention *</label>
+            <select class="form-select" id="statutIntervention" th:field="*{statutIntervention}" required>
+                <option value="OUVERTE">OUVERTE</option>
+                <option value="EN_COURS">EN_COURS</option>
             </select>
-        </p>
+            <small>La clôture (TERMINEE) se fait uniquement via l'action "Clôturer" sur la fiche de l'intervention.</small>
+        </div>
 
-        <p>
-            <label>Date de Résolution :</label><br>
-            <input type="date" th:field="*{dateResolution}">
-        </p>
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" th:field="*{observation}" rows="3"></textarea>
+        </div>
 
-        <p>
-            <label>Observation :</label><br>
-            <textarea th:field="*{observation}" rows="3" cols="50"></textarea>
-        </p>
-
-        <hr>
-        
-        <div>
-            <button type="submit">Enregistrer</button>
-            <a th:href="@{/maintenances}">Annuler</a>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/maintenances}">Retour à la liste</a>
         </div>
     </form>
-
+</main>
 </body>
 </html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout(${'Facture de vente n° ' + vente.id}, ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <table class="kpi-row">
+        <tr>
+            <td>
+                <div class="kpi-label">Montant total</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(vente.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+                <div class="kpi-hint"
+                     th:text="${#numbers.formatDecimal(vente.prixUnitaire, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar/kg'"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Poids vendu</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(vente.poidsVendu, 1, 'WHITESPACE', 2, 'COMMA')} + ' kg'">—</div>
+                <div class="kpi-hint"
+                     th:text="${vente.effectifVendu != null ? vente.effectifVendu + ' individus' : ''}"></div>
+            </td>
+            <td>
+                <div class="kpi-label">Statut</div>
+                <div class="kpi-value" style="font-size: 11pt;"
+                     th:text="${vente.statutVente != null ? vente.statutVente.code : '—'}">—</div>
+                <div class="kpi-hint"
+                     th:text="${vente.dateVente != null
+                               ? 'le ' + #temporals.format(vente.dateVente, 'dd/MM/yyyy') : ''}"></div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="panel">
+        <div class="panel-header">Client</div>
+        <div class="panel-body">
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Nom</td>
+                    <td class="info-value" th:text="${vente.client != null ? vente.client.nom : '—'}">—</td>
+                    <td class="info-label">Type</td>
+                    <td class="info-value"
+                        th:text="${vente.client != null and vente.client.typeClient != null
+                                  ? vente.client.typeClient.libelle : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Contact</td>
+                    <td class="info-value"
+                        th:text="${vente.client != null and vente.client.contact != null ? vente.client.contact : '—'}">—</td>
+                    <td class="info-label">Email</td>
+                    <td class="info-value"
+                        th:text="${vente.client != null and vente.client.email != null ? vente.client.email : '—'}">—</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">Détail de la vente</div>
+        <div class="panel-body">
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Date de vente</td>
+                    <td class="info-value"
+                        th:text="${vente.dateVente != null
+                                  ? #temporals.format(vente.dateVente, 'dd/MM/yyyy') : '—'}">—</td>
+                    <td class="info-label">Lot d'origine</td>
+                    <td class="info-value"
+                        th:text="${vente.recolte != null and vente.recolte.lot != null
+                                  ? vente.recolte.lot.code : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Récolte</td>
+                    <td class="info-value"
+                        th:text="${vente.recolte != null ? 'Récolte #' + vente.recolte.id : '—'}">—</td>
+                    <td class="info-label">Effectif vendu</td>
+                    <td class="info-value" th:text="${vente.effectifVendu != null ? vente.effectifVendu : '—'}">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Poids vendu</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(vente.poidsVendu, 1, 'WHITESPACE', 2, 'COMMA')} + ' kg'">—</td>
+                    <td class="info-label">Prix unitaire</td>
+                    <td class="info-value"
+                        th:text="${#numbers.formatDecimal(vente.prixUnitaire, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar/kg'">—</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Observation</td>
+                    <td class="info-value" colspan="3" style="text-align: left; font-weight: normal;"
+                        th:text="${vente.observation != null and !vente.observation.isBlank()
+                                  ? vente.observation : 'Aucune observation.'}">—</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="total-ligne"
+         th:text="'Montant total : ' + ${#numbers.formatDecimal(vente.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></div>
+
+</contenu>
+</body>
+</html>

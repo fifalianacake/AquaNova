@@ -1,38 +1,37 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Statut Bassin Form</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
-<body class="container mt-5">
+<body>
+<main>
+    <h2 th:text="${statut.id == null ? 'New Statut Bassin' : 'Edit Statut Bassin'}">Statut Bassin Form</h2>
 
-<h2 class="mb-4" th:text="${statut.id == null ? 'New Statut Bassin' : 'Edit Statut Bassin'}">
-    Statut Bassin Form
-</h2>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-<form th:action="${statut.id == null ? '/statuts-bassins' : '/statuts-bassins/' + statut.id}"
-      th:object="${statut}"
-      method="post"
-      class="col-md-6">
+    <form class="form-panel" th:action="${statut.id == null ? '/statuts-bassins' : '/statuts-bassins/' + statut.id}"
+          th:object="${statut}"
+          method="post">
 
-    <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{id}" />
 
-    <div class="mb-3">
-        <label for="libelle" class="form-label">Libelle :</label>
-        <select id="libelle" th:field="*{libelle}" class="form-select" required>
-            <option value="" disabled>Select a status...</option>
-            <option th:each="libelle : ${libelles}"
-                    th:value="${libelle}"
-                    th:text="${libelle}">
-                LIBRE
-            </option>
-        </select>
-    </div>
+        <div class="mb-3">
+            <label class="form-label" for="libelle">Libellé</label>
+            <select class="form-select" id="libelle" th:field="*{libelle}" required>
+                <option value="" disabled>Select a status...</option>
+                <option th:each="libelle : ${libelles}"
+                        th:value="${libelle}"
+                        th:text="${libelle}">
+                    LIBRE
+                </option>
+            </select>
+        </div>
 
-    <button type="submit" class="btn btn-success">Save</button>
-    <a th:href="@{/statuts-bassins}" class="btn btn-secondary">Cancel</a>
-</form>
-
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/statuts-bassins}">Retour à la liste</a>
+        </div>
+    </form>
+</main>
 </body>
 </html>

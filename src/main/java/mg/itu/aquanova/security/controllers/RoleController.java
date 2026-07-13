@@ -35,16 +35,22 @@ public class RoleController {
         return "security/roles/form";
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public String saveRole(@ModelAttribute("role") RoleModels role) {
         roleService.saveRole(role);
         return "redirect:/roles";
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteRole(@PathVariable("id") Long id) {
-        roleService.deleteRole(id);
-        return "redirect:/roles";
+    @GetMapping("/{id}/delete")
+    public String deleteRole(@PathVariable("id") Long id, Model model) {
+        try {
+            roleService.deleteRole(id);
+            return "redirect:/roles";
+        } catch (IllegalStateException e) {
+            model.addAttribute("roles", roleService.getAllRoles());
+            model.addAttribute("error", e.getMessage());
+            return "security/roles/list";
+        }
     }
 
 }

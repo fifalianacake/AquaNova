@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Prévisions de récolte</title>
+    <title>AquaNova - Prévisions de récolte</title>
 </head>
 <body>
+<main>
 
-<h1>Prévisions de récolte</h1>
+<div class="toolbar">
+    <a class="btn btn-outline-primary" th:href="@{/lots}"><i class="bi bi-arrow-left"></i> Retour aux lots</a>
+</div>
 
-<p>
-    <a th:href="@{/lots}">Lots</a>
-</p>
+<div class="panel mb-3">
+    <div class="panel-header">
+        <h5>Prévisions de récolte</h5>
+        <span class="result-count"
+              th:text="'Lots analysés : ' + ${previsions != null ? #lists.size(previsions) : 0}"></span>
+    </div>
 
-<form method="get" th:action="@{/production/previsions-recoltes}">
-    <div>
-        <label for="lotId">Lot :</label>
-        <select id="lotId" name="lotId">
+    <form method="get" th:action="@{/production/previsions-recoltes}" class="filters-bar">
+        <select class="form-select" id="lotId" name="lotId">
             <option value="">Tous les lots</option>
             <option th:each="lot : ${lots}"
                     th:value="${lot.id}"
@@ -23,11 +26,7 @@
                     th:selected="${filter.lotId != null && filter.lotId == lot.id}">
             </option>
         </select>
-    </div>
-
-    <div>
-        <label for="especeId">Espèce :</label>
-        <select id="especeId" name="especeId">
+        <select class="form-select" id="especeId" name="especeId">
             <option value="">Toutes les espèces</option>
             <option th:each="espece : ${especes}"
                     th:value="${espece.id}"
@@ -35,11 +34,7 @@
                     th:selected="${filter.especeId != null && filter.especeId == espece.id}">
             </option>
         </select>
-    </div>
-
-    <div>
-        <label for="bassinId">Bassin :</label>
-        <select id="bassinId" name="bassinId">
+        <select class="form-select" id="bassinId" name="bassinId">
             <option value="">Tous les bassins</option>
             <option th:each="bassin : ${bassins}"
                     th:value="${bassin.id}"
@@ -47,102 +42,99 @@
                     th:selected="${filter.bassinId != null && filter.bassinId == bassin.id}">
             </option>
         </select>
+        <div class="input-group">
+            <span class="input-group-text">Récolte du</span>
+            <input class="form-control" type="date" id="dateDebut" name="dateDebut" th:value="${filter.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" id="dateFin" name="dateFin" th:value="${filter.dateFin}">
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/production/previsions-recoltes}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Lot</th>
+                <th>Espèce</th>
+                <th>Bassin</th>
+                <th>Date mise en charge</th>
+                <th class="text-end">Effectif actuel</th>
+                <th class="text-end">Poids actuel (g)</th>
+                <th class="text-end">Poids cible (g)</th>
+                <th class="text-end">Croissance (g/jour)</th>
+                <th>Date récolte estimée</th>
+                <th>Statut</th>
+                <th>Alerte</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="prevision : ${previsions}">
+                <td class="fw-semibold">
+                    <a th:if="${prevision.lot != null}"
+                       th:href="@{/lots/{id}(id=${prevision.lot.id})}"
+                       th:text="${prevision.lot.code}">
+                    </a>
+                    <span th:if="${prevision.lot == null}">—</span>
+                </td>
+                <td th:text="${prevision.lot != null && prevision.lot.espece != null ? prevision.lot.espece.nom : '—'}"></td>
+                <td th:text="${prevision.lot != null && prevision.lot.bassin != null ? prevision.lot.bassin.reference : '—'}"></td>
+                <td th:text="${prevision.lot != null && prevision.lot.dateMiseEnCharge != null ? prevision.lot.dateMiseEnCharge : '—'}"></td>
+                <td class="text-end" th:text="${prevision.lot != null && prevision.lot.effectifActuel != null ? prevision.lot.effectifActuel : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsMoyenActuel != null ? #numbers.formatDecimal(prevision.poidsMoyenActuel, 1, 'WHITESPACE', 1, 'COMMA') : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsCible != null ? #numbers.formatDecimal(prevision.poidsCible, 1, 'WHITESPACE', 0, 'COMMA') : '—'}"></td>
+                <td class="text-end" th:text="${prevision.croissanceMoyenneJournaliere != null ? #numbers.formatDecimal(prevision.croissanceMoyenneJournaliere, 1, 'WHITESPACE', 2, 'COMMA') : '—'}"></td>
+                <td th:text="${prevision.dateRecolteEstimee != null ? prevision.dateRecolteEstimee : '—'}"></td>
+                <td>
+                    <span class="badge" th:classappend="${prevision.procheRecolte} ? 'badge-warning' : 'badge-success'"
+                          th:text="${prevision.procheRecolte ? 'Proche récolte' : 'En croissance'}"></span>
+                </td>
+                <td th:text="${prevision.alerte != null ? prevision.alerte : '—'}"></td>
+            </tr>
+            <tr th:if="${previsions == null || #lists.isEmpty(previsions)}">
+                <td colspan="11" class="text-center text-secondary py-4">Aucune prévision de récolte disponible.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Lots proches de la récolte</h5>
     </div>
 
-    <div>
-        <label for="dateDebut">Récolte estimée du :</label>
-        <input type="date" id="dateDebut" name="dateDebut" th:value="${filter.dateDebut}">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>Lot</th>
+                <th>Espèce</th>
+                <th>Bassin</th>
+                <th class="text-end">Poids actuel (g)</th>
+                <th class="text-end">Poids cible (g)</th>
+                <th>Date estimée</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="prevision : ${lotsProchesRecolte}">
+                <td class="fw-semibold" th:text="${prevision.lot != null ? prevision.lot.code : '—'}"></td>
+                <td th:text="${prevision.lot != null && prevision.lot.espece != null ? prevision.lot.espece.nom : '—'}"></td>
+                <td th:text="${prevision.lot != null && prevision.lot.bassin != null ? prevision.lot.bassin.reference : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsMoyenActuel != null ? #numbers.formatDecimal(prevision.poidsMoyenActuel, 1, 'WHITESPACE', 1, 'COMMA') : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsCible != null ? #numbers.formatDecimal(prevision.poidsCible, 1, 'WHITESPACE', 0, 'COMMA') : '—'}"></td>
+                <td th:text="${prevision.dateRecolteEstimee != null ? prevision.dateRecolteEstimee : '—'}"></td>
+            </tr>
+            <tr th:if="${lotsProchesRecolte == null || #lists.isEmpty(lotsProchesRecolte)}">
+                <td colspan="6" class="text-center text-secondary py-4">Aucun lot proche de la récolte.</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-
-    <div>
-        <label for="dateFin">Au :</label>
-        <input type="date" id="dateFin" name="dateFin" th:value="${filter.dateFin}">
-    </div>
-
-    <button type="submit">Filtrer</button>
-    <a th:href="@{/production/previsions-recoltes}">Réinitialiser</a>
-</form>
-
-<hr>
-
-<h2>Lots proches de la récolte</h2>
-
-<table>
-    <thead>
-    <tr>
-        <th>Lot</th>
-        <th>Espèce</th>
-        <th>Bassin</th>
-        <th>Poids actuel</th>
-        <th>Poids cible</th>
-        <th>Date estimée</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="prevision : ${lotsProchesRecolte}">
-        <td th:text="${prevision.lot != null ? prevision.lot.code : '-'}"></td>
-        <td th:text="${prevision.lot != null && prevision.lot.espece != null ? prevision.lot.espece.nom : '-'}"></td>
-        <td th:text="${prevision.lot != null && prevision.lot.bassin != null ? prevision.lot.bassin.reference : '-'}"></td>
-        <td th:text="${prevision.poidsMoyenActuel != null ? prevision.poidsMoyenActuel + ' g' : '-'}"></td>
-        <td th:text="${prevision.poidsCible != null ? prevision.poidsCible + ' g' : '-'}"></td>
-        <td th:text="${prevision.dateRecolteEstimee != null ? prevision.dateRecolteEstimee : '-'}"></td>
-    </tr>
-    <tr th:if="${lotsProchesRecolte == null || #lists.isEmpty(lotsProchesRecolte)}">
-        <td colspan="6">Aucun lot proche de la récolte.</td>
-    </tr>
-    </tbody>
-</table>
-
-<hr>
-
-<h2>Résultats</h2>
-
-<p>
-    <strong>Nombre de lots analysés :</strong>
-    <span th:text="${previsions != null ? #lists.size(previsions) : 0}">0</span>
-</p>
-
-<table>
-    <thead>
-    <tr>
-        <th>Lot</th>
-        <th>Espèce</th>
-        <th>Bassin</th>
-        <th>Date mise en charge</th>
-        <th>Effectif actuel</th>
-        <th>Poids actuel</th>
-        <th>Poids cible</th>
-        <th>Croissance / jour</th>
-        <th>Date récolte estimée</th>
-        <th>Statut</th>
-        <th>Alerte</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="prevision : ${previsions}">
-        <td>
-            <a th:if="${prevision.lot != null}"
-               th:href="@{/lots/{id}(id=${prevision.lot.id})}"
-               th:text="${prevision.lot.code}">
-            </a>
-            <span th:if="${prevision.lot == null}">-</span>
-        </td>
-        <td th:text="${prevision.lot != null && prevision.lot.espece != null ? prevision.lot.espece.nom : '-'}"></td>
-        <td th:text="${prevision.lot != null && prevision.lot.bassin != null ? prevision.lot.bassin.reference : '-'}"></td>
-        <td th:text="${prevision.lot != null && prevision.lot.dateMiseEnCharge != null ? prevision.lot.dateMiseEnCharge : '-'}"></td>
-        <td th:text="${prevision.lot != null && prevision.lot.effectifActuel != null ? prevision.lot.effectifActuel : '-'}"></td>
-        <td th:text="${prevision.poidsMoyenActuel != null ? prevision.poidsMoyenActuel + ' g' : '-'}"></td>
-        <td th:text="${prevision.poidsCible != null ? prevision.poidsCible + ' g' : '-'}"></td>
-        <td th:text="${prevision.croissanceMoyenneJournaliere != null ? prevision.croissanceMoyenneJournaliere + ' g/jour' : '-'}"></td>
-        <td th:text="${prevision.dateRecolteEstimee != null ? prevision.dateRecolteEstimee : '-'}"></td>
-        <td th:text="${prevision.procheRecolte ? 'Proche récolte' : 'En croissance'}"></td>
-        <td th:text="${prevision.alerte != null ? prevision.alerte : '-'}"></td>
-    </tr>
-    <tr th:if="${previsions == null || #lists.isEmpty(previsions)}">
-        <td colspan="11">Aucune prévision de récolte disponible.</td>
-    </tr>
-    </tbody>
-</table>
-
+</div>
+</main>
 </body>
 </html>

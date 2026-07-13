@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Marge brute par lot</title>
+</head>
+<body>
+<main>
+
+<div class="toolbar">
+    <a class="btn btn-outline-primary" th:href="@{/finance/dashboard}">
+        <i class="bi bi-speedometer2"></i> Dashboard financier
+    </a>
+    <a class="btn btn-outline-secondary" th:href="@{/finance/lots/export-excel}">
+        <i class="bi bi-file-earmark-spreadsheet"></i> Exporter en Excel
+    </a>
+</div>
+
+<p class="hint">
+    Marge brute = chiffre d'affaires réalisé du lot − coûts directs traçables (alevins + aliment distribué).
+    Les dépenses indirectes (main d'œuvre, énergie, maintenance…) ne sont rattachées à aucun lot :
+    elles sont déduites globalement dans le dashboard pour donner le profit net.
+</p>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h5>Marge brute par lot</h5>
+            <span class="result-count"
+                  th:text="${page.totalElements} + ' lot' + (${page.totalElements} > 1 ? 's' : '')"></span>
+        </div>
+
+        <form method="get" th:action="@{/finance/lots}" class="filters-bar">
+            <input type="hidden" name="page" value="0" />
+            <input class="form-control fc-sm" type="number" name="id" placeholder="ID" th:value="${lotFilter.id}">
+            <input class="form-control" type="text" name="code" placeholder="Code du lot" th:value="${lotFilter.code}">
+            <div class="input-group">
+                <span class="input-group-text">Du</span>
+                <input class="form-control" type="date" name="dateFrom" th:value="${lotFilter.dateFrom}">
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Au</span>
+                <input class="form-control" type="date" name="dateTo" th:value="${lotFilter.dateTo}">
+            </div>
+            <input class="form-control fc-sm" type="number" name="effectifMin" placeholder="Eff. min" th:value="${lotFilter.effectifMin}">
+            <input class="form-control fc-sm" type="number" name="effectifMax" placeholder="Eff. max" th:value="${lotFilter.effectifMax}">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+            <a class="btn btn-outline-secondary" th:href="@{/finance/lots}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>Lot</th>
+                    <th>Espèce</th>
+                    <th>Bassin</th>
+                    <th class="text-end">CA réalisé (Ar)</th>
+                    <th class="text-end">Alevins (Ar)</th>
+                    <th class="text-end">Alimentation (Ar)</th>
+                    <th class="text-end">Coûts directs (Ar)</th>
+                    <th class="text-end">Marge brute (Ar)</th>
+                    <th class="text-end">Taux de marge (%)</th>
+                    <th>Statut</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="lot : ${lots}">
+                    <td class="fw-semibold" th:text="${lot.lotCode}"></td>
+                    <td th:text="${lot.espece}"></td>
+                    <td th:text="${lot.bassin}"></td>
+                    <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                    <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.coutAlevins, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                    <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.coutAlimentation, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                    <td class="text-end montant" th:text="${#numbers.formatDecimal(lot.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                    <td class="text-end montant fw-semibold"
+                        th:classappend="${lot.statutRentabilite.name() == 'DEFICITAIRE'} ? 'text-danger' : (${lot.statutRentabilite.name() == 'RENTABLE'} ? 'text-success' : '')"
+                        th:text="${#numbers.formatDecimal(lot.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
+                    <td class="text-end" th:text="${lot.tauxMargeBrute != null} ? ${#numbers.formatDecimal(lot.tauxMargeBrute, 1, 'WHITESPACE', 2, 'COMMA')} : '—'"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${lot.statutRentabilite.name() == 'RENTABLE'} ? 'badge-success' : (${lot.statutRentabilite.name() == 'DEFICITAIRE'} ? 'badge-danger' : 'badge-secondary')"
+                              th:text="${lot.statutRentabilite.name() == 'NON_CALCULABLE'} ? 'NON VENDU' : ${lot.statutRentabilite}"></span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/finance/lots/{id}/analyse(id=${lot.lotId})}" title="Analyser">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(lots)}">
+                    <td colspan="11" class="text-center text-secondary py-4">Aucun lot trouvé.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:replace="~{fragments/tableau :: tableFooter(${page})}"></div>
+    </div>
+
+</main>
+</body>
+</html>

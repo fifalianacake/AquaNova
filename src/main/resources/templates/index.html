@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Tableau de bord</title>
+</head>
+<body>
+<main>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Tableau de bord</h2>
+        <p class="subtitle mb-0">Vue d'ensemble de l'exploitation — indicateurs recalculés à chaque affichage.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" th:href="@{/finance/dashboard}">
+            <i class="bi bi-graph-up-arrow"></i> Dashboard financier
+        </a>
+        <a class="btn btn-primary" th:href="@{/achats/alevins/new}">
+            <i class="bi bi-plus-lg"></i> Nouvel achat d'alevins
+        </a>
+    </div>
+</div>
+
+<!-- ══════════ Indicateurs clés ══════════ -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <a th:href="@{/lots}" class="kpi-card text-decoration-none d-block">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Biomasse totale</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(dashboard.biomasseTotaleKg, 1, 'WHITESPACE', 1, 'COMMA')} + ' kg'">0 kg</div>
+                    <span class="small"
+                          th:if="${dashboard.variationBiomassePct != null}"
+                          th:classappend="${dashboard.variationBiomassePct.signum() < 0} ? 'text-danger' : 'text-success'"
+                          th:text="(${dashboard.variationBiomassePct.signum() >= 0} ? '↗ +' : '↘ ') + ${dashboard.variationBiomassePct} + ' % sur 12 mois'"></span>
+                    <span class="small text-secondary" th:unless="${dashboard.variationBiomassePct != null}"
+                          th:text="${dashboard.lotsActifs} + ' lot(s) en croissance'"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-droplet-half"></i></div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <a th:href="@{/bassins}" class="kpi-card text-decoration-none d-block">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Bassins occupés</div>
+                    <div class="kpi-value" th:text="${dashboard.bassinsOccupes} + ' / ' + ${dashboard.bassinsTotal}">0 / 0</div>
+                    <span class="small text-secondary"
+                          th:text="${dashboard.bassinsLibres} + ' bassin(s) libre(s)'"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <a th:href="@{/mortalites}" class="kpi-card text-decoration-none d-block">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Taux de mortalité (30 j)</div>
+                    <div class="kpi-value"
+                         th:text="${dashboard.tauxMortalite30j != null} ? ${dashboard.tauxMortalite30j} + ' %' : '—'">—</div>
+                    <span class="small text-secondary"
+                          th:text="${dashboard.mortsSur30j} + ' individu(s) perdu(s)'"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-activity"></i></div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <a th:href="@{/ventes}" class="kpi-card text-decoration-none d-block">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Ventes du mois</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(dashboard.ventesDuMois, 1, 'WHITESPACE', 0, 'COMMA')} + ' Ar'">0 Ar</div>
+                    <span class="small"
+                          th:if="${dashboard.variationVentesPct != null}"
+                          th:classappend="${dashboard.variationVentesPct.signum() < 0} ? 'text-danger' : 'text-success'"
+                          th:text="(${dashboard.variationVentesPct.signum() >= 0} ? '↗ +' : '↘ ') + ${dashboard.variationVentesPct} + ' % vs mois dernier'"></span>
+                    <span class="small text-secondary" th:unless="${dashboard.variationVentesPct != null}">
+                        Aucune vente le mois dernier
+                    </span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-cash-coin"></i></div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- ══════════ Biomasse + répartition par espèce ══════════ -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <h5>Évolution de la biomasse (kg)</h5>
+                <span class="result-count">12 derniers mois</span>
+            </div>
+            <div class="p-3">
+                <canvas id="biomasseChart" height="110"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <h5>Répartition du cheptel par espèce</h5>
+            </div>
+            <div class="p-3">
+                <canvas id="especesChart" height="220"></canvas>
+                <p class="text-center text-secondary small mt-3 mb-0"
+                   th:if="${#lists.isEmpty(dashboard.repartitionEspeces)}">
+                    Aucun lot en croissance.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ Ventes + alertes ══════════ -->
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <h5>Ventes mensuelles (Ar)</h5>
+                <span class="result-count">12 derniers mois</span>
+            </div>
+            <div class="p-3">
+                <canvas id="ventesChart" height="110"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <h5>Alertes actives</h5>
+                <span class="result-count"
+                      th:text="${dashboard.nbAlertesActives} + ' active(s)'
+                               + (${dashboard.nbAlertesCritiques} > 0 ? ' · ' + ${dashboard.nbAlertesCritiques} + ' critique(s)' : '')"></span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <tbody>
+                    <tr th:each="a : ${dashboard.alertesRecentes}">
+                        <td>
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi"
+                                   th:classappend="${a.niveauCriticite.name() == 'CRITIQUE'} ? 'bi-exclamation-triangle-fill text-danger'
+                                                 : (${a.niveauCriticite.name() == 'AVERTISSEMENT'} ? 'bi-exclamation-circle-fill text-warning'
+                                                 : 'bi-info-circle-fill text-info')"></i>
+                                <div>
+                                    <a class="fw-semibold text-decoration-none"
+                                       th:href="@{/alertes/{id}(id=${a.id})}"
+                                       th:text="${a.message}"></a>
+                                    <div class="text-secondary small"
+                                         th:text="${a.moduleSource} + ' · ' + ${#temporals.format(a.dateCreation, 'dd/MM/yyyy HH:mm')}"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(dashboard.alertesRecentes)}">
+                        <td class="text-center text-secondary py-4">
+                            <i class="bi bi-check-circle-fill text-success"></i> Aucune alerte active. Tout va bien.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-3 pt-0" th:if="${dashboard.nbAlertesActives > 0}">
+                <a class="btn btn-sm btn-outline-primary w-100" th:href="@{/alertes}">
+                    Voir toutes les alertes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Séries injectées par Thymeleaf, consommées par Chart.js -->
+<script th:inline="javascript">
+    const biomasseLabels  = /*[[${dashboard.evolutionBiomasse.![libelle]}]]*/ [];
+    const biomasseValeurs = /*[[${dashboard.evolutionBiomasse.![valeur]}]]*/ [];
+    const ventesLabels    = /*[[${dashboard.ventesMensuelles.![libelle]}]]*/ [];
+    const ventesValeurs   = /*[[${dashboard.ventesMensuelles.![valeur]}]]*/ [];
+    const especesLabels   = /*[[${dashboard.repartitionEspeces.![libelle]}]]*/ [];
+    const especesValeurs  = /*[[${dashboard.repartitionEspeces.![valeur]}]]*/ [];
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const TEAL = '#128a7a';
+    const PALETTE = ['#128a7a', '#1f4e79', '#e0a72c', '#7fb8ad', '#a94442', '#5b7c99'];
+
+    new Chart(document.getElementById('biomasseChart'), {
+        type: 'line',
+        data: {
+            labels: biomasseLabels,
+            datasets: [{
+                label: 'Biomasse (kg)',
+                data: biomasseValeurs,
+                borderColor: TEAL,
+                backgroundColor: 'rgba(18, 138, 122, 0.12)',
+                fill: true,
+                tension: 0.35,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    new Chart(document.getElementById('especesChart'), {
+        type: 'doughnut',
+        data: {
+            labels: especesLabels,
+            datasets: [{ data: especesValeurs, backgroundColor: PALETTE, borderWidth: 0 }]
+        },
+        options: {
+            responsive: true,
+            cutout: '62%',
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    new Chart(document.getElementById('ventesChart'), {
+        type: 'bar',
+        data: {
+            labels: ventesLabels,
+            datasets: [{
+                label: 'Chiffre d\'affaires (Ar)',
+                data: ventesValeurs,
+                backgroundColor: TEAL,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+
+</main>
+</body>
+</html>

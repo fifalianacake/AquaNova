@@ -1,20 +1,23 @@
 package mg.itu.aquanova.production.controllers;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import mg.itu.aquanova.production.models.JournalLot;
 import mg.itu.aquanova.production.models.TypeEvenementLot;
 import mg.itu.aquanova.production.services.JournalLotFilter;
 import mg.itu.aquanova.production.services.JournalLotService;
 import mg.itu.aquanova.production.services.LotService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Controller
 public class JournalLotController {
+
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
+
     private final JournalLotService journalLotService;
     private final LotService lotService;
 
@@ -30,24 +33,16 @@ public class JournalLotController {
         return "production/journaux/lot";
     }
 
-    @GetMapping("/journaux")
+    @GetMapping("/journaux-lots")
     public String listeJournaux(
-            @RequestParam(required = false) Long lotId,
-            @RequestParam(required = false) TypeEvenementLot.LibelleEvenement typeEvenement,
-            @RequestParam(required = false) LocalDate dateDebut,
-            @RequestParam(required = false) LocalDate dateFin,
+            @ModelAttribute("filter") JournalLotFilter filter,
+            @PageableDefault(size = 10, sort = "dateEvenement") Pageable pageable,
             Model model) {
 
-        JournalLotFilter filter = new JournalLotFilter();
-        filter.setLotId(lotId);
-        filter.setTypeEvenement(typeEvenement);
-        filter.setDateDebut(dateDebut);
-        filter.setDateFin(dateFin);
-
-        model.addAttribute("filter", filter);
-        model.addAttribute("journaux", journalLotService.rechercher(filter));
+        model.addAttribute("journaux", journalLotService.lister(filter, pageable));
         model.addAttribute("lots", lotService.listerTous());
         model.addAttribute("typesEvenement", TypeEvenementLot.LibelleEvenement.values());
+        model.addAttribute("pageSizes", PAGE_SIZES);
         return "production/journaux/list";
     }
 }

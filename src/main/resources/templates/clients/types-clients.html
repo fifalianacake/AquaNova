@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Catégories Clients</title>
+</head>
+<body>
+<main>
+
+<div class="toolbar">
+    <a class="btn btn-outline-primary" th:href="@{/clients}">Retour aux clients</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Types de clients</h5>
+        <span class="result-count" th:text="${#lists.size(types)} + ' type(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Code interne</th>
+                <th>Libellé de la catégorie</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${types}">
+                <td th:text="${t.id}"></td>
+                <td th:text="${t.code}"></td>
+                <td class="fw-semibold" th:text="${t.libelle}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(types)}">
+                <td colspan="3" class="text-center text-secondary py-4">Aucun type de client enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
+</body>
+</html>

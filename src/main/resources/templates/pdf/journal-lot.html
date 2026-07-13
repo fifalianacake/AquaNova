@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout(${'Journal du lot ' + lot.code}, ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <div class="filtres"
+         th:text="${#lists.size(evenements)} + ' événement' + (${#lists.size(evenements)} > 1 ? 's' : '')
+                  + ' enregistré' + (${#lists.size(evenements)} > 1 ? 's' : '') + ' sur ce lot.'"></div>
+
+    <table class="data">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type d'événement</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="e : ${evenements}">
+            <td th:text="${e.dateEvenement != null
+                          ? #temporals.format(e.dateEvenement, 'dd/MM/yyyy HH:mm') : '—'}"></td>
+            <td th:text="${e.typeEvenement != null ? e.typeEvenement.libelle : '—'}"></td>
+            <td th:text="${e.description}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(evenements)}">
+            <td colspan="3" class="vide">Aucun événement enregistré sur ce lot.</td>
+        </tr>
+        </tbody>
+    </table>
+
+</contenu>
+</body>
+</html>

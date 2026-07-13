@@ -1,33 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>AquaNova - Détail du paramètre système</title>
 </head>
-
 <body>
-    <h1>Details du paramètre système</h1>
+<main>
 
-    <div th:if="${parametre != null}">
-        <p><strong>ID :</strong> <span th:text="${parametre.id}"></span></p>
-        <p><strong>Code :</strong> <span th:text="${parametre.code}"></span></p>
-        <p><strong>Libelle :</strong> <span th:text="${parametre.libelle}"></span></p>
-        <p><strong>Valeur :</strong> <span th:text="${parametre.valeur}"></span></p>
-        <p><strong>Type de valeur :</strong> <span th:text="${parametre.typeValeur}"></span></p>
-        <p><strong>Description :</strong> <span th:text="${parametre.description}"></span></p>
+<div th:if="${parametre == null}" class="panel">
+    <div class="p-4 text-center text-secondary">
+        Paramètre introuvable.
+        <div class="mt-3">
+            <a class="btn btn-outline-secondary" th:href="@{/parametres-systeme}">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+
+<div th:if="${parametre != null}">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="mb-1" th:text="${parametre.libelle}">Paramètre</h2>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <span class="badge badge-info" th:text="${parametre.code}"></span>
+                <span class="badge badge-secondary" th:text="${parametre.typeValeur}"></span>
+            </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-secondary" th:href="@{/parametres-systeme}"><i class="bi bi-arrow-left"></i> Retour</a>
+            <a class="btn btn-outline-primary" th:href="@{/parametres-systeme/{id}/edit(id=${parametre.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        </div>
     </div>
 
-    <div th:if="${parametre == null}">
-        <p>Paramètre introuvable.</p>
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-4">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-secondary small">Valeur actuelle</div>
+                        <div class="kpi-value" th:text="${parametre.valeur}">—</div>
+                        <span class="small text-secondary">Modifiable sans toucher au code</span>
+                    </div>
+                    <div class="kpi-icon"><i class="bi bi-sliders"></i></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <p>
-        <a th:href="@{/parametres-systeme}">Retour à la liste</a>
-        |
-        <a th:if="${parametre != null}" th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
-    </p>
+    <div class="panel">
+        <div class="panel-header"><h5>Informations</h5></div>
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-label">Code</div>
+                <div class="info-value fw-semibold" th:text="${parametre.code}">—</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Libellé</div>
+                <div class="info-value" th:text="${parametre.libelle}">—</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Valeur</div>
+                <div class="info-value fw-semibold" th:text="${parametre.valeur}">—</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Type de valeur</div>
+                <div class="info-value" th:text="${parametre.typeValeur}">—</div>
+            </div>
+            <div class="info-row info-row-full">
+                <div class="info-label">Description</div>
+                <div class="info-value"
+                     th:text="${parametre.description != null and !parametre.description.isBlank() ? parametre.description : 'Aucune description.'}">—</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
 </body>
-
 </html>

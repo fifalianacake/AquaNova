@@ -1,19 +1,43 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Détails Statut Lot</title>
+    <title>AquaNova - Détail du statut de lot</title>
 </head>
 <body>
-<h1>Détails statut lot <span th:text="${statut.id}"></span></h1>
-<div>
-    <p><strong>Libelle:</strong> <span th:text="${statut.libelle}"></span></p>
-    <p><strong>Description:</strong> <span th:text="${statut.description}"></span></p>
+<main>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1" th:text="${statut.libelle}">Statut de lot</h2>
+        <span class="text-secondary small" th:text="'Statut de lot #' + ${statut.id}"></span>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/statut-lots}"><i class="bi bi-arrow-left"></i> Retour</a>
+        <a class="btn btn-outline-primary" th:href="@{/statut-lots/{id}/edit(id=${statut.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        <a class="btn btn-outline-danger" th:href="@{/statut-lots/{id}/delete(id=${statut.id})}"
+           onclick="return confirm('Supprimer ce statut ?')"><i class="bi bi-trash3"></i> Supprimer</a>
+    </div>
 </div>
-<div>
-    <a th:href="@{/statut-lots}">Back to list</a>
-    <a th:href="@{'/statut-lots/' + ${statut.id} + '/edit'}">Edit</a>
-    <a th:href="@{'/statut-lots/' + ${statut.id} + '/delete'}" onclick="return confirm('Supprimer?')">Delete</a>
+
+<div class="panel">
+    <div class="panel-header"><h5>Informations</h5></div>
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-label">Libellé</div>
+            <div class="info-value fw-semibold" th:text="${statut.libelle}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Identifiant</div>
+            <div class="info-value" th:text="${statut.id}">—</div>
+        </div>
+        <div class="info-row info-row-full">
+            <div class="info-label">Description</div>
+            <div class="info-value"
+                 th:text="${statut.description != null and !statut.description.isBlank() ? statut.description : 'Aucune description.'}">—</div>
+        </div>
+    </div>
 </div>
+
+</main>
 </body>
 </html>

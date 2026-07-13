@@ -1,50 +1,55 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Liste des Utilisateurs</title>
 </head>
-
 <body>
+<main>
 
-    <h1>Liste des Utilisateurs</h1>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/users/new}"><i class="bi bi-plus-lg"></i> Ajouter un utilisateur</a>
+    <a class="btn btn-outline-primary" th:href="@{/roles}">Gérer les rôles</a>
+</div>
 
-    <a th:href="@{/users/new}">Ajouter un utilisateur</a> |
-    <a th:href="@{/roles}">Gerer les rôles</a>
-    <br><br>
+<p class="error" th:if="${error}" th:text="${error}"></p>
 
-    <table border="1">
-        <thead>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des utilisateurs</h5>
+        <span class="result-count" th:text="${#lists.size(users)} + ' utilisateur(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
                 <th>Prenom</th>
                 <th>Email</th>
                 <th>Date d'embauche</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="user : ${users}">
-                <td th:text="${user.id}">1</td>
-                <td th:text="${user.name}">Nom</td>
-                <td th:text="${user.lastname}">Prenom</td>
-                <td th:text="${user.email}">email@exemple.com</td>
-                <td th:text="${user.dateHired}">2026-06-18</td>
-                <td>
-                    <a th:href="@{/users/delete/{id}(id=${user.id})}"
-                        onclick="return confirm('Supprimer cet utilisateur ?');">
-                        Supprimer
-                    </a>
+                <td th:text="${user.id}"></td>
+                <td class="fw-semibold" th:text="${user.name}"></td>
+                <td th:text="${user.lastname}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.dateHired}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/users/{id}/delete(id=${user.id})}" title="Supprimer"
+                       onclick="return confirm('Supprimer cet utilisateur ?');"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(users)}">
-                <td colspan="6" style="text-align: center;">Aucun utilisateur trouve.</td>
+                <td colspan="6" class="text-center text-secondary py-4">Aucun utilisateur trouve.</td>
             </tr>
-        </tbody>
-    </table>
-
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
 </body>
-
 </html>

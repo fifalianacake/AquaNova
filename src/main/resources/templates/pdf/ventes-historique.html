@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{pdf/layout :: layout('Historique des ventes', ${sousTitre}, ~{::contenu})}">
+<body>
+<contenu th:fragment="contenu">
+
+    <div class="filtres" th:if="${filtres != null and !filtres.isEmpty()}">
+        <span th:each="f, i : ${filtres}"
+              th:text="${f.key} + ' : ' + ${f.value} + (${i.last} ? '' : '   |   ')"></span>
+    </div>
+
+    <table class="kpi-row">
+        <tr>
+            <td>
+                <div class="kpi-label">Chiffre d'affaires</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(totalMontant, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+                <div class="kpi-hint">hors ventes annulées</div>
+            </td>
+            <td>
+                <div class="kpi-label">Poids écoulé</div>
+                <div class="kpi-value"
+                     th:text="${#numbers.formatDecimal(totalPoids, 1, 'WHITESPACE', 2, 'COMMA')} + ' kg'">—</div>
+                <div class="kpi-hint">hors ventes annulées</div>
+            </td>
+            <td>
+                <div class="kpi-label">Ventes retenues</div>
+                <div class="kpi-value" th:text="${nbVentes}">0</div>
+                <div class="kpi-hint"
+                     th:text="'sur ' + ${#lists.size(ventes)} + ' ligne(s) affichée(s)'"></div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="data">
+        <thead>
+        <tr>
+            <th>N°</th>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Lot</th>
+            <th class="num">Poids (kg)</th>
+            <th class="num">Prix (Ar/kg)</th>
+            <th class="num">Montant (Ar)</th>
+            <th>Statut</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="v : ${ventes}">
+            <td th:text="${v.id}"></td>
+            <td th:text="${v.dateVente != null ? #temporals.format(v.dateVente, 'dd/MM/yyyy') : '—'}"></td>
+            <td th:text="${v.client != null ? v.client.nom : '—'}"></td>
+            <td th:text="${v.recolte != null and v.recolte.lot != null ? v.recolte.lot.code : '—'}"></td>
+            <td class="num" th:text="${#numbers.formatDecimal(v.poidsVendu, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            <td class="num" th:text="${#numbers.formatDecimal(v.prixUnitaire, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            <td class="num" th:text="${#numbers.formatDecimal(v.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            <td th:text="${v.statutVente != null ? v.statutVente.code : '—'}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(ventes)}">
+            <td colspan="8" class="vide">Aucune vente pour ces filtres.</td>
+        </tr>
+        </tbody>
+        <tfoot th:if="${!#lists.isEmpty(ventes)}">
+        <tr>
+            <td colspan="4">Total (hors annulées)</td>
+            <td class="num" th:text="${#numbers.formatDecimal(totalPoids, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            <td></td>
+            <td class="num" th:text="${#numbers.formatDecimal(totalMontant, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+            <td></td>
+        </tr>
+        </tfoot>
+    </table>
+
+</contenu>
+</body>
+</html>

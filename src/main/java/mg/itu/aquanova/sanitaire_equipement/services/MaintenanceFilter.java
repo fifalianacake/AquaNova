@@ -3,103 +3,51 @@ package mg.itu.aquanova.sanitaire_equipement.services;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum;
+import org.springframework.format.annotation.DateTimeFormat;
 
 public class MaintenanceFilter {
-    private Long id;
-    private Integer idEquipement;
-    private Integer idUser;
-    private Integer idCategorieMaintenance;
-    private LocalDate debutDateMaintenance;   
-    private LocalDate finDateMaintenance;
-    private BigDecimal cout;
-    private StatutInterventionEnum statutIntervention;
-    private LocalDate debutDateResolution;
-    private LocalDate finDateResolution;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateDebut;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateFin;
+
+    private BigDecimal coutMin;
+    private BigDecimal coutMax;
 
     public MaintenanceFilter() {
-
     }
 
-    public Long getId() {
-        return id;
+    public LocalDate getDateDebut() {
+        return dateDebut;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setDateDebut(LocalDate dateDebut) {
+        this.dateDebut = dateDebut;
     }
 
-    public Integer getIdEquipement() {
-        return idEquipement;
+    public LocalDate getDateFin() {
+        return dateFin;
     }
 
-    public void setIdEquipement(Integer idEquipement) {
-        this.idEquipement = idEquipement;
+    public void setDateFin(LocalDate dateFin) {
+        this.dateFin = dateFin;
     }
 
-    public Integer getIdUser() {
-        return idUser;
+    public BigDecimal getCoutMin() {
+        return coutMin;
     }
 
-    public void setIdUser(Integer idUser) {
-        this.idUser = idUser;
+    public void setCoutMin(BigDecimal coutMin) {
+        this.coutMin = coutMin;
     }
 
-    public Integer getIdCategorieMaintenance() {
-        return idCategorieMaintenance;
+    public BigDecimal getCoutMax() {
+        return coutMax;
     }
 
-    public void setIdCategorieMaintenance(Integer idCategorieMaintenance) {
-        this.idCategorieMaintenance = idCategorieMaintenance;
+    public void setCoutMax(BigDecimal coutMax) {
+        this.coutMax = coutMax;
     }
-
-    public LocalDate getDebutDateMaintenance() {
-        return debutDateMaintenance;
-    }
-
-    public void setDebutDateMaintenance(LocalDate debutDateMaintenance) {
-        this.debutDateMaintenance = debutDateMaintenance;
-    }
-
-    public LocalDate getFinDateMaintenance() {
-        return finDateMaintenance;
-    }
-
-    public void setFinDateMaintenance(LocalDate finDateMaintenance) {
-        this.finDateMaintenance = finDateMaintenance;
-    }
-
-    public BigDecimal getCout() {
-        return cout;
-    }
-
-    public void setCout(BigDecimal cout) {
-        this.cout = cout;
-    }
-
-    public StatutInterventionEnum getStatutIntervention() {
-        return statutIntervention;
-    }
-
-    public void setStatutIntervention(StatutInterventionEnum statutIntervention) {
-        this.statutIntervention = statutIntervention;
-    }
-
-    public LocalDate getDebutDateResolution() {
-        return debutDateResolution;
-    }
-
-    public void setDebutDateResolution(LocalDate debutDateResolution) {
-        this.debutDateResolution = debutDateResolution;
-    }
-
-    public LocalDate getFinDateResolution() {
-        return finDateResolution;
-    }
-
-    public void setFinDateResolution(LocalDate finDateResolution) {
-        this.finDateResolution = finDateResolution;
-    }
-
-    
 }

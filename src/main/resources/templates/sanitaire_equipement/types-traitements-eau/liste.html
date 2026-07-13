@@ -1,50 +1,54 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>AquaNova - Types de traitements eau</title>
 </head>
 <body>
-    <div>
-        <h2>Types de traitements de l'eau</h2>
-        <div>
-            <a th:href="@{/traitements-eau}">Traitements</a>
-            <a th:href="@{/types-traitements-eau/new}">Nouveau type</a>
-        </div>
+<main>
+
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/types-traitements-eau/new}"><i class="bi bi-plus-lg"></i> Nouveau type</a>
+    <a class="btn btn-outline-primary" th:href="@{/traitements-eau}">Traitements</a>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Types de traitements de l'eau</h5>
+        <span class="result-count" th:text="${#lists.size(types)} + ' type(s)'"></span>
     </div>
 
-    <section>
-        <table>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Libellé</th>
-                    <th>Description</th>
-                    <th>Actions</th>
-                </tr>
+            <tr>
+                <th>ID</th>
+                <th>Libellé</th>
+                <th>Description</th>
+                <th class="text-end">Actions</th>
+            </tr>
             </thead>
             <tbody>
-                <tr th:each="type : ${types}">
-                    <td th:text="${type.id}"></td>
-                    <td th:text="${type.libelle}"></td>
-                    <td th:text="${type.description ?: '-'}"></td>
-                    <td>
-                        <div>
-                            <a th:href="@{/types-traitements-eau/{id}(id=${type.id})}">Voir</a>
-                            <a th:href="@{/types-traitements-eau/edit/{id}(id=${type.id})}">Modifier</a>
-                            <form th:action="@{/types-traitements-eau/delete/{id}(id=${type.id})}"
-                                  method="post"
-                                  onsubmit="return confirm('Supprimer ce type de traitement ?')">
-                                <button type="submit">Supprimer</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(types)}">
-                    <td colspan="4">Aucun type de traitement enregistré.</td>
-                </tr>
+            <tr th:each="type : ${types}">
+                <td th:text="${type.id}"></td>
+                <td class="fw-semibold" th:text="${type.libelle}"></td>
+                <td th:text="${type.description ?: '-'}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-traitements-eau/{id}(id=${type.id})}" title="Voir"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-traitements-eau/{id}/edit(id=${type.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <form class="inline-form" th:action="@{/types-traitements-eau/{id}/delete(id=${type.id})}"
+                          method="post"
+                          onsubmit="return confirm('Supprimer ce type de traitement ?')">
+                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Supprimer"><i class="bi bi-trash3"></i></button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(types)}">
+                <td colspan="4" class="text-center text-secondary py-4">Aucun type de traitement enregistré.</td>
+            </tr>
             </tbody>
         </table>
-    </section>
+    </div>
+</div>
+</main>
 </body>
 </html>

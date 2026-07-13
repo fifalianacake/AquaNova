@@ -1,143 +1,74 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Liste des Maintenances et Pannes</title>
+    <title>AquaNova - Maintenances et Pannes</title>
 </head>
 <body>
+<main>
 
-    <h1>Maintenances & Pannes</h1>
-    
-    <p>
-        <a th:href="@{/maintenances/new}">+ Nouvelle Intervention</a>
-    </p>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/maintenances/new}"><i class="bi bi-plus-lg"></i> Nouvelle intervention</a>
+</div>
 
-    <fieldset>
-        <legend>Filtres de recherche</legend>
-        <form th:action="@{/maintenances}" th:object="${filter}" method="get">
-            <div>
-                <label>ID Intervention :</label>
-                <input type="number" th:field="*{id}">
-            </div>
-            <div>
-                <label>ID Équipement :</label>
-                <input type="number" th:field="*{idEquipement}">
-            </div>
-            <div>
-                <label>ID Utilisateur / Technicien :</label>
-                <input type="number" th:field="*{idUser}">
-            </div>
-            <div>
-                <label>ID Catégorie :</label>
-                <input type="number" th:field="*{idCategorieMaintenance}">
-            </div>
-            <div>
-                <label>Statut Intervention :</label>
-                <select th:field="*{statutIntervention}">
-                    <option value="">Tous</option>
-                    <option th:each="statut : ${T(mg.itu.aquanova.sanitaire_equipement.models.StatutInterventionEnum).values()}"
-                            th:value="${statut}" th:text="${statut}"></option>
-                </select>
-            </div>
-            <div>
-                <label>Coût exact :</label>
-                <input type="number" step="0.01" th:field="*{cout}">
-            </div>
-            <div>
-                <label>Date Maintenance (Début) :</label>
-                <input type="date" th:field="*{debutDateMaintenance}">
-            </div>
-            <div>
-                <label>Date Maintenance (Fin) :</label>
-                <input type="date" th:field="*{finDateMaintenance}">
-            </div>
-            <div>
-                <label>Date Résolution (Début) :</label>
-                <input type="date" th:field="*{debutDateResolution}">
-            </div>
-            <div>
-                <label>Date Résolution (Fin) :</label>
-                <input type="date" th:field="*{finDateResolution}">
-            </div>
-            <br>
-            <div>
-                <button type="submit">Filtrer</button>
-                <a th:href="@{/maintenances}">Réinitialiser</a>
-            </div>
-        </form>
-    </fieldset>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Maintenances &amp; Pannes</h5>
+        <span class="result-count"
+              th:text="${maintenances.totalElements} + ' intervention' + (${maintenances.totalElements} > 1 ? 's' : '') + ' trouvée' + (${maintenances.totalElements} > 1 ? 's' : '')"></span>
+    </div>
 
-    <br>
+    <form method="get" th:action="@{/maintenances}" class="filters-bar">
+        <input type="hidden" name="page" value="0" />
+        <div class="input-group">
+            <span class="input-group-text">Du</span>
+            <input class="form-control" type="date" name="dateDebut" th:value="${filter.dateDebut}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">Au</span>
+            <input class="form-control" type="date" name="dateFin" th:value="${filter.dateFin}">
+        </div>
+        <input class="form-control fc-sm" type="number" step="0.01" min="0" name="coutMin" placeholder="Coût min" th:value="${filter.coutMin}">
+        <input class="form-control fc-sm" type="number" step="0.01" min="0" name="coutMax" placeholder="Coût max" th:value="${filter.coutMax}">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/maintenances}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
+    </form>
 
-    <table border="1">
-        <thead>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Date</th>
                 <th>Équipement</th>
                 <th>Catégorie</th>
                 <th>Statut</th>
-                <th>Coût</th>
-                <th>Date Résolution</th>
-                <th>Actions</th>
+                <th class="text-end">Coût (Ar)</th>
+                <th>Date résolution</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
-            <tr th:each="m : ${maintenances}">
-                <td th:text="${m.id}">1</td>
-                <td th:text="${m.dateMaintenance}">2026-03-15</td>
-                <td th:text="${m.equipement != null ? 'Équipement #' + m.equipement.id : '-'}">Sonde A</td>
-                <td th:text="${m.categorieMaintenance != null ? m.categorieMaintenance.libelle : '-'}">Préventive</td>
-                <td th:text="${m.statutIntervention}">OUVERTE</td>
-                <td th:text="${m.cout != null ? m.cout + ' €' : '0.00 €'}">150 €</td>
-                <td th:text="${m.dateResolution != null ? m.dateResolution : '-'}">-</td>
-                <td>
-                    <a th:href="@{/maintenances/{id}(id=${m.id})}">Détails</a> | 
-                    <a th:href="@{/maintenances/delete/{id}(id=${m.id})}" onclick="return confirm('Confirmer la suppression ?')">Supprimer</a>
+            </thead>
+            <tbody>
+            <tr th:each="m : ${maintenances.content}">
+                <td th:text="${m.id}"></td>
+                <td th:text="${m.dateMaintenance}"></td>
+                <td class="fw-semibold" th:text="${m.equipement != null ? 'Équipement #' + m.equipement.id : '—'}"></td>
+                <td th:text="${m.categorieMaintenance != null ? m.categorieMaintenance.libelle : '—'}"></td>
+                <td><span class="badge badge-info" th:text="${m.statutIntervention}"></span></td>
+                <td class="text-end montant" th:text="${m.cout != null ? m.cout + ' €' : '0.00 €'}"></td>
+                <td th:text="${m.dateResolution != null ? m.dateResolution : '—'}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/maintenances/{id}(id=${m.id})}" title="Voir les détails"><i class="bi bi-eye"></i></a>
                 </td>
             </tr>
-            <tr th:if="${#lists.isEmpty(maintenances)}">
-                <td colspan="8">Aucune maintenance trouvée.</td>
+            <tr th:if="${maintenances.empty}">
+                <td colspan="8" class="text-center text-secondary py-4">Aucune maintenance ne correspond à ces critères.</td>
             </tr>
-        </tbody>
-    </table>
-
-    <div th:if="${page.totalPages > 0}">
-        <p>
-            Page <span th:text="${page.number + 1}">1</span> sur <span th:text="${page.totalPages}">5</span>
-        </p>
-        <div>
-            <a th:href="@{/maintenances(
-                    page=${page.number - 1}, 
-                    id=${filter.id}, 
-                    idEquipement=${filter.idEquipement}, 
-                    idUser=${filter.idUser}, 
-                    idCategorieMaintenance=${filter.idCategorieMaintenance}, 
-                    statutIntervention=${filter.statutIntervention}, 
-                    cout=${filter.cout}, 
-                    debutDateMaintenance=${filter.debutDateMaintenance}, 
-                    finDateMaintenance=${filter.finDateMaintenance}, 
-                    debutDateResolution=${filter.debutDateResolution}, 
-                    finDateResolution=${filter.finDateResolution}
-            )}" 
-            th:if="${page.hasPrevious()}">Précédent</a>
-
-            <a th:href="@{/maintenances(
-                    page=${page.number + 1}, 
-                    id=${filter.id}, 
-                    idEquipement=${filter.idEquipement}, 
-                    idUser=${filter.idUser}, 
-                    idCategorieMaintenance=${filter.idCategorieMaintenance}, 
-                    statutIntervention=${filter.statutIntervention}, 
-                    cout=${filter.cout}, 
-                    debutDateMaintenance=${filter.debutDateMaintenance}, 
-                    finDateMaintenance=${filter.finDateMaintenance}, 
-                    debutDateResolution=${filter.debutDateResolution}, 
-                    finDateResolution=${filter.finDateResolution}
-            )}" 
-            th:if="${page.hasNext()}">Suivant</a>
-        </div>
+            </tbody>
+        </table>
     </div>
 
+    <div th:replace="~{fragments/tableau :: tableFooter(${maintenances})}"></div>
+</div>
+</main>
 </body>
 </html>

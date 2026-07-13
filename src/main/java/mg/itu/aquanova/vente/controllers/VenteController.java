@@ -1,10 +1,17 @@
 package mg.itu.aquanova.vente.controllers;
 
+import java.util.List;
+
+import mg.itu.aquanova.vente.dto.TransactionFilterDTO;
 import mg.itu.aquanova.vente.models.Vente;
 import mg.itu.aquanova.vente.services.VenteService;
+import mg.itu.aquanova.vente.services.ClientService;
+import mg.itu.aquanova.vente.services.TypeClientService;
 import mg.itu.aquanova.vente.repositories.StatutVenteRepository;
+import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.production.services.RecolteService;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,38 +21,44 @@ import java.time.LocalDate;
 @RequestMapping("/ventes")
 public class VenteController {
 
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50, 100);
+
     private final VenteService service;
     private final StatutVenteRepository statutRepository;
     private final RecolteService recolteService; // Ajouté ici
+    private final LotService lotService;
+    private final ClientService clientService;
+    private final TypeClientService typeClientService;
 
     public VenteController(VenteService service, StatutVenteRepository statutRepository,
-            RecolteService recolteService) {
+            RecolteService recolteService, LotService lotService, ClientService clientService,
+            TypeClientService typeClientService) {
         this.service = service;
         this.statutRepository = statutRepository;
         this.recolteService = recolteService;
+        this.lotService = lotService;
+        this.clientService = clientService;
+        this.typeClientService = typeClientService;
     }
 
     @GetMapping
     public String lister(
-            @RequestParam(required = false) Long id,
-            @RequestParam(required = false) String client,
-            @RequestParam(required = false) Long recolteId,
-            @RequestParam(required = false) Long lotId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin,
-            @RequestParam(required = false) Long statutId,
+            @ModelAttribute("filter") TransactionFilterDTO filter,
+            @PageableDefault(size = 10, sort = "dateVente") Pageable pageable,
             Model model) {
 
-        model.addAttribute("ventes", service.search(id, client, recolteId, lotId, debut, fin, statutId));
+        model.addAttribute("ventes", service.lister(filter, pageable));
         model.addAttribute("statuts", statutRepository.findAll());
-        model.addAttribute("currentId", id);
-        model.addAttribute("currentClient", client);
-        model.addAttribute("currentRecolteId", recolteId);
-        model.addAttribute("currentLotId", lotId);
-        model.addAttribute("currentDebut", debut);
-        model.addAttribute("currentFin", fin);
-        model.addAttribute("currentStatutId", statutId);
+        model.addAttribute("recoltes", recolteService.getAllRecoltes());
+        model.addAttribute("lots", lotService.listerTous());
+        model.addAttribute("pageSizes", PAGE_SIZES);
         return "ventes/liste";
+    }
+
+    @GetMapping("/{id}/journal")
+    public String voirJournal(@PathVariable Long id, Model model) {
+        model.addAttribute("vente", service.trouverParId(id));
+        return "ventes/journal";
     }
 
     @GetMapping("/new")
@@ -54,7 +67,9 @@ public class VenteController {
         v.setDateVente(LocalDate.now());
 
         model.addAttribute("vente", v);
-        model.addAttribute("recoltes", recolteService.getAllRecoltes()); // Utilise le getAllRecoltes() de Tommy
+        model.addAttribute("recoltes", recolteService.getRecoltesDisponibles()); // Utilise le getAllRecoltes() de Tommy
+        model.addAttribute("clients", clientService.listerActifsPour(null));
+        model.addAttribute("typesClient", typeClientService.listerTout());
         return "ventes/formulaire";
     }
 
@@ -63,6 +78,9 @@ public class VenteController {
         try {
             if (vente.getRecolte() != null && vente.getRecolte().getId() != null) {
                 vente.setRecolte(recolteService.getRecolteById(vente.getRecolte().getId()));
+            }
+            if (vente.getClient() != null && vente.getClient().getId() != null) {
+                vente.setClient(clientService.trouverParId(vente.getClient().getId()));
             }
 
             if (vente.getId() == null) {
@@ -74,9 +92,11 @@ public class VenteController {
             return "redirect:/ventes";
         } catch (RuntimeException e) {
             model.addAttribute("erreur", e.getMessage());
+            model.addAttribute("clients", clientService.listerActifsPour(vente.getClient()));
+            model.addAttribute("typesClient", typeClientService.listerTout());
 
             if (vente.getId() == null) {
-                model.addAttribute("recoltes", recolteService.getAllRecoltes());
+                model.addAttribute("recoltes", recolteService.getRecoltesDisponibles());
                 return "ventes/formulaire";
             }
 
@@ -92,19 +112,46 @@ public class VenteController {
 
     @GetMapping("/{id}/edit")
     public String afficherFormulaireModification(@PathVariable Long id, Model model) {
-        model.addAttribute("vente", service.trouverParId(id));
+        Vente vente = service.trouverParId(id);
+        model.addAttribute("vente", vente);
+        model.addAttribute("clients", clientService.listerActifsPour(vente.getClient()));
+        model.addAttribute("typesClient", typeClientService.listerTout());
         return "ventes/edit";
     }
 
     @PostMapping("/{id}/valider")
-    public String valider(@PathVariable Long id) {
-        service.validerVente(id);
-        return "redirect:/ventes/" + id;
+    public String valider(@PathVariable Long id, Model model) {
+        try {
+            service.validerVente(id);
+            return "redirect:/ventes/" + id;
+        } catch (RuntimeException e) {
+            model.addAttribute("vente", service.trouverParId(id));
+            model.addAttribute("erreur", e.getMessage());
+            return "ventes/fiche";
+        }
+    }
+
+    @PostMapping("/{id}/payer")
+    public String payer(@PathVariable Long id, Model model) {
+        try {
+            service.marquerPayee(id);
+            return "redirect:/ventes/" + id;
+        } catch (RuntimeException e) {
+            model.addAttribute("vente", service.trouverParId(id));
+            model.addAttribute("erreur", e.getMessage());
+            return "ventes/fiche";
+        }
     }
 
     @PostMapping("/{id}/annuler")
-    public String annuler(@PathVariable Long id) {
-        service.annulerVente(id);
-        return "redirect:/ventes/" + id;
+    public String annuler(@PathVariable Long id, Model model) {
+        try {
+            service.annulerVente(id);
+            return "redirect:/ventes/" + id;
+        } catch (RuntimeException e) {
+            model.addAttribute("vente", service.trouverParId(id));
+            model.addAttribute("erreur", e.getMessage());
+            return "ventes/fiche";
+        }
     }
 }

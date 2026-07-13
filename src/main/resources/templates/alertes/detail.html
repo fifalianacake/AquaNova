@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Detail alerte</title>
+</head>
+<body>
+<main>
+<div class="container mt-4">
+
+    <h2>Detail de l'alerte</h2>
+
+    <hr>
+
+    <table class="table table-bordered">
+
+        <tr>
+            <th>ID</th>
+            <td th:text="${alerte.id}"></td>
+        </tr>
+
+        <tr>
+            <th>Module</th>
+            <td th:text="${alerte.moduleSource}"></td>
+        </tr>
+
+        <tr>
+            <th>Type</th>
+            <td th:text="${alerte.typeAlerte}"></td>
+        </tr>
+
+        <tr>
+            <th>Criticité</th>
+            <td th:text="${alerte.niveauCriticite}"></td>
+        </tr>
+
+        <tr>
+            <th>Statut</th>
+            <td th:text="${alerte.statut}"></td>
+        </tr>
+
+        <tr>
+            <th>Message</th>
+            <td th:text="${alerte.message}"></td>
+        </tr>
+
+        <tr>
+            <th>Date création</th>
+            <td th:text="${alerte.dateCreation}"></td>
+        </tr>
+
+        <tr th:if="${alerte.dateResolution!=null}">
+            <th>Date résolution</th>
+            <td th:text="${alerte.dateResolution}"></td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h4>Changer le statut</h4>
+
+    <form th:action="@{/alertes/{id}/statut(id=${alerte.id})}"
+          method="post">
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Nouveau statut
+            </label>
+
+            <select
+                    class="form-select"
+                    name="nouveauStatut"
+                    required>
+
+                <option value="">
+                    -- Choisir --
+                </option>
+
+                <option
+                        th:each="s:${statuts}"
+                        th:value="${s}"
+                        th:text="${s}">
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Commentaire
+            </label>
+
+            <textarea
+                    class="form-control"
+                    rows="4"
+                    name="commentaire"></textarea>
+
+            <small class="text-muted">
+                Conseillé si le statut est RESOLUE ou IGNOREE..
+            </small>
+
+        </div>
+
+        <button
+                class="btn btn-primary"
+                type="submit">
+
+            Enregistrer
+
+        </button>
+
+        <a
+                th:href="@{/alertes}"
+                class="btn btn-secondary">
+
+            Retour
+
+        </a>
+
+    </form>
+
+</div>
+</main>
+</body>
+</html>

@@ -1,27 +1,30 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Formulaire Statut Lot</title>
 </head>
 <body>
-<h1 th:text="${statut.id} == null ? 'Créer un statut' : 'Modifier statut ' + ${statut.id}"></h1>
+<main>
+    <h2 th:text="${statut.id} == null ? 'Créer un statut' : 'Modifier statut ' + ${statut.id}"></h2>
 
-<form th:action="${statut.id} == null ? @{/statut-lots} : @{/statut-lots/{id}(id=${statut.id})}" method="post" th:object="${statut}">
-    <div>
-        <label>Libelle:
-            <select th:field="*{libelle}">
+    <form class="form-panel" th:action="${statut.id} == null ? @{/statut-lots} : @{/statut-lots/{id}(id=${statut.id})}" method="post" th:object="${statut}">
+        <div class="mb-3">
+            <label class="form-label" for="libelle">Libellé</label>
+            <select class="form-select" id="libelle" th:field="*{libelle}">
                 <option th:each="val : ${libelles}" th:value="${val}" th:text="${val}"></option>
             </select>
-        </label>
-    </div>
-    <div>
-        <label>Description: <textarea th:field="*{description}"></textarea></label>
-    </div>
-    <div>
-        <button type="submit">Save</button>
-        <a th:href="@{/statut-lots}">Cancel</a>
-    </div>
-</form>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control" id="description" th:field="*{description}"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/statut-lots}">Retour à la liste</a>
+        </div>
+    </form>
+</main>
 </body>
 </html>

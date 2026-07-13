@@ -1,11 +1,12 @@
 package mg.itu.aquanova.alimentation.services;
 
-import mg.itu.aquanova.admin.models.ParametreSysteme;
-import mg.itu.aquanova.admin.repositories.ParametreSystemeRepository;
+import mg.itu.aquanova.admin.service.ParametreSystemeService;
 import mg.itu.aquanova.alimentation.dto.DistributionDTO;
+import mg.itu.aquanova.alimentation.dto.DistributionFilter;
 import mg.itu.aquanova.alimentation.models.Distribution;
 import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.services.PrevisionRecolteService;
 import mg.itu.aquanova.referentiel.models.Aliment;
@@ -13,6 +14,9 @@ import mg.itu.aquanova.alimentation.models.MouvementStock;
 import mg.itu.aquanova.alimentation.models.TypeMouvement;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -28,26 +32,60 @@ public class DistributionService {
     private final LotRepository lotRepository;
     private final MouvementService mouvementStockService;
     private final AlimentRepository alimentRepository;
-    private final ParametreSystemeRepository parametreSystemeRepository;
+    private final ParametreSystemeService parametreSystemeService;
     private final PrevisionRecolteService previsionRecolteService;
+    private final CumpService cumpService;
 
     public DistributionService(DistributionRepository distributionRepository,
             LotRepository lotRepository,
             MouvementService mouvementStockService,
             AlimentRepository alimentRepository,
-            ParametreSystemeRepository parametreSystemeRepository,
-            PrevisionRecolteService previsionRecolteService) {
+            ParametreSystemeService parametreSystemeService,
+            PrevisionRecolteService previsionRecolteService,
+            CumpService cumpService) {
 
         this.distributionRepository = distributionRepository;
         this.lotRepository = lotRepository;
         this.mouvementStockService = mouvementStockService;
         this.alimentRepository = alimentRepository;
-        this.parametreSystemeRepository = parametreSystemeRepository;
+        this.parametreSystemeService = parametreSystemeService;
         this.previsionRecolteService = previsionRecolteService;
+        this.cumpService = cumpService;
     }
 
     public List<mg.itu.aquanova.alimentation.models.Distribution> getAllDistributions() {
         return distributionRepository.findAll();
+    }
+
+    public Page<Distribution> lister(DistributionFilter filter, Pageable pageable) {
+        return distributionRepository.findAll(specification(filter), pageable);
+    }
+
+    private Specification<Distribution> specification(DistributionFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getLotId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("lot").get("id"), filter.getLotId()));
+            }
+            if (filter.getAlimentId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("aliment").get("id"), filter.getAlimentId()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates, cb.greaterThanOrEqualTo(root.get("dateDistribution"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(root.get("dateDistribution"), filter.getDateFin()));
+            }
+
+            return predicates;
+        };
     }
 
     public mg.itu.aquanova.alimentation.models.Distribution getDistributionById(Long id) {
@@ -55,57 +93,54 @@ public class DistributionService {
                 .orElseThrow(() -> new IllegalArgumentException("Distribution introuvable avec l'ID : " + id));
     }
 
+    @Transactional
     public void deleteDistribution(Long id) {
-        distributionRepository.deleteById(id);
+        Distribution distribution = getDistributionById(id);
+
+        mouvementStockService.findByDistributionId(distribution.getId())
+                .ifPresent(mouvement -> mouvementStockService.deleteLinkedToDistribution(mouvement.getId()));
+
+        distributionRepository.delete(distribution);
     }
 
     @Transactional
-    public void saveOrUpdateDistribution(DistributionDTO distributionDTO) {
-        validateDistributionDTO(distributionDTO);
-        Distribution distribution = new Distribution();
-
-        if (distributionDTO.getId() != null) {
-            distribution = getDistributionById(distributionDTO.getId());
-        }
-
-        LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
-
-        if (distributionDTO.getIdAliment() == null)
-            throw new IllegalArgumentException("ID de l'aliment est requis");
-
-        Aliment aliment = alimentRepository.findById(distributionDTO.getIdAliment())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Aliment introuvable avec l'ID : " + distributionDTO.getIdAliment()));
-
-        distribution.setDateDistribution(distributionDTO.getDateDistribution());
-        distribution.setLot(lot);
-        distribution.setAliment(aliment);
-        distribution.setQuantite(distributionDTO.getQuantite());
-
-        BigDecimal rationTheorique = CalculRationTheoriqueCible(distributionDTO);
-
-        distribution.setRationTheorique(rationTheorique);
-
-        distributionRepository.save(distribution);
-    }
-
     public Distribution saveDistribution(DistributionDTO distributionDTO) {
         validateDistributionDTO(distributionDTO);
 
-        Distribution distribution = new Distribution();
+        boolean isUpdate = distributionDTO.getId() != null;
+        Distribution distribution = isUpdate
+                ? getDistributionById(distributionDTO.getId())
+                : new Distribution();
 
         LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
 
+        if (lot.getStatutLot().getLibelle().equals(StatutLotEnum.ANNULE) || lot.getStatutLot().getLibelle().equals(StatutLotEnum.CLOTURE)) {
+            throw new IllegalArgumentException("Le lot est déjà clôturé ou annulé");
+        }
+
         if (distributionDTO.getIdAliment() == null)
             throw new IllegalArgumentException("ID de l'aliment est requis");
+
 
         Aliment aliment = alimentRepository.findById(distributionDTO.getIdAliment())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Aliment introuvable avec l'ID : " + distributionDTO.getIdAliment()));
+
+        if (isUpdate) {
+            mouvementStockService.findByDistributionId(distribution.getId())
+                    .ifPresent(mouvement -> mouvementStockService.deleteLinkedToDistribution(mouvement.getId()));
+        }
+
+        double stockDisponible = mouvementStockService.getStockDisponibleADate(
+                aliment.getId(), distributionDTO.getDateDistribution());
+        if (stockDisponible < distributionDTO.getQuantite().doubleValue()) {
+            throw new IllegalStateException(
+                    "Stock insuffisant pour " + aliment.getNom() + " à la date "
+                            + distributionDTO.getDateDistribution() + " : disponible "
+                            + stockDisponible + " kg, demandé " + distributionDTO.getQuantite() + " kg.");
+        }
 
         distribution.setDateDistribution(distributionDTO.getDateDistribution());
         distribution.setLot(lot);
@@ -116,14 +151,15 @@ public class DistributionService {
 
         distribution.setRationTheorique(rationTheorique);
 
-        distributionRepository.save(distribution);
+        distribution.setCoutUnitaire(
+                cumpService.calculerCump(aliment.getId(), distribution.getDateDistribution()));
+
+        distribution = distributionRepository.save(distribution);
 
         MouvementStock mouvementStock = createMouvementStock(distribution);
-
         mouvementStockService.create(mouvementStock);
 
         return distribution;
-
     }
 
     private MouvementStock createMouvementStock(Distribution distribution) {
@@ -133,6 +169,7 @@ public class DistributionService {
         mouvementStock.setTypeMouvement(TypeMouvement.SORTIE);
         mouvementStock.setQuantite(distribution.getQuantite().doubleValue());
         mouvementStock.setCommentaire("Distribution aliment dans le lot #" + distribution.getLot().getId());
+        mouvementStock.setDistribution(distribution);
         return mouvementStock;
     }
 
@@ -154,10 +191,9 @@ public class DistributionService {
         }
     }
 
-    public Double calculGPQCible(DistributionDTO distributionDTO) {
-        LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
+    public Double calculGPQCible(Long idLot) {
+        LotModels lot = lotRepository.findById(idLot)
+                .orElseThrow(() -> new IllegalArgumentException("Lot introuvable avec l'ID : " + idLot));
 
         Double poidsMoyenActuel = lot.getPoidsMoyenActuel() != null ? lot.getPoidsMoyenActuel() : 0.0;
 
@@ -165,17 +201,17 @@ public class DistributionService {
                 ? lot.getEspece().getPoidsCibleMoyen().doubleValue()
                 : 0.0;
 
-        LocalDate dateRecolteEstimee = previsionRecolteService.estimerDateRecolte(lot.getId());
+        LocalDate dateRecolteEstimee = previsionRecolteService.estimerDateRecolte(idLot);
 
         if (dateRecolteEstimee == null) {
-            System.err.println("Date de récolte estimée introuvable pour le lot avec l'ID : " + lot.getId());
+            System.err.println("Date de récolte estimée introuvable pour le lot avec l'ID : " + idLot);
             return 1.0;
         }
 
         Integer jourRestant = (int) java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), dateRecolteEstimee);
 
         if (jourRestant <= 0) {
-            System.err.println("La date de récolte estimée est passée pour le lot avec l'ID : " + lot.getId());
+            System.err.println("La date de récolte estimée est passée pour le lot avec l'ID : " + idLot);
             return 0.2; // evite infini
         }
 
@@ -186,60 +222,42 @@ public class DistributionService {
         if (total <= 0) {
             System.err
                     .println("Le poids moyen actuel est supérieur ou égal au poids moyen cible pour le lot avec l'ID : "
-                            + lot.getId());
+                            + idLot);
             return 0.2; // evite infini
         }
 
         return total;
     }
 
-    public Double calculGainCible(DistributionDTO distributionDTO) {
-        LotModels lot = lotRepository.findById(distributionDTO.getIdLot())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Lot introuvable avec l'ID : " + distributionDTO.getIdLot()));
+    public Double calculGPQCible(DistributionDTO distributionDTO) {
+        return calculGPQCible(distributionDTO.getIdLot());
+    }
 
-        Double gainCible = 0.0;
+    public Double calculGainCible(Long idLot) {
+        LotModels lot = lotRepository.findById(idLot)
+                .orElseThrow(() -> new IllegalArgumentException("Lot introuvable avec l'ID : " + idLot));
 
-        Double gpqCible = calculGPQCible(distributionDTO);
+        Double gpqCible = calculGPQCible(idLot);
 
         Integer quantitePoisson = lot.getEffectifActuel() != null ? lot.getEffectifActuel() : 0;
 
-        gainCible = (gpqCible * quantitePoisson) / 1000.0;
+        return (gpqCible * quantitePoisson) / 1000.0;
+    }
 
-        return gainCible;
+    public Double calculGainCible(DistributionDTO distributionDTO) {
+        return calculGainCible(distributionDTO.getIdLot());
+    }
+
+    public BigDecimal calculRationTheoriqueCible(Long idLot) {
+        Double gainCible = calculGainCible(idLot);
+
+        Double ica = parametreSystemeService.getDouble(ParametreSystemeService.ICA_SYSTEME, 1.3);
+
+        return BigDecimal.valueOf(gainCible.doubleValue() * ica);
     }
 
     public BigDecimal CalculRationTheoriqueCible(DistributionDTO distributionDTO) {
-        Double rationTheoriqueCible = 0.0;
-
-        Double gainCible = calculGainCible(distributionDTO);
-
-        String paramCode = "ICA_SYSTEME";
-
-        ParametreSysteme param = parametreSystemeRepository.findByCode(paramCode).orElse(null);
-
-        Double ica = 1.3;
-
-        if (param != null) {
-            try {
-                String icaStr = param.getValeur();
-
-                icaStr = icaStr.replace(",", ".");
-
-                ica = Double.parseDouble(icaStr);
-
-            } catch (NumberFormatException e) {
-                System.err.println("Erreur lors de la conversion de la valeur ICA : " + e.getMessage());
-                ica = 1.3;
-            }
-
-        } else {
-            System.err.println("Paramètre ICA introuvable. Utilisation de la valeur par défaut : 1.3");
-        }
-
-        rationTheoriqueCible = gainCible.doubleValue() * ica;
-        return BigDecimal.valueOf(rationTheoriqueCible);
-
+        return calculRationTheoriqueCible(distributionDTO.getIdLot());
     }
 
 }

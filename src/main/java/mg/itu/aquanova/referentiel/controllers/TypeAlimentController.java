@@ -8,7 +8,7 @@ import mg.itu.aquanova.referentiel.models.TypeAlimentModels;
 import mg.itu.aquanova.referentiel.services.TypeAlimentService;
 
 @Controller
-@RequestMapping("/type-aliment")
+@RequestMapping("/types-aliments")
 public class TypeAlimentController {
 
     private final TypeAlimentService service;
@@ -30,9 +30,15 @@ public class TypeAlimentController {
     }
 
     @PostMapping
-    public String save(@ModelAttribute TypeAlimentModels type) {
-        service.save(type);
-        return "redirect:/type-aliment";
+    public String save(@ModelAttribute TypeAlimentModels type, Model model) {
+        try {
+            service.save(type);
+            return "redirect:/types-aliments";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("type", type);
+            model.addAttribute("error", e.getMessage());
+            return "type-aliment/form";
+        }
     }
 
     @GetMapping("/{id}")
@@ -41,9 +47,9 @@ public class TypeAlimentController {
         return "type-aliment/form";
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String delete(@PathVariable Integer id) {
         service.delete(id);
-        return "redirect:/type-aliment";
+        return "redirect:/types-aliments";
     }
 }

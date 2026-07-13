@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Simulation de récolte</title>
+</head>
+<body>
+<main>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Quand faut-il récolter ce lot&nbsp;?</h2>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge badge-info" th:text="${simulation.codeLot}">LOT</span>
+            <span class="text-secondary small"
+                  th:text="${simulation.espece} + ' · bassin ' + ${simulation.bassin}"></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/finance/previsions}">
+            <i class="bi bi-arrow-left"></i> Prévisions
+        </a>
+        <a class="btn btn-outline-primary" th:href="@{/lots/{id}(id=${simulation.lotId})}">
+            <i class="bi bi-droplet-half"></i> Fiche du lot
+        </a>
+    </div>
+</div>
+
+<div class="error" th:unless="${simulation.calculable}" th:text="${simulation.impossible}"></div>
+
+<div th:if="${simulation.calculable}">
+
+    <!-- ══════════ La recommandation ══════════ -->
+    <div class="panel mb-4">
+        <div class="p-4">
+            <div class="d-flex align-items-start gap-3">
+                <div style="font-size: 2rem; color: var(--aq-teal);"><i class="bi bi-lightbulb"></i></div>
+                <div>
+                    <div class="fs-5 mb-1">
+                        Récolte optimale estimée au
+                        <strong th:text="${#temporals.format(simulation.optimum.date, 'dd MMMM yyyy')}">—</strong>
+                        <span class="text-secondary"
+                              th:text="'(dans ' + ${simulation.optimum.jour} + ' jour(s))'"></span>
+                    </div>
+                    <div class="text-secondary">
+                        Marge prévisionnelle&nbsp;:
+                        <strong th:text="${#numbers.formatDecimal(simulation.optimum.marge, 1, 'WHITESPACE', 0, 'COMMA')} + ' Ar'"></strong>
+                        pour
+                        <span th:text="${#numbers.formatDecimal(simulation.optimum.biomasse, 1, 'WHITESPACE', 1, 'COMMA')} + ' kg'"></span>
+                        de poisson.
+                    </div>
+
+                    <div class="mt-2" th:if="${simulation.gainAAttendre != null}">
+                        <span th:if="${simulation.optimum.jour > 0}">
+                            Récolter aujourd'hui rapporterait
+                            <strong th:text="${#numbers.formatDecimal(simulation.aujourdHui.marge, 1, 'WHITESPACE', 0, 'COMMA')} + ' Ar'"></strong>.
+                            Attendre rapporte
+                            <strong class="text-success"
+                                    th:text="'+' + ${#numbers.formatDecimal(simulation.gainAAttendre, 1, 'WHITESPACE', 0, 'COMMA')} + ' Ar'"></strong>
+                            de plus.
+                        </span>
+                        <span th:if="${simulation.optimum.jour == 0}" class="text-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Il faut récolter <strong>maintenant</strong> : attendre coûterait plus en aliment
+                            et en mortalité que cela ne rapporterait en croissance.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ Hypothèses ══════════ -->
+    <div class="panel mb-4">
+        <div class="panel-header">
+            <h5>Hypothèses</h5>
+            <span class="result-count">Rien n'est enregistré : cette page ne fait que simuler</span>
+        </div>
+        <form method="get" class="p-3" th:action="@{/finance/lots/{id}/simulation(id=${simulation.lotId})}">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label" for="prixVenteKg">Prix de vente (Ar/kg)</label>
+                    <input class="form-control" type="number" step="50" min="0"
+                           id="prixVenteKg" name="prixVenteKg"
+                           th:value="${#numbers.formatDecimal(simulation.prixVenteKg, 1, 0)}">
+                    <div class="form-text">Prix moyen constaté pour l'espèce</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="coutAlimentKg">Coût de l'aliment (Ar/kg)</label>
+                    <input class="form-control" type="number" step="50" min="0"
+                           id="coutAlimentKg" name="coutAlimentKg"
+                           th:value="${#numbers.formatDecimal(simulation.coutAlimentKg, 1, 0)}">
+                    <div class="form-text">Coût moyen pondéré réel (CUMP)</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="tauxMortalite">Mortalité (% / jour)</label>
+                    <input class="form-control" type="number" step="0.01" min="0" max="100"
+                           id="tauxMortalite" name="tauxMortalite"
+                           th:value="${simulation.tauxMortaliteJournalier}">
+                    <div class="form-text">Taux observé sur ce lot</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="horizonJours">Horizon (jours)</label>
+                    <input class="form-control" type="number" step="10" min="10" max="365"
+                           id="horizonJours" name="horizonJours" th:value="${simulation.horizonJours}">
+                    <div class="form-text">Durée explorée</div>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-arrow-repeat"></i> Recalculer
+                </button>
+                <a class="btn btn-outline-secondary"
+                   th:href="@{/finance/lots/{id}/simulation(id=${simulation.lotId})}">
+                    <i class="bi bi-x-circle"></i> Hypothèses réelles
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- ══════════ La courbe ══════════ -->
+    <div class="panel mb-4">
+        <div class="panel-header">
+            <h5>Marge selon la date de récolte</h5>
+        </div>
+        <div class="p-3">
+            <canvas id="simulationChart" height="90"></canvas>
+            <p class="hint mt-3 mb-0">
+                Attendre fait grossir les poissons, donc monte le chiffre d'affaires. Mais l'aliment se paie
+                chaque jour et la mortalité réduit l'effectif. Une fois le poids cible atteint
+                <span th:if="${simulation.dateCiblePoids != null}"
+                      th:text="'(le ' + ${#temporals.format(simulation.dateCiblePoids, 'dd/MM/yyyy')} + ')'"></span>,
+                les poissons ne grossissent plus mais continuent de manger : la marge se met à décroître.
+                C'est ce retournement qui détermine la date optimale.
+            </p>
+        </div>
+    </div>
+
+    <!-- ══════════ Données du lot ══════════ -->
+    <div class="panel">
+        <div class="panel-header"><h5>Base de calcul</h5></div>
+        <div class="panel-body p-3">
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Effectif actuel</div>
+                    <div class="info-value" th:text="${simulation.effectifActuel} + ' individus'">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Poids moyen actuel</div>
+                    <div class="info-value"
+                         th:text="${#numbers.formatDecimal(simulation.poidsMoyenActuel, 1, 'WHITESPACE', 1, 'COMMA')} + ' g'">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Croissance observée</div>
+                    <div class="info-value"
+                         th:text="${#numbers.formatDecimal(simulation.croissanceJournaliere, 1, 'WHITESPACE', 2, 'COMMA')} + ' g / jour'">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Poids cible de l'espèce</div>
+                    <div class="info-value"
+                         th:text="${#numbers.formatDecimal(simulation.poidsCible, 1, 'WHITESPACE', 0, 'COMMA')} + ' g'">—</div>
+                </div>
+                <div class="info-row info-row-full">
+                    <div class="info-label">Coûts déjà engagés sur ce lot</div>
+                    <div class="info-value montant"
+                         th:text="${#numbers.formatDecimal(simulation.coutsDejaEngages, 1, 'WHITESPACE', 0, 'COMMA')}
+                                  + ' Ar (alevins + aliment déjà distribué)'">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const simJours   = /*[[${simulation.points.![jour]}]]*/ [];
+        const simMarge   = /*[[${simulation.points.![marge]}]]*/ [];
+        const simCa      = /*[[${simulation.points.![chiffreAffaires]}]]*/ [];
+        const simAliment = /*[[${simulation.points.![coutAlimentFutur]}]]*/ [];
+        const simDates   = /*[[${simulation.points.![date]}]]*/ [];
+        const simOptimum = /*[[${simulation.optimum.jour}]]*/ 0;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const formatAr = v => new Intl.NumberFormat('fr-FR').format(Math.round(v)) + ' Ar';
+        const etiquettes = simJours.map(j => 'J+' + j);
+
+        /* Repère vertical sur la date optimale : c'est la lecture principale du graphique,
+           il faut qu'elle saute aux yeux sans avoir à survoler la courbe. */
+        const repereOptimum = {
+            id: 'repereOptimum',
+            afterDatasetsDraw(chart) {
+                const x = chart.scales.x.getPixelForValue(simOptimum);
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.strokeStyle = '#1f4e79';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.moveTo(x, chart.chartArea.top);
+                ctx.lineTo(x, chart.chartArea.bottom);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#1f4e79';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Optimum', x, chart.chartArea.top - 4);
+                ctx.restore();
+            }
+        };
+
+        new Chart(document.getElementById('simulationChart'), {
+            type: 'line',
+            data: {
+                labels: etiquettes,
+                datasets: [
+                    {
+                        label: 'Marge si je récolte ce jour-là',
+                        data: simMarge,
+                        borderColor: '#128a7a',
+                        backgroundColor: 'rgba(18, 138, 122, 0.12)',
+                        fill: true,
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Chiffre d\'affaires',
+                        data: simCa,
+                        borderColor: '#5b7c99',
+                        borderDash: [5, 4],
+                        tension: 0.3,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Aliment cumulé à payer',
+                        data: simAliment,
+                        borderColor: '#e0a72c',
+                        tension: 0.3,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            title: items => simDates[items[0].dataIndex],
+                            label: c => c.dataset.label + ' : ' + formatAr(c.parsed.y)
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { maxTicksLimit: 15 } },
+                    y: { ticks: { callback: v => new Intl.NumberFormat('fr-FR').format(v) } }
+                }
+            },
+            plugins: [repereOptimum]
+        });
+    </script>
+
+</div>
+
+</main>
+</body>
+</html>

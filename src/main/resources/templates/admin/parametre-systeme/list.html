@@ -1,50 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des paramètres système</title>
 </head>
-
 <body>
-    <h1>Liste des paramètres système</h1>
+<main>
 
-    <p>
-        <a th:href="@{/parametres-systeme/new}">Creer un nouveau paramètre</a>
-    </p>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/parametres-systeme/new}"><i class="bi bi-plus-lg"></i> Créer un paramètre</a>
+</div>
 
-    <table border="1">
-        <thead>
+<p class="error" th:if="${error}" th:text="${error}"></p>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des paramètres système</h5>
+        <span class="result-count" th:text="${#lists.size(parametres)} + ' paramètre(s)'"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Code</th>
-                <th>Libelle</th>
+                <th>Libellé</th>
                 <th>Valeur</th>
                 <th>Type</th>
                 <th>Description</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="parametre : ${parametres}">
                 <td th:text="${parametre.id}"></td>
-                <td th:text="${parametre.code}"></td>
+                <td class="fw-semibold" th:text="${parametre.code}"></td>
                 <td th:text="${parametre.libelle}"></td>
                 <td th:text="${parametre.valeur}"></td>
                 <td th:text="${parametre.typeValeur}"></td>
                 <td th:text="${parametre.description}"></td>
-                <td>
-                    <a th:href="@{'/parametres-systeme/' + ${parametre.id}}">Details</a>
-                    |
-                    <a th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}">Modifier</a>
-                    |
-                    <a th:href="@{'/parametres-systeme/' + ${parametre.id} + '/delete'}"
-                        onclick="return confirm('Supprimer ce paramètre ?');">Supprimer</a>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/parametres-systeme/' + ${parametre.id}}" title="Voir"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{'/parametres-systeme/' + ${parametre.id} + '/edit'}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{'/parametres-systeme/' + ${parametre.id} + '/delete'}" title="Supprimer"
+                       onclick="return confirm('Supprimer ce paramètre ?');"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
-        </tbody>
-    </table>
+            <tr th:if="${#lists.isEmpty(parametres)}">
+                <td colspan="7" class="text-center text-secondary py-4">Aucun paramètre enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
 </body>
-
 </html>

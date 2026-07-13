@@ -1,46 +1,42 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Liste des fournisseurs</title>
+    <title>AquaNova - Liste des fournisseurs</title>
 </head>
 <body>
+<main>
 
-    <h1>Liste des fournisseurs</h1>
+<div class="success" th:if="${successMessage}" th:text="${successMessage}"></div>
+<div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
-    <p><a th:href="@{/fournisseurs/new}">+ Ajouter un nouveau fournisseur</a></p>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/fournisseurs/new}"><i class="bi bi-plus-lg"></i> Ajouter un nouveau fournisseur</a>
+</div>
 
-    <div th:if="${successMessage}" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des fournisseurs</h5>
+        <span class="result-count"
+              th:text="${#lists.size(fournisseurs)} + ' fournisseur' + (${#lists.size(fournisseurs)} > 1 ? 's' : '') + ' trouvé' + (${#lists.size(fournisseurs)} > 1 ? 's' : '')"></span>
+    </div>
 
-    <h2>Filtres de recherche</h2>
-    <form th:action="@{/fournisseurs}" method="get">
-        <label for="filtreId">ID :</label>
-        <input type="number" id="filtreId" name="id" th:value="${param.id}">
-
-        <label for="filtreNom">Nom :</label>
-        <input type="text" id="filtreNom" name="nom" th:value="${param.nom}">
-
-        <label for="filtreType">Type fournisseur :</label>
-        <input type="text" id="filtreType" name="typeFournisseur" th:value="${param.typeFournisseur}">
-
-        <label for="filtreContact">Contact :</label>
-        <input type="text" id="filtreContact" name="contact" th:value="${param.contact}">
-
-        <label for="filtreActif">Statut :</label>
-        <select id="filtreActif" name="actif">
-            <option value="">Tous</option>
+    <form method="get" th:action="@{/fournisseurs}" class="filters-bar">
+        <input class="form-control fc-sm" type="number" name="id" placeholder="ID" th:value="${param.id}">
+        <input class="form-control" type="text" name="nom" placeholder="Nom" th:value="${param.nom}">
+        <input class="form-control" type="text" name="typeFournisseur" placeholder="Type fournisseur" th:value="${param.typeFournisseur}">
+        <input class="form-control" type="text" name="contact" placeholder="Contact" th:value="${param.contact}">
+        <select class="form-select" name="actif">
+            <option value="">Tous les statuts</option>
             <option value="true" th:selected="${param.actif != null && param.actif[0] == 'true'}">Actif</option>
             <option value="false" th:selected="${param.actif != null && param.actif[0] == 'false'}">Inactif</option>
         </select>
-
-        <button type="submit">Filtrer</button>
-        <a th:href="@{/fournisseurs}">Réinitialiser</a>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
+        <a class="btn btn-outline-secondary" th:href="@{/fournisseurs}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
     </form>
 
-    <h2>Résultats</h2>
-    <table border="1">
-        <thead>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
@@ -49,31 +45,37 @@
                 <th>Email</th>
                 <th>Adresse</th>
                 <th>Actif</th>
-                <th>Actions</th>
+                <th class="text-end">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="f : ${fournisseurs}">
                 <td th:text="${f.id}"></td>
-                <td th:text="${f.nom}"></td>
+                <td class="fw-semibold" th:text="${f.nom}"></td>
                 <td th:text="${f.typeFournisseur}"></td>
                 <td th:text="${f.contact}"></td>
                 <td th:text="${f.email}"></td>
                 <td th:text="${f.adresse}"></td>
-                <td th:text="${f.actif ? 'Oui' : 'Non'}"></td>
                 <td>
-                    <a th:href="@{/fournisseurs/{id}(id=${f.id})}">Consulter</a> | 
-                    <a th:href="@{/fournisseurs/{id}/edit(id=${f.id})}">Modifier</a> |
-                    <form th:action="@{/fournisseurs/{id}/desactiver(id=${f.id})}" method="post" style="display:inline;">
-                        <button type="submit" th:if="${f.actif}" onclick="return confirm('Désactiver ce fournisseur ?');">Désactiver</button>
+                    <span th:class="'badge ' + (${f.actif} ? 'badge-success' : 'badge-danger')"
+                          th:text="${f.actif ? 'Oui' : 'Non'}"></span>
+                </td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/fournisseurs/{id}(id=${f.id})}" title="Consulter"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/fournisseurs/{id}/edit(id=${f.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <form class="inline-form" th:action="@{/fournisseurs/{id}/desactiver(id=${f.id})}" method="post" th:if="${f.actif}"
+                          onsubmit="return confirm('Désactiver ce fournisseur ?');">
+                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Désactiver"><i class="bi bi-trash3"></i></button>
                     </form>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(fournisseurs)}">
-                <td colspan="8">Aucun fournisseur trouvé.</td>
+                <td colspan="8" class="text-center text-secondary py-4">Aucun fournisseur ne correspond à ces critères.</td>
             </tr>
-        </tbody>
-    </table>
-
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
 </body>
 </html>

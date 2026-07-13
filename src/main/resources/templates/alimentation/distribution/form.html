@@ -1,65 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${distribution.id != null} ? 'Modifier la distribution' : 'Nouvelle distribution'"></title>
+    <title>AquaNova - Distribution</title>
 </head>
-
 <body>
+<main>
+    <h2 th:text="${distribution.id != null} ? 'Modifier la distribution' : 'Créer une nouvelle distribution'"></h2>
 
-    <h1 th:text="${distribution.id != null} ? 'Modifier la distribution' : 'Créer une nouvelle distribution'"></h1>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-    <form th:action="@{/alimentation/distribution/save}" th:object="${distribution}" method="post">
+    <form class="form-panel" th:action="${distribution.id} == null ? @{/distributions} : @{'/distributions/' + ${distribution.id}}"
+          th:object="${distribution}" method="post">
 
-        <input type="hidden" th:field="*{id}" />
-
-        <div>
-            <label for="dateDistribution">Date de distribution :</label>
-            <input type="date" id="dateDistribution" th:field="*{dateDistribution}" required />
+        <div class="mb-3">
+            <label class="form-label" for="dateDistribution">Date de distribution</label>
+            <input class="form-control" type="date" id="dateDistribution" th:field="*{dateDistribution}" required />
         </div>
 
-        <br />
-
-        <div>
-            <label for="lot">Lot concerné :</label>
-            <select id="lot" th:field="*{idLot}" required>
+        <div class="mb-3">
+            <label class="form-label" for="lot">Lot concerné</label>
+            <select class="form-select" id="lot" th:field="*{idLot}" required>
                 <option value="">-- Sélectionner un lot --</option>
                 <option th:each="l : ${lots}" th:value="${l.id}" th:text="'Lot #' + ${l.id}"></option>
             </select>
         </div>
 
-        <br />
-
-        <div>
-            <label for="aliment">Aliment en Stock :</label>
-            <select th:field="*{idAliment}" class="form-control" id="aliment" required>
+        <div class="mb-3">
+            <label class="form-label" for="aliment">Aliment en Stock</label>
+            <select class="form-select" id="aliment" th:field="*{idAliment}" required>
                 <option value="">-- Choisir un aliment --</option>
-                <option th:each="al : ${aliments}" th:value="${al.id}" th:text="${al.nom}"> </option>
+                <option th:each="al : ${aliments}" th:value="${al.id}" th:text="${al.nom}"></option>
             </select>
         </div>
 
-        <br />
-
-        <div>
-            <label for="quantite">Quantité distribuée (kg) :</label>
-            <input type="number" step="0.01" id="quantite" th:field="*{quantite}" />
+        <div class="mb-3">
+            <label class="form-label" for="quantite">Quantité distribuée (kg)</label>
+            <input class="form-control" type="number" step="0.01" id="quantite" th:field="*{quantite}" />
         </div>
 
-        <br />
-
-        <div>
-            <label for="rationTheorique">Ration théorique :</label>
-            <input type="number" step="0.01" id="rationTheorique" th:field="*{rationTheorique}" />
+        <div class="mb-3">
+            <label class="form-label" for="rationTheorique">Ration théorique</label>
+            <input class="form-control" type="number" step="0.01" id="rationTheorique" th:field="*{rationTheorique}" />
         </div>
 
-        <br />
-
-        <button type="submit">Enregistrer</button>
-        <a th:href="@{/alimentation/distribution}">Annuler</a>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{/distributions}">Retour à la liste</a>
+        </div>
     </form>
-
+</main>
 </body>
-
 </html>

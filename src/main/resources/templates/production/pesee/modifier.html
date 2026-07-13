@@ -1,31 +1,40 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Edit Weighing</title>
+    <title>Modifier une pesée</title>
 </head>
 <body>
-    <h1>Edit Weighing</h1>
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+<main>
+    <h2>Modifier une pesée</h2>
 
-    <form th:action="@{/production/pesee/modifier}" method="post">
-        
-        <input type="hidden" name="id" th:value="${pese.id}">
-        
-        <label>Date:</label>
-        <input type="date" name="datePesee" th:value="${pese.datePesee}" required><br>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
-        <label>Sample Size:</label>
-        <input type="number" name="nbEchantillon" th:value="${pese.nbEchantillon}" required><br>
+    <form class="form-panel" th:action="@{'/pesees/' + ${pese.id}}" method="post">
+        <div class="mb-3">
+            <label class="form-label" for="datePesee">Date</label>
+            <input class="form-control" type="date" id="datePesee" name="datePesee" th:value="${pese.datePesee}" required>
+        </div>
 
-        <label>Total Weight (kg):</label>
-        <input type="number" step="0.01" name="poidsTotal" th:value="${pese.poidsTotalEchantillon}" required><br>
+        <div class="mb-3">
+            <label class="form-label" for="nbEchantillon">Nombre d'échantillons</label>
+            <input class="form-control" type="number" id="nbEchantillon" name="nbEchantillon" th:value="${pese.nbEchantillon}" required>
+        </div>
 
-        <label>Observation:</label>
-        <textarea name="observation" th:text="${pese.observation}"></textarea><br>
+        <div class="mb-3">
+            <label class="form-label" for="poidsTotal">Poids Total (kg)</label>
+            <input class="form-control" type="number" step="0.01" id="poidsTotal" name="poidsTotal" th:value="${pese.poidsTotalEchantillon}" required>
+        </div>
 
-        <button type="submit">Update</button>
-        <a th:href="@{'/production/pesee/liste/' + ${pese.lot.id}}">Cancel</a>
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" name="observation" th:text="${pese.observation}"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+            <a class="btn btn-secondary" th:href="@{'/lots/' + ${pese.lot.id} + '/pesees'}">Retour à la liste</a>
+        </div>
     </form>
+</main>
 </body>
 </html>

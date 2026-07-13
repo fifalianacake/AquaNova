@@ -1,34 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova</title>
+</head>
 <body>
-    <h1 th:text="${equipement.id != null} ? 'Modification Équipement' : 'Saisie Équipement'">
+<main>
+    <h2 th:text="${equipement.id != null} ? 'Modification Équipement' : 'Saisie Équipement'">
         Saisie Équipement
-    </h1>
+    </h2>
 
-    <form th:action="${equipement.id == null} ? @{/equipements/save} : @{/equipements/edit/{id}(id=${equipement.id})}"
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <form class="form-panel" th:action="${equipement.id == null} ? @{/equipements} : @{/equipements/{id}(id=${equipement.id})}"
           th:object="${equipement}"
           method="post">
-        <label>Nom :</label> <input type="text" th:field="*{nom}" required /><br/>
-        
-        <label>Type :</label>
-        <select th:field="*{typeEquipement.id}" required>
-            <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
-        </select><br/>
+        <div class="mb-3">
+            <label class="form-label" for="nom">Nom</label>
+            <input class="form-control" type="text" id="nom" th:field="*{nom}" required />
+        </div>
 
-        <label>Statut :</label>
-        <select th:field="*{statut}" required>
-            <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
-        </select><br/>
+        <div class="mb-3">
+            <label class="form-label" for="typeEquipement">Type</label>
+            <select class="form-select" id="typeEquipement" th:field="*{typeEquipement.id}" required>
+                <option value="">-- Choisir un type --</option>
+                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
+            </select>
+        </div>
 
-        <label>Date Installation :</label> <input type="date" th:field="*{dateInstallation}" required /><br/>
-        
-        <label>Observation :</label> <textarea th:field="*{observation}"></textarea><br/>
-        
-        <button type="submit" th:text="${equipement.id != null} ? 'Modifier' : 'Enregistrer'">
-            Enregistrer
-        </button>
+        <div class="mb-3">
+            <label class="form-label" for="statut">Statut</label>
+            <select class="form-select" id="statut" th:field="*{statut}" required>
+                <option value="">-- Choisir un statut --</option>
+                <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="dateInstallation">Date Installation</label>
+            <input class="form-control" type="date" id="dateInstallation" th:field="*{dateInstallation}" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" th:field="*{observation}"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit" th:text="${equipement.id != null} ? 'Modifier' : 'Enregistrer'">
+                Enregistrer
+            </button>
+            <a class="btn btn-secondary" th:href="@{/equipements}">Retour à la liste</a>
+        </div>
     </form>
-
-    <a th:href="@{/equipements}">Retour</a>
+</main>
 </body>
 </html>

@@ -32,11 +32,18 @@ public class Distribution {
     @Column(name = "ration_theorique", precision = 10, scale = 2)
     private BigDecimal rationTheorique;
 
-    // @Enumerated(EnumType.STRING)
-    // @Column(name = "statut", nullable = false)
-    // private StatutDistributionModels statut = StatutDistributionModels.EN_ATTENTE;
+    @Column(name = "cout_unitaire", precision = 14, scale = 4)
+    private BigDecimal coutUnitaire;
 
     public Distribution() {
+    }
+
+    public BigDecimal getCoutUnitaire() {
+        return coutUnitaire;
+    }
+
+    public void setCoutUnitaire(BigDecimal coutUnitaire) {
+        this.coutUnitaire = coutUnitaire;
     }
 
     public Long getId() {

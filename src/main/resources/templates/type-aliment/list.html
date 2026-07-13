@@ -1,29 +1,46 @@
-<h2>Liste des Types d'Aliments</h2>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Liste des Types d'Aliments</title>
+</head>
+<body>
+<main>
 
-<a href="/type-aliment/new">Ajouter</a>
+<div class="toolbar">
+    <a class="btn btn-primary" href="/types-aliments/new"><i class="bi bi-plus-lg"></i> Ajouter un type</a>
+</div>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Nom</th>
-        <th>Actions</th>
-    </tr>
+<div class="panel">
+    <div class="panel-header">
+        <h5>Liste des types d'aliments</h5>
+        <span class="result-count" th:text="${#lists.size(types)} + ' type(s)'"></span>
+    </div>
 
-```
-<tr th:each="t : ${types}">
-    <td th:text="${t.id}"></td>
-    <td th:text="${t.nom}"></td>
-
-    <td>
-        <a th:href="@{/type-aliment/{id}(id=${t.id})}">
-            Edit
-        </a>
-
-        <a th:href="@{/type-aliment/delete/{id}(id=${t.id})}">
-            Delete
-        </a>
-    </td>
-</tr>
-```
-
-</table>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${types}">
+                <td th:text="${t.id}"></td>
+                <td class="fw-semibold" th:text="${t.nom}"></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/types-aliments/{id}(id=${t.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" th:href="@{/types-aliments/{id}/delete(id=${t.id})}" title="Supprimer"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(types)}">
+                <td colspan="3" class="text-center text-secondary py-4">Aucun type d'aliment enregistré.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</main>
+</body>
+</html>

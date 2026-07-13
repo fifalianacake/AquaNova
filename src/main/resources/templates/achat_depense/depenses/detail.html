@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Détail de la dépense</title>
+</head>
+<body>
+<main>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1" th:text="${depense.libelle}">Dépense</h2>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="badge badge-info"
+                  th:if="${depense.categorieDepense != null}"
+                  th:text="${depense.categorieDepense.libelle}"></span>
+            <span class="text-secondary small"
+                  th:text="'Dépense #' + ${depense.id} + ' · '
+                           + ${depense.dateDepense != null ? #temporals.format(depense.dateDepense, 'dd/MM/yyyy') : '—'}"></span>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" th:href="@{/depenses}"><i class="bi bi-arrow-left"></i> Retour</a>
+        <a class="btn btn-outline-primary" th:href="@{/depenses/{id}/edit(id=${depense.id})}"><i class="bi bi-pencil"></i> Modifier</a>
+        <form class="inline-form" method="post" th:action="@{/depenses/{id}/delete(id=${depense.id})}"
+              onsubmit="return confirm('Supprimer cette dépense ?')">
+            <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash3"></i> Supprimer</button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-secondary small">Montant</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(depense.montant, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">0 Ar</div>
+                    <span class="small text-secondary" th:text="${depense.modePaiement ?: 'Mode de paiement non précisé'}"></span>
+                </div>
+                <div class="kpi-icon"><i class="bi bi-receipt"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h5>Informations</h5>
+    </div>
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-label">Date</div>
+            <div class="info-value"
+                 th:text="${depense.dateDepense != null ? #temporals.format(depense.dateDepense, 'dd/MM/yyyy') : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Catégorie</div>
+            <div class="info-value"
+                 th:text="${depense.categorieDepense != null ? depense.categorieDepense.code + ' — ' + depense.categorieDepense.libelle : '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Libellé</div>
+            <div class="info-value fw-semibold" th:text="${depense.libelle}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Montant</div>
+            <div class="info-value montant"
+                 th:text="${#numbers.formatDecimal(depense.montant, 1, 'WHITESPACE', 2, 'COMMA')} + ' Ar'">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Mode de paiement</div>
+            <div class="info-value" th:text="${depense.modePaiement ?: '—'}">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Référence</div>
+            <div class="info-value" th:text="${depense.reference ?: '—'}">—</div>
+        </div>
+        <div class="info-row info-row-full">
+            <div class="info-label">Observation</div>
+            <div class="info-value"
+                 th:text="${depense.observation != null and !depense.observation.isBlank() ? depense.observation : 'Aucune observation.'}">—</div>
+        </div>
+    </div>
+</div>
+
+</main>
+</body>
+</html>

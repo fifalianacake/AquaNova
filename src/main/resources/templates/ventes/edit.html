@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>AquaNova - Modifier la Vente</title>
+</head>
+<body>
+<main>
+
+    <h2>Modifier la Vente #<span th:text="${vente.id}"></span></h2>
+
+    <div class="error" th:if="${erreur}" th:text="${erreur}"></div>
+
+    <form class="form-panel" th:action="@{/ventes}" th:object="${vente}" method="post">
+
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{recolte.id}" />
+
+        <div class="mb-3">
+            <label class="form-label">Récolte d'origine</label>
+            <div class="readonly-value" th:text="'Récolte N° ' + ${vente.recolte.id} + ' [Poids total: ' + ${vente.recolte.poidsTotal} + 'kg]'"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="clientSelect">Client *</label>
+            <div class="client-row">
+                <select class="form-select" th:field="*{client.id}" id="clientSelect" required>
+                    <option value="">-- Sélectionner le client --</option>
+                    <option th:each="c : ${clients}" th:value="${c.id}" th:text="${c.nom}"></option>
+                </select>
+                <button type="button" class="btn btn-link" onclick="ouvrirModalClient()">+ Nouveau client</button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="dateVente">Date de la vente *</label>
+            <input class="form-control" type="date" id="dateVente" th:field="*{dateVente}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Quantité vendue exprimée en *</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="modeSaisieQuantite" id="modeSaisiePoids" value="POIDS" checked onchange="basculerModeSaisie()">
+                    <label class="form-check-label" for="modeSaisiePoids">Poids (kg)</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="modeSaisieQuantite" id="modeSaisieEffectif" value="EFFECTIF" onchange="basculerModeSaisie()">
+                    <label class="form-check-label" for="modeSaisieEffectif">Effectif (pièces)</label>
+                </div>
+            </div>
+            <small class="hint">L'autre valeur est déduite automatiquement à partir du poids moyen de la récolte.</small>
+        </div>
+
+        <div class="mb-3" id="groupePoidsVendu">
+            <label class="form-label" for="inputPoidsVendu">Poids vendu (kg) *</label>
+            <input class="form-control" type="number" step="0.01" th:field="*{poidsVendu}" id="inputPoidsVendu" min="0.01" placeholder="0.00" required>
+        </div>
+
+        <div class="mb-3 d-none" id="groupeEffectifVendu">
+            <label class="form-label" for="inputEffectifVendu">Effectif vendu (pièces) *</label>
+            <input class="form-control" type="number" th:field="*{effectifVendu}" id="inputEffectifVendu" min="1" placeholder="Nombre de pièces" disabled>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="prixUnitaire">Prix unitaire (Ar) *</label>
+            <input class="form-control" type="number" step="0.01" id="prixUnitaire" th:field="*{prixUnitaire}" min="0.01" placeholder="0.00" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="observation">Observation</label>
+            <textarea class="form-control" id="observation" th:field="*{observation}" rows="3" placeholder="Notes complémentaires..."></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+            <a th:href="@{/ventes/{id}(id=${vente.id})}" class="btn btn-secondary">Retour</a>
+        </div>
+    </form>
+
+    <dialog id="modalNouveauClient">
+        <h3 class="mt-0">Nouveau client</h3>
+        <div id="modalClientErreur" class="error d-none"></div>
+
+        <div class="mb-3">
+            <label class="form-label" for="modalClientNom">Nom / Raison sociale *</label>
+            <input class="form-control" type="text" id="modalClientNom" placeholder="Nom du client">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="modalClientType">Type de client *</label>
+            <select class="form-select" id="modalClientType">
+                <option value="">-- Choisir un type --</option>
+                <option th:each="t : ${typesClient}" th:value="${t.id}" th:text="${t.libelle}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="modalClientContact">Contact téléphonique</label>
+            <input class="form-control" type="text" id="modalClientContact" placeholder="Optionnel">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="modalClientEmail">Email</label>
+            <input class="form-control" type="email" id="modalClientEmail" placeholder="Optionnel">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="modalClientAdresse">Adresse</label>
+            <input class="form-control" type="text" id="modalClientAdresse" placeholder="Optionnel">
+        </div>
+
+        <div class="btn-box">
+            <button type="button" class="btn btn-secondary" onclick="fermerModalClient()">Annuler</button>
+            <button type="button" class="btn btn-primary" onclick="creerClientModal()">Créer le client</button>
+        </div>
+    </dialog>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function basculerModeSaisie() {
+            const mode = document.querySelector('input[name="modeSaisieQuantite"]:checked').value;
+            const inputPoids = document.getElementById('inputPoidsVendu');
+            const inputEffectif = document.getElementById('inputEffectifVendu');
+
+            if (mode === 'POIDS') {
+                document.getElementById('groupePoidsVendu').classList.remove('d-none');
+                document.getElementById('groupeEffectifVendu').classList.add('d-none');
+                inputPoids.disabled = false;
+                inputPoids.required = true;
+                inputEffectif.disabled = true;
+                inputEffectif.required = false;
+                inputEffectif.value = '';
+            } else {
+                document.getElementById('groupePoidsVendu').classList.add('d-none');
+                document.getElementById('groupeEffectifVendu').classList.remove('d-none');
+                inputPoids.disabled = true;
+                inputPoids.required = false;
+                inputPoids.value = '';
+                inputEffectif.disabled = false;
+                inputEffectif.required = true;
+            }
+        }
+        basculerModeSaisie();
+
+        const urlCreationClient = /*[[@{/clients/api}]]*/ '/clients/api';
+
+        function ouvrirModalClient() {
+            document.getElementById('modalClientErreur').classList.add('d-none');
+            document.getElementById('modalNouveauClient').showModal();
+        }
+
+        function fermerModalClient() {
+            document.getElementById('modalNouveauClient').close();
+        }
+
+        function creerClientModal() {
+            const nom = document.getElementById('modalClientNom').value.trim();
+            const typeClientId = document.getElementById('modalClientType').value;
+            const contact = document.getElementById('modalClientContact').value.trim();
+            const email = document.getElementById('modalClientEmail').value.trim();
+            const adresse = document.getElementById('modalClientAdresse').value.trim();
+            const erreurDiv = document.getElementById('modalClientErreur');
+            erreurDiv.classList.add('d-none');
+
+            if (!nom || !typeClientId) {
+                erreurDiv.textContent = 'Le nom et le type de client sont obligatoires.';
+                erreurDiv.classList.remove('d-none');
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('nom', nom);
+            params.append('typeClientId', typeClientId);
+            if (contact) params.append('contact', contact);
+            if (email) params.append('email', email);
+            if (adresse) params.append('adresse', adresse);
+
+            fetch(urlCreationClient, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(async (res) => {
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur lors de la création du client.');
+                }
+                return data;
+            })
+            .then((data) => {
+                const select = document.getElementById('clientSelect');
+                const option = document.createElement('option');
+                option.value = data.id;
+                option.textContent = data.nom;
+                select.appendChild(option);
+                select.value = data.id;
+
+                document.getElementById('modalClientNom').value = '';
+                document.getElementById('modalClientType').value = '';
+                document.getElementById('modalClientContact').value = '';
+                document.getElementById('modalClientEmail').value = '';
+                document.getElementById('modalClientAdresse').value = '';
+
+                fermerModalClient();
+            })
+            .catch((err) => {
+                erreurDiv.textContent = err.message;
+                erreurDiv.classList.remove('d-none');
+            });
+        }
+        /*]]>*/
+    </script>
+</main>
+</body>
+</html>
