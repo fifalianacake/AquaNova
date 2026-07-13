@@ -21,4 +21,7 @@ public interface DepenseRepository extends JpaRepository<Depense, Long>, JpaSpec
             + "GROUP BY d.categorieDepense.id, d.categorieDepense.libelle "
             + "ORDER BY SUM(d.montant) DESC")
     List<Object[]> sumMontantParCategorieEntre(@Param("debut") LocalDate debut, @Param("fin") LocalDate fin);
+
+    boolean existsByCategorieDepenseId(Long categorieId);
+
 }
