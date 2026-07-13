@@ -13,24 +13,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import mg.itu.aquanova.achat.models.CategorieDepense;
+import mg.itu.aquanova.achat.services.AchatService;
 import mg.itu.aquanova.achat.services.CategorieDepenseService;
+import mg.itu.aquanova.achat.services.DepenseService;
 
 
 @Controller
 public class CategorieDepenseController {
 
     private final CategorieDepenseService categorieDepenseService;
-    // private final DepenseService depenseService;
-    // private final AchatService achatService;
+    private final DepenseService depenseService;
+    private final AchatService achatService;
 
     public CategorieDepenseController(
-        CategorieDepenseService categorieDepenseService /*, 
+        CategorieDepenseService categorieDepenseService, 
         DepenseService depenseService,
-        AchatService achatService */
+        AchatService achatService
     ) {
         this.categorieDepenseService = categorieDepenseService;
-        // this.depenseService = depenseService;
-        // this.achatService = achatService;
+        this.depenseService = depenseService;
+        this.achatService = achatService;
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
@@ -68,7 +70,7 @@ public class CategorieDepenseController {
     public String modifier(@PathVariable Long id, @ModelAttribute CategorieDepense categorieDepense, Model model) {
         try {
             categorieDepenseService.modifier(id, categorieDepense);
-            return "redirect:/categories-depenses/";
+            return "redirect:/categories-depenses";
         } catch (IllegalArgumentException ex) {
             categorieDepense.setId(id);
             model.addAttribute("error", ex.getMessage());
@@ -79,12 +81,12 @@ public class CategorieDepenseController {
 
     // @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/categories-depenses/{id}/delete")
-    public String deleteCategorie(@PathVariable Long id) {
-        // if(!depenseService.estDejaUtilise(id) && !achatService.estDejaUtilise(id)) {
-        //     categorieDepenseService.delete(id);
-        // } else {
-        //    model.addAttribute("error", "Impossible de supprimer la catégorie : elle est actuellement liée à des informations enregistrées.");
-        // }
+    public String deleteCategorie(@PathVariable Long id, Model model) {
+        if(!depenseService.estDejaUtilise(id) && !achatService.estDejaUtilise(id)) {
+            categorieDepenseService.delete(id);
+        } else {
+           model.addAttribute("error", "Impossible de supprimer la catégorie : elle est actuellement liée à des informations enregistrées.");
+        }
         return "redirect:/categories-depenses";
     }
     

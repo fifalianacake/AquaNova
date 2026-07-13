@@ -194,4 +194,8 @@ public class DepenseService {
     private String blankToNull(String value) {
         return value == null || value.trim().isEmpty() ? null : value.trim();
     }
+
+    public boolean estDejaUtilise(Long id) {
+        return depenseRepository.existsByCategorieDepenseId(id);
+    }
 }
