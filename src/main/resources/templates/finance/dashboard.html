@@ -118,12 +118,26 @@
     </div>
 </div>
 
+<!-- ══════════ Évolution mensuelle : graphique ou tableau ══════════ -->
 <div class="panel">
     <div class="panel-header">
         <h5>Évolution mensuelle</h5>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Affichage de l'évolution mensuelle">
+            <button type="button" class="btn btn-outline-primary active" id="btnEvolutionGraphique">
+                <i class="bi bi-graph-up"></i> Graphique
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="btnEvolutionTableau">
+                <i class="bi bi-table"></i> Tableau
+            </button>
+        </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
+
+    <div class="p-3" id="evolutionGraphique" th:if="${!#lists.isEmpty(dashboard.evolution)}">
+        <canvas id="evolutionChart" height="90"></canvas>
+    </div>
+
+    <div class="table-responsive d-none" id="evolutionTableau">
+        <table class="table table-hover align-middle mb-0">
             <thead>
             <tr>
                 <th>Mois</th>
@@ -153,30 +167,58 @@
             </tbody>
         </table>
     </div>
+
+    <div class="text-center text-secondary py-4" th:if="${#lists.isEmpty(dashboard.evolution)}">
+        Aucune donnée sur cette période.
+    </div>
 </div>
 
+<!-- ══════════ Dépenses indirectes par catégorie ══════════ -->
 <div class="panel">
     <div class="panel-header">
         <h5>Dépenses indirectes par catégorie</h5>
+        <span class="result-count"
+              th:text="${#numbers.formatDecimal(dashboard.depenses, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar au total'"></span>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead>
-            <tr>
-                <th>Catégorie</th>
-                <th class="text-end">Montant</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="d : ${dashboard.depensesParCategorie}">
-                <td th:text="${d.libelle}"></td>
-                <td class="text-end montant" th:text="${#numbers.formatDecimal(d.montant, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(dashboard.depensesParCategorie)}">
-                <td colspan="2" class="text-center text-secondary py-4">Aucune dépense sur cette période.</td>
-            </tr>
-            </tbody>
-        </table>
+
+    <div class="p-3" th:if="${!#lists.isEmpty(dashboard.depensesParCategorie)}">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-5">
+                <canvas id="depensesChart" height="220"></canvas>
+            </div>
+            <!--/* Le camembert donne la proportion, le tableau donne le montant exact :
+                   les deux sont nécessaires, l'un ne remplace pas l'autre. */-->
+            <div class="col-lg-7">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Catégorie</th>
+                            <th class="text-end">Montant</th>
+                            <th class="text-end">Part</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="d : ${dashboard.depensesParCategorie}">
+                            <td th:text="${d.libelle}"></td>
+                            <td class="text-end montant"
+                                th:text="${#numbers.formatDecimal(d.montant, 0, 'WHITESPACE', 2, 'COMMA')} + ' Ar'"></td>
+                            <!--/* doubleValue() : une division de BigDecimal au quotient illimité
+                                   (20 000 × 100 / 68 000) lèverait une ArithmeticException. */-->
+                            <td class="text-end text-secondary"
+                                th:text="${dashboard.depenses.signum() > 0}
+                                         ? ${#numbers.formatDecimal(d.montant.doubleValue() * 100 / dashboard.depenses.doubleValue(), 1, 1)} + ' %'
+                                         : '—'"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center text-secondary py-4" th:if="${#lists.isEmpty(dashboard.depensesParCategorie)}">
+        Aucune dépense sur cette période.
     </div>
 </div>
 
@@ -245,6 +287,131 @@
         </table>
     </div>
 </div>
+
+<!-- Séries injectées par Thymeleaf, consommées par Chart.js -->
+<script th:inline="javascript">
+    const evolMois        = /*[[${dashboard.evolution.![mois]}]]*/ [];
+    const evolCa          = /*[[${dashboard.evolution.![chiffreAffaires]}]]*/ [];
+    const evolCouts       = /*[[${dashboard.evolution.![coutsDirects]}]]*/ [];
+    const evolMarge       = /*[[${dashboard.evolution.![margeBrute]}]]*/ [];
+    const evolDepenses    = /*[[${dashboard.evolution.![depenses]}]]*/ [];
+    const evolProfit      = /*[[${dashboard.evolution.![profitNet]}]]*/ [];
+    const depensesLabels  = /*[[${dashboard.depensesParCategorie.![libelle]}]]*/ [];
+    const depensesValeurs = /*[[${dashboard.depensesParCategorie.![montant]}]]*/ [];
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const TEAL = '#128a7a';
+    const PALETTE = ['#128a7a', '#1f4e79', '#e0a72c', '#7fb8ad', '#a94442', '#5b7c99'];
+
+    const formatAr = valeur => new Intl.NumberFormat('fr-FR').format(valeur) + ' Ar';
+
+    const canvasEvolution = document.getElementById('evolutionChart');
+    if (canvasEvolution) {
+        new Chart(canvasEvolution, {
+            type: 'line',
+            data: {
+                labels: evolMois,
+                datasets: [
+                    {
+                        label: 'Chiffre d\'affaires',
+                        data: evolCa,
+                        borderColor: TEAL,
+                        backgroundColor: 'rgba(18, 138, 122, 0.12)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 3
+                    },
+                    {
+                        label: 'Coûts directs',
+                        data: evolCouts,
+                        borderColor: '#e0a72c',
+                        tension: 0.35,
+                        pointRadius: 3
+                    },
+                    {
+                        label: 'Dépenses indirectes',
+                        data: evolDepenses,
+                        borderColor: '#5b7c99',
+                        borderDash: [5, 4],
+                        tension: 0.35,
+                        pointRadius: 3
+                    },
+                    {
+                        /* Le profit net est la seule courbe qui peut passer sous zéro :
+                           on l'épaissit, c'est la lecture principale du graphique. */
+                        label: 'Profit net',
+                        data: evolProfit,
+                        borderColor: '#1f4e79',
+                        borderWidth: 3,
+                        tension: 0.35,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: c => c.dataset.label + ' : ' + formatAr(c.parsed.y)
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { callback: v => new Intl.NumberFormat('fr-FR').format(v) }
+                    }
+                }
+            }
+        });
+    }
+
+    const canvasDepenses = document.getElementById('depensesChart');
+    if (canvasDepenses) {
+        new Chart(canvasDepenses, {
+            type: 'doughnut',
+            data: {
+                labels: depensesLabels,
+                datasets: [{ data: depensesValeurs, backgroundColor: PALETTE, borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                cutout: '62%',
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: c => c.label + ' : ' + formatAr(c.parsed)
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* Bascule graphique / tableau de l'évolution mensuelle. */
+    const btnGraphique = document.getElementById('btnEvolutionGraphique');
+    const btnTableau = document.getElementById('btnEvolutionTableau');
+    const vueGraphique = document.getElementById('evolutionGraphique');
+    const vueTableau = document.getElementById('evolutionTableau');
+
+    if (btnGraphique && btnTableau && vueTableau) {
+        const afficher = versTableau => {
+            vueTableau.classList.toggle('d-none', !versTableau);
+            if (vueGraphique) {
+                vueGraphique.classList.toggle('d-none', versTableau);
+            }
+            btnTableau.classList.toggle('active', versTableau);
+            btnGraphique.classList.toggle('active', !versTableau);
+        };
+        btnGraphique.addEventListener('click', () => afficher(false));
+        btnTableau.addEventListener('click', () => afficher(true));
+    }
+</script>
 
 </main>
 </body>
