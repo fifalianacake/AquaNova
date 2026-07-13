@@ -82,3 +82,7 @@ FROM (VALUES
 WHERE NOT EXISTS (
     SELECT 1 FROM type_equipement t WHERE t.libelle = v.libelle
 );
+
+
+INSERT INTO roles (name) VALUES ('ADMIN'), ('RESPONSABLE'), ('TECHNICIEN')
+ON CONFLICT (name) DO NOTHING;

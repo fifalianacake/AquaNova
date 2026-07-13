@@ -1,20 +1,69 @@
 package mg.itu.aquanova.config.navigation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import mg.itu.aquanova.config.securite.ReglesAcces;
+import mg.itu.aquanova.config.securite.Roles;
 
 @ControllerAdvice
 public class NavigationControllerAdvice {
 
+    private final ReglesAcces reglesAcces;
+
+    public NavigationControllerAdvice(ReglesAcces reglesAcces) {
+        this.reglesAcces = reglesAcces;
+    }
+
     @ModelAttribute("menuNavigation")
     public List<NavigationItemDTO> menuNavigation(HttpServletRequest request) {
-        List<NavigationItemDTO> menu = construireMenu();
+        List<NavigationItemDTO> menu = filtrerParRole(construireMenu(), roleCourant(request));
         marquerActif(menu, request.getRequestURI());
         return menu;
+    }
+
+    /** Exposé aux vues pour masquer les boutons réservés à l'administrateur. */
+    @ModelAttribute("estAdmin")
+    public boolean estAdmin(HttpServletRequest request) {
+        return Roles.ADMIN.equals(roleCourant(request));
+    }
+
+    /** Exposé aux vues : l'accès au métier « argent » et aux référentiels. */
+    @ModelAttribute("peutGererLeMetier")
+    public boolean peutGererLeMetier(HttpServletRequest request) {
+        String role = roleCourant(request);
+        return Roles.ADMIN.equals(role) || Roles.RESPONSABLE.equals(role);
+    }
+
+    private String roleCourant(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        return session != null ? (String) session.getAttribute("role") : null;
+    }
+
+    /**
+     * Le menu est filtré avec la MÊME table de règles que l'intercepteur : un lien visible
+     * correspond donc toujours à une URL réellement autorisée, et un lien masqué à une URL
+     * réellement bloquée. Masquer un menu ne protège rien — c'est l'intercepteur qui protège ;
+     * ce filtrage évite simplement de proposer des portes fermées.
+     */
+    private List<NavigationItemDTO> filtrerParRole(List<NavigationItemDTO> menu, String role) {
+        List<NavigationItemDTO> visible = new ArrayList<>();
+
+        for (NavigationItemDTO section : menu) {
+            List<NavigationItemDTO> sousItems = section.getSousItems().stream()
+                    .filter(item -> reglesAcces.estAutorise(role, item.getUrl()))
+                    .toList();
+
+            if (!sousItems.isEmpty()) {
+                visible.add(new NavigationItemDTO(section.getLibelle(), section.getIcone(), sousItems));
+            }
+        }
+        return visible;
     }
 
     /** Tailles de page proposées par le pied de tableau standard (fragments/tableau :: tableFooter). */
