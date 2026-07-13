@@ -6,20 +6,45 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import mg.itu.aquanova.finance.dto.PrevisionFinanciereDTO;
 import mg.itu.aquanova.finance.services.PrevisionFinanciereService;
+import mg.itu.aquanova.finance.services.SimulationRecolteService;
 
 @Controller
 @RequestMapping("/finance")
 public class PrevisionFinanciereController {
 
     private final PrevisionFinanciereService previsionFinanciereService;
+    private final SimulationRecolteService simulationRecolteService;
 
-    public PrevisionFinanciereController(PrevisionFinanciereService previsionFinanciereService) {
+    public PrevisionFinanciereController(PrevisionFinanciereService previsionFinanciereService,
+                                         SimulationRecolteService simulationRecolteService) {
         this.previsionFinanciereService = previsionFinanciereService;
+        this.simulationRecolteService = simulationRecolteService;
+    }
+
+    /**
+     * Simulation de la date de récolte optimale d'un lot.
+     *
+     * Les hypothèses (prix de vente, coût de l'aliment, mortalité) sont passées en paramètres :
+     * l'utilisateur peut les faire varier pour voir la courbe se déformer. Rien n'est écrit en
+     * base — c'est une aide à la décision, pas un enregistrement.
+     */
+    @GetMapping("/lots/{id}/simulation")
+    public String simulerRecolte(@PathVariable Long id,
+                                 @RequestParam(required = false) Double prixVenteKg,
+                                 @RequestParam(required = false) Double coutAlimentKg,
+                                 @RequestParam(required = false) Double tauxMortalite,
+                                 @RequestParam(required = false) Integer horizonJours,
+                                 Model model) {
+
+        model.addAttribute("simulation", simulationRecolteService.simuler(
+                id, prixVenteKg, coutAlimentKg, tauxMortalite, horizonJours));
+        return "finance/prevision/simulation";
     }
 
     @GetMapping("/previsions")
@@ -47,7 +72,15 @@ public class PrevisionFinanciereController {
         List<PrevisionFinanciereDTO> previsions = previsionFinanciereService.genererPrevisions(dateDebut, dateFin);
         model.addAttribute("previsions", previsions);
 
+        model.addAttribute("totalBiomasse", somme(previsions, PrevisionFinanciereDTO::getBiomassePrevue));
+        model.addAttribute("totalCa", somme(previsions, PrevisionFinanciereDTO::getCaPrevisionnel));
+        model.addAttribute("totalProfit", somme(previsions, PrevisionFinanciereDTO::getProfitPrevisionnel));
+
         return "finance/prevision/list";
     }
 
+    private double somme(List<PrevisionFinanciereDTO> previsions,
+                         java.util.function.ToDoubleFunction<PrevisionFinanciereDTO> extracteur) {
+        return previsions.stream().mapToDouble(extracteur).sum();
+    }
 }

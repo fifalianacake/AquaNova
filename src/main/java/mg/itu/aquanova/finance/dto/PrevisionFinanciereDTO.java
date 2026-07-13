@@ -8,8 +8,28 @@ public class PrevisionFinanciereDTO {
     private Double prixMoyenVenteKg; // Prix estimé au kg
     private Double caPrevisionnel; // Biomasse * Prix moyen
     private Double coutPrevisionnel; // Dépenses totales estimées
-    private Double profitPrevisionnel; // CA - Coût
+    private Double profitPrevisionnel; // CA - coûts déjà engagés - aliment restant
     private Double margePrevisionnelle;// En % (Profit / CA * 100)
+    private java.time.LocalDate dateRecolteEstimee; // Date à laquelle le poids cible est atteint
+
+    /** Alevins + aliment déjà distribué : de l'argent déjà sorti, qui doit peser sur le profit. */
+    private Double coutsDejaEngages;
+
+    public Double getCoutsDejaEngages() {
+        return coutsDejaEngages;
+    }
+
+    public void setCoutsDejaEngages(Double coutsDejaEngages) {
+        this.coutsDejaEngages = coutsDejaEngages;
+    }
+
+    public java.time.LocalDate getDateRecolteEstimee() {
+        return dateRecolteEstimee;
+    }
+
+    public void setDateRecolteEstimee(java.time.LocalDate dateRecolteEstimee) {
+        this.dateRecolteEstimee = dateRecolteEstimee;
+    }
 
     public PrevisionFinanciereDTO() {
     }

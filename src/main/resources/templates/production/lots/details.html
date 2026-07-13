@@ -167,8 +167,13 @@
             <a class="btn btn-outline-primary" th:href="@{/production/previsions-recoltes(lotId=${lot.id})}">
                 <i class="bi bi-calendar-check"></i> Prévision de récolte
             </a>
-            <a class="btn btn-outline-primary" th:href="@{/finance/lots/{id}/analyse(id=${lot.id})}">
+            <a class="btn btn-outline-primary" th:href="@{/finance/lots/{id}/analyse(id=${lot.id})}"
+               th:if="${peutGererLeMetier}">
                 <i class="bi bi-graph-up-arrow"></i> Rentabilité
+            </a>
+            <a class="btn btn-primary" th:href="@{/finance/lots/{id}/simulation(id=${lot.id})}"
+               th:if="${peutGererLeMetier}">
+                <i class="bi bi-lightbulb"></i> Quand récolter ?
             </a>
         </div>
     </div>

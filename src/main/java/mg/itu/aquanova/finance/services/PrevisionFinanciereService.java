@@ -12,6 +12,7 @@ import mg.itu.aquanova.alimentation.repositories.DistributionRepository;
 import mg.itu.aquanova.alimentation.services.DistributionService;
 import mg.itu.aquanova.finance.dto.PrevisionFinanciereDTO;
 import mg.itu.aquanova.production.models.LotModels;
+import mg.itu.aquanova.production.models.StatutLotEnum;
 import mg.itu.aquanova.production.repositories.LotRepository;
 import mg.itu.aquanova.production.services.PrevisionRecolteService;
 import mg.itu.aquanova.referentiel.repositories.AlimentRepository;
@@ -25,16 +26,19 @@ public class PrevisionFinanciereService {
     private final DistributionService distributionService;
     private final PrevisionRecolteService previsionRecolteService;
     private final AlimentRepository alimentRepository;
+    private final RentabiliteLotService rentabiliteLotService;
 
     public PrevisionFinanciereService(LotRepository lotRepository, VenteRepository venteRepository,
             DistributionRepository distributionRepository, DistributionService distributionService,
-            PrevisionRecolteService previsionRecolteService, AlimentRepository alimentRepository) {
+            PrevisionRecolteService previsionRecolteService, AlimentRepository alimentRepository,
+            RentabiliteLotService rentabiliteLotService) {
         this.lotRepository = lotRepository;
         this.venteRepository = venteRepository;
         this.distributionRepository = distributionRepository;
         this.distributionService = distributionService;
         this.previsionRecolteService = previsionRecolteService;
         this.alimentRepository = alimentRepository;
+        this.rentabiliteLotService = rentabiliteLotService;
     }
 
     private Double estimerPrixMoyenVenteKg(Integer especeId) {
@@ -101,6 +105,12 @@ public class PrevisionFinanciereService {
         return total;
     }
 
+    private boolean estActif(LotModels lot) {
+        return lot.getStatutLot() == null
+                || (lot.getStatutLot().getLibelle() != StatutLotEnum.CLOTURE
+                        && lot.getStatutLot().getLibelle() != StatutLotEnum.ANNULE);
+    }
+
     public List<PrevisionFinanciereDTO> genererPrevisions(LocalDate dateDebut, LocalDate dateFin) {
         List<PrevisionFinanciereDTO> previsions = new ArrayList<>();
 
@@ -109,6 +119,12 @@ public class PrevisionFinanciereService {
         for (LotModels lot : listeLots) {
 
             if (lot.getId() == null) {
+                continue;
+            }
+            // Un lot clôturé ou annulé n'a plus rien à récolter : sans ce filtre, il obtenait
+            // encore une date de récolte estimée et apparaissait dans les prévisions avec une
+            // biomasse nulle — une ligne fantôme.
+            if (!estActif(lot)) {
                 continue;
             }
 
@@ -127,7 +143,14 @@ public class PrevisionFinanciereService {
             String codeLot = lot.getCode() != null ? lot.getCode() : "Inconnu";
             Double coutPrevisionnel = estimerCoutsFuturs(lot.getId(), dateRecolteEstimee);
             Double caPrevisionnel = biomassePrevue * prixMoyenVenteKg;
-            Double profitPrevisionnel = caPrevisionnel - coutPrevisionnel;
+
+            // Les alevins et l'aliment déjà distribué sont de l'argent déjà sorti : ils doivent
+            // peser sur le profit attendu, exactement comme dans la marge brute du module Finance.
+            // Sans eux, cette page surestimait le profit et contredisait le reste de l'application.
+            Double coutsDejaEngages = rentabiliteLotService.construirePourLot(lot)
+                    .getCoutsDirects().doubleValue();
+
+            Double profitPrevisionnel = caPrevisionnel - coutsDejaEngages - coutPrevisionnel;
             Double margePrevisionnelle = (caPrevisionnel != 0) ? (profitPrevisionnel / caPrevisionnel) * 100 : 0.0;
 
             PrevisionFinanciereDTO prevision = new PrevisionFinanciereDTO();
@@ -140,6 +163,8 @@ public class PrevisionFinanciereService {
             prevision.setCoutPrevisionnel(coutPrevisionnel);
             prevision.setProfitPrevisionnel(profitPrevisionnel);
             prevision.setMargePrevisionnelle(margePrevisionnelle);
+            prevision.setDateRecolteEstimee(dateRecolteEstimee);
+            prevision.setCoutsDejaEngages(coutsDejaEngages);
 
             previsions.add(prevision);
         }
