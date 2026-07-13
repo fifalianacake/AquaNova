@@ -8,16 +8,21 @@ import mg.itu.aquanova.sanitaire_equipement.models.Equipement;
 import mg.itu.aquanova.sanitaire_equipement.services.EquipementService;
 import mg.itu.aquanova.sanitaire_equipement.services.TypeEquipementService;
 import mg.itu.aquanova.sanitaire_equipement.models.StatutEquipement;
+import mg.itu.aquanova.referentiel.services.BassinService;
+
 @Controller
 @RequestMapping("/equipements")
 public class EquipementController {
 
     private final EquipementService equipementService;
     private final TypeEquipementService typeService;
+    private final BassinService bassinService;
 
-    public EquipementController(EquipementService equipementService, TypeEquipementService typeService) {
+    public EquipementController(EquipementService equipementService, TypeEquipementService typeService,
+            BassinService bassinService) {
         this.equipementService = equipementService;
         this.typeService = typeService;
+        this.bassinService = bassinService;
     }
 
     @GetMapping
@@ -45,6 +50,7 @@ public String lister(
 
     model.addAttribute("types", typeService.listerTous());
     model.addAttribute("statuts", StatutEquipement.values());
+    model.addAttribute("bassins", bassinService.getAllBassins());
 
     return "sanitaire_equipement/equipements/liste";
 }
@@ -57,6 +63,8 @@ public String formulaire(Model model){
     model.addAttribute("types",typeService.listerTous());
 
     model.addAttribute("statuts", StatutEquipement.values());
+
+    model.addAttribute("bassins", bassinService.getAllBassins());
 
     return "sanitaire_equipement/equipements/form";
 }
@@ -72,6 +80,7 @@ public String formulaire(Model model){
         model.addAttribute("equipement", equipementService.trouverParId(id));
         model.addAttribute("types", typeService.listerTous());
         model.addAttribute("statuts", StatutEquipement.values());
+        model.addAttribute("bassins", bassinService.getAllBassins());
 
         return "sanitaire_equipement/equipements/form";
     }

@@ -1,11 +1,11 @@
 package mg.itu.aquanova.sanitaire_equipement.controllers;
 
+import mg.itu.aquanova.sanitaire_equipement.dto.TraitementEauFilter;
 import mg.itu.aquanova.sanitaire_equipement.models.TraitementEau;
 import mg.itu.aquanova.sanitaire_equipement.services.TraitementEauService;
 import mg.itu.aquanova.sanitaire_equipement.services.TypeTraitementEauService;
 import mg.itu.aquanova.referentiel.services.BassinService;
 import mg.itu.aquanova.security.models.User;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,26 +31,16 @@ public class TraitementEauController {
 
     @GetMapping
     public String lister(
-            @RequestParam(required = false) Long id,
-            @RequestParam(required = false) Long bassinId,
-            @RequestParam(required = false) Long typeId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin,
+            @ModelAttribute("traitementFilter") TraitementEauFilter filter,
             Model model,
             HttpSession session) {
         if (session.getAttribute("user") == null) {
             return "redirect:/login";
         }
-        
-        model.addAttribute("traitements", service.search(id, bassinId, typeId, debut, fin));
+
+        model.addAttribute("traitements", service.lister(filter));
         model.addAttribute("types", typeService.listerTous());
         model.addAttribute("bassins", bassinService.getAllBassins());
-
-        model.addAttribute("currentId", id);
-        model.addAttribute("currentBassinId", bassinId);
-        model.addAttribute("currentTypeId", typeId);
-        model.addAttribute("currentDebut", debut);
-        model.addAttribute("currentFin", fin);
 
         return "sanitaire_equipement/traitements-eau/liste";
     }

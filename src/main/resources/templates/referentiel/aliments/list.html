@@ -28,6 +28,8 @@
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
+                <th>Type</th>
+                <th class="text-end">Prix unitaire (Ar/kg)</th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>
@@ -35,6 +37,8 @@
             <tr th:each="aliment : ${aliments}">
                 <td th:text="${aliment.id}"></td>
                 <td class="fw-semibold" th:text="${aliment.nom}"></td>
+                <td th:text="${aliment.typeAliment != null ? aliment.typeAliment.nom : '—'}"></td>
+                <td class="text-end" th:text="${aliment.prixUnitaire != null ? aliment.prixUnitaire : '—'}"></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}(id=${aliment.id})}" title="Voir"><i class="bi bi-eye"></i></a>
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/aliments/{id}/edit(id=${aliment.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>
@@ -43,7 +47,7 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(aliments)}">
-                <td colspan="3" class="text-center text-secondary py-4">Aucun aliment trouvé.</td>
+                <td colspan="5" class="text-center text-secondary py-4">Aucun aliment trouvé.</td>
             </tr>
             </tbody>
         </table>

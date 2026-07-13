@@ -76,6 +76,13 @@ public class VenteService {
         if (vente.getPrixUnitaire() == null || vente.getPrixUnitaire() <= 0)
             throw new RuntimeException("Prix unitaire doit être > 0");
 
+        if (vente.getDateVente().isBefore(vente.getRecolte().getDateRecolte())) {
+            throw new IllegalArgumentException("La date de vente ne peut pas être antérieure à la date de récolte");
+        }
+        if (vente.getDateVente().isBefore(vente.getRecolte().getLot().getDateMiseEnCharge())) {
+            throw new RuntimeException("Le lot ne peut pas être vendu avant sa date de mise en charge");
+        }
+
         resoudrePoidsEtEffectif(vente);
 
         Double dispoPoids = calculerPoidsDisponibleRecolte(vente.getRecolte(), null);

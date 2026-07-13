@@ -1,6 +1,9 @@
 package mg.itu.aquanova.alimentation.controllers;
 
+import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -17,6 +20,7 @@ import mg.itu.aquanova.alimentation.dto.DistributionDTO;
 import mg.itu.aquanova.alimentation.dto.DistributionFilter;
 import mg.itu.aquanova.alimentation.models.Distribution;
 import mg.itu.aquanova.alimentation.services.DistributionService;
+import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.services.LotService;
 import mg.itu.aquanova.referentiel.services.AlimentService;
 
@@ -57,10 +61,25 @@ public class DistributionController {
     public String showDistributionForm(Model model) {
 
         model.addAttribute("distribution", new DistributionDTO());
-        model.addAttribute("lots", lotService.listerTous());
-        model.addAttribute("aliments", alimentService.findAll());
+        addFormAttributes(model);
 
         return "alimentation/distribution/form";
+    }
+
+    /**
+     * La ration théorique n'est pas saisie : le formulaire l'affiche pour le lot choisi,
+     * à partir des valeurs que le service recalcule de toute façon à l'enregistrement.
+     */
+    private void addFormAttributes(Model model) {
+        List<LotModels> lots = lotService.listerTous();
+        Map<Long, BigDecimal> rationsParLot = new LinkedHashMap<>();
+        for (LotModels lot : lots) {
+            rationsParLot.put(lot.getId(), distributionService.calculRationTheoriqueOuNull(lot.getId()));
+        }
+
+        model.addAttribute("lots", lots);
+        model.addAttribute("rationsParLot", rationsParLot);
+        model.addAttribute("aliments", alimentService.findAll());
     }
 
     @PostMapping
@@ -82,8 +101,7 @@ public class DistributionController {
         } catch (IllegalArgumentException | IllegalStateException ex) {
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("distribution", distributionDTO);
-            model.addAttribute("lots", lotService.listerTous());
-            model.addAttribute("aliments", alimentService.findAll());
+            addFormAttributes(model);
             return "alimentation/distribution/form";
         }
     }
@@ -103,8 +121,7 @@ public class DistributionController {
         distributionDTO.setRationTheorique(distribution.getRationTheorique());
 
         model.addAttribute("distribution", distributionDTO);
-        model.addAttribute("lots", lotService.listerTous());
-        model.addAttribute("aliments", alimentService.findAll());
+        addFormAttributes(model);
 
         return "alimentation/distribution/form";
     }

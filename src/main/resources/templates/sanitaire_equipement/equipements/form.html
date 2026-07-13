@@ -28,6 +28,14 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label" for="bassin">Bassin</label>
+            <select class="form-select" id="bassin" th:field="*{bassin.id}">
+                <option value="">-- Aucun bassin --</option>
+                <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label" for="statut">Statut</label>
             <select class="form-select" id="statut" th:field="*{statut}" required>
                 <option value="">-- Choisir un statut --</option>

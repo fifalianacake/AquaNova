@@ -58,7 +58,7 @@
                 <div>
                     <div class="text-secondary small">Lignes rejetées</div>
                     <div class="kpi-value" th:text="${apercu.lignesRejetees.size()}">0</div>
-                    <span class="small text-secondary">non enregistrées</span>
+                    <span class="small text-secondary">bloquent tout l'import</span>
                 </div>
                 <div class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
             </div>
@@ -66,8 +66,13 @@
     </div>
 </div>
 
-<div class="error" th:unless="${apercu.importPossible}">
-    Aucune ligne valide : rien ne peut être importé. Corrigez le fichier et déposez-le à nouveau.
+<div class="error" th:if="${!apercu.lignesRejetees.isEmpty()}"
+     th:text="${apercu.lignesRejetees.size()} + ' ligne(s) rejetée(s) : l\'import est bloqué. '
+              + 'Un fichier n\'est importé qu\'en entier : corrigez les lignes ci-dessous, puis déposez à nouveau le fichier.'">
+</div>
+
+<div class="error" th:if="${apercu.lignesValides.isEmpty() and apercu.lignesRejetees.isEmpty()}">
+    Le fichier ne contient aucune ligne à importer.
 </div>
 
 <!-- ══════════ Lignes rejetées ══════════ -->

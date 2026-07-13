@@ -17,12 +17,12 @@
 
         <div class="mb-3">
             <label class="form-label" for="nbEchantillon">Nombre d'échantillons</label>
-            <input class="form-control" type="number" id="nbEchantillon" name="nbEchantillon" th:value="${nbEchantillon}" required>
+            <input class="form-control" type="number" min="1" id="nbEchantillon" name="nbEchantillon" th:value="${nbEchantillon}" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label" for="poidsTotal">Poids total de l'échantillon (g)</label>
-            <input class="form-control" type="number" step="0.01" min="0" id="poidsTotal" name="poidsTotal" th:value="${poidsTotal}" required>
+            <input class="form-control" type="number" step="0.01" min="0.01" id="poidsTotal" name="poidsTotal" th:value="${poidsTotal}" required>
             <div class="form-text">Le poids moyen (g) est calculé automatiquement : poids total ÷ nombre d'échantillons.</div>
         </div>
 

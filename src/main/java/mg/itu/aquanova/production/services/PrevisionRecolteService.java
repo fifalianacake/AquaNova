@@ -132,8 +132,10 @@ public class PrevisionRecolteService {
         Double croissanceMoyenne = calculerCroissanceMoyenne(lot);
         result.setCroissanceMoyenneJournaliere(croissanceMoyenne);
 
+        LocalDate dateDepart = dateDepartPrevision(lot);
+
         if (result.getPoidsMoyenActuel() >= result.getPoidsCible()) {
-            result.setDateRecolteEstimee(LocalDate.now());
+            result.setDateRecolteEstimee(dateDepart);
             result.setAlerte("Poids cible atteint ou dépassé.");
             return result;
         }
@@ -148,8 +150,23 @@ public class PrevisionRecolteService {
 
         Double poidsRestant = result.getPoidsCible() - result.getPoidsMoyenActuel();
         long joursRestants = (long) Math.ceil(poidsRestant / croissanceMoyenne);
-        result.setDateRecolteEstimee(LocalDate.now().plusDays(joursRestants));
+        result.setDateRecolteEstimee(dateDepart.plusDays(joursRestants));
         return result;
+    }
+
+    /**
+     * Le poids moyen actuel est celui de la dernière pesée : projeter à partir
+     * d'aujourd'hui alors que cette pesée est postérieure produirait une date de
+     * récolte antérieure à la mesure sur laquelle elle s'appuie.
+     */
+    private LocalDate dateDepartPrevision(LotModels lot) {
+        LocalDate aujourdhui = LocalDate.now();
+        List<Pese> pesees = peseRepository.findByLotIdOrderByDatePeseeDesc(lot.getId());
+        if (pesees.isEmpty() || pesees.get(0).getDatePesee() == null) {
+            return aujourdhui;
+        }
+        LocalDate dernierePesee = pesees.get(0).getDatePesee();
+        return dernierePesee.isAfter(aujourdhui) ? dernierePesee : aujourdhui;
     }
 
     private Double resolvePoidsMoyenActuel(LotModels lot) {

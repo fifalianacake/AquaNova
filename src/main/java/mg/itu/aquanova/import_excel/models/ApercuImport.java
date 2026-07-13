@@ -46,7 +46,12 @@ public class ApercuImport implements Serializable {
         return lignesValides.size() + lignesRejetees.size();
     }
 
+    /**
+     * L'import est tout ou rien : une seule ligne rejetée bloque le fichier entier,
+     * pour qu'un fichier partiellement importé ne laisse jamais l'utilisateur deviner
+     * ce qui est déjà en base et ce qu'il lui reste à ressaisir.
+     */
     public boolean isImportPossible() {
-        return !lignesValides.isEmpty();
+        return !lignesValides.isEmpty() && lignesRejetees.isEmpty();
     }
 }

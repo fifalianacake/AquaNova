@@ -201,6 +201,11 @@ public class PeseeService {
         if (poidsTotal == null || poidsTotal.signum() <= 0) {
             throw new IllegalArgumentException("Le poids total de l'échantillon doit être supérieur à 0.");
         }
+
+        if (poidsTotal.divide(BigDecimal.valueOf(nbEchantillon)).compareTo(BigDecimal.valueOf(lot.getPoidsMoyenActuel() * 1.2)) > 0) {
+            throw new IllegalArgumentException("Vérifier le poids");
+        }
+
     }
 
     private void recalculerPoidsMoyenActuel(LotModels lot) {

@@ -19,12 +19,12 @@
 
         <div class="mb-3">
             <label class="form-label" for="poidsMin">Poids Min (g)</label>
-            <input class="form-control" type="number" step="0.01" id="poidsMin" th:field="*{poidsMin}" />
+            <input class="form-control" type="number" step="0.01" min="0" id="poidsMin" th:field="*{poidsMin}" />
         </div>
 
         <div class="mb-3">
             <label class="form-label" for="poidsMax">Poids Max (g)</label>
-            <input class="form-control" type="number" step="0.01" id="poidsMax" th:field="*{poidsMax}" />
+            <input class="form-control" type="number" step="0.01" min="0" id="poidsMax" th:field="*{poidsMax}" />
         </div>
 
         <div class="d-flex gap-2 mt-4">

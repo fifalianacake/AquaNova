@@ -136,6 +136,9 @@ public class LotService {
     }
 
     public LotModels creer(LotModels lot) {
+        if (lot != null && (lot.getCode() == null || lot.getCode().isBlank())) {
+            lot.setCode(genererCodeLot(lot.getDateMiseEnCharge()));
+        }
         validerLot(lot, null);
         initialiserValeursActuelles(lot);
         if (estActif(lot.getStatutLot())) {
@@ -205,6 +208,19 @@ public class LotService {
             throw new IllegalArgumentException("Le lot doit être associé à un statut.");
         }
 
+        if (lot.getEffectifInitial() == null || lot.getEffectifInitial() <= 0) {
+            throw new IllegalArgumentException("L'effectif initial doit être strictement positif.");
+        }
+        if (lot.getEffectifActuel() != null && lot.getEffectifActuel() < 0) {
+            throw new IllegalArgumentException("L'effectif actuel ne peut pas être négatif.");
+        }
+        if (lot.getPoidsMoyenInitial() == null || lot.getPoidsMoyenInitial() <= 0) {
+            throw new IllegalArgumentException("Le poids moyen initial doit être strictement positif.");
+        }
+        if (lot.getPoidsMoyenActuel() != null && lot.getPoidsMoyenActuel() < 0) {
+            throw new IllegalArgumentException("Le poids moyen actuel ne peut pas être négatif.");
+        }
+
         StatutLotModels statut = statutLotRepository.findById(lot.getStatutLot().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Statut de lot introuvable: " + lot.getStatutLot().getId()));
         lot.setStatutLot(statut);
@@ -250,6 +266,11 @@ public class LotService {
     }
 
     private void verifierBassinDisponible(Long bassinId, Long idLotIgnore) {
+        Bassin bassin = bassinsRepository.findById(bassinId).orElse(null);
+        if (!bassin.getStatut().getLibelle().equals(LibelleStatutBassin.LIBRE)) {
+            throw new IllegalArgumentException("Ce bassin n'est pas libre");
+        }
+
         List<LotModels> lotsActifsDuBassin = repository.findByBassinIdAndStatutLotLibelleNotIn(
                 bassinId,
                 List.of(StatutLotEnum.CLOTURE, StatutLotEnum.ANNULE));

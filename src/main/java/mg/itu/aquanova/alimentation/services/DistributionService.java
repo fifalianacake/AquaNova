@@ -256,6 +256,18 @@ public class DistributionService {
         return BigDecimal.valueOf(gainCible.doubleValue() * ica);
     }
 
+    /**
+     * Variante tolérante pour l'affichage : un lot sans espèce, sans poids cible ou sans
+     * assez de pesées ne doit pas empêcher le formulaire de s'afficher.
+     */
+    public BigDecimal calculRationTheoriqueOuNull(Long idLot) {
+        try {
+            return calculRationTheoriqueCible(idLot);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
     public BigDecimal CalculRationTheoriqueCible(DistributionDTO distributionDTO) {
         return calculRationTheoriqueCible(distributionDTO.getIdLot());
     }

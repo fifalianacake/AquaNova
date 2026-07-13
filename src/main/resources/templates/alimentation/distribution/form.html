@@ -21,7 +21,8 @@
             <label class="form-label" for="lot">Lot concerné</label>
             <select class="form-select" id="lot" th:field="*{idLot}" required>
                 <option value="">-- Sélectionner un lot --</option>
-                <option th:each="l : ${lots}" th:value="${l.id}" th:text="'Lot #' + ${l.id}"></option>
+                <option th:each="l : ${lots}" th:value="${l.id}" th:text="'Lot #' + ${l.id}"
+                        th:attr="data-ration=${rationsParLot[l.id]}"></option>
             </select>
         </div>
 
@@ -35,12 +36,14 @@
 
         <div class="mb-3">
             <label class="form-label" for="quantite">Quantité distribuée (kg)</label>
-            <input class="form-control" type="number" step="0.01" id="quantite" th:field="*{quantite}" />
+            <input class="form-control" type="number" step="0.01" min="0.01" id="quantite" th:field="*{quantite}" />
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="rationTheorique">Ration théorique</label>
-            <input class="form-control" type="number" step="0.01" id="rationTheorique" th:field="*{rationTheorique}" />
+            <label class="form-label" for="rationTheorique">Ration théorique (kg)</label>
+            <input class="form-control readonly-field" type="text" id="rationTheorique" readonly
+                   th:value="${distribution.rationTheorique}" placeholder="—" />
+            <div class="form-text">Calculée à partir du lot choisi (effectif, poids cible, date de récolte estimée, ICA) : elle n'est pas saisie.</div>
         </div>
 
         <div class="d-flex gap-2 mt-4">
@@ -48,6 +51,21 @@
             <a class="btn btn-secondary" th:href="@{/distributions}">Retour à la liste</a>
         </div>
     </form>
+
+    <script>
+        (function () {
+            const lot = document.getElementById('lot');
+            const ration = document.getElementById('rationTheorique');
+
+            function majRation() {
+                const option = lot.selectedOptions[0];
+                const valeur = option ? option.dataset.ration : null;
+                ration.value = valeur ? Number(valeur).toFixed(2) : '';
+            }
+
+            lot.addEventListener('change', majRation);
+        })();
+    </script>
 </main>
 </body>
 </html>

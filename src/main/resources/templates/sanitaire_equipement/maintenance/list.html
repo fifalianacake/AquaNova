@@ -54,7 +54,7 @@
                 <td class="fw-semibold" th:text="${m.equipement != null ? 'Équipement #' + m.equipement.id : '—'}"></td>
                 <td th:text="${m.categorieMaintenance != null ? m.categorieMaintenance.libelle : '—'}"></td>
                 <td><span class="badge badge-info" th:text="${m.statutIntervention}"></span></td>
-                <td class="text-end montant" th:text="${m.cout != null ? m.cout + ' €' : '0.00 €'}"></td>
+                <td class="text-end montant" th:text="${m.cout != null ? m.cout : '0.00'}"></td>
                 <td th:text="${m.dateResolution != null ? m.dateResolution : '—'}"></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/maintenances/{id}(id=${m.id})}" title="Voir les détails"><i class="bi bi-eye"></i></a>

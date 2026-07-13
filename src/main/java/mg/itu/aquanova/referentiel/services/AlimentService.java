@@ -35,6 +35,8 @@ public class AlimentService {
             throw new RuntimeException("Aliment introuvable : " + aliment.getId());
         }
 
+        validerAliment(aliment);
+        normaliserAliment(aliment);
         return repo.save(aliment);
     }
 
@@ -65,9 +67,12 @@ public class AlimentService {
         if (aliment.getNom() == null || aliment.getNom().trim().isEmpty()) {
             throw new IllegalArgumentException("Le nom de l'aliment est obligatoire.");
         }
-        // Le type d'aliment n'est pas encore saisi par le formulaire actuel
-        // (referentiel/aliments/form.html) : pas de contrainte bloquante ici tant
-        // que ce champ n'y est pas ajouté.
+        if (aliment.getTypeAliment() == null || aliment.getTypeAliment().getId() == null) {
+            throw new IllegalArgumentException("Le type d'aliment est obligatoire.");
+        }
+        if (aliment.getPrixUnitaire() == null || aliment.getPrixUnitaire() <= 0) {
+            throw new IllegalArgumentException("Le prix unitaire doit être strictement positif.");
+        }
     }
 
     private void normaliserAliment(Aliment aliment) {

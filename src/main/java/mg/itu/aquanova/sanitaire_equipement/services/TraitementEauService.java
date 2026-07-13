@@ -1,10 +1,12 @@
 package mg.itu.aquanova.sanitaire_equipement.services;
 
+import mg.itu.aquanova.sanitaire_equipement.dto.TraitementEauFilter;
 import mg.itu.aquanova.sanitaire_equipement.models.TraitementEau;
 import mg.itu.aquanova.sanitaire_equipement.repositories.TraitementEauRepository;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -52,8 +54,38 @@ public class TraitementEauService {
         }
     }
 
-    public List<TraitementEau> search(Long id, Long bassinId, Long typeId, LocalDate debut, LocalDate fin) {
-        return repository.filtrerTraitements(id, bassinId, typeId, debut, fin);
+    public List<TraitementEau> lister(TraitementEauFilter filter) {
+        return repository.findAll(specification(filter), Sort.by(Sort.Direction.DESC, "dateTraitement"));
+    }
+
+    private Specification<TraitementEau> specification(TraitementEauFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter == null) {
+                return predicates;
+            }
+            if (filter.getId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getBassinId() != null) {
+                predicates = cb.and(predicates, cb.equal(root.get("bassin").get("id"), filter.getBassinId()));
+            }
+            if (filter.getTypeId() != null) {
+                predicates = cb.and(predicates,
+                        cb.equal(root.get("typeTraitementEau").get("id"), filter.getTypeId()));
+            }
+            if (filter.getDateDebut() != null) {
+                predicates = cb.and(predicates,
+                        cb.greaterThanOrEqualTo(root.get("dateTraitement"), filter.getDateDebut()));
+            }
+            if (filter.getDateFin() != null) {
+                predicates = cb.and(predicates,
+                        cb.lessThanOrEqualTo(root.get("dateTraitement"), filter.getDateFin()));
+            }
+
+            return predicates;
+        };
     }
 
     public TraitementEau trouverParId(Long id) {

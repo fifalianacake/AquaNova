@@ -69,7 +69,7 @@
                 <td th:text="${recolte.dateRecolte}"></td>
                 <td class="text-end" th:text="${recolte.effectifRecolte}"></td>
                 <td class="text-end" th:text="${recolte.poidsTotal}"></td>
-                <td class="text-end" th:text="${recolte.poidsMoyen}"></td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(recolte.poidsMoyen, 1,3)}"></td>
                 <td><span class="badge badge-info" th:text="${recolte.statut}"></span></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/recoltes/{id}(id=${recolte.id})}" title="Voir les détails"><i class="bi bi-eye"></i></a>

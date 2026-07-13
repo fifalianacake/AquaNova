@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import mg.itu.aquanova.alimentation.services.MouvementService;
 import mg.itu.aquanova.referentiel.models.Aliment;
 import mg.itu.aquanova.referentiel.services.AlimentService;
+import mg.itu.aquanova.referentiel.services.TypeAlimentService;
 
 
 
@@ -21,10 +22,13 @@ public class AlimentController {
 
     private final AlimentService service;
     private final MouvementService mvtService;
+    private final TypeAlimentService typeAlimentService;
 
-    public AlimentController(AlimentService service, MouvementService mvtService) {
+    public AlimentController(AlimentService service, MouvementService mvtService,
+            TypeAlimentService typeAlimentService) {
         this.service = service;
         this.mvtService = mvtService;
+        this.typeAlimentService = typeAlimentService;
     }
 
     @GetMapping
@@ -37,6 +41,7 @@ public class AlimentController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("aliment", new Aliment());
+        model.addAttribute("typesAliments", typeAlimentService.findAll());
         return "referentiel/aliments/form";
     }
 
@@ -47,6 +52,7 @@ public class AlimentController {
             return "redirect:/aliments";
         } catch (IllegalArgumentException e) {
             model.addAttribute("aliment", aliment);
+            model.addAttribute("typesAliments", typeAlimentService.findAll());
             model.addAttribute("error", e.getMessage());
             return "referentiel/aliments/form";
         }
@@ -63,6 +69,7 @@ public class AlimentController {
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Long id, Model model) {
         model.addAttribute("aliment", service.findById(id));
+        model.addAttribute("typesAliments", typeAlimentService.findAll());
         return "referentiel/aliments/form";
     }
 

@@ -41,6 +41,8 @@ public class EquipementService {
     @Transactional
     public Equipement creer(Equipement equipement) {
 
+        normaliserBassin(equipement);
+
         if (equipement.getNom() == null || equipement.getNom().isBlank()) {
             throw new IllegalArgumentException("Le nom est obligatoire.");
         }
@@ -60,8 +62,16 @@ public class EquipementService {
         return repository.save(equipement);
     }
 
+    private void normaliserBassin(Equipement equipement) {
+        if (equipement.getBassin() != null && equipement.getBassin().getId() == null) {
+            equipement.setBassin(null);
+        }
+    }
+
     @Transactional
     public Equipement modifier(Long id, Equipement equipementDetails) {
+
+        normaliserBassin(equipementDetails);
 
         Equipement equipement = trouverParId(id);
 

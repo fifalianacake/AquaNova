@@ -128,13 +128,20 @@ public class ImportDonneesService {
 
     // ------------------------------------------------------------------ Écriture
     /**
-     * Écrit les lignes valides. Toute exception remontée par un service métier annule
-     * l'intégralité de l'import (rollback), et le message est renvoyé à l'utilisateur.
+     * Écrit le fichier en entier ou rien du tout : la moindre ligne rejetée à la
+     * validation, comme toute exception remontée par un service métier (rollback),
+     * annule l'import complet et le message est renvoyé à l'utilisateur.
      */
     @Transactional
     public int executer(ApercuImport apercu) {
-        if (apercu == null || !apercu.isImportPossible()) {
+        if (apercu == null || apercu.getLignesValides().isEmpty()) {
             throw new IllegalStateException("Aucune ligne valide à importer.");
+        }
+        if (!apercu.getLignesRejetees().isEmpty()) {
+            throw new IllegalStateException(
+                    "Import annulé : " + apercu.getLignesRejetees().size()
+                            + " ligne(s) invalide(s) dans le fichier. Corrigez-les puis déposez à nouveau le fichier ;"
+                            + " aucune donnée n'a été enregistrée.");
         }
 
         for (LigneImport ligne : apercu.getLignesValides()) {

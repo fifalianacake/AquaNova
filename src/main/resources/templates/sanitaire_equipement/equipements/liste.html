@@ -27,6 +27,13 @@
                     th:text="${t.libelle}"
                     th:selected="${param.type != null and param.type[0] == t.id.toString()}"></option>
         </select>
+        <select class="form-select" name="bassin">
+            <option value="">Tous les bassins</option>
+            <option th:each="b : ${bassins}"
+                    th:value="${b.id}"
+                    th:text="${b.reference}"
+                    th:selected="${param.bassin != null and param.bassin[0] == b.id.toString()}"></option>
+        </select>
         <select class="form-select" name="statut">
             <option value="">Tous les statuts</option>
             <option th:each="s : ${statuts}"

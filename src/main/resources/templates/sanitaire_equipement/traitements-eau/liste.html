@@ -16,26 +16,23 @@
         <span class="result-count" th:text="${#lists.size(traitements)} + ' traitement(s)'"></span>
     </div>
 
-    <form th:action="@{/traitements-eau}" method="get" class="filters-bar">
-        <input class="form-control" type="number" name="id" placeholder="ID" th:value="${currentId}">
-        <select class="form-select" name="bassinId">
+    <form th:action="@{/traitements-eau}" method="get" class="filters-bar" th:object="${traitementFilter}">
+        <input class="form-control" type="number" min="1" placeholder="ID" th:field="*{id}">
+        <select class="form-select" th:field="*{bassinId}">
             <option value="">Tous les bassins</option>
-            <option th:each="b : ${bassins}"
-                    th:value="${b.id}"
-                    th:text="${b.reference}"
-                    th:selected="${b.id == currentBassinId}"></option>
+            <option th:each="b : ${bassins}" th:value="${b.id}" th:text="${b.reference}"></option>
         </select>
-        <select class="form-select" name="typeId">
+        <select class="form-select" th:field="*{typeId}">
             <option value="">Tous les types</option>
-            <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}" th:selected="${t.id == currentTypeId}"></option>
+            <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
         </select>
         <div class="input-group">
             <span class="input-group-text">Du</span>
-            <input class="form-control" type="date" name="debut" th:value="${currentDebut}">
+            <input class="form-control" type="date" th:field="*{dateDebut}">
         </div>
         <div class="input-group">
             <span class="input-group-text">Au</span>
-            <input class="form-control" type="date" name="fin" th:value="${currentFin}">
+            <input class="form-control" type="date" th:field="*{dateFin}">
         </div>
         <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Filtrer</button>
         <a class="btn btn-outline-secondary" th:href="@{/traitements-eau}"><i class="bi bi-x-circle"></i> Réinitialiser</a>
