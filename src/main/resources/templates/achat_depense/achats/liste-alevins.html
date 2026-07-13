@@ -76,7 +76,7 @@
                 <th>Catégorie</th>
                 <th>Espèce</th>
                 <th class="text-end">Quantité</th>
-                <th class="text-end">Montant total</th>
+                <th class="text-end">Montant total (Ar)</th>
                 <th>Statut</th>
                 <th class="text-end">Actions</th>
             </tr>
@@ -84,12 +84,12 @@
             <tbody>
             <tr th:each="achatAlevin : ${achats.content}">
                 <td th:text="${achatAlevin.id}"></td>
-                <td th:text="${achatAlevin.dateAchat}"></td>
+                <td th:text="${achatAlevin.dateAchat != null ? #temporals.format(achatAlevin.dateAchat, 'dd/MM/yyyy') : '—'}"></td>
                 <td class="fw-semibold" th:text="${achatAlevin.fournisseur != null ? achatAlevin.fournisseur.nom : '—'}"></td>
                 <td th:text="${achatAlevin.categorieDepense != null ? achatAlevin.categorieDepense.code : '—'}"></td>
                 <td th:text="${!#lists.isEmpty(achatAlevin.lignes) && achatAlevin.lignes[0].espece != null ? achatAlevin.lignes[0].espece.nom : '—'}"></td>
                 <td class="text-end" th:text="${!#lists.isEmpty(achatAlevin.lignes) ? achatAlevin.lignes[0].quantite + ' ' + achatAlevin.lignes[0].unite : '—'}"></td>
-                <td class="text-end montant" th:text="${achatAlevin.montantTotal}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(achatAlevin.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td><span class="badge badge-info" th:text="${achatAlevin.statutAchat}"></span></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/achats/{id}(id=${achatAlevin.id})}" title="Voir la fiche"><i class="bi bi-eye"></i></a>

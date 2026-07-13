@@ -121,16 +121,16 @@
                     <tr>
                         <th>Client</th>
                         <th>Nombre de ventes</th>
-                        <th>Volume acheté</th>
-                        <th>Chiffre d'affaires</th>
+                        <th class="text-end">Volume acheté (kg)</th>
+                        <th class="text-end">Chiffre d'affaires (Ar)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="client : ${topClients}">
                         <td th:text="${client.clientNom}">Client</td>
                         <td th:text="${client.nombreVentes}">0</td>
-                        <td th:text="${client.volumeAchete != null ? client.volumeAchete + ' kg' : '0 kg'}">0 kg</td>
-                        <td th:text="${client.chiffreAffaires != null ? client.chiffreAffaires + ' Ar' : '0 Ar'}">0 Ar</td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(client.volumeAchete != null ? client.volumeAchete : 0, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td class="text-end montant" th:text="${#numbers.formatDecimal(client.chiffreAffaires != null ? client.chiffreAffaires : 0, 1, 'WHITESPACE', 0, 'COMMA')}">0</td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(topClients)}">
                         <td colspan="4">Aucun client trouvé.</td>
@@ -148,18 +148,18 @@
                     <tr>
                         <th>Lot</th>
                         <th>Récolte</th>
-                        <th>Poids vendu</th>
-                        <th>Effectif vendu</th>
-                        <th>Montant total</th>
+                        <th class="text-end">Poids vendu (kg)</th>
+                        <th class="text-end">Effectif vendu</th>
+                        <th class="text-end">Montant total (Ar)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="ligne : ${parLot}">
                         <td th:text="${ligne.lotNom}">Lot</td>
                         <td th:text="${ligne.recolteReference}">Récolte</td>
-                        <td th:text="${ligne.poidsVendu != null ? ligne.poidsVendu + ' kg' : '0 kg'}">0 kg</td>
-                        <td th:text="${ligne.effectifVendu != null ? ligne.effectifVendu : 0}">0</td>
-                        <td th:text="${ligne.montantTotal != null ? ligne.montantTotal + ' Ar' : '0 Ar'}">0 Ar</td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(ligne.poidsVendu != null ? ligne.poidsVendu : 0, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td class="text-end" th:text="${ligne.effectifVendu != null ? ligne.effectifVendu : 0}">0</td>
+                        <td class="text-end montant" th:text="${#numbers.formatDecimal(ligne.montantTotal != null ? ligne.montantTotal : 0, 1, 'WHITESPACE', 0, 'COMMA')}">0</td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(parLot)}">
                         <td colspan="5">Aucune donnée trouvée.</td>

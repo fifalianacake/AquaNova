@@ -54,8 +54,8 @@
                 <th>Date</th>
                 <th>Lot</th>
                 <th>Aliment</th>
-                <th class="text-end">Ration théorique</th>
-                <th class="text-end">Quantité distribuée</th>
+                <th class="text-end">Ration théorique (kg)</th>
+                <th class="text-end">Quantité distribuée (kg)</th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>
@@ -65,8 +65,8 @@
                 <td th:text="${dist.dateDistribution}"></td>
                 <td class="fw-semibold" th:text="${dist.lot != null ? dist.lot.id : '—'}"></td>
                 <td th:text="${dist.aliment != null ? dist.aliment.nom : '—'}"></td>
-                <td class="text-end" th:text="${dist.rationTheorique + ' kg'}"></td>
-                <td class="text-end" th:text="${dist.quantite + ' kg'}"></td>
+                <td class="text-end" th:text="${dist.rationTheorique != null ? #numbers.formatDecimal(dist.rationTheorique, 1, 'WHITESPACE', 2, 'COMMA') : '—'}"></td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(dist.quantite, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/distributions/{id}(id=${dist.id})}" title="Voir les détails"><i class="bi bi-eye"></i></a>
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/distributions/{id}/edit(id=${dist.id})}" title="Modifier"><i class="bi bi-pencil"></i></a>

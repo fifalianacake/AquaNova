@@ -65,22 +65,22 @@
                         <th>Client</th>
                         <th>Récolte</th>
                         <th>Lot d'origine</th>
-                        <th class="text-end">Poids vendu</th>
-                        <th class="text-end">Prix unitaire</th>
-                        <th class="text-end">Montant total</th>
+                        <th class="text-end">Poids vendu (kg)</th>
+                        <th class="text-end">Prix unitaire (Ar/kg)</th>
+                        <th class="text-end">Montant total (Ar)</th>
                         <th>Statut</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="v : ${ventes.content}" th:onclick="|window.location.href='@{/ventes/}' + ${v.id}|">
                         <td th:text="${v.id}"></td>
-                        <td th:text="${v.dateVente}"></td>
+                        <td th:text="${v.dateVente != null ? #temporals.format(v.dateVente, 'dd/MM/yyyy') : '—'}"></td>
                         <td class="fw-semibold" th:text="${v.client != null ? v.client.nom : '—'}"></td>
                         <td th:text="${'Récolte #' + v.recolte.id}"></td>
-                        <td th:text="${v.recolte.lot != null ? 'Lot #' + v.recolte.lot.id : '—'}"></td>
-                        <td class="text-end" th:text="${v.poidsVendu + ' kg'}"></td>
-                        <td class="text-end" th:text="${v.prixUnitaire + ' Ar'}"></td>
-                        <td class="text-end montant" th:text="${v.montantTotal + ' Ar'}"></td>
+                        <td th:text="${v.recolte != null and v.recolte.lot != null ? v.recolte.lot.code : '—'}"></td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(v.poidsVendu, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                        <td class="text-end montant" th:text="${#numbers.formatDecimal(v.prixUnitaire, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                        <td class="text-end montant fw-semibold" th:text="${#numbers.formatDecimal(v.montantTotal, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
                         <td>
                             <span th:class="'badge badge-' + ${#strings.toLowerCase(v.statutVente.code)}"
                                   th:text="${v.statutVente.libelle}"></span>

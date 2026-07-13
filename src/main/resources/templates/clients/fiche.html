@@ -90,7 +90,7 @@
             <tr>
                 <th>Référence</th>
                 <th>Date</th>
-                <th class="text-end">Montant total</th>
+                <th class="text-end">Montant total (Ar)</th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>
@@ -98,7 +98,7 @@
             <tr th:each="v : ${ventes}">
                 <td class="fw-semibold" th:text="'Vente #' + ${v.id}"></td>
                 <td th:text="${v.dateVente != null ? #temporals.format(v.dateVente, 'dd/MM/yyyy') : '—'}"></td>
-                <td class="text-end montant" th:text="${v.montantTotal} + ' Ar'"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(v.montantTotal, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/ventes/{id}(id=${v.id})}" title="Voir la vente">
                         <i class="bi bi-eye"></i>

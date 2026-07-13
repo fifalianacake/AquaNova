@@ -63,9 +63,9 @@
                 <th>Bassin</th>
                 <th>Date mise en charge</th>
                 <th class="text-end">Effectif actuel</th>
-                <th class="text-end">Poids actuel</th>
-                <th class="text-end">Poids cible</th>
-                <th class="text-end">Croissance / jour</th>
+                <th class="text-end">Poids actuel (g)</th>
+                <th class="text-end">Poids cible (g)</th>
+                <th class="text-end">Croissance (g/jour)</th>
                 <th>Date récolte estimée</th>
                 <th>Statut</th>
                 <th>Alerte</th>
@@ -84,9 +84,9 @@
                 <td th:text="${prevision.lot != null && prevision.lot.bassin != null ? prevision.lot.bassin.reference : '—'}"></td>
                 <td th:text="${prevision.lot != null && prevision.lot.dateMiseEnCharge != null ? prevision.lot.dateMiseEnCharge : '—'}"></td>
                 <td class="text-end" th:text="${prevision.lot != null && prevision.lot.effectifActuel != null ? prevision.lot.effectifActuel : '—'}"></td>
-                <td class="text-end" th:text="${prevision.poidsMoyenActuel != null ? prevision.poidsMoyenActuel + ' g' : '—'}"></td>
-                <td class="text-end" th:text="${prevision.poidsCible != null ? prevision.poidsCible + ' g' : '—'}"></td>
-                <td class="text-end" th:text="${prevision.croissanceMoyenneJournaliere != null ? prevision.croissanceMoyenneJournaliere + ' g/j' : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsMoyenActuel != null ? #numbers.formatDecimal(prevision.poidsMoyenActuel, 1, 'WHITESPACE', 1, 'COMMA') : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsCible != null ? #numbers.formatDecimal(prevision.poidsCible, 1, 'WHITESPACE', 0, 'COMMA') : '—'}"></td>
+                <td class="text-end" th:text="${prevision.croissanceMoyenneJournaliere != null ? #numbers.formatDecimal(prevision.croissanceMoyenneJournaliere, 1, 'WHITESPACE', 2, 'COMMA') : '—'}"></td>
                 <td th:text="${prevision.dateRecolteEstimee != null ? prevision.dateRecolteEstimee : '—'}"></td>
                 <td>
                     <span class="badge" th:classappend="${prevision.procheRecolte} ? 'badge-warning' : 'badge-success'"
@@ -114,8 +114,8 @@
                 <th>Lot</th>
                 <th>Espèce</th>
                 <th>Bassin</th>
-                <th class="text-end">Poids actuel</th>
-                <th class="text-end">Poids cible</th>
+                <th class="text-end">Poids actuel (g)</th>
+                <th class="text-end">Poids cible (g)</th>
                 <th>Date estimée</th>
             </tr>
             </thead>
@@ -124,8 +124,8 @@
                 <td class="fw-semibold" th:text="${prevision.lot != null ? prevision.lot.code : '—'}"></td>
                 <td th:text="${prevision.lot != null && prevision.lot.espece != null ? prevision.lot.espece.nom : '—'}"></td>
                 <td th:text="${prevision.lot != null && prevision.lot.bassin != null ? prevision.lot.bassin.reference : '—'}"></td>
-                <td class="text-end" th:text="${prevision.poidsMoyenActuel != null ? prevision.poidsMoyenActuel + ' g' : '—'}"></td>
-                <td class="text-end" th:text="${prevision.poidsCible != null ? prevision.poidsCible + ' g' : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsMoyenActuel != null ? #numbers.formatDecimal(prevision.poidsMoyenActuel, 1, 'WHITESPACE', 1, 'COMMA') : '—'}"></td>
+                <td class="text-end" th:text="${prevision.poidsCible != null ? #numbers.formatDecimal(prevision.poidsCible, 1, 'WHITESPACE', 0, 'COMMA') : '—'}"></td>
                 <td th:text="${prevision.dateRecolteEstimee != null ? prevision.dateRecolteEstimee : '—'}"></td>
             </tr>
             <tr th:if="${lotsProchesRecolte == null || #lists.isEmpty(lotsProchesRecolte)}">

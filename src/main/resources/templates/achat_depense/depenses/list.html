@@ -56,7 +56,7 @@
                 <th>Date</th>
                 <th>Catégorie</th>
                 <th>Libellé</th>
-                <th class="text-end">Montant</th>
+                <th class="text-end">Montant (Ar)</th>
                 <th>Mode paiement</th>
                 <th>Référence</th>
                 <th class="text-end">Actions</th>
@@ -65,10 +65,10 @@
             <tbody>
             <tr th:each="depense : ${depenses.content}">
                 <td th:text="${depense.id}"></td>
-                <td th:text="${depense.dateDepense}"></td>
+                <td th:text="${depense.dateDepense != null ? #temporals.format(depense.dateDepense, 'dd/MM/yyyy') : '—'}"></td>
                 <td th:text="${depense.categorieDepense != null ? depense.categorieDepense.code + ' - ' + depense.categorieDepense.libelle : '—'}"></td>
                 <td class="fw-semibold" th:text="${depense.libelle}"></td>
-                <td class="text-end montant" th:text="${depense.montant}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(depense.montant, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td th:text="${depense.modePaiement ?: '—'}"></td>
                 <td th:text="${depense.reference ?: '—'}"></td>
                 <td class="text-end">

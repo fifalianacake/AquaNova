@@ -68,7 +68,7 @@
                 <th>Fournisseur</th>
                 <th>Aliment</th>
                 <th class="text-end">Quantité</th>
-                <th class="text-end">Montant total</th>
+                <th class="text-end">Montant total (Ar)</th>
                 <th>Statut</th>
                 <th class="text-end">Actions</th>
             </tr>
@@ -76,11 +76,11 @@
             <tbody>
             <tr th:each="achat : ${achats.content}">
                 <td th:text="${achat.id}"></td>
-                <td th:text="${achat.dateAchat}"></td>
+                <td th:text="${achat.dateAchat != null ? #temporals.format(achat.dateAchat, 'dd/MM/yyyy') : '—'}"></td>
                 <td class="fw-semibold" th:text="${achat.fournisseur != null ? achat.fournisseur.nom : '—'}"></td>
                 <td th:text="${!#lists.isEmpty(achat.lignes) && achat.lignes[0].aliment != null ? achat.lignes[0].aliment.nom : '—'}"></td>
                 <td class="text-end" th:text="${!#lists.isEmpty(achat.lignes) ? achat.lignes[0].quantite + ' ' + achat.lignes[0].unite : '—'}"></td>
-                <td class="text-end montant" th:text="${achat.montantTotal}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(achat.montantTotal, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td><span class="badge badge-info" th:text="${achat.statutAchat}"></span></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/achats/{id}(id=${achat.id})}" title="Voir la fiche"><i class="bi bi-eye"></i></a>

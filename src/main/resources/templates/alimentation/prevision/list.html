@@ -62,22 +62,22 @@
                 <thead>
                 <tr>
                     <th>Aliment</th>
-                    <th class="text-end">Quantité restante</th>
-                    <th class="text-end">Consommation / jour</th>
+                    <th class="text-end">Quantité restante (kg)</th>
+                    <th class="text-end">Consommation (kg/jour)</th>
                     <th class="text-end">Jours restants</th>
                     <th>Date de rupture</th>
-                    <th class="text-end">Suggestion d’achat</th>
+                    <th class="text-end">Suggestion d’achat (kg)</th>
                     <th>Alerte</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="prevision : ${previsions}">
                     <td class="fw-semibold" th:text="${prevision.alimentNom}"></td>
-                    <td class="text-end" th:text="${prevision.quantiteRestante != null ? prevision.quantiteRestante + ' kg' : '-'}"></td>
-                    <td class="text-end" th:text="${prevision.consommationJour != null ? prevision.consommationJour + ' kg/jour' : '-'}"></td>
-                    <td class="text-end" th:text="${prevision.joursRestants != null ? prevision.joursRestants + ' jours' : '-'}"></td>
-                    <td th:text="${prevision.dateRupture != null ? prevision.dateRupture : '-'}"></td>
-                    <td class="text-end" th:text="${prevision.suggestionQuantiteAchat != null ? prevision.suggestionQuantiteAchat + ' kg' : '-'}"></td>
+                    <td class="text-end" th:text="${prevision.quantiteRestante != null ? #numbers.formatDecimal(prevision.quantiteRestante, 1, 'WHITESPACE', 2, 'COMMA') : '—'}"></td>
+                    <td class="text-end" th:text="${prevision.consommationJour != null ? #numbers.formatDecimal(prevision.consommationJour, 1, 'WHITESPACE', 2, 'COMMA') : '—'}"></td>
+                    <td class="text-end" th:text="${prevision.joursRestants != null ? prevision.joursRestants : '—'}"></td>
+                    <td th:text="${prevision.dateRupture != null ? #temporals.format(prevision.dateRupture, 'dd/MM/yyyy') : '—'}"></td>
+                    <td class="text-end" th:text="${prevision.suggestionQuantiteAchat != null ? #numbers.formatDecimal(prevision.suggestionQuantiteAchat, 1, 'WHITESPACE', 2, 'COMMA') : '—'}"></td>
                     <td>
                         <span th:if="${prevision.alerte == null}" class="badge badge-success">Stock suffisant</span>
                         <span th:if="${prevision.alerte != null && prevision.joursRestants != null && prevision.joursRestants > 7}"

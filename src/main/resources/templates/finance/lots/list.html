@@ -53,12 +53,12 @@
                     <th>Lot</th>
                     <th>Espèce</th>
                     <th>Bassin</th>
-                    <th class="text-end">CA réalisé</th>
-                    <th class="text-end">Alevins</th>
-                    <th class="text-end">Alimentation</th>
-                    <th class="text-end">Coûts directs</th>
-                    <th class="text-end">Marge brute</th>
-                    <th class="text-end">Taux</th>
+                    <th class="text-end">CA réalisé (Ar)</th>
+                    <th class="text-end">Alevins (Ar)</th>
+                    <th class="text-end">Alimentation (Ar)</th>
+                    <th class="text-end">Coûts directs (Ar)</th>
+                    <th class="text-end">Marge brute (Ar)</th>
+                    <th class="text-end">Taux de marge (%)</th>
                     <th>Statut</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -75,7 +75,7 @@
                     <td class="text-end montant fw-semibold"
                         th:classappend="${lot.statutRentabilite.name() == 'DEFICITAIRE'} ? 'text-danger' : (${lot.statutRentabilite.name() == 'RENTABLE'} ? 'text-success' : '')"
                         th:text="${#numbers.formatDecimal(lot.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
-                    <td class="text-end" th:text="${lot.tauxMargeBrute != null} ? ${lot.tauxMargeBrute} + ' %' : '—'"></td>
+                    <td class="text-end" th:text="${lot.tauxMargeBrute != null} ? ${#numbers.formatDecimal(lot.tauxMargeBrute, 1, 'WHITESPACE', 2, 'COMMA')} : '—'"></td>
                     <td>
                         <span class="badge"
                               th:classappend="${lot.statutRentabilite.name() == 'RENTABLE'} ? 'badge-success' : (${lot.statutRentabilite.name() == 'DEFICITAIRE'} ? 'badge-danger' : 'badge-secondary')"

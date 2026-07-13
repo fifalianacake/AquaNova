@@ -124,11 +124,11 @@
                 <th>Récolte estimée</th>
                 <th class="text-end">Biomasse (kg)</th>
                 <th class="text-end">Prix (Ar/kg)</th>
-                <th class="text-end">CA attendu</th>
-                <th class="text-end">Coûts engagés</th>
-                <th class="text-end">Aliment restant</th>
-                <th class="text-end">Marge attendue</th>
-                <th class="text-end">Taux</th>
+                <th class="text-end">CA attendu (Ar)</th>
+                <th class="text-end">Coûts engagés (Ar)</th>
+                <th class="text-end">Aliment restant (Ar)</th>
+                <th class="text-end">Marge attendue (Ar)</th>
+                <th class="text-end">Taux de marge (%)</th>
                 <th class="text-end">Décision</th>
             </tr>
             </thead>
@@ -151,7 +151,7 @@
                     th:classappend="${p.profitPrevisionnel < 0} ? 'text-danger' : 'text-success'"
                     th:text="${#numbers.formatDecimal(p.profitPrevisionnel, 1, 'WHITESPACE', 0, 'COMMA')}"></td>
                 <td class="text-end"
-                    th:text="${#numbers.formatDecimal(p.margePrevisionnelle, 1, 'WHITESPACE', 1, 'COMMA')} + ' %'"></td>
+                    th:text="${#numbers.formatDecimal(p.margePrevisionnelle, 1, 'WHITESPACE', 1, 'COMMA')}"></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary"
                        th:href="@{/finance/lots/{id}/simulation(id=${p.lotId})}"

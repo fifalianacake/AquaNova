@@ -141,11 +141,11 @@
             <thead>
             <tr>
                 <th>Mois</th>
-                <th class="text-end">Chiffre d'affaires</th>
-                <th class="text-end">Coûts directs</th>
-                <th class="text-end">Marge brute</th>
-                <th class="text-end">Dépenses</th>
-                <th class="text-end">Profit net</th>
+                <th class="text-end">Chiffre d'affaires (Ar)</th>
+                <th class="text-end">Coûts directs (Ar)</th>
+                <th class="text-end">Marge brute (Ar)</th>
+                <th class="text-end">Dépenses (Ar)</th>
+                <th class="text-end">Profit net (Ar)</th>
             </tr>
             </thead>
             <tbody>
@@ -194,7 +194,7 @@
                         <thead>
                         <tr>
                             <th>Catégorie</th>
-                            <th class="text-end">Montant</th>
+                            <th class="text-end">Montant (Ar)</th>
                             <th class="text-end">Part</th>
                         </tr>
                         </thead>
@@ -232,10 +232,10 @@
             <tr>
                 <th>Lot</th>
                 <th>Espèce</th>
-                <th class="text-end">CA</th>
-                <th class="text-end">Coûts directs</th>
-                <th class="text-end">Marge brute</th>
-                <th class="text-end">Taux</th>
+                <th class="text-end">CA (Ar)</th>
+                <th class="text-end">Coûts directs (Ar)</th>
+                <th class="text-end">Marge brute (Ar)</th>
+                <th class="text-end">Taux de marge (%)</th>
             </tr>
             </thead>
             <tbody>
@@ -245,7 +245,7 @@
                 <td class="text-end montant" th:text="${#numbers.formatDecimal(l.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td class="text-end montant" th:text="${#numbers.formatDecimal(l.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td class="text-end montant text-success" th:text="${#numbers.formatDecimal(l.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
-                <td class="text-end" th:text="${l.tauxMargeBrute != null} ? ${l.tauxMargeBrute} + ' %' : '—'"></td>
+                <td class="text-end" th:text="${l.tauxMargeBrute != null} ? ${#numbers.formatDecimal(l.tauxMargeBrute, 1, 'WHITESPACE', 2, 'COMMA')} : '—'"></td>
             </tr>
             <tr th:if="${#lists.isEmpty(dashboard.topLotsRentables)}">
                 <td colspan="6" class="text-center text-secondary py-4">Aucun lot rentable pour l'instant.</td>
@@ -265,10 +265,10 @@
             <tr>
                 <th>Lot</th>
                 <th>Espèce</th>
-                <th class="text-end">CA</th>
-                <th class="text-end">Coûts directs</th>
-                <th class="text-end">Marge brute</th>
-                <th class="text-end">Taux</th>
+                <th class="text-end">CA (Ar)</th>
+                <th class="text-end">Coûts directs (Ar)</th>
+                <th class="text-end">Marge brute (Ar)</th>
+                <th class="text-end">Taux de marge (%)</th>
             </tr>
             </thead>
             <tbody>
@@ -278,7 +278,7 @@
                 <td class="text-end montant" th:text="${#numbers.formatDecimal(l.chiffreAffaires, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td class="text-end montant" th:text="${#numbers.formatDecimal(l.coutsDirects, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
                 <td class="text-end montant text-danger" th:text="${#numbers.formatDecimal(l.margeBrute, 0, 'WHITESPACE', 2, 'COMMA')}"></td>
-                <td class="text-end" th:text="${l.tauxMargeBrute != null} ? ${l.tauxMargeBrute} + ' %' : '—'"></td>
+                <td class="text-end" th:text="${l.tauxMargeBrute != null} ? ${#numbers.formatDecimal(l.tauxMargeBrute, 1, 'WHITESPACE', 2, 'COMMA')} : '—'"></td>
             </tr>
             <tr th:if="${#lists.isEmpty(dashboard.lotsDeficitairesDetail)}">
                 <td colspan="6" class="text-center text-secondary py-4">Aucun lot déficitaire.</td>

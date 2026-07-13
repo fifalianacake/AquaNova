@@ -52,18 +52,18 @@
                 <th>Fournisseur</th>
                 <th>Catégorie</th>
                 <th>Détails</th>
-                <th class="text-end">Montant</th>
+                <th class="text-end">Montant (Ar)</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="item : ${historiques.content}">
                 <td th:text="${item.id}"></td>
                 <td><span class="badge badge-info" th:text="${item.typeOperation.libelle}"></span></td>
-                <td th:text="${item.date}"></td>
+                <td th:text="${item.date != null ? #temporals.format(item.date, 'dd/MM/yyyy') : '—'}"></td>
                 <td class="fw-semibold" th:text="${item.fournisseur ?: '—'}"></td>
                 <td th:text="${item.categorie}"></td>
                 <td th:text="${item.details ?: '—'}"></td>
-                <td class="text-end montant" th:text="${item.montant}"></td>
+                <td class="text-end montant" th:text="${#numbers.formatDecimal(item.montant, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
             </tr>
             <tr th:if="${historiques.empty}">
                 <td colspan="7" class="text-center text-secondary py-4">Aucune opération ne correspond à ces critères.</td>
