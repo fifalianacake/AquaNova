@@ -1,6 +1,7 @@
 package mg.itu.aquanova.alimentation.controllers;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.ui.Model;
 
@@ -58,9 +60,17 @@ public class DistributionController {
     }
 
     @GetMapping("/new")
-    public String showDistributionForm(Model model) {
+    public String showDistributionForm(@RequestParam(value = "lotId", required = false) Long lotId, Model model) {
 
-        model.addAttribute("distribution", new DistributionDTO());
+        DistributionDTO distributionDTO = new DistributionDTO();
+        if (lotId != null) {
+            LotModels lot = lotService.trouverParId(lotId);
+            distributionDTO.setIdLot(lot.getId());
+            distributionDTO.setDateDistribution(LocalDate.now());
+            distributionDTO.setRationTheorique(distributionService.calculRationTheoriqueOuNull(lotId));
+            model.addAttribute("lotPreselectionne", lot);
+        }
+        model.addAttribute("distribution", distributionDTO);
         addFormAttributes(model);
 
         return "alimentation/distribution/form";

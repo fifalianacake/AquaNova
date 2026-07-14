@@ -69,7 +69,7 @@ public class LoginController {
         session.setAttribute("user", user);
         session.setAttribute("role", userRole.getRole().getName());
 
-        return "redirect:/releves-eau";
+        return "redirect:/";
     }
 
     @GetMapping("/register")

@@ -19,7 +19,11 @@
 
         <div class="mb-3">
             <label class="form-label" for="lot">Lot concerné</label>
-            <select class="form-select" id="lot" th:field="*{idLot}" required>
+            <div th:if="${lotPreselectionne != null}">
+                <input class="form-control" type="text" th:value="'Lot #' + ${lotPreselectionne.id}" disabled>
+                <input type="hidden" th:field="*{idLot}">
+            </div>
+            <select th:unless="${lotPreselectionne != null}" class="form-select" id="lot" th:field="*{idLot}" required>
                 <option value="">-- Sélectionner un lot --</option>
                 <option th:each="l : ${lots}" th:value="${l.id}" th:text="'Lot #' + ${l.id}"
                         th:attr="data-ration=${rationsParLot[l.id]}"></option>
@@ -63,7 +67,9 @@
                 ration.value = valeur ? Number(valeur).toFixed(2) : '';
             }
 
-            lot.addEventListener('change', majRation);
+            if (lot) {
+                lot.addEventListener('change', majRation);
+            }
         })();
     </script>
 </main>

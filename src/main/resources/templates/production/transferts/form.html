@@ -27,20 +27,23 @@
 
         <div class="mb-3">
             <label class="form-label" for="lotSource">Lot source</label>
-            <select class="form-select" id="lotSource" th:field="*{lotSource.id}" required>
+            <div th:if="${lotPreselectionne != null}">
+                <input class="form-control" type="text" th:value="${lotPreselectionne.code}" disabled>
+                <input type="hidden" th:field="*{lotSource.id}">
+            </div>
+            <select th:unless="${lotPreselectionne != null}" class="form-select" id="lotSource" th:field="*{lotSource.id}" required>
                 <option value="">-- Choisir un lot source --</option>
                 <option th:each="lot : ${lots}" th:value="${lot.id}" th:text="${lot.code}"></option>
             </select>
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="codeLotDestination">Code du nouveau lot destination</label>
-            <input class="form-control" type="text" id="codeLotDestination" th:field="*{codeLotDestination}">
-        </div>
-
-        <div class="mb-3">
             <label class="form-label" for="bassinSource">Bassin source</label>
-            <select class="form-select" id="bassinSource" th:field="*{bassinSource.id}" required>
+            <div th:if="${lotPreselectionne != null}">
+                <input class="form-control" type="text" th:value="${lotPreselectionne.bassin != null ? lotPreselectionne.bassin.reference : '—'}" disabled>
+                <input type="hidden" th:field="*{bassinSource.id}">
+            </div>
+            <select th:unless="${lotPreselectionne != null}" class="form-select" id="bassinSource" th:field="*{bassinSource.id}" required>
                 <option value="">-- Choisir un bassin source --</option>
                 <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
@@ -50,7 +53,7 @@
             <label class="form-label" for="bassinDestination">Bassin destination</label>
             <select class="form-select" id="bassinDestination" th:field="*{bassinDestination.id}" required>
                 <option value="">-- Choisir un bassin destination --</option>
-                <option th:each="bassin : ${bassins}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
+                <option th:each="bassin : ${bassinsLibres}" th:value="${bassin.id}" th:text="${bassin.reference}"></option>
             </select>
         </div>
 

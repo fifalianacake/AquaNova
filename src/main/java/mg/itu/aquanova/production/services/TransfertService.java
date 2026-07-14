@@ -165,14 +165,6 @@ public class TransfertService {
         if (transfert.getEffectif() > lotSource.getEffectifActuel()) {
             throw new IllegalArgumentException("L'effectif transféré dépasse l'effectif actuel du lot source.");
         }
-        boolean transfertPartiel = transfert.getEffectif() < lotSource.getEffectifActuel();
-        if (transfertPartiel) {
-            if (transfert.getCodeLotDestination() == null || transfert.getCodeLotDestination().trim().isEmpty()) {
-                throw new IllegalArgumentException("Le code du nouveau lot destination est obligatoire pour un transfert partiel.");
-            }
-            // Le code du lot destination est saisi à la main : il doit être libre, comme tout code de lot.
-            lotService.verifierCodeDisponible(transfert.getCodeLotDestination().trim(), null);
-        }
     }
 
     private void verifierDateApresMiseEnCharge(LotModels lotSource, TransfertModels transfert) {
@@ -201,7 +193,7 @@ public class TransfertService {
 
     private LotModels creerLotDestination(TransfertModels transfert, LotModels lotSource, Bassin bassinDestination) {
         LotModels lotDestination = new LotModels();
-        lotDestination.setCode(transfert.getCodeLotDestination().trim());
+        lotDestination.setCode(lotService.genererCodeLot(transfert.getDateTransfert()));
         lotDestination.setEspece(lotSource.getEspece());
         lotDestination.setBassin(bassinDestination);
         lotDestination.setStadeCroissance(lotSource.getStadeCroissance());

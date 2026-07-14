@@ -1,5 +1,6 @@
 package mg.itu.aquanova.production.controllers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -9,12 +10,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.persistence.EntityNotFoundException;
+import mg.itu.aquanova.production.models.LotModels;
 import mg.itu.aquanova.production.models.TransfertModels;
 import mg.itu.aquanova.production.services.TransfertService;
-import mg.itu.aquanova.referentiel.services.BassinService; 
-import mg.itu.aquanova.production.services.LotService; 
+import mg.itu.aquanova.referentiel.services.BassinService;
+import mg.itu.aquanova.production.services.LotService;
 
 @Controller
 @RequestMapping("/transferts")
@@ -39,8 +42,19 @@ public class TransfertController {
     }
 
     @GetMapping("/new")
-    public String showCreateTransfertForm(Model model) {
-        model.addAttribute("transfert", new TransfertModels());
+    public String showCreateTransfertForm(@RequestParam(value = "lotId", required = false) Long lotId, Model model) {
+        TransfertModels transfert = new TransfertModels();
+        if (lotId != null) {
+            LotModels lotSource = lotService.trouverParId(lotId);
+            transfert.setLotSource(lotSource);
+            transfert.setBassinSource(lotSource.getBassin());
+            transfert.setEffectif(lotSource.getEffectifActuel());
+            if (lotSource.getPoidsMoyenActuel() != null) {
+                transfert.setPoidsMoyen(BigDecimal.valueOf(lotSource.getPoidsMoyenActuel()));
+            }
+            model.addAttribute("lotPreselectionne", lotSource);
+        }
+        model.addAttribute("transfert", transfert);
         addFormLists(model);
         return "production/transferts/form";
     }
@@ -71,6 +85,7 @@ public class TransfertController {
 
     private void addFormLists(Model model) {
         model.addAttribute("bassins", bassinService.getAllBassins());
+        model.addAttribute("bassinsLibres", bassinService.listerBassinsLibres());
         model.addAttribute("lots", lotService.listerTous());
     }
 }

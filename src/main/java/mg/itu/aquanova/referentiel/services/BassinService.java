@@ -1,6 +1,7 @@
 package mg.itu.aquanova.referentiel.services;
 
 import mg.itu.aquanova.referentiel.models.Bassin;
+import mg.itu.aquanova.referentiel.models.LibelleStatutBassin;
 import mg.itu.aquanova.referentiel.models.StatutBassin;
 import mg.itu.aquanova.referentiel.models.TypeBassin;
 import mg.itu.aquanova.referentiel.repositories.BassinsRepository;
@@ -39,6 +40,12 @@ public class BassinService {
     public Bassin getBassinById(Long id) {
         return bassinRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Bassin introuvable avec l'ID : " + id));
+    }
+
+    public List<Bassin> listerBassinsLibres() {
+        StatutBassin libre = statutBassinRepository.findByLibelle(LibelleStatutBassin.LIBRE)
+                .orElseThrow(() -> new IllegalArgumentException("Veuillez bien verifier le statut du bassin"));
+        return bassinRepository.findAllByStatutOrderByReferenceAsc(libre);
     }
 
     @Transactional
